@@ -10,6 +10,40 @@ import net.runelite.api.Player;
  */
 public class PlayerAPI
 {
+    private final Player player;
+
+    // Private constructor for wrapping a player
+    private PlayerAPI(Player player) {
+        this.player = player;
+    }
+
+    /**
+     * Get the local player wrapped in PlayerAPI
+     * @return PlayerAPI instance for local player
+     */
+    public static PlayerAPI getLocal() {
+        Client client = Static.getClient();
+        Player localPlayer = Static.invoke(client::getLocalPlayer);
+        return new PlayerAPI(localPlayer);
+    }
+
+    /**
+     * Get a PlayerAPI instance for any player
+     * @param player the player to wrap
+     * @return PlayerAPI instance
+     */
+    public static PlayerAPI of(Player player) {
+        return new PlayerAPI(player);
+    }
+
+    /**
+     * Check if this player is idle
+     * @return true if idle
+     */
+    public boolean isIdle() {
+        return isIdle(this.player);
+    }
+
     /**
      * interact with a player by option number
      * @param player player
