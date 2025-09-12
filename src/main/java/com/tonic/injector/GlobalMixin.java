@@ -24,11 +24,14 @@ public class GlobalMixin
         modifyResourceLoading.instrument(classNode);
         for(MethodNode node : classNode.methods)
         {
-            LdcRewriter.rewriteString(
-                    node,
-                    "Welcome to RuneScape",
-                    "<col=FFFFFF>Welcome to </col><col=00FFFF>VitaLite</col>"
-            );
+            if(!Main.optionsParser.isIncognito())
+            {
+                LdcRewriter.rewriteString(
+                        node,
+                        "Welcome to RuneScape",
+                        "<col=FFFFFF>Welcome to </col><col=00FFFF>VitaLite</col>"
+                );
+            }
         }
     }
 }
