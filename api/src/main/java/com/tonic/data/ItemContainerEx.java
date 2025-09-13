@@ -31,7 +31,7 @@ public class ItemContainerEx
         items = new ArrayList<>();
         for(int i = 0; i < container.getItems().length; i++)
         {
-            if(container.getItems()[i] == null)
+            if(container.getItems()[i] == null || container.getItems()[i].getId() <= 0)
                 continue;
             items.add(new ItemEx(container.getItems()[i], i));
         }

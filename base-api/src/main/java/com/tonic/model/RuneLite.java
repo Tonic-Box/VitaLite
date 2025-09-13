@@ -15,6 +15,7 @@ public class RuneLite
     private final RLClientThread clientThread;
     private final RLEventBus eventBus;
     private final RLClientUI clientUI;
+    private final GameApplet gameApplet = new GameApplet();
     private final String USER_AGENT;
     private final String version = RuneliteConfigUtil.getTagValueFromURL("release");
 

@@ -41,10 +41,6 @@ bin/
 ### Mac OS ###
 .DS_Store
 /.idea/gradle.xml
-/gradle/wrapper/gradle-wrapper.jar
-/gradle/wrapper/gradle-wrapper.properties
-/gradlew
-/gradlew.bat
 /.idea/misc.xml
 /.idea/vcs.xml
 /.idea/uiDesigner.xml

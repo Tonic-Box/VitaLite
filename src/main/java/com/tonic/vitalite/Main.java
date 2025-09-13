@@ -57,7 +57,10 @@ public class Main {
                     f.getName().endsWith(".jar") &&
                             !f.getName().contains("guice") &&
                             !f.getName().contains("javax") &&
-                            !f.getName().contains("guava")
+                            !f.getName().contains("guava") &&
+                            !f.getName().contains("logback-core") &&
+                            !f.getName().contains("logback-classic") &&
+                            !f.getName().contains("slf4j-api")
             );
             if(jarfiles == null)
                 throw new Exception();
