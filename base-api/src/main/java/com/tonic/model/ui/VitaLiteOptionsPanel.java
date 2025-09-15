@@ -3,9 +3,9 @@ package com.tonic.model.ui;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.events.PacketSent;
-import com.tonic.model.ui.componants.OptionPanel;
-import com.tonic.model.ui.componants.ToggleSlider;
-import com.tonic.model.ui.componants.VPluginPanel;
+import com.tonic.model.ui.componants.*;
+import com.tonic.services.ClickManager;
+import com.tonic.services.ClickStrategy;
 import com.tonic.util.ReflectBuilder;
 import com.tonic.util.ReflectUtil;
 
@@ -103,40 +103,45 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 logMenuActionsToggle,
                 () -> {}
         ));
+        contentPanel.add(Box.createVerticalStrut(12));
+
+        FancyDualSpinner pointSpinner = new FancyDualSpinner(
+                "Static Click Point",
+                Integer.MIN_VALUE, Integer.MAX_VALUE, ClickManager.getPoint().x,
+                Integer.MIN_VALUE, Integer.MAX_VALUE, ClickManager.getPoint().y
+        );
+        pointSpinner.addChangeListener(e -> ClickManager.setPoint(pointSpinner.getLeftValue().intValue(), pointSpinner.getRightValue().intValue()));
+        pointSpinner.setVisible(ClickManager.getStrategy() == ClickStrategy.STATIC);
+
+        FancyDropdown<ClickStrategy> clickStrategyDropdown = new FancyDropdown<>("Click Strategy", ClickStrategy.class);
+        clickStrategyDropdown.addSelectionListener(event -> {
+            ClickManager.setStrategy(clickStrategyDropdown.getSelectedItem());
+            pointSpinner.setVisible(ClickManager.getStrategy() == ClickStrategy.STATIC);
+        });
+        contentPanel.add(clickStrategyDropdown);
+        contentPanel.add(Box.createVerticalStrut(12));
+        contentPanel.add(pointSpinner);
 
         contentPanel.add(Box.createVerticalStrut(20));
-        contentPanel.add(createSeparator());
-        contentPanel.add(Box.createVerticalStrut(20));
+        JLabel debugLabel = new JLabel("Debug");
+        debugLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        debugLabel.setForeground(HEADER_COLOR);
+        debugLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        debugLabel.add(Box.createVerticalStrut(10));
+        contentPanel.add(debugLabel);
+        contentPanel.add(Box.createVerticalStrut(12));
 
-        JButton checkButton = new JButton("Check Platform Info");
-        checkButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        FancyButton checkButton = new FancyButton("Check Platform Info");
         checkButton.addActionListener(e -> {
             checkShit();
             Logger.info("Platform info checked and logged.");
         });
-        checkButton.setMaximumSize(new Dimension(PANEL_WIDTH - 40, 30));
-        checkButton.setBackground(ACCENT_COLOR);
-        checkButton.setForeground(Color.WHITE);
-        checkButton.setFocusPainted(false);
-        checkButton.setBorderPainted(false);
-        checkButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        checkButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         contentPanel.add(checkButton);
 
-        contentPanel.add(Box.createVerticalStrut(20));
-        contentPanel.add(createSeparator());
-        contentPanel.add(Box.createVerticalStrut(20));
+        contentPanel.add(Box.createVerticalStrut(12));
 
-        JButton mouseButton = new JButton("Check Mouse Values");
-        mouseButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        FancyButton mouseButton = new FancyButton("Check Mouse Values");
         mouseButton.addActionListener(e -> checkMouseValues());
-        mouseButton.setMaximumSize(new Dimension(PANEL_WIDTH - 40, 30));
-        mouseButton.setBackground(ACCENT_COLOR);
-        mouseButton.setForeground(Color.WHITE);
-        mouseButton.setFocusPainted(false);
-        mouseButton.setBorderPainted(false);
-        mouseButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        mouseButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         contentPanel.add(mouseButton);
 
         add(contentPanel);
