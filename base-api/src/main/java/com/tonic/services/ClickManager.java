@@ -27,6 +27,11 @@ public class ClickManager
         rect = rectangle;
     }
 
+    public static void clearClickBox()
+    {
+        rect = null;
+    }
+
     public static void click()
     {
         Static.invoke(() -> {
@@ -52,7 +57,6 @@ public class ClickManager
                     int cx = (int) (Math.random() * rect.getWidth()) + rect.x;
                     int cy = (int) (Math.random() * rect.getHeight()) + rect.y;
                     client.getPacketWriter().clickPacket(0, cx, cy);
-                    rect = null;
                     break;
             }
         });
