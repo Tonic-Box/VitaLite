@@ -79,8 +79,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     public void clickPacket(int mouseButton, int mouseX, int mouseY)
     {
         long ms = System.currentTimeMillis();
-        client.getMouseHandler().setMouseLastPressedMillis(ms);
-        int mousePressedTime = (int)((client.getMouseHandler().getMouseLastPressedMillis()) - (client.getClientMouseLastPressedMillis()));
+        int mousePressedTime = (int)((ms - client.getMouseHandler().getMouseLastPressedMillis()));
         if (mousePressedTime < 0)
         {
             mousePressedTime = 0;
@@ -89,7 +88,8 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         {
             mousePressedTime = 32767;
         }
-        client.setClientMouseLastPressedMillis(client.getMouseHandler().getMouseLastPressedMillis());
+        client.getMouseHandler().setMouseLastPressedMillis(ms);
+        client.setClientMouseLastPressedMillis(ms);
         int mouseInfo = (mousePressedTime << 1) + (mouseButton);
         MapEntry entry = PacketMapReader.get("OP_MOUSE_CLICK");
         Map<String,Object> args = new HashMap<>();

@@ -123,7 +123,44 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         checkButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         contentPanel.add(checkButton);
 
+        contentPanel.add(Box.createVerticalStrut(20));
+        contentPanel.add(createSeparator());
+        contentPanel.add(Box.createVerticalStrut(20));
+
+        JButton mouseButton = new JButton("Check Mouse Values");
+        mouseButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mouseButton.addActionListener(e -> checkMouseValues());
+        mouseButton.setMaximumSize(new Dimension(PANEL_WIDTH - 40, 30));
+        mouseButton.setBackground(ACCENT_COLOR);
+        mouseButton.setForeground(Color.WHITE);
+        mouseButton.setFocusPainted(false);
+        mouseButton.setBorderPainted(false);
+        mouseButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        mouseButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        contentPanel.add(mouseButton);
+
         add(contentPanel);
+    }
+
+    private void checkMouseValues()
+    {
+        Object client = Static.getClient();
+        long client_latsPressed = ReflectBuilder.of(client)
+                .method("getClientMouseLastPressedMillis", null, null)
+                .get();
+
+        long mh_lastPressed = ReflectBuilder.of(client)
+                .method("getMouseHandler", null, null)
+                .method("getMouseLastPressedMillis", null, null)
+                .get();
+
+        long ms = System.currentTimeMillis();
+
+        int time = (int) (ms - mh_lastPressed);
+
+        short info = (short)(time << 1);
+
+        Logger.info("Client last pressed: " + client_latsPressed + ", MouseHandler last pressed: " + mh_lastPressed + ", Diff: " + time + ", Info: " + info);
     }
 
     private void checkShit()
