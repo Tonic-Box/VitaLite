@@ -3,6 +3,7 @@ package com.tonic.api.game;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.queries.WorldQuery;
+import com.tonic.services.ClickManager;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.gameval.InterfaceID;
@@ -74,7 +75,7 @@ public class WorldsAPI
         TClient tClient = Static.getClient();
         Static.invoke(() -> {
             if (client.getWidget(InterfaceID.Worldswitcher.BUTTONS) == null) {
-                tClient.getPacketWriter().clickPacket(0, -1, -1);
+                ClickManager.click();
                 tClient.getPacketWriter().widgetActionPacket(1, 11927555, -1, -1);
             }
             final net.runelite.api.World rsWorld = client.createWorld();

@@ -2,6 +2,7 @@ package com.tonic.api.game;
 
 import com.tonic.Static;
 import com.tonic.api.TClient;
+import com.tonic.services.ClickManager;
 import net.runelite.api.Client;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
@@ -83,7 +84,7 @@ public class MovementAPI {
     {
         TClient client = Static.getClient();
         Static.invoke(() -> {
-            client.getPacketWriter().clickPacket(0, -1, -1);
+            ClickManager.click();
             client.getPacketWriter().walkPacket(worldX, worldY, false);
         });
     }

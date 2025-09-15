@@ -4,6 +4,7 @@ import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.TileObjectQuery;
+import com.tonic.services.ClickManager;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.ObjectComposition;
@@ -30,7 +31,7 @@ public class TileObjectAPI
 
         Static.invoke(() ->
         {
-            tclient.getPacketWriter().clickPacket(0, -1, -1);
+            ClickManager.click();
             tclient.getPacketWriter().objectActionPacket(action, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false);
         });
     }
@@ -49,7 +50,7 @@ public class TileObjectAPI
 
         Static.invoke(() ->
         {
-            tclient.getPacketWriter().clickPacket(0, -1, -1);
+            ClickManager.click();
             tclient.getPacketWriter().objectActionPacket(action, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false);
         });
     }
@@ -70,7 +71,7 @@ public class TileObjectAPI
 
         Static.invoke(() ->
         {
-            tclient.getPacketWriter().clickPacket(0, -1, -1);
+            ClickManager.click();
             tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false);
         });
     }
@@ -91,7 +92,7 @@ public class TileObjectAPI
 
         Static.invoke(() ->
         {
-            tclient.getPacketWriter().clickPacket(0, -1, -1);
+            ClickManager.click();
             tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false);
         });
     }

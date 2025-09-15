@@ -43,6 +43,12 @@ public class ClickManager
                     break;
                 case RANDOM:
                     Rectangle r = Static.getRuneLite().getGameApplet().getViewportArea();
+                    if(r == null)
+                    {
+                        Logger.warn("Viewport area is null, defaulting to STATIC.");
+                        client.getPacketWriter().clickPacket(0, point.x, point.y);
+                        break;
+                    }
                     int rx = (int) (Math.random() * r.getWidth()) + r.x;
                     int ry = (int) (Math.random() * r.getHeight()) + r.y;
                     client.getPacketWriter().clickPacket(0, rx, ry);
