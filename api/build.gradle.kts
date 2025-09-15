@@ -27,9 +27,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-val TaskContainer.publishToMavenLocal: TaskProvider<DefaultTask>
-    get() = named<DefaultTask>("publishToMavenLocal")
-
 tasks.test {
     useJUnitPlatform()
 }

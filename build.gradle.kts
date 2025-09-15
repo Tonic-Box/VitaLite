@@ -36,13 +36,12 @@ subprojects {
     apply(plugin = "maven-publish")
 
     group = "com.tonic"
-    version = "1.0-SNAPSHOT"
+    version = rootProject.version
 
     publishing {
         publications {
             create<MavenPublication>("maven") {
                 from(components["java"])
-                // artifactId defaults to the subproject name (api, remapper, utilities)
             }
         }
     }
@@ -52,7 +51,7 @@ subprojects {
 tasks.register("buildAndPublishAll") {
     description = "Cleans and publishes all projects to Maven Local"
 
-    dependsOn(tasks.publishToMavenLocal)
+    dependsOn(tasks.named("publishToMavenLocal"))
     subprojects.forEach {
         dependsOn(it.tasks.named("publishToMavenLocal"))
     }
@@ -158,9 +157,6 @@ fun getRuneLiteArtifacts(): Map<String, String> {
 }
 
 val runeliteVersions by lazy { getRuneLiteArtifacts() }
-
-val TaskContainer.publishToMavenLocal: TaskProvider<DefaultTask>
-    get() = named<DefaultTask>("publishToMavenLocal")
 
 dependencies {
     compileOnly("net.runelite:api:latest.release")

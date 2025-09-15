@@ -80,9 +80,6 @@ val apiFilePatterns = mapOf(
     "gameval"     to Regex(".*\\.java")
 )
 
-val TaskContainer.publishToMavenLocal: TaskProvider<DefaultTask>
-    get() = named<DefaultTask>("publishToMavenLocal")
-
 tasks.register("syncRuneliteApi") {
     group = "runelite"
     description = "Download selected runelite-api sources from GitHub raw and overwrite local files"

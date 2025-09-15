@@ -17,6 +17,11 @@ public class Static
     private static Object CLIENT_OBJECT;
     private static RuneLite RL;
 
+    /**
+     * get client instance
+     * @return client instance
+     * @param <T> client type (TClient/Client)
+     */
     public static <T> T getClient()
     {
         return (T) CLIENT_OBJECT;
