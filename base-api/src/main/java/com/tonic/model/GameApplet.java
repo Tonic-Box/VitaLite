@@ -10,10 +10,7 @@ import java.awt.*;
 
 public class GameApplet
 {
-    GameApplet()
-    {
-        // hidden
-    }
+    GameApplet() {}
 
     /**
      * Get the current viewport area
@@ -58,6 +55,56 @@ public class GameApplet
     public Rectangle getChatBoxArea()
     {
         return CHAT_BOX.getArea();
+    }
+
+    public Canvas getCanvas()
+    {
+        Object client = Static.getClient();
+        if(client == null) return null;
+
+        return ReflectBuilder.of(client)
+                .method("getCanvas", null, null)
+                .get();
+    }
+
+    public int getWorld()
+    {
+        Object client = Static.getClient();
+        if(client == null) return -1;
+
+        return ReflectBuilder.of(client)
+                .method("getWorld", null, null)
+                .get();
+    }
+
+    public static void setUsername(String username)
+    {
+        Object client = Static.getClient();
+        if(client == null) return;
+
+        ReflectBuilder.of(client)
+                .method("setUsername", new Class[]{String.class}, new Object[]{username})
+                .get();
+    }
+
+    public void setPassword(String password)
+    {
+        Object client = Static.getClient();
+        if(client == null) return;
+
+        ReflectBuilder.of(client)
+                .method("setPassword", new Class[]{String.class}, new Object[]{password})
+                .get();
+    }
+
+    public int getTickCount()
+    {
+        Object client = Static.getClient();
+        if(client == null) return -1;
+
+        return ReflectBuilder.of(client)
+                .method("getTickCount", null, null)
+                .get();
     }
 
     @RequiredArgsConstructor
