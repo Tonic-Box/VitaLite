@@ -107,8 +107,8 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
         FancyDualSpinner pointSpinner = new FancyDualSpinner(
                 "Static Click Point",
-                Integer.MIN_VALUE, Integer.MAX_VALUE, ClickManager.getPoint().x,
-                Integer.MIN_VALUE, Integer.MAX_VALUE, ClickManager.getPoint().y
+                Integer.MIN_VALUE, Integer.MAX_VALUE, ClickManager.getPoint().get().x,
+                Integer.MIN_VALUE, Integer.MAX_VALUE, ClickManager.getPoint().get().y
         );
         pointSpinner.addChangeListener(e -> ClickManager.setPoint(pointSpinner.getLeftValue().intValue(), pointSpinner.getRightValue().intValue()));
         pointSpinner.setVisible(ClickManager.getStrategy() == ClickStrategy.STATIC);

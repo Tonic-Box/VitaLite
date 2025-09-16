@@ -7,19 +7,20 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ClickManager
 {
     @Setter
     @Getter
-    private static ClickStrategy strategy = ClickStrategy.STATIC;
+    private static volatile ClickStrategy strategy = ClickStrategy.STATIC;
     @Getter
-    private static final Point point = new Point(-1, -1);
-    private static Shape shape = null;
+    private static final AtomicReference<Point> point = new AtomicReference<>(new Point(-1, -1));
+    private static volatile Shape shape = null;
 
     public static void setPoint(int x, int y)
     {
-        point.setLocation(x, y);
+        point.set(new Point(x, y));
     }
 
     public static void queueClickBox(Shape shape)
@@ -41,17 +42,19 @@ public class ClickManager
     {
         Static.invoke(() -> {
             TClient client = Static.getClient();
+            int px = point.get().x;
+            int py = point.get().y;
             switch (strategy)
             {
                 case STATIC:
-                    client.getPacketWriter().clickPacket(0, point.x, point.y);
+                    client.getPacketWriter().clickPacket(0, px, py);
                     break;
                 case RANDOM:
                     Rectangle r = Static.getRuneLite().getGameApplet().getViewportArea();
                     if(r == null)
                     {
                         Logger.warn("Viewport area is null, defaulting to STATIC.");
-                        client.getPacketWriter().clickPacket(0, point.x, point.y);
+                        client.getPacketWriter().clickPacket(0, px, py);
                         break;
                     }
                     int rx = (int) (Math.random() * r.getWidth()) + r.x;
@@ -62,7 +65,7 @@ public class ClickManager
                     if(shape == null)
                     {
                         Logger.warn("Click box is null, defaulting to STATIC.");
-                        client.getPacketWriter().clickPacket(0, point.x, point.y);
+                        client.getPacketWriter().clickPacket(0, px, py);
                         break;
                     }
                     Point p = getRandomPointInShape(shape);
