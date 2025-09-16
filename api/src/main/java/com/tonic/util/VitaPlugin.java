@@ -5,6 +5,7 @@ import com.tonic.util.Coroutine;
 import com.tonic.util.ReflectUtil;
 import com.tonic.util.ThreadPool;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.config.Config;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import java.util.concurrent.Future;

@@ -15,21 +15,26 @@ public class ClickManager
     private static ClickStrategy strategy = ClickStrategy.STATIC;
     @Getter
     private static final Point point = new Point(-1, -1);
-    private static Rectangle rect = null;
+    private static Shape shape = null;
 
     public static void setPoint(int x, int y)
     {
         point.setLocation(x, y);
     }
 
-    public static void queueClickBox(Rectangle rectangle)
+    public static void queueClickBox(Shape shape)
     {
-        rect = rectangle;
+        if(shape == null)
+        {
+            ClickManager.shape = null;
+            return;
+        }
+        ClickManager.shape = shape;
     }
 
     public static void clearClickBox()
     {
-        rect = null;
+        shape = null;
     }
 
     public static void click()
@@ -54,17 +59,29 @@ public class ClickManager
                     client.getPacketWriter().clickPacket(0, rx, ry);
                     break;
                 case CONTROLLED:
-                    if(rect == null)
+                    if(shape == null)
                     {
                         Logger.warn("Click box is null, defaulting to STATIC.");
                         client.getPacketWriter().clickPacket(0, point.x, point.y);
                         break;
                     }
-                    int cx = (int) (Math.random() * rect.getWidth()) + rect.x;
-                    int cy = (int) (Math.random() * rect.getHeight()) + rect.y;
-                    client.getPacketWriter().clickPacket(0, cx, cy);
+                    Point p = getRandomPointInShape(shape);
+                    client.getPacketWriter().clickPacket(0, p.x, p.y);
                     break;
             }
         });
+    }
+
+    private static Point getRandomPointInShape(Shape shape) {
+        Rectangle bounds = shape.getBounds(); // getBounds() returns Rectangle with ints
+
+        while (true) {
+            int x = (int) (Math.random() * bounds.width) + bounds.x;
+            int y = (int) (Math.random() * bounds.height) + bounds.y;
+
+            if (shape.contains(x, y)) {
+                return new Point(x, y);
+            }
+        }
     }
 }

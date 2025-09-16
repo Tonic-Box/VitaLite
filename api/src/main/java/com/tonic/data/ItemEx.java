@@ -5,8 +5,12 @@ import lombok.*;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.game.ItemManager;
+
+import java.awt.*;
 
 @Getter
 @RequiredArgsConstructor
@@ -81,6 +85,26 @@ public class ItemEx {
                 return true;
         }
         return false;
+    }
+
+    public Widget getWidget() {
+        Client client = Static.getClient();
+        return Static.invoke(() -> {
+            Widget inventory = client.getWidget(InterfaceID.Inventory.ITEMS);
+            if(inventory == null)
+            {
+                return null;
+            }
+            return inventory.getChild(getSlot());
+        });
+    }
+
+    public Shape getClickBox()
+    {
+        Widget w = getWidget();
+        if(w == null)
+            return null;
+        return w.getBounds();
     }
 
     public int getShopPrice() {
