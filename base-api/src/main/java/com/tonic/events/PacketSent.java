@@ -7,13 +7,30 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
+
 @Getter
 public class PacketSent {
-    private final int id;
-    private final int length;
-    private final byte[] payload;
+    private static final PacketSent INSTANCE = new PacketSent();
+
+    public static PacketSent of(int id, int length, byte[] payload)
+    {
+        INSTANCE.id = id;
+        INSTANCE.length = length;
+        INSTANCE.payload = payload;
+        INSTANCE.buffer = null;
+        return INSTANCE;
+    }
+
+    private int id;
+    private int length;
+    private byte[] payload;
     private PacketBuffer buffer;
+
+    private PacketSent() {
+        this.id = 0;
+        this.length = 0;
+        this.payload = new byte[0];
+    }
 
     public PacketBuffer getBuffer()
     {

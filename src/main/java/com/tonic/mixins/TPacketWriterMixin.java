@@ -57,12 +57,10 @@ public abstract class TPacketWriterMixin implements TPacketWriter
 
         byte[] bytes = buffer.getArray();
         int payloadSize = (len > 0) ? len : (offset - 1);
-        if(payloadSize > 1024)
-            return;
         byte[] payload = new byte[payloadSize];
         System.arraycopy(bytes, 1, payload, 0, payloadSize);
 
-        PacketSent packetSent = new PacketSent(id, len, payload);
+        PacketSent packetSent = PacketSent.of(id, len, payload);
         Static.post(packetSent);
         VitaLiteOptionsPanel.getInstance().onPacketSent(packetSent);
     }
