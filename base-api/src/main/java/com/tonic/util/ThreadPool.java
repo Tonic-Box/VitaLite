@@ -1,14 +1,14 @@
 package com.tonic.util;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import com.tonic.Static;
+
+import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 public class ThreadPool
 {
     private final static ExecutorService executor = Executors.newCachedThreadPool();
+    private static ScheduledExecutorService executorService;
 
     public static Future<?> submit(Runnable runnable)
     {
@@ -21,6 +21,15 @@ public class ThreadPool
         Runnable runnable = () -> future.complete(supplier.get());
         submit(runnable);
         return future.join();
+    }
+
+    public static ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit)
+    {
+        if(executorService == null || executorService.isShutdown())
+        {
+            executorService = Static.getInjector().getInstance(ScheduledExecutorService.class);
+        }
+        return executorService.schedule(command, delay, unit);
     }
 
     public static void shutdown()

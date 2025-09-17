@@ -1,7 +1,11 @@
 package com.tonic.services.pathfinder.collections;
 
+import com.tonic.services.pathfinder.Transport;
+import com.tonic.services.pathfinder.TransportLoader;
 import com.tonic.services.pathfinder.model.Step;
 import gnu.trove.map.hash.TIntIntHashMap;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,13 +40,31 @@ public class BFSCache
     {
         int parent = get(pos);
         LinkedList<Step> path = new LinkedList<>();
-        path.add(0, new Step(pos));
+        Transport transport;
+        path.add(0, new Step(pos, null));
         while(parent != -1)
         {
+            transport = getTransport(pos, parent);
             pos = parent;
             parent = get(pos);
-            path.add(0, new Step(pos));
+            path.add(0, new Step(pos, transport));
         }
         return path;
+    }
+
+    public Transport getTransport(int pos, int parent)
+    {
+        ArrayList<Transport> tr = TransportLoader.getTransports().get(parent);
+        if(tr != null)
+        {
+            for (int i = 0; i < tr.size(); i++)
+            {
+                if(tr.get(i).getDestination() == pos)
+                {
+                    return tr.get(i);
+                }
+            }
+        }
+        return null;
     }
 }

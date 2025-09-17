@@ -1,19 +1,24 @@
 package com.tonic.services.pathfinder;
 
 import com.tonic.services.pathfinder.requirements.Requirements;
+import com.tonic.util.WorldPointUtil;
 import lombok.AllArgsConstructor;
-import lombok.Value;
+import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
 
-@Value
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
 @AllArgsConstructor
 public class Transport
 {
-    WorldPoint source;
-    WorldPoint destination;
+    int source;
+    int destination;
     int sourceRadius;
     int destinationRadius;
-    Runnable handler;
+    int duration;
+    List<Runnable> handler;
     Requirements requirements;
 
     public Transport(WorldPoint source,
@@ -23,11 +28,66 @@ public class Transport
                      Runnable handler
     )
     {
+        this.source = WorldPointUtil.compress(source);
+        this.destination = WorldPointUtil.compress(destination);
+        this.sourceRadius = sourceRadius;
+        this.destinationRadius = destinationRadius;
+        this.handler = new ArrayList<>();
+        this.handler.add(handler);
+        this.requirements = new Requirements();
+        this.duration = 1;
+    }
+
+    public Transport(WorldPoint source,
+                     WorldPoint destination,
+                     int sourceRadius,
+                     int destinationRadius,
+                     Runnable handler,
+                     Requirements requirements
+    )
+    {
+        this.source = WorldPointUtil.compress(source);
+        this.destination = WorldPointUtil.compress(destination);
+        this.sourceRadius = sourceRadius;
+        this.destinationRadius = destinationRadius;
+        this.handler = new ArrayList<>();
+        this.handler.add(handler);
+        this.requirements = requirements;
+        this.duration = 1;
+    }
+
+    public Transport(int source,
+                     int destination,
+                     int sourceRadius,
+                     int destinationRadius,
+                     Runnable handler
+    )
+    {
         this.source = source;
         this.destination = destination;
         this.sourceRadius = sourceRadius;
         this.destinationRadius = destinationRadius;
-        this.handler = handler;
+        this.handler = new ArrayList<>();
+        this.handler.add(handler);
         this.requirements = new Requirements();
+        this.duration = 1;
+    }
+
+    public Transport(int source,
+                     int destination,
+                     int sourceRadius,
+                     int destinationRadius,
+                     Runnable handler,
+                     Requirements requirements
+    )
+    {
+        this.source = source;
+        this.destination = destination;
+        this.sourceRadius = sourceRadius;
+        this.destinationRadius = destinationRadius;
+        this.handler = new ArrayList<>();
+        this.handler.add(handler);
+        this.requirements = requirements;
+        this.duration = 1;
     }
 }

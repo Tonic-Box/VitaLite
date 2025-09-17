@@ -1,16 +1,31 @@
 package com.tonic.services.pathfinder.teleports;
 
 import net.runelite.api.ItemID;
+import net.runelite.api.Varbits;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.VarbitID;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.swing.*;
 import java.util.List;
+import java.util.Map;
 
 public class MovementConstants
 {
     public static final WorldArea WILDERNESS_ABOVE_GROUND = new WorldArea(2944, 3523, 448, 448, 0);
     public static final WorldArea WILDERNESS_UNDERGROUND = new WorldArea(2944, 9918, 320, 442, 0);
+    public static final Map<Integer, Pair<WorldPoint, WorldPoint>> DRAYNOR_MANOR_BASEMENT_DOORS = Map.of(
+            VarbitID.ERNESTDOOR_4TO7, Pair.of(new WorldPoint(3108, 9757, 0), new WorldPoint(3108, 9759, 0)),
+            VarbitID.ERNESTDOOR_4TO5, Pair.of(new WorldPoint(3104, 9760, 0), new WorldPoint(3106, 9760, 0)),
+            VarbitID.ERNESTDOOR_5TO8, Pair.of(new WorldPoint(3102, 9757, 0), new WorldPoint(3102, 9759, 0)),
+            VarbitID.ERNESTDOOR_5TO6, Pair.of(new WorldPoint(3101, 9760, 0), new WorldPoint(3098, 9760, 0)),
+            VarbitID.ERNESTDOOR_3TO6, Pair.of(new WorldPoint(3097, 9762, 0), new WorldPoint(3097, 9764, 0)),
+            VarbitID.ERNESTDOOR_2TO3, Pair.of(new WorldPoint(3099, 9765, 0), new WorldPoint(3101, 9765, 0)),
+            VarbitID.ERNESTDOOR_1TO2, Pair.of(new WorldPoint(3104, 9765, 0), new WorldPoint(3106, 9765, 0)),
+            VarbitID.ERNESTDOOR_2TO5, Pair.of(new WorldPoint(3102, 9764, 0), new WorldPoint(3102, 9762, 0)),
+            VarbitID.ERNESTDOOR_8TO9, Pair.of(new WorldPoint(3101, 9755, 0), new WorldPoint(3099, 9755, 0))
+    );
     public static WorldPoint HOUSE_POINT = new WorldPoint(10000, 4000, 1);
 
     public static final int[] RING_OF_DUELING = new int[]

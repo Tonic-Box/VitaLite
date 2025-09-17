@@ -1,5 +1,6 @@
 package com.tonic.services.pathfinder.model;
 
+import com.tonic.services.pathfinder.Transport;
 import com.tonic.util.WorldPointUtil;
 import net.runelite.api.coords.WorldPoint;
 
@@ -7,6 +8,7 @@ import java.util.List;
 
 public class Step {
     public final int position;
+    public final Transport transport;
 
     public WorldPoint getPosition()
     {
@@ -18,12 +20,13 @@ public class Step {
         return WorldPointUtil.fromCompressed(position);
     }
 
-    public Step(int position) {
+    public Step(int position, Transport transport) {
         this.position = position;
+        this.transport = transport;
     }
 
     public boolean hasTransport()
     {
-        return false;
+        return transport != null;
     }
 }

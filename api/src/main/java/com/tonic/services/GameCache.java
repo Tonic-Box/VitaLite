@@ -3,6 +3,8 @@ package com.tonic.services;
 import com.tonic.Static;
 import com.tonic.data.TileItemEx;
 import com.tonic.data.TileObjectEx;
+import com.tonic.services.pathfinder.TransportLoader;
+import com.tonic.util.ThreadPool;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
@@ -11,10 +13,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public class GameCache
 {
+    private static boolean INITIAL_LOGIN = true;
+    private static boolean REFRESH_PATH = false;
     //static api
     public static int getTickCount()
     {
@@ -88,7 +93,8 @@ public class GameCache
         Static.getRuneLite()
                 .getEventBus()
                 .register(this);
-        System.out.println("GameCache initialized");
+        TransportLoader.init();
+        System.out.println("GameCache initialized!");
     }
 
     private final List<TileObjectEx> objectCache = new CopyOnWriteArrayList<>();
@@ -109,6 +115,26 @@ public class GameCache
     {
         if(event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
             tickCount = 0;
+
+//        switch (event.getGameState())
+//        {
+//            case UNKNOWN:
+//            case STARTING:
+//            case LOGIN_SCREEN:
+//            case LOGIN_SCREEN_AUTHENTICATOR:
+//            case CONNECTION_LOST:
+//                INITIAL_LOGIN = true;
+//                break;
+//            case LOGGED_IN:
+//                if (INITIAL_LOGIN)
+//                {
+//                    INITIAL_LOGIN = false;
+//                    ThreadPool.schedule(() -> {
+//                        REFRESH_PATH = true;
+//                        TransportLoader.refreshTransports();
+//                    }, 1000, TimeUnit.MILLISECONDS);
+//                }
+//        }
     }
 
     // ############## Actors ##############

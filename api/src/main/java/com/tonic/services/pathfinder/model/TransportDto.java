@@ -17,6 +17,6 @@ public class TransportDto
 
     public Transport toTransport()
     {
-        return null; //TransportLoader.objectTransport(source, destination, objectId, action, requirements);
+        return TransportLoader.objectTransport(source, destination, objectId, action, requirements);
     }
 }

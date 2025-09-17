@@ -19,6 +19,9 @@ import com.tonic.services.pathfinder.model.Step;
 import com.tonic.services.pathfinder.teleports.Teleport;
 import com.tonic.util.Coroutine;
 import com.tonic.util.Location;
+import com.tonic.util.WorldPointUtil;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -318,33 +321,32 @@ public class Walker
     }
 
     private boolean handleTransport(List<Step> steps, Player local, Tile tile, Step step) {
-//        if (step.hasTransport()) {
-//            if (!PlayerAPI.isIdle(local)) {
-//                return true;
-//            }
-//
-//            int dist = Location.getDistance(local.getWorldLocation(), step.transport.getSource());
-//            if (dist < 10) {
-//                Logger.info("[Pathfinder] Interacting with transport");
-//
-//                step.transport.getHandler().get(0).accept(client);
-//                if (step.transport.getHandler().size() > 1) {
-//                    multiSteps.addAll(step.transport.getHandler());
-//                    multiStepPointer = 1;
-//                }
-//                cooldown = Math.max(step.transport.getDelayAfter(), 0);
-//                timeout = 0;
-//                steps.remove(step);
-//                return true;
-//            }
-//
-//            if (cooldown > 0) {
-//                return true;
-//            }
-//
-//            timeout++;
-//            return true;
-//        }
+        if (step.hasTransport()) {
+            if (!PlayerAPI.isIdle(local)) {
+                return true;
+            }
+
+            if (tile != null && Location.getDistance(tile, WorldPointUtil.fromCompressed(step.transport.getSource())) < 10) {
+                Logger.info("[Pathfinder] Interacting with transport");
+
+                step.transport.getHandler().get(0).run();
+                if (step.transport.getHandler().size() > 1) {
+                    multiSteps.addAll(step.transport.getHandler());
+                    multiStepPointer = 1;
+                }
+                cooldown = Math.max(step.transport.getDuration(), 0);
+                timeout = 0;
+                steps.remove(step);
+                return true;
+            }
+
+            if (cooldown > 0) {
+                return true;
+            }
+
+            timeout++;
+            return true;
+        }
         return false;
     }
 

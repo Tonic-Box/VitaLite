@@ -13,6 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Location {
+    public static int getDistance(Tile source, WorldPoint worldPoint)
+    {
+        WorldPoint p1 = source.getWorldLocation();
+        return (int)Math.sqrt((p1.getY() - worldPoint.getY()) * (p1.getY() - worldPoint.getY()) + (p1.getX() - worldPoint.getX()) * (p1.getX() - worldPoint.getX()));
+    }
+
     /**
      * get the distance between 2 world points
      *

@@ -23,9 +23,6 @@ import java.util.List;
 
 public class Pathfinder
 {
-    @Getter
-    private static CollisionMap collisionMap;
-
     static {
         try {
             collisionMap = GlobalCollisionMap.load();
@@ -34,13 +31,14 @@ public class Pathfinder
         }
     }
 
+    @Getter
+    private static CollisionMap collisionMap;
     private LocalCollisionMap localMap;
     @Getter
     private Teleport teleport;
-
     private final WorldPoint targetWorldPoint;
-
     private boolean inInstance = false;
+    private int transportsUsed;
 
     public Pathfinder(final WorldPoint target) {
         this.targetWorldPoint = target;
@@ -56,6 +54,7 @@ public class Pathfinder
             Client client = Static.getClient();
             this.inInstance = client.getTopLevelWorldView().isInstance();
             List<Teleport> teleports = Teleport.buildTeleportLinks();
+            TransportLoader.refreshTransports();
 
             final List<Integer> startPoints = new ArrayList<>();
 
@@ -220,6 +219,7 @@ public class Pathfinder
                 addNeighbor(node, WorldPointUtil.compress(x + 1, y - 1, plane), queue, visited);
                 addNeighbor(node, WorldPointUtil.compress(x - 1, y + 1, plane), queue, visited);
                 addNeighbor(node, WorldPointUtil.compress(x + 1, y + 1, plane), queue, visited);
+                checkTransports(node, queue, visited);
                 return;
             case Flags.NONE:
                 return;
@@ -255,6 +255,40 @@ public class Pathfinder
 
         if ((flags & Flags.NORTHEAST) != 0) {
             addNeighbor(node, WorldPointUtil.compress(x + 1, y + 1, plane), queue, visited);
+        }
+
+        checkTransports(node, queue, visited);
+    }
+
+    private void checkTransports(final int node, final HybridIntQueue queue, final BFSCache visited)
+    {
+        final ArrayList<Transport> tr = TransportLoader.getTransports().get(node);
+        if(tr != null)
+        {
+            for (Transport t : tr) {
+                transportsUsed++;
+                addTransportNeighbor(node, t.getDestination(), calculateDelay(t.getDuration() * 2, queue.size()), queue, visited);
+            }
+        }
+    }
+
+    private int calculateDelay(int transportDelay, int queueSize) {
+        if (transportDelay <= 0) {
+            return 0;
+        }
+        // Recalculate incrementValue without floating point:
+        // (5 + 5 * transportsUsed) * 1.2 = 6 * (1 + transportsUsed)
+        int incrementValue = 6 * (1 + transportsUsed);
+        int part1 = queueSize * transportDelay;
+        int part2 = incrementValue * (transportDelay * (transportDelay + 1) / 2);
+        int longCalculated = part1 + part2;
+        return longCalculated < 0 ? Integer.MAX_VALUE : longCalculated;
+    }
+
+    private void addTransportNeighbor(final int node, final int neighbor, final int delay, final HybridIntQueue queue, final BFSCache visited) {
+        if (visited.put(neighbor, node))
+        {
+            queue.enqueueTransport(neighbor, delay);
         }
     }
 
