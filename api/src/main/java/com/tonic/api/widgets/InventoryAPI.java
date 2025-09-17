@@ -338,4 +338,8 @@ public class InventoryAPI
 
         WidgetAPI.onWidget(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), InterfaceID.Inventory.ITEMS, target.getId(), target.getSlot());
     }
+
+    public static int getCount(int id) {
+        return InventoryQuery.fromInventoryId(InventoryID.INV).withId(id).count();
+    }
 }

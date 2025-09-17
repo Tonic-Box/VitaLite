@@ -1,6 +1,7 @@
 package com.tonic.data;
 
 import com.tonic.Static;
+import com.tonic.util.TextUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.Client;
@@ -33,7 +34,7 @@ public class TileObjectEx
             ObjectComposition composition = client.getObjectDefinition(tileObject.getId());
             if(composition == null)
                 return null;
-            return composition.getName();
+            return TextUtil.sanitize(composition.getName());
         });
     }
 

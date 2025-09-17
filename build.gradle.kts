@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.tonic"
-version = "1.11.16"
+version = "1.11.17"
 
 repositories {
     mavenCentral()
@@ -179,6 +179,9 @@ dependencies {
 
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+
+    implementation("net.sf.trove4j:trove4j:3.0.3")
+    implementation("it.unimi.dsi:fastutil:8.5.11")
 
     implementation("com.google.guava:guava:${runeliteVersions["guava"]}")
     implementation("com.google.inject:guice:${runeliteVersions["guice"]}:no_aop")

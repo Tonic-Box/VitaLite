@@ -3,10 +3,7 @@ package com.tonic.util;
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
 import lombok.Getter;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.Tile;
-import net.runelite.api.WorldView;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -94,6 +91,23 @@ public class Location {
             return false;
         WorldPoint player = client.getLocalPlayer().getWorldLocation();
         return player.getX() > x1_sw && player.getX() < x2_ne && player.getY() > y1_sw && player.getY() < y2_ne;
+    }
+
+    public static Tile toTile(WorldPoint wp)
+    {
+        Client client = Static.getClient();
+        WorldView wv = client.getTopLevelWorldView();
+        LocalPoint lp = LocalPoint.fromWorld(wv, wp.getX(), wp.getY());
+        if(lp == null)
+            return null;
+        try
+        {
+            return wv.getScene().getTiles()[wp.getPlane()][lp.getSceneX()][lp.getSceneY()];
+        }
+        catch (Exception ignored)
+        {
+            return null;
+        }
     }
 
     /**

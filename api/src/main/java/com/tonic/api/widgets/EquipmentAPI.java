@@ -162,4 +162,8 @@ public class EquipmentAPI
         unEquip(EquipmentSlot.GLOVES);
         unEquip(EquipmentSlot.RING);
     }
+
+    public static int getCount(int id) {
+        return Static.invoke(() -> InventoryQuery.fromInventoryId(InventoryID.WORN).withId(id).count());
+    }
 }
