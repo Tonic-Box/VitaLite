@@ -12,7 +12,13 @@ public class ThreadPool
 
     public static Future<?> submit(Runnable runnable)
     {
-        return executor.submit(runnable);
+        return executor.submit(() -> {
+            try {
+                runnable.run();
+            } catch (Exception e) {
+                System.err.println("Task execution failed: " + e.getMessage());
+            }
+        });
     }
 
     public static <T> T submit(Supplier<T> supplier)
