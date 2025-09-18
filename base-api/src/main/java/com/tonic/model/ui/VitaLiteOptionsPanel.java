@@ -8,9 +8,11 @@ import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
 import com.tonic.util.ReflectBuilder;
 import com.tonic.util.ReflectUtil;
+import com.tonic.util.ThreadPool;
 
 import javax.swing.*;
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +37,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ToggleSlider headlessToggle;
     private final ToggleSlider logPacketsToggle;
     private final ToggleSlider logMenuActionsToggle;
+    private JFrame transportsEditor;
 
     private VitaLiteOptionsPanel() {
         super(true);
@@ -144,7 +147,36 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         mouseButton.addActionListener(e -> checkMouseValues());
         contentPanel.add(mouseButton);
 
+        contentPanel.add(Box.createVerticalStrut(12));
+
+        FancyButton transportButton = new FancyButton("Transport Editor");
+        transportButton.addActionListener(e -> toggleTransportsEditor());
+        contentPanel.add(transportButton);
+
         add(contentPanel);
+    }
+
+    private JFrame getTransportsEditor()
+    {
+        try
+        {
+            Class<?> clazz = Static.getClient().getClass().getClassLoader().loadClass("com.tonic.services.pathfinder.ui.TransportEditorFrame");
+            return (JFrame) clazz.getDeclaredConstructor().newInstance();
+        }
+        catch (Exception e)
+        {
+            Logger.error("Failed to open Transports Editor: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public void toggleTransportsEditor()
+    {
+        if(transportsEditor == null)
+        {
+            transportsEditor = ThreadPool.submit(this::getTransportsEditor);
+        }
+        SwingUtilities.invokeLater(() -> transportsEditor.setVisible(!transportsEditor.isVisible()));
     }
 
     private void checkMouseValues()

@@ -16,6 +16,18 @@ public class Requirements
     List<WorldRequirement> worldRequirements = new ArrayList<>();
     List<OtherRequirement> otherRequirements = new ArrayList<>();
 
+    public Requirements() {
+    }
+
+    public Requirements(List<ItemRequirement> itemRequirements, List<SkillRequirement> skillRequirements, List<VarRequirement> varRequirements, List<QuestRequirement> questRequirements, List<WorldRequirement> worldRequirements, List<OtherRequirement> otherRequirements) {
+        this.itemRequirements.addAll(itemRequirements);
+        this.skillRequirements.addAll(skillRequirements);
+        this.varRequirements.addAll(varRequirements);
+        this.questRequirements.addAll(questRequirements);
+        this.worldRequirements.addAll(worldRequirements);
+        this.otherRequirements.addAll(otherRequirements);
+    }
+
     public boolean fulfilled()
     {
         List<Requirement> all = getAll();

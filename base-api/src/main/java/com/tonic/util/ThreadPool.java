@@ -1,7 +1,6 @@
 package com.tonic.util;
 
 import com.tonic.Static;
-
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 
