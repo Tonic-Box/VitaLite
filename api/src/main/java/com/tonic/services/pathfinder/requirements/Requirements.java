@@ -14,8 +14,15 @@ public class Requirements
     List<VarRequirement> varRequirements = new ArrayList<>();
     List<QuestRequirement> questRequirements = new ArrayList<>();
     List<WorldRequirement> worldRequirements = new ArrayList<>();
+    List<OtherRequirement> otherRequirements = new ArrayList<>();
 
     public boolean fulfilled()
+    {
+        List<Requirement> all = getAll();
+        return all.stream().allMatch(Supplier::get);
+    }
+
+    public List<Requirement> getAll()
     {
         List<Requirement> all = new ArrayList<>();
         all.addAll(itemRequirements);
@@ -23,6 +30,51 @@ public class Requirements
         all.addAll(varRequirements);
         all.addAll(questRequirements);
         all.addAll(worldRequirements);
-        return all.stream().allMatch(Supplier::get);
+        all.addAll(otherRequirements);
+        return all;
+    }
+
+    public void addRequirements(Requirement... reqs)
+    {
+        for(Requirement req : reqs)
+        {
+            addRequirement(req);
+        }
+    }
+
+    public void addRequirements(List<Requirement> reqs)
+    {
+        for(Requirement req : reqs)
+        {
+            addRequirement(req);
+        }
+    }
+
+    public void addRequirement(Requirement req)
+    {
+        if(req instanceof ItemRequirement)
+        {
+            itemRequirements.add((ItemRequirement) req);
+        }
+        else if(req instanceof SkillRequirement)
+        {
+            skillRequirements.add((SkillRequirement) req);
+        }
+        else if(req instanceof VarRequirement)
+        {
+            varRequirements.add((VarRequirement) req);
+        }
+        else if(req instanceof QuestRequirement)
+        {
+            questRequirements.add((QuestRequirement) req);
+        }
+        else if(req instanceof WorldRequirement)
+        {
+            worldRequirements.add((WorldRequirement) req);
+        }
+        else if(req instanceof OtherRequirement)
+        {
+            otherRequirements.add((OtherRequirement) req);
+        }
     }
 }

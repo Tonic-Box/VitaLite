@@ -3,6 +3,8 @@ package com.tonic.services.pathfinder.requirements;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import lombok.Value;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Value
@@ -12,6 +14,16 @@ public class ItemRequirement implements Requirement
     boolean equipped;
     List<Integer> ids;
     int amount;
+
+    public ItemRequirement(Boolean equipped, int amount, int... ids) {
+        reduction = Reduction.OR;
+        this.equipped = equipped;
+        this.amount = amount;
+        this.ids = new ArrayList<>();
+        for (int id : ids) {
+            this.ids.add(id);
+        }
+    }
 
     @Override
     public Boolean get()

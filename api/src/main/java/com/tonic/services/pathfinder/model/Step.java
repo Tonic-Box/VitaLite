@@ -1,6 +1,6 @@
 package com.tonic.services.pathfinder.model;
 
-import com.tonic.services.pathfinder.Transport;
+import com.tonic.services.pathfinder.transports.Transport;
 import com.tonic.util.WorldPointUtil;
 import net.runelite.api.coords.WorldPoint;
 

@@ -1,6 +1,7 @@
 package com.tonic.queries.abstractions;
 
 import com.tonic.util.Location;
+import com.tonic.util.TextUtil;
 import net.runelite.api.Actor;
 import net.runelite.api.coords.WorldPoint;
 
@@ -22,7 +23,7 @@ public abstract class AbstractActorQuery<T extends Actor, Q extends AbstractActo
      */
     public Q withName(String name)
     {
-        return removeIf(o -> !name.equalsIgnoreCase(o.getName()));
+        return removeIf(o -> !name.equalsIgnoreCase(TextUtil.sanitize(o.getName())));
     }
 
     /**

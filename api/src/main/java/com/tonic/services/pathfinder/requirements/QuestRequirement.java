@@ -15,6 +15,18 @@ public class QuestRequirement implements Requirement
     Quest quest;
     Set<QuestState> states;
 
+    public QuestRequirement(Quest quest, QuestState... states)
+    {
+        this.quest = quest;
+        this.states = Set.of(states);
+    }
+
+    public QuestRequirement(Quest quest, Set<QuestState> states)
+    {
+        this.quest = quest;
+        this.states = states;
+    }
+
     @Override
     public Boolean get()
     {

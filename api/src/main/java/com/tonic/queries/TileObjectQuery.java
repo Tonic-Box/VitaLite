@@ -91,4 +91,8 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
             return Double.compare(point.distance(p1), point.distance(p0));
         });
     }
+
+    public TileObjectQuery<T> withPartialAction(String partial) {
+        return keepIf(o -> o.getActions() != null && TextUtil.containsIgnoreCase(partial, o.getActions()));
+    }
 }

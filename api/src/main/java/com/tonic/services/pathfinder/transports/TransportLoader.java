@@ -1,26 +1,35 @@
-package com.tonic.services.pathfinder;
+package com.tonic.services.pathfinder.transports;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.entities.NpcAPI;
+import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
+import com.tonic.api.game.MovementAPI;
 import com.tonic.api.game.Skills;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.game.WorldsAPI;
 import com.tonic.api.threaded.Delays;
+import com.tonic.api.threaded.DialogueNode;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
+import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.ItemEx;
+import com.tonic.data.NpcLocations;
 import com.tonic.data.Quests;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
+import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.TransportDto;
-import com.tonic.services.pathfinder.requirements.Requirements;
+import com.tonic.services.pathfinder.requirements.*;
 import com.tonic.services.pathfinder.teleports.MovementConstants;
+import com.tonic.services.pathfinder.transports.LongTransport;
+import com.tonic.services.pathfinder.transports.Transport;
+import com.tonic.services.pathfinder.transports.data.*;
+import com.tonic.util.WorldPointUtil;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
@@ -32,6 +41,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.tonic.services.pathfinder.teleports.MovementConstants.SLASH_ITEMS;
@@ -486,6 +496,31 @@ public class TransportLoader
             }
 
             LAST_TRANSPORT_LIST.clear();
+            hardcodedBullshit(LAST_TRANSPORT_LIST);
+
+            addManholes(LAST_TRANSPORT_LIST);
+            if(WorldsAPI.inMembersWorld())
+            {
+                zannerisDoor(LAST_TRANSPORT_LIST);
+                veos(LAST_TRANSPORT_LIST);
+                barnaby(LAST_TRANSPORT_LIST);
+                charterShip(LAST_TRANSPORT_LIST);
+                spiritTrees(LAST_TRANSPORT_LIST);
+                kourendMinecartNetwork(LAST_TRANSPORT_LIST);
+                gnomeGliders(LAST_TRANSPORT_LIST);
+                fairyRings(LAST_TRANSPORT_LIST);
+                dwarvenCarts(LAST_TRANSPORT_LIST);
+                canoes(LAST_TRANSPORT_LIST);
+            }
+            if(VarAPI.getVar(279) == 1 || InventoryAPI.contains(ItemID.ROPE))
+            {
+                computeIfAbsent(LAST_TRANSPORT_LIST, lumbyCave());
+            }
+            if(InventoryAPI.count(ItemID.COINS_995) > 10 || InventoryAPI.contains(ItemID.SHANTAY_PASS))
+            {
+                computeIfAbsent(LAST_TRANSPORT_LIST, shantyPass());
+            }
+
             for (Transport transport : transports)
             {
                 computeIfAbsent(LAST_TRANSPORT_LIST, transport);
@@ -494,9 +529,286 @@ public class TransportLoader
                 computeIfAbsent(LAST_TRANSPORT_LIST, transport);
             }
 
+            LAST_TRANSPORT_LIST.forEachValue(list -> list.removeIf(t -> !t.getRequirements().fulfilled()));
+            LAST_TRANSPORT_LIST.retainEntries((key, value) ->  !value.isEmpty());
+
             System.out.println("Refreshed transports, found " + LAST_TRANSPORT_LIST.size() + " transport nodes");
             return true;
         });
+    }
+
+    private static void canoes(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        for(Transport transport : CanoeStation.getTravelMatrix())
+        {
+            computeIfAbsent(transports, transport.getSource(), transport);
+        }
+    }
+
+    private static void dwarvenCarts(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        for(DwarvenCart cart : DwarvenCart.values())
+        {
+            List<Runnable> consumers = new ArrayList<>();
+            consumers.add(cart::rideBack);
+
+            Transport transport = new Transport(WorldPointUtil.compress(cart.getLocation()), WorldPointUtil.compress(cart.getDestination()), 6, 1, 22, consumers, cart.getRequirements());
+            computeIfAbsent(transports, WorldPointUtil.compress(cart.getLocation()), transport);
+        }
+
+        for(DwarvenCart cart : DwarvenCart.values())
+        {
+            List<Runnable> consumers = new ArrayList<>();
+            consumers.add(cart::rideThere);
+
+            Transport transport = new Transport(WorldPointUtil.compress(DwarvenCart.KELDEGRIM_WORLDPOINT), WorldPointUtil.compress(cart.getLocation()), 6, 1, 21, consumers, cart.getRequirements());
+            computeIfAbsent(transports, WorldPointUtil.compress(DwarvenCart.KELDEGRIM_WORLDPOINT), transport);
+        }
+    }
+
+    private static void fairyRings(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        for(FairyRing ring : FairyRing.values())
+        {
+            for(FairyRing destination : FairyRing.values())
+            {
+                if(ring == destination)
+                {
+                    continue;
+                }
+
+                if (destination == FairyRing.ZANARIS)
+                {
+                    List<Runnable> consumers = new ArrayList<>();
+                    consumers.add(() -> {
+                        TileObjectEx current = new TileObjectQuery<>()
+                                .withName("Fairy ring")
+                                .first();
+                        TileObjectAPI.interact(current, "Zanaris");
+                    });
+
+                    Requirements merged = new Requirements();
+                    merged.addRequirements(ring.getRequirements().getAll());
+                    merged.addRequirements(destination.getRequirements().getAll());
+
+                    Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, consumers, merged);
+                    computeIfAbsent(transports, WorldPointUtil.compress(ring.getLocation()), transport);
+                    continue;
+                }
+
+                List<Runnable> consumers = new ArrayList<>();
+                consumers.add(() -> {
+                    TileObjectEx current = new TileObjectQuery<>()
+                            .withName("Fairy ring")
+                            .first();
+                    TileObjectAPI.interact(current, "Configure");
+                    Delays.waitUntil(() -> WidgetAPI.get(398, 0) != null);
+                    while(!destination.travel())
+                    {
+                        Delays.tick();
+                    }
+                });
+
+                Requirements merged = new Requirements();
+                merged.addRequirements(ring.getRequirements().getAll());
+                merged.addRequirements(destination.getRequirements().getAll());
+
+                Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, consumers, merged);
+                computeIfAbsent(transports, WorldPointUtil.compress(ring.getLocation()), transport);
+            }
+        }
+    }
+
+    private static void gnomeGliders(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        for(GnomeGlider glider : GnomeGlider.values())
+        {
+            if(glider == GnomeGlider.DIG_SITE)
+            {
+                continue;
+            }
+            for(GnomeGlider destination : GnomeGlider.values())
+            {
+                if(glider == destination)
+                {
+                    continue;
+                }
+
+                List<Runnable> consumers = new ArrayList<>();
+                consumers.add(() -> {
+                    NPC npc = new NpcQuery().withName(glider.getNpcName()).first();
+                    NpcAPI.interact(npc, "Glider");
+                    Delays.waitUntil(() -> WidgetAPI.get(138, 0) != null);
+                    WidgetAPI.interact(0, destination.getIndex(), -1, -1);
+                });
+                Transport transport = new Transport(WorldPointUtil.compress(glider.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 4, consumers, destination.getRequirements());
+                computeIfAbsent(transports, WorldPointUtil.compress(glider.getLocation()), transport);
+            }
+        }
+    }
+
+    private static void kourendMinecartNetwork(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        for(MinecartNetwork minecart : MinecartNetwork.values())
+        {
+            for(MinecartNetwork destination : MinecartNetwork.values())
+            {
+                if(minecart == destination)
+                {
+                    continue;
+                }
+
+                List<Runnable> consumers = new ArrayList<>();
+                consumers.add(() -> {
+                    Client client = Static.getClient();
+                    NPC npc = new NpcQuery().withName(minecart.getNpcName()).first();
+                    NpcAPI.interact(npc, "Travel");
+                    Delays.waitUntil(() -> PlayerAPI.isIdle(client.getLocalPlayer()));
+                    Delays.tick();
+                    DialogueAPI.resumePause(12255235, destination.getIndex());
+                });
+                Transport transport = new Transport(WorldPointUtil.compress(minecart.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 5, consumers, MinecartNetwork.getRequirements());
+                computeIfAbsent(transports, WorldPointUtil.compress(minecart.getLocation()), transport);
+            }
+        }
+    }
+
+    private static void spiritTrees(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        for(SpiritTree tree : SpiritTree.values())
+        {
+            for(SpiritTree destination : SpiritTree.values())
+            {
+                if(tree == destination)
+                {
+                    continue;
+                }
+
+                List<Runnable> consumers = new ArrayList<>();
+                consumers.add(() -> {
+                    TileObjectEx current = new TileObjectQuery<>()
+                            .withName("Spirit tree")
+                            .first();
+                    TileObjectAPI.interact(current, "Travel");
+                    Delays.waitUntil(() -> WidgetAPI.get(12255235) != null);
+                    DialogueAPI.resumePause(12255235, destination.getIndex());
+                });
+                Transport transport = new Transport(WorldPointUtil.compress(tree.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 3, consumers, destination.getRequirements());
+                computeIfAbsent(transports, WorldPointUtil.compress(tree.getLocation()), transport);
+            }
+        }
+    }
+
+    private static void charterShip(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        CharterShip charterShip;
+        for(CharterMap map : CharterMap.values())
+        {
+            charterShip = map.getCharterShip();
+            for(CharterShip destination : map.getDestinations()) {
+                List<Runnable> actions = new ArrayList<>();
+                actions.add(() -> {
+                    NPC npc = new NpcQuery().withName("Trader Crewmember").sortNearest().first();
+                    NpcAPI.interact(npc, "Charter");
+                    Client client = Static.getClient();
+                    Delays.waitUntil(() -> client.getWidget(57999364) != null);
+                    WidgetAPI.interact(0, 57999364, destination.getIndex(), -1);
+                    Delays.tick();
+                    if(DialogueAPI.dialoguePresent())
+                    {
+                        DialogueNode.get()
+                                .node("Okay, don't")
+                                .process();
+                    }
+                });
+                Transport transport = new Transport(
+                        WorldPointUtil.compress(charterShip.getLocation()),
+                        WorldPointUtil.compress(destination.getArival()),
+                        6, 1, 4,
+                        actions,
+                        destination.getRequirements()
+                );
+                computeIfAbsent(transports, WorldPointUtil.compress(charterShip.getLocation()), transport);
+            }
+        }
+    }
+
+    private static void barnaby(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        BarnabyShip barnabyShip;
+        for(BarnabyMap map : BarnabyMap.values())
+        {
+            barnabyShip = map.getBarnabyShip();
+            for(BarnabyShip destination : map.getDestinations()) {
+                List<Runnable> consumers = new ArrayList<>();
+                consumers.add(() -> {
+                    NPC npc = new NpcQuery().withName("Captain Barnaby").first();
+                    NpcAPI.interact(npc, destination.getOption());
+                    Delays.waitUntil(() -> !MovementAPI.isMoving());
+                });
+                Transport transport = new Transport(WorldPointUtil.compress(barnabyShip.getLocation()), WorldPointUtil.compress(destination.getArival()), 6, 1, 7, consumers, map.getRequirements());
+                computeIfAbsent(transports, WorldPointUtil.compress(barnabyShip.getLocation()), transport);
+            }
+        }
+    }
+
+    private static void veos(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        //sarim -> Port Piscarilius
+        WorldPoint source = new WorldPoint(3054, 3246, 0);
+        WorldPoint destination = new WorldPoint(1824, 3695, 1);
+        List<Runnable> consumers = new ArrayList<>();
+        consumers.add(() -> {
+            NpcLocations.VEOS_PORT_SARIM.talkTo();
+            DialogueNode.get()
+                    .node("Take me there please")
+                    .node("take me", " Port ")
+                    .process();
+        });
+        Transport transport = new Transport(source, destination, 2, 2, consumers, 4);
+        computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
+
+        //sarim -> Lands End
+        WorldPoint source2 = new WorldPoint(3054, 3246, 0);
+        WorldPoint destination2 = new WorldPoint(1504, 3395, 1);
+        List<Runnable> consumers2 = new ArrayList<>();
+        consumers2.add(() -> {
+            NpcLocations.VEOS_PORT_SARIM.talkTo();
+            DialogueNode.get()
+                    .node("Take me there please")
+                    .node("take me", " Land")
+                    .process();
+            Delays.tick(4);
+            if(VarAPI.getVar(VarbitID.ZEAH_PLAYERHASVISITED) != 1)
+            {
+                Walker.walkTo(destination2);
+            }
+        });
+        Transport transport2 = new Transport(source2, destination2, 2, 2, consumers2, 0);
+        computeIfAbsent(transports, WorldPointUtil.compress(source2), transport2);
+    }
+
+    private static void zannerisDoor(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        WorldPoint source = WorldPointUtil.fromCompressed(51924097);
+        WorldPoint destination = WorldPointUtil.fromCompressed(73255316);
+        List<Runnable> consumers = new ArrayList<>();
+        consumers.add(() -> {
+            TileObjectEx object = new TileObjectQuery<>()
+                    .withId(2406)
+                    .sortNearest()
+                    .first();
+            if(object != null)
+            {
+                TileObjectAPI.interact(object, "Open");
+            }
+        });
+        consumers.add(() -> {});
+        consumers.add(() -> MovementAPI.walkToWorldPoint(WorldPointUtil.fromCompressed(73255316)));
+
+        LongTransport transport = new LongTransport(source, destination, 2, 2, consumers, new Requirements(), 0);
+
+        computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
     }
 
     public static void updateTempTransports(List<Transport> transports)
@@ -561,44 +873,6 @@ public class TransportLoader
             }
         });
     }
-
-//    public static Transport fairyRingTransport(
-//            FairyRingLocation source,
-//            FairyRingLocation destination
-//    )
-//    {
-//        return new Transport(source.getLocation(), destination.getLocation(), Integer.MAX_VALUE, 0, () ->
-//        {
-//            log.debug("Looking for fairy ring at {} to {}", source.getLocation(), destination.getLocation());
-//            TileObject ring = TileObjects.getFirstSurrounding(source.getLocation(), 5, "Fairy ring");
-//
-//            if (ring == null)
-//            {
-//                log.debug("Fairy ring at {} is null", source.getLocation());
-//                return;
-//            }
-//
-//            if (destination == FairyRingLocation.ZANARIS)
-//            {
-//                ring.interact("Zanaris");
-//                return;
-//            }
-//
-//            if (ring.hasAction(a -> a != null && a.contains(destination.getCode())))
-//            {
-//                ring.interact(a -> a != null && a.contains(destination.getCode()));
-//                return;
-//            }
-//
-//            if (Widgets.isVisible(Widgets.get(WidgetInfo.FAIRY_RING)))
-//            {
-//                destination.travel();
-//                return;
-//            }
-//
-//            ring.interact("Configure");
-//        });
-//    }
 
     public static Transport itemUseTransport(
             WorldPoint source,
@@ -804,5 +1078,227 @@ public class TransportLoader
                 TileObjectAPI.interact(web, "Slash");
             }
         });
+    }
+
+    private static void addManholes(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        //varrock sewers
+        manhole(
+                transports,
+                new WorldPoint(3236, 3458, 0),
+                new WorldPoint(3237, 9858, 0),
+                882,
+                881
+        );
+
+        //edgvile dungeon
+        manhole(
+                transports,
+                new WorldPoint(3096, 3468, 0),
+                new WorldPoint(3096, 9867, 0),
+                1581,
+                1579
+        );
+
+        manhole(
+                transports,
+                new WorldPoint(3654, 3519, 0),
+                new WorldPoint(3669, 9888, 3),
+                16114,
+                16113
+        );
+    }
+
+    private static void manhole(final TIntObjectHashMap<ArrayList<Transport>> transports, WorldPoint source, WorldPoint destination, int objectIdOpen, int objectIdClosed)
+    {
+        List<Runnable> consumers = new ArrayList<>();
+        consumers.add(() -> {
+            TileObjectEx object = new TileObjectQuery<>()
+                    .withId(objectIdClosed)
+                    .within(source, 5)
+                    .first();
+            if(object != null)
+            {
+                TileObjectAPI.interact(object, "Open");
+            }
+        });
+        consumers.add(() -> {
+            TileObjectEx object = new TileObjectQuery<>()
+                    .withId(objectIdOpen)
+                    .within(source, 5)
+                    .first();
+            TileObjectAPI.interact(object, "Climb");
+        });
+
+        LongTransport transport = new LongTransport(source, destination, 2, 2, consumers, new Requirements(), 0);
+
+        computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
+    }
+
+    public static LongTransport shantyPass() {
+        WorldPoint source = new WorldPoint(3303, 3124, 0);
+        WorldPoint destination = new WorldPoint(3303, 3115, 0);
+
+        List<Runnable> consumers = new ArrayList<>();
+
+        consumers.add(() -> {
+            if (!InventoryAPI.contains(ItemID.SHANTAY_PASS)) {
+                NPC npc = new NpcQuery()
+                        .withIds(NpcID.SHANTAY)
+                        .within(source, 10)
+                        .first();
+                NpcAPI.interact(npc, "buy");
+            } else {
+                TileObjectEx object = new TileObjectQuery<>()
+                        .withId(ObjectID.SHANTAY_PASS)
+                        .first();
+                TileObjectAPI.interact(object, 0);
+            }
+        });
+        consumers.add(() -> {
+            TileObjectEx object = new TileObjectQuery<>()
+                    .withId(ObjectID.SHANTAY_PASS)
+                    .first();
+            TileObjectAPI.interact(object, 0);
+        });
+        consumers.add(() -> {
+            Client client = Static.getClient();
+            if (Static.invoke(() -> client.getWidget(565, 17) != null && client.getWidget(565, 17).getText().contains("Proceed regardless"))) {
+                WidgetAPI.interact(0, 37027857, -1, -1);
+            }
+        });
+        return new LongTransport(source, destination, 2, 2, consumers, new Requirements(), 2);
+    }
+
+    private static LongTransport lumbyCave()
+    {
+        WorldPoint source = new WorldPoint(3169, 3173, 0);
+        WorldPoint destination = new WorldPoint(3167, 9573, 0);
+
+        List<Runnable> consumers = new ArrayList<>();
+
+        consumers.add(() -> {
+            if(VarAPI.getVar(279) != 1 && InventoryAPI.contains(ItemID.ROPE))
+            {
+                ItemEx rope = InventoryAPI.getItem(ItemID.ROPE);
+                TileObjectEx object = new TileObjectQuery<>()
+                        .withId(ObjectID.DARK_HOLE)
+                        .first();
+                InventoryAPI.useOn(rope, object);
+            }
+        });
+        consumers.add(() -> {
+            TileObjectEx object = new TileObjectQuery<>()
+                    .withId(ObjectID.DARK_HOLE)
+                    .first();
+            TileObjectAPI.interact(object, 0);
+        });
+
+        return new LongTransport(source, destination, 2, 2, consumers, new Requirements(), 1);
+    }
+
+    private static Requirements getGoldReq(int amount) {
+        Requirements requirements = new Requirements();
+        requirements.getItemRequirements().add(new ItemRequirement(false, amount, 995));
+        return requirements;
+    }
+
+    private static void hardcodedBullshit(final TIntObjectHashMap<ArrayList<Transport>> transports) {
+        //*
+
+        //crabclaw island
+        addNpcTransport(transports, 10, getGoldReq(10000), new WorldPoint(1782, 3458, 0), new WorldPoint(1778, 3417, 0), "Sandicrahb", "Travel");
+        addNpcTransport(transports, 10, new WorldPoint(1779, 3418, 0), new WorldPoint(1784, 3458, 0), "Sandicrahb", "Travel");
+
+        //lunar
+        Requirements requirements3 = new Requirements();
+        requirements3.getQuestRequirements().add(new QuestRequirement(Quest.LUNAR_DIPLOMACY,
+                new HashSet<>() {{
+                    add(QuestState.IN_PROGRESS);
+                    add(QuestState.FINISHED);
+                }}));
+        addNpcTransport(transports, 10, requirements3, new WorldPoint(2222, 3796, 2), new WorldPoint(2130, 3899, 2), "Bentley", "Travel");
+        addNpcTransport(transports, 10, requirements3, new WorldPoint(2130, 3899, 2), new WorldPoint(2222, 3796, 2), "Bentley", "Travel");
+
+        //the lost tribe
+        Requirements requirements4 = new Requirements();
+        requirements4.getQuestRequirements().add(new QuestRequirement(Quest.THE_LOST_TRIBE,
+                new HashSet<>() {{
+                    add(QuestState.FINISHED);
+                }}));
+        addNpcTransport(transports, 6, requirements4, new WorldPoint(3229, 9610, 0), new WorldPoint(3316, 9613, 0), "Kazgar", "Mines");
+        addNpcTransport(transports, 6, requirements4, new WorldPoint(3316, 9613, 0), new WorldPoint(3229, 9610, 0), "Mistag", "Cellar");
+
+        //elkoy tree gnome village
+        Requirements requirements5 = new Requirements();
+        requirements5.getQuestRequirements().add(new QuestRequirement(Quest.TREE_GNOME_VILLAGE,
+                new HashSet<>() {{
+                    add(QuestState.IN_PROGRESS);
+                    add(QuestState.FINISHED);
+                }}));
+        addNpcTransport(transports, 6, requirements5, new WorldPoint(2504, 3192, 0), new WorldPoint(2515, 3159, 0), "Elkoy", "Follow");
+        addNpcTransport(transports, 6, requirements5, new WorldPoint(2515, 3159, 0), new WorldPoint(2504, 3192, 0), "Elkoy", "Follow");
+
+        //Captain Barnaby
+
+
+        // Eagles peak cave
+        Requirements requirements = new Requirements();
+        requirements.getVarRequirements().add(new VarRequirement(Comparison.GREATER_THAN_EQUAL, VarType.VARP, 934, 15));
+        addObjectTransport(transports, 2, requirements, new WorldPoint(2328, 3496, 0), new WorldPoint(1994, 4983, 3), 19790, "Enter");
+        addObjectTransport(transports, 2, requirements, new WorldPoint(1994, 4983, 3), new WorldPoint(2328, 3496, 0), 19891, "Exit");
+
+        // Waterbirth island
+        Requirements req = getGoldReq(1000);
+        addNpcTransport(transports, 10, req, new WorldPoint(2544, 3760, 0), new WorldPoint(2620, 3682, 0), "Jarvald", "Rellekka");
+        addNpcTransport(transports, 10, req, new WorldPoint(2620, 3682, 0), new WorldPoint(2547, 3759, 0), "Jarvald", "Waterbirth Island");
+
+        // Digsite gate
+        Requirements requirements2 = new Requirements();
+        requirements.getVarRequirements().add(new VarRequirement(Comparison.GREATER_THAN_EQUAL, VarType.VARP, 3637, 153));
+        addObjectTransport(transports, 2, requirements2, new WorldPoint(3295, 3429, 0), new WorldPoint(3296, 3429, 0), 24561, "Open");
+        addObjectTransport(transports, 2, requirements2, new WorldPoint(3296, 3429, 0), new WorldPoint(3295, 3429, 0), 24561, "Open");
+        addObjectTransport(transports, 2, requirements2, new WorldPoint(3295, 3428, 0), new WorldPoint(3296, 3428, 0), 24561, "Open");
+        addObjectTransport(transports, 2, requirements2, new WorldPoint(3296, 3428, 0), new WorldPoint(3295, 3428, 0), 24561, "Open");
+
+        //sarim
+        addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(3027, 3217, 0), new WorldPoint(2956, 3143, 1), "Captain Tobias", "Pay-fare");
+        addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(2956, 3146, 0), new WorldPoint(3032, 3217, 1), "Customs officer", "Pay-fare");
+    }
+
+    private static void addNpcTransport(final TIntObjectHashMap<ArrayList<Transport>> transports, int delay, WorldPoint source, WorldPoint destination, String npcName, String option) {
+        addNpcTransport(transports, delay, source, destination, npcName, option, new String[]{});
+    }
+
+    private static void addNpcTransport(final TIntObjectHashMap<ArrayList<Transport>> transports, int delay, WorldPoint source, WorldPoint destination, String npcName, String option, String... dialogueOptions) {
+        Transport transport = LongTransport.npcDialogTransport(delay, new Requirements(), npcName, option, 10, source, destination, dialogueOptions);
+        computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
+    }
+
+    private static void addNpcTransport(final TIntObjectHashMap<ArrayList<Transport>> transports, int delay, Requirements requirements, WorldPoint source, WorldPoint destination, String npcName, String option) {
+        addNpcTransport(transports, delay, requirements, source, destination, npcName, option, new String[]{});
+    }
+
+    private static void addNpcTransport(final TIntObjectHashMap<ArrayList<Transport>> transports, int delay, Requirements requirements, WorldPoint source, WorldPoint destination, String npcName, String option, String... dialogueOptions) {
+        LongTransport transport = LongTransport.npcDialogTransport(delay, requirements, npcName, option, 10, source, destination, dialogueOptions);
+        computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
+    }
+
+    private static void addObjectTransport(final TIntObjectHashMap<ArrayList<Transport>> transports, int delay, WorldPoint source, WorldPoint destination, int objectID, String action) {
+        addObjectTransport(transports, delay, source, destination, objectID, action, new String[]{});
+    }
+
+    private static void addObjectTransport(final TIntObjectHashMap<ArrayList<Transport>> transports, int delay, WorldPoint source, WorldPoint destination, int objectID, String action, String... options) {
+        Transport transport = LongTransport.addObjectTransport(delay, new Requirements(), source, destination, objectID, action, options);
+        computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
+    }
+
+    private static void addObjectTransport(final TIntObjectHashMap<ArrayList<Transport>> transports, int delay, Requirements requirements, WorldPoint source, WorldPoint destination, int objectID, String action) {
+        addObjectTransport(transports, delay, requirements, source, destination, objectID, action, new String[]{});
+    }
+
+    private static void addObjectTransport(final TIntObjectHashMap<ArrayList<Transport>> transports, int delay, Requirements requirements, WorldPoint source, WorldPoint destination, int objectID, String action, String... options) {
+        Transport transport = LongTransport.addObjectTransport(delay, requirements, source, destination, objectID, action, options);
+        computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
     }
 }

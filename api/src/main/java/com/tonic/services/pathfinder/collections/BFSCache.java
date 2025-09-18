@@ -1,7 +1,7 @@
 package com.tonic.services.pathfinder.collections;
 
-import com.tonic.services.pathfinder.Transport;
-import com.tonic.services.pathfinder.TransportLoader;
+import com.tonic.services.pathfinder.transports.Transport;
+import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.services.pathfinder.model.Step;
 import gnu.trove.map.hash.TIntIntHashMap;
 

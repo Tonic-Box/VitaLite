@@ -11,6 +11,8 @@ import com.tonic.services.pathfinder.collision.Properties;
 import com.tonic.services.pathfinder.local.LocalCollisionMap;
 import com.tonic.services.pathfinder.model.Step;
 import com.tonic.services.pathfinder.teleports.Teleport;
+import com.tonic.services.pathfinder.transports.Transport;
+import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.Location;
 import com.tonic.util.Profiler;
 import com.tonic.util.WorldPointUtil;

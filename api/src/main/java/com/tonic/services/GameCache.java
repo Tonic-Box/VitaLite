@@ -3,17 +3,14 @@ package com.tonic.services;
 import com.tonic.Static;
 import com.tonic.data.TileItemEx;
 import com.tonic.data.TileObjectEx;
-import com.tonic.services.pathfinder.TransportLoader;
-import com.tonic.util.ThreadPool;
+import com.tonic.services.pathfinder.transports.TransportLoader;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.client.eventbus.Subscribe;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public class GameCache
