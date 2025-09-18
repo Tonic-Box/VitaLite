@@ -44,13 +44,13 @@ public class GameCache
     public static ArrayList<Player> playerList()
     {
         Client client = Static.getClient();
-        return client.getTopLevelWorldView().players().stream().collect(Collectors.toCollection(ArrayList::new));
+        return Static.invoke(() -> client.getTopLevelWorldView().players().stream().collect(Collectors.toCollection(ArrayList::new)));
     }
 
     public static ArrayList<NPC> npcList()
     {
         Client client = Static.getClient();
-        return client.getTopLevelWorldView().npcs().stream().collect(Collectors.toCollection(ArrayList::new));
+        return Static.invoke(() -> client.getTopLevelWorldView().npcs().stream().collect(Collectors.toCollection(ArrayList::new)));
     }
 
     public static Stream<TileObjectEx> objectStream()
