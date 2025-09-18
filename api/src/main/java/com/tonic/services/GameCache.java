@@ -11,12 +11,11 @@ import net.runelite.client.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class GameCache
 {
-    private static boolean INITIAL_LOGIN = true;
-    private static boolean REFRESH_PATH = false;
     //static api
     public static int getTickCount()
     {
@@ -34,32 +33,63 @@ public class GameCache
 
     public static Stream<Player> playerStream()
     {
-        return new ArrayList<>(INSTANCE.playerCache).stream();
+        return  playerList().stream();
     }
 
     public static Stream<NPC> npcStream()
     {
-        return new ArrayList<>(INSTANCE.npcCache).stream();
+        return npcList().stream();
     }
 
     public static ArrayList<Player> playerList()
     {
-        return new ArrayList<>(INSTANCE.playerCache);
+        Client client = Static.getClient();
+        return client.getTopLevelWorldView().players().stream().collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static ArrayList<NPC> npcList()
     {
-        return new ArrayList<>(INSTANCE.npcCache);
+        Client client = Static.getClient();
+        return client.getTopLevelWorldView().npcs().stream().collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static Stream<TileObjectEx> objectStream()
     {
-        return new ArrayList<>(INSTANCE.objectCache).stream();
+        return objectList().stream();
     }
 
     public static ArrayList<TileObjectEx> objectList()
     {
-        return new ArrayList<>(INSTANCE.objectCache);
+        return Static.invoke(() -> {
+            ArrayList<TileObjectEx> temp = new ArrayList<>();
+            Client client = Static.getClient();
+            Tile[][][] tiles = client.getTopLevelWorldView().getScene().getTiles();
+            for (Tile[][] value : tiles) {
+                for (Tile[] item : value) {
+                    for (Tile tile : item) {
+                        if (tile != null) {
+                            if (tile.getGameObjects() != null) {
+                                for (GameObject gameObject : tile.getGameObjects()) {
+                                    if (gameObject != null) {
+                                        temp.add(new TileObjectEx(gameObject));
+                                    }
+                                }
+                            }
+                            if (tile.getWallObject() != null) {
+                                temp.add(new TileObjectEx(tile.getWallObject()));
+                            }
+                            if (tile.getDecorativeObject() != null) {
+                                temp.add(new TileObjectEx(tile.getDecorativeObject()));
+                            }
+                            if (tile.getGroundObject() != null) {
+                                temp.add(new TileObjectEx(tile.getGroundObject()));
+                            }
+                        }
+                    }
+                }
+            }
+            return temp;
+        });
     }
 
     public static Stream<TileItemEx> tileItemStream()
@@ -94,10 +124,7 @@ public class GameCache
         System.out.println("GameCache initialized!");
     }
 
-    private final List<TileObjectEx> objectCache = new CopyOnWriteArrayList<>();
     private final List<TileItemEx> tileItemCache = new CopyOnWriteArrayList<>();
-    private final List<NPC> npcCache = new CopyOnWriteArrayList<>();
-    private final List<Player> playerCache = new CopyOnWriteArrayList<>();
     private Actor lastInteracting = null;
     private int tickCount = 0;
 
@@ -112,52 +139,6 @@ public class GameCache
     {
         if(event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
             tickCount = 0;
-
-//        switch (event.getGameState())
-//        {
-//            case UNKNOWN:
-//            case STARTING:
-//            case LOGIN_SCREEN:
-//            case LOGIN_SCREEN_AUTHENTICATOR:
-//            case CONNECTION_LOST:
-//                INITIAL_LOGIN = true;
-//                break;
-//            case LOGGED_IN:
-//                if (INITIAL_LOGIN)
-//                {
-//                    INITIAL_LOGIN = false;
-//                    ThreadPool.schedule(() -> {
-//                        REFRESH_PATH = true;
-//                        TransportLoader.refreshTransports();
-//                    }, 1000, TimeUnit.MILLISECONDS);
-//                }
-//        }
-    }
-
-    // ############## Actors ##############
-
-    @Subscribe
-    public void onPlayerSpawned(PlayerSpawned event)
-    {
-        playerCache.add(event.getPlayer());
-    }
-
-    @Subscribe
-    public void onNpcSpawned(NpcSpawned event)
-    {
-        npcCache.add(event.getNpc());
-    }
-
-    @Subscribe
-    public void onPlayerDespawned(PlayerDespawned event)
-    {
-        playerCache.remove(event.getPlayer());
-    }
-
-    @Subscribe
-    public void onNpcDespawned(NpcDespawned event)
-    {
-        npcCache.remove(event.getNpc());
     }
 
     @Subscribe
@@ -181,66 +162,6 @@ public class GameCache
         return actor.getName() != null;
     }
 
-    // ############## TileObjects ##############
-
-    @Subscribe
-    public void onGameObjectSpawned(GameObjectSpawned event)
-    {
-        addTileObject(event.getGameObject());
-    }
-
-    @Subscribe
-    public void onGameObjectDespawned(GameObjectDespawned event)
-    {
-        removeTileObject(event.getGameObject());
-    }
-
-    @Subscribe
-    public void onWallObjectSpawned(WallObjectSpawned event)
-    {
-        addTileObject(event.getWallObject());
-    }
-
-    @Subscribe
-    public void onWallObjectDespawned(WallObjectDespawned event)
-    {
-        removeTileObject(event.getWallObject());
-    }
-
-    @Subscribe
-    public void onDecorativeObjectSpawned(DecorativeObjectSpawned event)
-    {
-        addTileObject(event.getDecorativeObject());
-    }
-
-    @Subscribe
-    public void onDecorativeObjectDespawned(DecorativeObjectDespawned event)
-    {
-        removeTileObject(event.getDecorativeObject());
-    }
-
-    @Subscribe
-    public void onGroundObjectSpawned(GroundObjectSpawned event)
-    {
-        addTileObject(event.getGroundObject());
-    }
-
-    @Subscribe
-    public void onGroundObjectDespawned(GroundObjectDespawned event)
-    {
-        removeTileObject(event.getGroundObject());
-    }
-
-    private void addTileObject(TileObject tileObject)
-    {
-        objectCache.add(new TileObjectEx(tileObject));
-    }
-
-    private void removeTileObject(TileObject tileObject)
-    {
-        objectCache.removeIf(ex -> ex.getTileObject().equals(tileObject));
-    }
-
     //tile items
 
     @Subscribe
@@ -252,6 +173,15 @@ public class GameCache
                         WorldPoint.fromLocal(Static.getClient(), event.getTile().getLocalLocation()),
                         event.getTile().getLocalLocation()
                 )
+        );
+    }
+
+    @Subscribe
+    public void onItemDespawned(ItemDespawned event)
+    {
+        tileItemCache.removeIf(ex -> ex.getItem().equals(event.getItem()) &&
+                ex.getWorldLocation().equals(WorldPoint.fromLocal(Static.getClient(), event.getTile().getLocalLocation())) &&
+                ex.getLocalPoint().equals(event.getTile().getLocalLocation())
         );
     }
 }
