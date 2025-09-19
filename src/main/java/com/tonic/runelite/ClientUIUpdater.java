@@ -16,6 +16,7 @@ public class ClientUIUpdater
 {
     private static JPanel wrapper;
     private static JScrollPane scrollPane;
+
     public static void inject()
     {
         if(Main.optionsParser.isIncognito())
@@ -45,6 +46,8 @@ public class ClientUIUpdater
         scrollPane = new JScrollPane(console);
         scrollPane.setPreferredSize(new Dimension(0, 150));
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(30, 30, 30), 5));
+        Logger.setLoggerComponent(scrollPane);
+        Logger.initLoggerUI(scrollPane, wrapper, frame);
 
         wrapper.add(originalContent, BorderLayout.CENTER);
         wrapper.add(scrollPane, BorderLayout.SOUTH);
