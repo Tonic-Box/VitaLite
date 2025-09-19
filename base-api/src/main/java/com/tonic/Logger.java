@@ -1,5 +1,6 @@
 package com.tonic;
 
+import lombok.Setter;
 import lombok.SneakyThrows;
 import javax.inject.Singleton;
 import javax.swing.*;
@@ -16,6 +17,11 @@ import java.time.format.DateTimeFormatter;
 @Singleton
 public class Logger {
     private static Logger INSTANCE;
+    @Setter
+    private static JComponent loggerComponent;
+    private static Container wrapper;            // the panel that holds the logger (BorderLayout)
+    private static JFrame clientFrame;           // the top level window
+    private static int loggerHeight = 150;         // height of the logger component
 
     static
     {
@@ -332,6 +338,67 @@ public class Logger {
                 console.getStyledDocument().insertString(console.getStyledDocument().getLength(), body + "\n", ERROR);
             }
         });
+    }
+
+    /**
+     * Called once after the UI has been built.  It stores the wrapper panel,
+     * the top level frame and the height of the logger component so that
+     * {@link #setLoggerVisible(boolean)} can resize the window.
+     *
+     * @param component   the scroll pane (or any component) that represents the logger
+     * @param wrapperPanel the container that has the logger added in BorderLayout.SOUTH
+     * @param frame        the client {@link JFrame}
+     */
+    public static void initLoggerUI(JComponent component, Container wrapperPanel, JFrame frame) {
+        loggerComponent = component;
+        wrapper = wrapperPanel;
+        clientFrame = frame;
+
+        // Remember the preferred height (including borders etc.)
+        if (component != null) {
+            loggerHeight = component.getPreferredSize().height;
+        }
+    }
+
+    /**
+     * Shows or hides the logger component and resizes the client window
+     * by the exact height of the logger.
+     *
+     * @param visible visible
+     */
+    public static void setLoggerVisible(boolean visible) {
+        if (loggerComponent == null || wrapper == null || clientFrame == null) {
+            return;
+        }
+
+        if (visible) {
+            wrapper.add(loggerComponent, BorderLayout.SOUTH);
+        } else {
+            wrapper.remove(loggerComponent);
+        }
+
+        wrapper.revalidate();
+        wrapper.repaint();
+
+        Dimension size = clientFrame.getSize();
+
+        if (visible) {
+            size.height += loggerHeight;
+        } else {
+            size.height -= loggerHeight;
+        }
+
+        clientFrame.setSize(size);
+        clientFrame.validate();
+    }
+
+    /**
+     * Current visibility state of the logger component.
+     *
+     * @return true if the logger component is visible, false otherwise
+     */
+    public static boolean isLoggerVisible() {
+        return loggerComponent != null && loggerComponent.isVisible();
     }
 
     private void _norm(String data)
