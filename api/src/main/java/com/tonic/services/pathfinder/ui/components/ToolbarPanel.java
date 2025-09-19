@@ -25,6 +25,9 @@ public class ToolbarPanel extends JPanel {
     private JButton saveAsButton;
     private JButton newTransportButton;
 
+    // Checkbox
+    private JCheckBox highlightTransportsCheckbox;
+
     public ToolbarPanel(TransportEditorFrame parent) {
         this.parent = parent;
         initializeComponents();
@@ -42,6 +45,13 @@ public class ToolbarPanel extends JPanel {
         saveAsButton = createToolbarButton("Save As...", "Save to a new file");
         newTransportButton = createToolbarButton("New Transport", "Add a new transport");
 
+        // Create highlight checkbox
+        highlightTransportsCheckbox = new JCheckBox("Highlight Transports");
+        highlightTransportsCheckbox.setBackground(BACKGROUND_COLOR);
+        highlightTransportsCheckbox.setForeground(Color.WHITE);
+        highlightTransportsCheckbox.setFocusPainted(false);
+        highlightTransportsCheckbox.setToolTipText("Highlight transport objects in game world");
+
         // Initially disable save button
         saveButton.setEnabled(false);
     }
@@ -58,6 +68,10 @@ public class ToolbarPanel extends JPanel {
 
         // Transport operations group
         add(newTransportButton);
+        add(createSeparator());
+
+        // Highlight checkbox
+        add(highlightTransportsCheckbox);
 
         // Add spacer and info
         add(Box.createHorizontalGlue());
@@ -73,6 +87,12 @@ public class ToolbarPanel extends JPanel {
         saveButton.addActionListener(e -> parent.saveTransportsToFile());
         saveAsButton.addActionListener(e -> parent.saveTransportsAsNewFile());
         newTransportButton.addActionListener(e -> parent.addNewTransport());
+
+        // Highlight checkbox event handler
+        highlightTransportsCheckbox.addActionListener(e -> {
+            boolean isSelected = highlightTransportsCheckbox.isSelected();
+            System.out.println("Highlight Transports checkbox changed: " + isSelected);
+        });
     }
 
     private JButton createToolbarButton(String text, String tooltip) {
