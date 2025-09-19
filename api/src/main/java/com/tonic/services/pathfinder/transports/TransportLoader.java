@@ -474,7 +474,7 @@ public class TransportLoader
             List<Runnable> consumers = new ArrayList<>();
             consumers.add(cart::rideBack);
 
-            Transport transport = new Transport(WorldPointUtil.compress(cart.getLocation()), WorldPointUtil.compress(cart.getDestination()), 6, 1, 22, consumers, cart.getRequirements());
+            Transport transport = new Transport(WorldPointUtil.compress(cart.getLocation()), WorldPointUtil.compress(cart.getDestination()), 6, 1, 22, consumers, cart.getRequirements(), -1);
             computeIfAbsent(transports, WorldPointUtil.compress(cart.getLocation()), transport);
         }
 
@@ -483,7 +483,7 @@ public class TransportLoader
             List<Runnable> consumers = new ArrayList<>();
             consumers.add(cart::rideThere);
 
-            Transport transport = new Transport(WorldPointUtil.compress(DwarvenCart.KELDEGRIM_WORLDPOINT), WorldPointUtil.compress(cart.getLocation()), 6, 1, 21, consumers, cart.getRequirements());
+            Transport transport = new Transport(WorldPointUtil.compress(DwarvenCart.KELDEGRIM_WORLDPOINT), WorldPointUtil.compress(cart.getLocation()), 6, 1, 21, consumers, cart.getRequirements(), -1);
             computeIfAbsent(transports, WorldPointUtil.compress(DwarvenCart.KELDEGRIM_WORLDPOINT), transport);
         }
     }
@@ -513,7 +513,7 @@ public class TransportLoader
                     merged.addRequirements(ring.getRequirements().getAll());
                     merged.addRequirements(destination.getRequirements().getAll());
 
-                    Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, consumers, merged);
+                    Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, consumers, merged, -1);
                     computeIfAbsent(transports, WorldPointUtil.compress(ring.getLocation()), transport);
                     continue;
                 }
@@ -535,7 +535,7 @@ public class TransportLoader
                 merged.addRequirements(ring.getRequirements().getAll());
                 merged.addRequirements(destination.getRequirements().getAll());
 
-                Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, consumers, merged);
+                Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, consumers, merged, -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(ring.getLocation()), transport);
             }
         }
@@ -563,7 +563,7 @@ public class TransportLoader
                     Delays.waitUntil(() -> WidgetAPI.get(138, 0) != null);
                     WidgetAPI.interact(0, destination.getIndex(), -1, -1);
                 });
-                Transport transport = new Transport(WorldPointUtil.compress(glider.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 4, consumers, destination.getRequirements());
+                Transport transport = new Transport(WorldPointUtil.compress(glider.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 4, consumers, destination.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(glider.getLocation()), transport);
             }
         }
@@ -589,7 +589,7 @@ public class TransportLoader
                     Delays.tick();
                     DialogueAPI.resumePause(12255235, destination.getIndex());
                 });
-                Transport transport = new Transport(WorldPointUtil.compress(minecart.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 5, consumers, MinecartNetwork.getRequirements());
+                Transport transport = new Transport(WorldPointUtil.compress(minecart.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 5, consumers, MinecartNetwork.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(minecart.getLocation()), transport);
             }
         }
@@ -615,7 +615,7 @@ public class TransportLoader
                     Delays.waitUntil(() -> WidgetAPI.get(12255235) != null);
                     DialogueAPI.resumePause(12255235, destination.getIndex());
                 });
-                Transport transport = new Transport(WorldPointUtil.compress(tree.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 3, consumers, destination.getRequirements());
+                Transport transport = new Transport(WorldPointUtil.compress(tree.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 3, consumers, destination.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(tree.getLocation()), transport);
             }
         }
@@ -648,7 +648,8 @@ public class TransportLoader
                         WorldPointUtil.compress(destination.getArival()),
                         6, 1, 4,
                         actions,
-                        destination.getRequirements()
+                        destination.getRequirements(),
+                        -1
                 );
                 computeIfAbsent(transports, WorldPointUtil.compress(charterShip.getLocation()), transport);
             }
@@ -668,7 +669,7 @@ public class TransportLoader
                     NpcAPI.interact(npc, destination.getOption());
                     Delays.waitUntil(() -> !MovementAPI.isMoving());
                 });
-                Transport transport = new Transport(WorldPointUtil.compress(barnabyShip.getLocation()), WorldPointUtil.compress(destination.getArival()), 6, 1, 7, consumers, map.getRequirements());
+                Transport transport = new Transport(WorldPointUtil.compress(barnabyShip.getLocation()), WorldPointUtil.compress(destination.getArival()), 6, 1, 7, consumers, map.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(barnabyShip.getLocation()), transport);
             }
         }
@@ -687,7 +688,7 @@ public class TransportLoader
                     .node("take me", " Port ")
                     .process();
         });
-        Transport transport = new Transport(source, destination, 2, 2, consumers, 4);
+        Transport transport = new Transport(source, destination, 2, 2, consumers, 4, -1);
         computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
 
         //sarim -> Lands End
@@ -706,7 +707,7 @@ public class TransportLoader
                 Walker.walkTo(destination2);
             }
         });
-        Transport transport2 = new Transport(source2, destination2, 2, 2, consumers2, 0);
+        Transport transport2 = new Transport(source2, destination2, 2, 2, consumers2, 0, -1);
         computeIfAbsent(transports, WorldPointUtil.compress(source2), transport2);
     }
 
@@ -762,7 +763,7 @@ public class TransportLoader
             {
                 TileObjectAPI.interact(openDoor, "Open");
             }
-        });
+        }, -1);
     }
 
     public static Transport trapDoorTransport(
@@ -793,7 +794,7 @@ public class TransportLoader
                 TileObjectAPI.interact(openedTrapdoor, 0);
                 return;
             }
-        });
+        }, -1);
     }
 
     public static Transport itemUseTransport(
@@ -819,7 +820,7 @@ public class TransportLoader
             {
                 InventoryAPI.useOn(item, transport);
             }
-        });
+        }, -1);
     }
 
     public static Transport npcTransport(
@@ -839,7 +840,7 @@ public class TransportLoader
             {
                 NpcAPI.interact(npc, action);
             }
-        });
+        }, -1);
     }
 
     public static Transport npcTransport(
@@ -859,7 +860,7 @@ public class TransportLoader
             {
                 NpcAPI.interact(npc, action);
             }
-        });
+        }, -1);
     }
 
     public static Transport npcDialogTransport(
@@ -917,7 +918,7 @@ public class TransportLoader
             }
 
             TileObjectAPI.interact(first, actions);
-        });
+        }, -1);
     }
 
     public static Transport objectTransport(
@@ -949,7 +950,7 @@ public class TransportLoader
             {
                 TileObjectAPI.interact(obj, actions);
             }
-        }, requirements);
+        }, requirements, objId);
     }
 
     public static Transport objectDialogTransport(
@@ -999,7 +1000,7 @@ public class TransportLoader
             {
                 TileObjectAPI.interact(web, "Slash");
             }
-        });
+        }, -1);
     }
 
     private static void addManholes(final TIntObjectHashMap<ArrayList<Transport>> transports)

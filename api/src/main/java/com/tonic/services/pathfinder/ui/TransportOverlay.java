@@ -9,6 +9,9 @@ import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.MenuEntryAdded;
+import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -32,6 +35,41 @@ public class TransportOverlay extends Overlay
         setPosition(OverlayPosition.DYNAMIC);
         setPriority(PRIORITY_LOW);
         setLayer(OverlayLayer.ABOVE_SCENE);
+    }
+
+    @Subscribe
+    public void onMenuEntryAdded(MenuEntryAdded entry) {
+        String color = "<col=00ff00>";
+        int opcode = entry.getType();
+        if(opcode == MenuAction.WALK.getId())
+        {
+            Client client = Static.getClient();
+            WorldView worldView = client.getTopLevelWorldView();
+            if(worldView.getSelectedSceneTile() == null)
+                return;
+
+            WorldPoint worldPoint = WorldPointUtil.get(worldView.getSelectedSceneTile().getWorldLocation());
+            ArrayList<Transport> tr = TransportLoader.getTransports().get(WorldPointUtil.compress(worldPoint));
+            if(tr != null && !tr.isEmpty())
+            {
+                for(Transport t : tr)
+                {
+                    if(t.getId() == -1)
+                    {
+                        client.createMenuEntry(1)
+                                .setOption("Hardcoded Transport [-> " + WorldPointUtil.fromCompressed(t.getDestination()) + "]")
+                                .setTarget(color + "Transport ")
+                                .setType(MenuAction.RUNELITE);
+                        continue;
+                    }
+                    client.createMenuEntry(1)
+                            .setOption("Edit Transport [-> " + WorldPointUtil.fromCompressed(t.getDestination()) + "]")
+                            .setTarget(color + "Transport ")
+                            .setType(MenuAction.RUNELITE)
+                            .onClick(c -> TransportEditorFrame.INSTANCE.selectTransportByObjectAndSource(t.getId(), worldPoint));
+                }
+            }
+        }
     }
 
     @Override

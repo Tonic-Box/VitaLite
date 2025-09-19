@@ -51,11 +51,11 @@ public class ToolbarPanel extends JPanel {
         newTransportButton = createToolbarButton("New Transport", "Add a new transport");
 
         // Create highlight checkbox
-        highlightTransportsCheckbox = new JCheckBox("Highlight Transports");
+        highlightTransportsCheckbox = new JCheckBox("Enable In-Game Interop");
         highlightTransportsCheckbox.setBackground(BACKGROUND_COLOR);
         highlightTransportsCheckbox.setForeground(Color.WHITE);
         highlightTransportsCheckbox.setFocusPainted(false);
-        highlightTransportsCheckbox.setToolTipText("Highlight transport objects in game world");
+        highlightTransportsCheckbox.setToolTipText("Enable transport highlighting and menu options in-game");
 
         // Initially disable save button
         saveButton.setEnabled(false);
@@ -99,11 +99,11 @@ public class ToolbarPanel extends JPanel {
             OverlayManager overlayManager = Static.getInjector().getInstance(OverlayManager.class);
             if (isSelected) {
                 TransportLoader.refreshTransports(false);
+                Static.getRuneLite().getEventBus().register(overlay);
                 overlayManager.add(overlay);
-                System.out.println("Transport highlighting enabled");
             } else {
+                Static.getRuneLite().getEventBus().unregister(overlay);
                 overlayManager.remove(overlay);
-                System.out.println("Transport highlighting disabled");
             }
         });
     }

@@ -8,6 +8,7 @@ import com.tonic.services.pathfinder.ui.components.TransportListPanel;
 import com.tonic.services.pathfinder.ui.components.ToolbarPanel;
 import com.tonic.services.pathfinder.ui.utils.JsonFileManager;
 import com.tonic.util.ThreadPool;
+import net.runelite.api.coords.WorldPoint;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
  * Provides a clean, modern interface for managing transport JSON data.
  */
 public class TransportEditorFrame extends JFrame {
+    public static TransportEditorFrame INSTANCE;
     private static final String TITLE = "VitaLite Transport Editor";
     private static final Dimension PREFERRED_SIZE = new Dimension(1400, 900);
     private static final Color BACKGROUND_COLOR = new Color(45, 47, 49);
@@ -48,6 +50,7 @@ public class TransportEditorFrame extends JFrame {
 
         // Auto-load transports on startup
         SwingUtilities.invokeLater(this::loadTransportsFromFile);
+        INSTANCE = this;
     }
 
     private void initializeFrame() {
@@ -215,6 +218,10 @@ public class TransportEditorFrame extends JFrame {
 
     public List<TransportDto> getTransports() {
         return transports;
+    }
+
+    public boolean selectTransportByObjectAndSource(int objectId, WorldPoint worldPoint) {
+        return selectTransportByObjectAndSource(objectId, worldPoint.getX(), worldPoint.getY(), worldPoint.getPlane());
     }
 
     /**

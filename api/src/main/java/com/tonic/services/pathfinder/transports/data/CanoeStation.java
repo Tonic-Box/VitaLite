@@ -109,7 +109,8 @@ public enum CanoeStation
                                         10,
                                         29,
                                         actions,
-                                        canoe.getRequirements()
+                                        canoe.getRequirements(),
+                                        -1
                                 )
                         );
                     }
