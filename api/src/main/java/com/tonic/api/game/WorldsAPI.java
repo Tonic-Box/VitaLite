@@ -78,6 +78,10 @@ public class WorldsAPI
                 ClickManager.click();
                 tClient.getPacketWriter().widgetActionPacket(1, 11927555, -1, -1);
             }
+            if (client.getWidget(InterfaceID.Objectbox.UNIVERSE) != null) {
+                ClickManager.click();
+                tClient.getPacketWriter().resumePauseWidgetPacket(12648448, 1);
+            }
             final net.runelite.api.World rsWorld = client.createWorld();
             rsWorld.setActivity(world.getActivity());
             rsWorld.setAddress(world.getAddress());
@@ -90,6 +94,7 @@ public class WorldsAPI
             {
                 client.changeWorld(rsWorld);
             }
+            client.hopToWorld(rsWorld);
         });
     }
 
