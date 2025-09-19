@@ -125,8 +125,29 @@ public class RequirementsEditorPanel extends JPanel {
     // Public API
 
     public void setRequirements(Requirements requirements) {
+        System.out.println("setRequirements called with: " + (requirements != null ? "non-null requirements" : "null"));
         this.currentRequirements = requirements;
+
+        // Initialize our local requirement lists from the provided requirements
+        if (requirements != null) {
+            itemRequirements = new ArrayList<>(requirements.getItemRequirements());
+            skillRequirements = new ArrayList<>(requirements.getSkillRequirements());
+            varRequirements = new ArrayList<>(requirements.getVarRequirements());
+            questRequirements = new ArrayList<>(requirements.getQuestRequirements());
+            worldRequirements = new ArrayList<>(requirements.getWorldRequirements());
+            System.out.println("Requirements lists populated from provided requirements");
+        } else {
+            itemRequirements.clear();
+            skillRequirements.clear();
+            varRequirements.clear();
+            questRequirements.clear();
+            worldRequirements.clear();
+            System.out.println("Requirements lists cleared (null requirements)");
+        }
+
+        System.out.println("Calling updateRequirementDisplays...");
         updateRequirementDisplays();
+        System.out.println("setRequirements completed");
     }
 
     public Requirements getRequirements() {
@@ -159,14 +180,6 @@ public class RequirementsEditorPanel extends JPanel {
     // Private methods
 
     private void updateRequirementDisplays() {
-        if (currentRequirements != null) {
-            itemRequirements = new ArrayList<>(currentRequirements.getItemRequirements());
-            skillRequirements = new ArrayList<>(currentRequirements.getSkillRequirements());
-            varRequirements = new ArrayList<>(currentRequirements.getVarRequirements());
-            questRequirements = new ArrayList<>(currentRequirements.getQuestRequirements());
-            worldRequirements = new ArrayList<>(currentRequirements.getWorldRequirements());
-        }
-
         refreshRequirementPanel(itemRequirementsPanel, itemRequirements, "Item");
         refreshRequirementPanel(skillRequirementsPanel, skillRequirements, "Skill");
         refreshRequirementPanel(varRequirementsPanel, varRequirements, "Variable");
@@ -205,6 +218,21 @@ public class RequirementsEditorPanel extends JPanel {
         descLabel.setForeground(TEXT_COLOR);
         descLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
 
+        // Create button panel for edit and delete
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+        buttonPanel.setBackground(new Color(55, 57, 59));
+
+        // Create edit button
+        JButton editButton = new JButton("✎");
+        editButton.setBackground(new Color(75, 110, 175));
+        editButton.setForeground(Color.WHITE);
+        editButton.setFocusPainted(false);
+        editButton.setBorder(new EmptyBorder(2, 6, 2, 6));
+        editButton.setPreferredSize(new Dimension(20, 20));
+        editButton.setToolTipText("Edit requirement");
+
+        editButton.addActionListener(e -> editRequirement(requirement, type));
+
         // Create delete button
         JButton deleteButton = new JButton("×");
         deleteButton.setBackground(new Color(150, 50, 50));
@@ -212,11 +240,15 @@ public class RequirementsEditorPanel extends JPanel {
         deleteButton.setFocusPainted(false);
         deleteButton.setBorder(new EmptyBorder(2, 6, 2, 6));
         deleteButton.setPreferredSize(new Dimension(20, 20));
+        deleteButton.setToolTipText("Delete requirement");
 
         deleteButton.addActionListener(e -> removeRequirement(requirement, type));
 
+        buttonPanel.add(editButton);
+        buttonPanel.add(deleteButton);
+
         panel.add(descLabel, BorderLayout.CENTER);
-        panel.add(deleteButton, BorderLayout.EAST);
+        panel.add(buttonPanel, BorderLayout.EAST);
 
         return panel;
     }
@@ -653,26 +685,482 @@ public class RequirementsEditorPanel extends JPanel {
     }
 
     private void removeRequirement(Requirement requirement, String type) {
+        // Confirm deletion
+        int result = JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to delete this " + type.toLowerCase() + " requirement?",
+            "Delete Requirement",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
+
+        if (result != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        System.out.println("Removing " + type + " requirement: " + getRequirementDescription(requirement));
+
+        boolean removed = false;
         switch (type) {
             case "Item":
-                itemRequirements.remove(requirement);
+                removed = itemRequirements.remove(requirement);
                 break;
             case "Skill":
-                skillRequirements.remove(requirement);
+                removed = skillRequirements.remove(requirement);
                 break;
             case "Variable":
-                varRequirements.remove(requirement);
+                removed = varRequirements.remove(requirement);
                 break;
             case "Quest":
-                questRequirements.remove(requirement);
+                removed = questRequirements.remove(requirement);
                 break;
             case "World":
-                worldRequirements.remove(requirement);
+                removed = worldRequirements.remove(requirement);
                 break;
         }
 
-        updateRequirementDisplays();
-        notifyParentOfChange();
+        System.out.println("Requirement removed: " + removed);
+
+        if (removed) {
+            updateRequirementDisplays();
+            notifyParentOfChange();
+        }
+    }
+
+    private void editRequirement(Requirement requirement, String type) {
+        switch (type) {
+            case "Item":
+                editItemRequirement((ItemRequirement) requirement);
+                break;
+            case "Skill":
+                editSkillRequirement((SkillRequirement) requirement);
+                break;
+            case "Variable":
+                editVarRequirement((VarRequirement) requirement);
+                break;
+            case "Quest":
+                editQuestRequirement((QuestRequirement) requirement);
+                break;
+            case "World":
+                editWorldRequirement((WorldRequirement) requirement);
+                break;
+        }
+    }
+
+    private void editItemRequirement(ItemRequirement requirement) {
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Edit Item Requirement", true);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(BACKGROUND_COLOR);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        // Reduction type
+        JLabel reductionLabel = new JLabel("Logic:");
+        reductionLabel.setForeground(TEXT_COLOR);
+        JComboBox<Reduction> reductionCombo = new JComboBox<>(Reduction.values());
+        reductionCombo.setSelectedItem(requirement.getReduction());
+        styleComboBox(reductionCombo);
+
+        // Equipped checkbox
+        JCheckBox equippedCheck = new JCheckBox("Equipped (vs Inventory)");
+        equippedCheck.setSelected(requirement.isEquipped());
+        equippedCheck.setBackground(BACKGROUND_COLOR);
+        equippedCheck.setForeground(TEXT_COLOR);
+
+        // Amount
+        JLabel amountLabel = new JLabel("Amount:");
+        amountLabel.setForeground(TEXT_COLOR);
+        JSpinner amountSpinner = new JSpinner(new SpinnerNumberModel(requirement.getAmount(), 1, Integer.MAX_VALUE, 1));
+        styleSpinner(amountSpinner);
+
+        // Item IDs
+        JLabel idsLabel = new JLabel("Item IDs (comma-separated):");
+        idsLabel.setForeground(TEXT_COLOR);
+        JTextField idsField = createStyledTextField();
+        idsField.setText(requirement.getIds().stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(", ")));
+
+        // Buttons
+        JButton okButton = new JButton("Update");
+        JButton cancelButton = new JButton("Cancel");
+        styleDialogButton(okButton);
+        styleDialogButton(cancelButton);
+
+        // Layout
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST;
+        dialog.add(reductionLabel, gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
+        dialog.add(reductionCombo, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 2; gbc.fill = GridBagConstraints.NONE;
+        dialog.add(equippedCheck, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1; gbc.anchor = GridBagConstraints.WEST;
+        dialog.add(amountLabel, gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
+        dialog.add(amountSpinner, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3; gbc.anchor = GridBagConstraints.WEST;
+        dialog.add(idsLabel, gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
+        dialog.add(idsField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 1; gbc.fill = GridBagConstraints.NONE;
+        dialog.add(okButton, gbc);
+        gbc.gridx = 1;
+        dialog.add(cancelButton, gbc);
+
+        // Event handlers
+        okButton.addActionListener(e -> {
+            try {
+                String[] idStrings = idsField.getText().split(",");
+                int[] ids = new int[idStrings.length];
+                for (int i = 0; i < idStrings.length; i++) {
+                    ids[i] = Integer.parseInt(idStrings[i].trim());
+                }
+
+                ItemRequirement newRequirement = new ItemRequirement(
+                    equippedCheck.isSelected(),
+                    (Integer) amountSpinner.getValue(),
+                    ids
+                );
+
+                // Replace the old requirement with the new one
+                int index = itemRequirements.indexOf(requirement);
+                if (index >= 0) {
+                    itemRequirements.set(index, newRequirement);
+                    updateRequirementDisplays();
+                    notifyParentOfChange();
+                }
+
+                dialog.dispose();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "Invalid item IDs", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        cancelButton.addActionListener(e -> dialog.dispose());
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    private void editSkillRequirement(SkillRequirement requirement) {
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Edit Skill Requirement", true);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(BACKGROUND_COLOR);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        // Skill
+        JLabel skillLabel = new JLabel("Skill:");
+        skillLabel.setForeground(TEXT_COLOR);
+        JComboBox<Skill> skillCombo = new JComboBox<>(Skill.values());
+        skillCombo.setSelectedItem(requirement.getSkill());
+        styleComboBox(skillCombo);
+
+        // Level
+        JLabel levelLabel = new JLabel("Level:");
+        levelLabel.setForeground(TEXT_COLOR);
+        JSpinner levelSpinner = new JSpinner(new SpinnerNumberModel(requirement.getLevel(), 1, 99, 1));
+        styleSpinner(levelSpinner);
+
+        // Buttons
+        JButton okButton = new JButton("Update");
+        JButton cancelButton = new JButton("Cancel");
+        styleDialogButton(okButton);
+        styleDialogButton(cancelButton);
+
+        // Layout
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST;
+        dialog.add(skillLabel, gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
+        dialog.add(skillCombo, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.WEST;
+        dialog.add(levelLabel, gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
+        dialog.add(levelSpinner, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE;
+        dialog.add(okButton, gbc);
+        gbc.gridx = 1;
+        dialog.add(cancelButton, gbc);
+
+        // Event handlers
+        okButton.addActionListener(e -> {
+            SkillRequirement newRequirement = new SkillRequirement(
+                (Skill) skillCombo.getSelectedItem(),
+                (Integer) levelSpinner.getValue()
+            );
+
+            // Replace the old requirement with the new one
+            int index = skillRequirements.indexOf(requirement);
+            if (index >= 0) {
+                skillRequirements.set(index, newRequirement);
+                updateRequirementDisplays();
+                notifyParentOfChange();
+            }
+
+            dialog.dispose();
+        });
+
+        cancelButton.addActionListener(e -> dialog.dispose());
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    private void editVarRequirement(VarRequirement requirement) {
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Edit Variable Requirement", true);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(BACKGROUND_COLOR);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        // Type
+        JLabel typeLabel = new JLabel("Type:");
+        typeLabel.setForeground(TEXT_COLOR);
+        JComboBox<VarType> typeCombo = new JComboBox<>(VarType.values());
+        typeCombo.setSelectedItem(requirement.getType());
+        styleComboBox(typeCombo);
+
+        // Variable index
+        JLabel varLabel = new JLabel("Variable:");
+        varLabel.setForeground(TEXT_COLOR);
+        JSpinner varSpinner = new JSpinner(new SpinnerNumberModel(requirement.getVar(), 0, Integer.MAX_VALUE, 1));
+        styleSpinner(varSpinner);
+
+        // Comparison
+        JLabel compLabel = new JLabel("Comparison:");
+        compLabel.setForeground(TEXT_COLOR);
+        JComboBox<Comparison> compCombo = new JComboBox<>(Comparison.values());
+        compCombo.setSelectedItem(requirement.getComparison());
+        styleComboBox(compCombo);
+
+        // Value
+        JLabel valueLabel = new JLabel("Value:");
+        valueLabel.setForeground(TEXT_COLOR);
+        JSpinner valueSpinner = new JSpinner(new SpinnerNumberModel(requirement.getValue(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
+        styleSpinner(valueSpinner);
+
+        // Buttons
+        JButton okButton = new JButton("Update");
+        JButton cancelButton = new JButton("Cancel");
+        styleDialogButton(okButton);
+        styleDialogButton(cancelButton);
+
+        // Layout
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST;
+        dialog.add(typeLabel, gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
+        dialog.add(typeCombo, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.WEST;
+        dialog.add(varLabel, gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
+        dialog.add(varSpinner, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2; gbc.anchor = GridBagConstraints.WEST;
+        dialog.add(compLabel, gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
+        dialog.add(compCombo, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3; gbc.anchor = GridBagConstraints.WEST;
+        dialog.add(valueLabel, gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
+        dialog.add(valueSpinner, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 4; gbc.fill = GridBagConstraints.NONE;
+        dialog.add(okButton, gbc);
+        gbc.gridx = 1;
+        dialog.add(cancelButton, gbc);
+
+        // Event handlers
+        okButton.addActionListener(e -> {
+            VarRequirement newRequirement = new VarRequirement(
+                (Comparison) compCombo.getSelectedItem(),
+                (VarType) typeCombo.getSelectedItem(),
+                (Integer) varSpinner.getValue(),
+                (Integer) valueSpinner.getValue()
+            );
+
+            // Replace the old requirement with the new one
+            int index = varRequirements.indexOf(requirement);
+            if (index >= 0) {
+                varRequirements.set(index, newRequirement);
+                updateRequirementDisplays();
+                notifyParentOfChange();
+            }
+
+            dialog.dispose();
+        });
+
+        cancelButton.addActionListener(e -> dialog.dispose());
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    private void editQuestRequirement(QuestRequirement requirement) {
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Edit Quest Requirement", true);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(BACKGROUND_COLOR);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        // Quest dropdown
+        JLabel questLabel = new JLabel("Quest:");
+        questLabel.setForeground(TEXT_COLOR);
+        JComboBox<Quest> questCombo = new JComboBox<>(Quest.values());
+        questCombo.setSelectedItem(requirement.getQuest());
+        questCombo.setBackground(FIELD_COLOR);
+        questCombo.setForeground(TEXT_COLOR);
+        questCombo.setMaximumRowCount(15);
+
+        // Quest state checkboxes
+        JLabel stateLabel = new JLabel("Required States:");
+        stateLabel.setForeground(TEXT_COLOR);
+
+        JPanel statePanel = new JPanel();
+        statePanel.setLayout(new BoxLayout(statePanel, BoxLayout.Y_AXIS));
+        statePanel.setBackground(BACKGROUND_COLOR);
+
+        JCheckBox notStartedCheck = new JCheckBox("NOT_STARTED");
+        JCheckBox inProgressCheck = new JCheckBox("IN_PROGRESS");
+        JCheckBox finishedCheck = new JCheckBox("FINISHED");
+
+        // Set current states
+        Set<QuestState> currentStates = requirement.getStates();
+        notStartedCheck.setSelected(currentStates.contains(QuestState.NOT_STARTED));
+        inProgressCheck.setSelected(currentStates.contains(QuestState.IN_PROGRESS));
+        finishedCheck.setSelected(currentStates.contains(QuestState.FINISHED));
+
+        // Style checkboxes
+        JCheckBox[] checkboxes = {notStartedCheck, inProgressCheck, finishedCheck};
+        for (JCheckBox checkbox : checkboxes) {
+            checkbox.setBackground(BACKGROUND_COLOR);
+            checkbox.setForeground(TEXT_COLOR);
+            checkbox.setFocusPainted(false);
+            statePanel.add(checkbox);
+        }
+
+        // Buttons
+        JButton okButton = new JButton("Update");
+        JButton cancelButton = new JButton("Cancel");
+        styleDialogButton(okButton);
+        styleDialogButton(cancelButton);
+
+        // Layout
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.WEST;
+        dialog.add(questLabel, gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL; gbc.weightx = 1.0;
+        dialog.add(questCombo, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.NORTHWEST; gbc.weightx = 0.0;
+        dialog.add(stateLabel, gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
+        dialog.add(statePanel, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE; gbc.gridwidth = 1;
+        dialog.add(okButton, gbc);
+        gbc.gridx = 1;
+        dialog.add(cancelButton, gbc);
+
+        // Event handlers
+        okButton.addActionListener(e -> {
+            Quest selectedQuest = (Quest) questCombo.getSelectedItem();
+            if (selectedQuest == null) {
+                JOptionPane.showMessageDialog(dialog, "Please select a quest.", "No Quest Selected", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Collect selected states
+            Set<QuestState> selectedStates = new HashSet<>();
+            if (notStartedCheck.isSelected()) selectedStates.add(QuestState.NOT_STARTED);
+            if (inProgressCheck.isSelected()) selectedStates.add(QuestState.IN_PROGRESS);
+            if (finishedCheck.isSelected()) selectedStates.add(QuestState.FINISHED);
+
+            if (selectedStates.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Please select at least one quest state.", "No State Selected", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            QuestRequirement newRequirement = new QuestRequirement(selectedQuest, selectedStates);
+
+            // Replace the old requirement with the new one
+            int index = questRequirements.indexOf(requirement);
+            if (index >= 0) {
+                questRequirements.set(index, newRequirement);
+                updateRequirementDisplays();
+                notifyParentOfChange();
+            }
+
+            dialog.dispose();
+        });
+
+        cancelButton.addActionListener(e -> dialog.dispose());
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    private void editWorldRequirement(WorldRequirement requirement) {
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Edit World Requirement", true);
+        dialog.setLayout(new GridBagLayout());
+        dialog.getContentPane().setBackground(BACKGROUND_COLOR);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        // Member world checkbox
+        JCheckBox memberCheck = new JCheckBox("Requires Members World");
+        memberCheck.setSelected(requirement.isMemberWorld());
+        memberCheck.setBackground(BACKGROUND_COLOR);
+        memberCheck.setForeground(TEXT_COLOR);
+
+        // Buttons
+        JButton okButton = new JButton("Update");
+        JButton cancelButton = new JButton("Cancel");
+        styleDialogButton(okButton);
+        styleDialogButton(cancelButton);
+
+        // Layout
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        dialog.add(memberCheck, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1;
+        dialog.add(okButton, gbc);
+        gbc.gridx = 1;
+        dialog.add(cancelButton, gbc);
+
+        // Event handlers
+        okButton.addActionListener(e -> {
+            WorldRequirement newRequirement = new WorldRequirement(memberCheck.isSelected());
+
+            // Replace the old requirement with the new one
+            int index = worldRequirements.indexOf(requirement);
+            if (index >= 0) {
+                worldRequirements.set(index, newRequirement);
+                updateRequirementDisplays();
+                notifyParentOfChange();
+            }
+
+            dialog.dispose();
+        });
+
+        cancelButton.addActionListener(e -> dialog.dispose());
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 
     private void notifyParentOfChange() {

@@ -265,18 +265,24 @@ public class TransportDetailPanel extends JPanel {
     // Public API
 
     public void displayTransport(TransportDto transport) {
+        System.out.println("displayTransport called with: " + (transport != null ? transport.getAction() : "null"));
         this.currentTransport = transport;
         isUpdating = true;
 
         if (transport != null) {
+            System.out.println("Updating fields from transport...");
             updateFieldsFromTransport(transport);
             setFieldsEnabled(true);
+            System.out.println("Fields updated and enabled");
         } else {
+            System.out.println("Clearing fields...");
             clearFields();
             setFieldsEnabled(false);
+            System.out.println("Fields cleared and disabled");
         }
 
         isUpdating = false;
+        System.out.println("displayTransport completed");
     }
 
     public void clearSelection() {

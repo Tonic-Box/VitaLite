@@ -101,9 +101,7 @@ public class TransportEditorFrame extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (confirmDiscardChanges()) {
-                    dispose();
-                }
+                dispose();
             }
         });
     }
@@ -169,16 +167,34 @@ public class TransportEditorFrame extends JFrame {
     }
 
     public void deleteTransport(TransportDto transport) {
+        System.out.println("deleteTransport called with transport: " + (transport != null ? transport.getAction() : "null"));
+
         if (transport != null && confirmDeleteTransport()) {
-            transports.remove(transport);
-            listPanel.refreshTransportList(transports);
+            System.out.println("User confirmed deletion, removing transport...");
+
+            boolean removed = transports.remove(transport);
+            System.out.println("Transport removed from list: " + removed);
+
+            System.out.println("Clearing detail panel selection first...");
             detailPanel.clearSelection();
+            System.out.println("Detail panel cleared");
+
+            System.out.println("Refreshing transport list...");
+            listPanel.refreshTransportList(transports);
+            System.out.println("Transport list refreshed");
+
+            System.out.println("Setting unsaved changes flag...");
             setHasUnsavedChanges(true);
+            System.out.println("deleteTransport completed successfully");
+        } else {
+            System.out.println("Deletion cancelled or transport was null");
         }
     }
 
     public void onTransportSelected(TransportDto transport) {
+        System.out.println("onTransportSelected called with: " + (transport != null ? transport.getAction() : "null"));
         detailPanel.displayTransport(transport);
+        System.out.println("detailPanel.displayTransport completed");
     }
 
     public void onTransportModified() {
