@@ -1,6 +1,10 @@
 package com.tonic.services.pathfinder.ui.components;
 
+import com.tonic.Static;
+import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.services.pathfinder.ui.TransportEditorFrame;
+import com.tonic.services.pathfinder.ui.TransportOverlay;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -27,6 +31,7 @@ public class ToolbarPanel extends JPanel {
 
     // Checkbox
     private JCheckBox highlightTransportsCheckbox;
+    private final TransportOverlay overlay = new TransportOverlay();
 
     public ToolbarPanel(TransportEditorFrame parent) {
         this.parent = parent;
@@ -91,7 +96,15 @@ public class ToolbarPanel extends JPanel {
         // Highlight checkbox event handler
         highlightTransportsCheckbox.addActionListener(e -> {
             boolean isSelected = highlightTransportsCheckbox.isSelected();
-            System.out.println("Highlight Transports checkbox changed: " + isSelected);
+            OverlayManager overlayManager = Static.getInjector().getInstance(OverlayManager.class);
+            if (isSelected) {
+                TransportLoader.refreshTransports(false);
+                overlayManager.add(overlay);
+                System.out.println("Transport highlighting enabled");
+            } else {
+                overlayManager.remove(overlay);
+                System.out.println("Transport highlighting disabled");
+            }
         });
     }
 

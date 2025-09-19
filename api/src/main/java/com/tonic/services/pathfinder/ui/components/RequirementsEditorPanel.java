@@ -258,7 +258,7 @@ public class RequirementsEditorPanel extends JPanel {
             ItemRequirement item = (ItemRequirement) requirement;
             return String.format("%s %s: %d of %s",
                 item.getReduction(),
-                item.isEquipped() ? "Equipped" : "Inventory",
+                    (item.isEquipped() == null ? "both" : (item.isEquipped() ? "Equipped" : "Inventory")),
                 item.getAmount(),
                 item.getIds().toString());
         } else if (requirement instanceof SkillRequirement) {
