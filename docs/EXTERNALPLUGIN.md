@@ -6,11 +6,10 @@ This document provides guidelines and best practices for developing external plu
 ### Needed Imports
 To get the current VitaLite version, look in the vitalite main module gradle.
 ```kt
-val runeLiteVersion = "latest.release"
-val vitaVersion = "xx.xx.xx"
-compileOnly("net.runelite:client:$runeLiteVersion")
-compileOnly("com.tonic:base-api:$vitaVersion")
-compileOnly("com.tonic:api:$vitaVersion")
+val apiVersion = "latest.release"
+compileOnly("net.runelite:client:$apiVersion")
+compileOnly("com.tonic:base-api:$apiVersion")
+compileOnly("com.tonic:api:$apiVersion")
 ```
 
 for repositories {} section of your gradle, you'll want these:
