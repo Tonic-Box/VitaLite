@@ -77,8 +77,6 @@ public class TransportOverlay extends Overlay
     {
         graphics.setFont(FONT);
         getPoints();
-        Client client = Static.getClient();
-        WorldView wv = client.getTopLevelWorldView();
         Stroke stroke = new BasicStroke((float) 1);
         for(var entry : points.entrySet())
         {
