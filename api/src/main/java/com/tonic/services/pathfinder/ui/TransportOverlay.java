@@ -5,6 +5,7 @@ import com.tonic.Static;
 import com.tonic.services.pathfinder.transports.Transport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.WorldPointUtil;
+import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
@@ -29,9 +30,12 @@ public class TransportOverlay extends Overlay
     private static final int MAX_DRAW_DISTANCE = 32;
     private static final Font FONT = FontManager.getRunescapeFont().deriveFont(Font.BOLD, 16);
     private final Map<WorldPoint,Integer> points = new HashMap<>();
+    @Setter
+    private boolean active = false;
 
     public TransportOverlay()
     {
+        Static.getRuneLite().getEventBus().register(this);
         setPosition(OverlayPosition.DYNAMIC);
         setPriority(PRIORITY_LOW);
         setLayer(OverlayLayer.ABOVE_SCENE);
@@ -39,6 +43,8 @@ public class TransportOverlay extends Overlay
 
     @Subscribe
     public void onMenuEntryAdded(MenuEntryAdded entry) {
+        if(!active)
+            return;
         String color = "<col=00ff00>";
         int opcode = entry.getType();
         if(opcode == MenuAction.WALK.getId())

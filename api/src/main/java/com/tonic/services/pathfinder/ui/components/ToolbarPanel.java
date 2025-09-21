@@ -99,11 +99,12 @@ public class ToolbarPanel extends JPanel {
             OverlayManager overlayManager = Static.getInjector().getInstance(OverlayManager.class);
             if (isSelected) {
                 TransportLoader.refreshTransports(false);
-                Static.getRuneLite().getEventBus().register(overlay);
                 overlayManager.add(overlay);
+                overlay.setActive(true);
             } else {
                 Static.getRuneLite().getEventBus().unregister(overlay);
                 overlayManager.remove(overlay);
+                overlay.setActive(false);
             }
         });
     }

@@ -4,12 +4,9 @@ import com.tonic.services.pathfinder.requirements.Requirements;
 import com.tonic.util.WorldPointUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.runelite.api.World;
 import net.runelite.api.coords.WorldPoint;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 @Getter
 @AllArgsConstructor

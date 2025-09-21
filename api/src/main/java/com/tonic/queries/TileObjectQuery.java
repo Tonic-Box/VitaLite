@@ -1,7 +1,7 @@
 package com.tonic.queries;
 
 import com.tonic.queries.abstractions.AbstractQuery;
-import com.tonic.services.GameCache;
+import com.tonic.services.GameManager;
 import com.tonic.data.TileObjectEx;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
@@ -14,7 +14,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
 {
     public TileObjectQuery()
     {
-        super(GameCache.objectList());
+        super(GameManager.objectList());
     }
 
     public TileObjectQuery<T> withId(int... id)
