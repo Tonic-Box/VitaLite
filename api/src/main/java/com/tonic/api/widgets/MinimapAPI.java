@@ -134,7 +134,7 @@ public class MinimapAPI
         int xTileOffset = worldPoint.getX() + widthInTiles / 2 - worldMapPosition.getX();
 
         int xGraphDiff = (int) (xTileOffset * pixelsPerTile);
-        xGraphDiff += pixelsPerTile - Math.ceil(pixelsPerTile / 2);
+        xGraphDiff += (int) (pixelsPerTile - Math.ceil(pixelsPerTile / 2));
         xGraphDiff += (int) worldMapRect.getX();
 
         return xGraphDiff;
@@ -174,7 +174,7 @@ public class MinimapAPI
         int yTileOffset = (yTileMax - worldPoint.getY() - 1) * -1;
 
         int yGraphDiff = (int) (yTileOffset * pixelsPerTile);
-        yGraphDiff -= pixelsPerTile - Math.ceil(pixelsPerTile / 2);
+        yGraphDiff -= (int) (pixelsPerTile - Math.ceil(pixelsPerTile / 2));
         yGraphDiff = worldMapRect.height - yGraphDiff;
         yGraphDiff += (int) worldMapRect.getY();
 
