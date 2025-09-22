@@ -1,4 +1,4 @@
-package com.tonic.data;
+package com.tonic.data.locatables;
 
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.threaded.Delays;

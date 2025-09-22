@@ -1,6 +1,7 @@
 package com.tonic.services;
 
 import com.tonic.Static;
+import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.MiniMapAPI;
 import com.tonic.api.widgets.WorldMapAPI;
 import com.tonic.data.TileItemEx;
@@ -9,6 +10,7 @@ import com.tonic.services.pathfinder.Pathfinder;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.Step;
 import com.tonic.services.pathfinder.transports.TransportLoader;
+import com.tonic.util.ResourceUtil;
 import com.tonic.util.ThreadPool;
 import net.runelite.api.*;
 import net.runelite.api.Point;
@@ -16,10 +18,11 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.*;
+
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -140,6 +143,7 @@ public class GameManager extends Overlay {
                 .getEventBus()
                 .register(this);
         TransportLoader.init();
+
         System.out.println("GameCache initialized!");
     }
 
@@ -227,7 +231,7 @@ public class GameManager extends Overlay {
         final Client client = Static.getClient();
         List<MenuEntry> entries = new LinkedList<>(Arrays.asList(client.getMenu().getMenuEntries()));
 
-        if (entries.stream().anyMatch(e -> e.getOption().equals("Pathfind") && e.getTarget().equals("Here"))) {
+        if (entries.stream().anyMatch(e -> e.getOption().equals("Walk ") || e.getOption().equals("Test Path ") || e.getOption().equals("Clear "))) {
             return;
         }
 
@@ -246,6 +250,7 @@ public class GameManager extends Overlay {
                         List<Step> path = engine.find();
                         pathPoints = Step.toWorldPoints(path);
                         Walker.walkTo(path, engine.getTeleport());
+                        Delays.waitUntilIdle();
                         pathPoints = null;
                     }));
         }
@@ -287,7 +292,7 @@ public class GameManager extends Overlay {
                     .setParam1(event.getActionParam1())
                     .setIdentifier(event.getIdentifier())
                     .setType(MenuAction.RUNELITE)
-                    .onClick(e -> ThreadPool.submit(() -> testPoints = null));
+                    .onClick(e -> testPoints = null);
         }
     }
 
@@ -298,12 +303,16 @@ public class GameManager extends Overlay {
         {
             WorldMapAPI.drawPath(graphics, testPoints, Color.MAGENTA);
             MiniMapAPI.drawPath(graphics, testPoints, Color.MAGENTA);
+            WorldPoint last = testPoints.get(testPoints.size() - 1);
+            WorldMapAPI.drawRedMapMarker(graphics, last);
         }
 
         if(pathPoints != null && !pathPoints.isEmpty())
         {
             WorldMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
             MiniMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
+            WorldPoint last = pathPoints.get(pathPoints.size() - 1);
+            WorldMapAPI.drawGreenMapMarker(graphics, last);
         }
 
         return null;

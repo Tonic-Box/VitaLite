@@ -6,11 +6,13 @@ import net.runelite.api.Point;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.api.worldmap.WorldMap;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Path2D;
+import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class WorldMapAPI
@@ -351,5 +353,330 @@ public class WorldMapAPI
         g.transform(at);
 
         g.drawLine(0, 0, len, 0);
+    }
+
+    /**
+     * Draws a BufferedImage at a WorldPoint on the floating world map with customizable offset.
+     * <p>
+     * This method renders an image at the specified world coordinates with a configurable
+     * offset from the tile position. The offset allows precise positioning relative to
+     * the world point. The image will only be drawn if it falls within the visible map
+     * area and the world map is currently open.
+     *
+     * @param graphics the Graphics2D context to draw on
+     * @param worldPoint the world point to use as the reference position
+     * @param image the BufferedImage to draw
+     * @param width the desired width of the image in pixels
+     * @param height the desired height of the image in pixels
+     * @param offsetX the horizontal offset from the world point in pixels (negative = left, positive = right)
+     * @param offsetY the vertical offset from the world point in pixels (negative = up, positive = down)
+     */
+    public static void drawImageAtWorldPoint(Graphics2D graphics, WorldPoint worldPoint, BufferedImage image, int width, int height, int offsetX, int offsetY) {
+        if (graphics == null || worldPoint == null || image == null) {
+            return;
+        }
+
+        Client client = Static.getClient();
+        if (client == null) {
+            return;
+        }
+
+        // Check if world map is open
+        Widget mapWidget = client.getWidget(InterfaceID.Worldmap.MAP_CONTAINER);
+        if (mapWidget == null || mapWidget.isHidden()) {
+            return;
+        }
+
+        // Get screen coordinates for the world point
+        Integer screenX = mapWorldPointToScreenX(client, worldPoint);
+        Integer screenY = mapWorldPointToScreenY(client, worldPoint);
+
+        if (screenX == null || screenY == null) {
+            return;
+        }
+
+        // Calculate position with offset
+        int drawX = screenX + offsetX;
+        int drawY = screenY + offsetY;
+
+        // Get the map clipping area to ensure we only draw within map bounds
+        Area mapClipArea = getWorldMapClipArea(mapWidget.getBounds());
+
+        // Create a bounding rectangle for the image
+        Rectangle imageBounds = new Rectangle(drawX, drawY, width, height);
+
+        // Check if image is at least partially within the map area
+        if (!mapClipArea.intersects(imageBounds)) {
+            return;
+        }
+
+        // Save the current clip
+        Shape oldClip = graphics.getClip();
+
+        // Set clip to map area to prevent drawing outside map bounds
+        graphics.setClip(mapClipArea);
+
+        // Draw the image at the specified offset from the world point
+        graphics.drawImage(image, drawX, drawY, width, height, null);
+
+        // Restore the original clip
+        graphics.setClip(oldClip);
+    }
+
+    /**
+     * Convenience method to draw a BufferedImage centered over a WorldPoint.
+     * <p>
+     * This is a helper method that automatically calculates the offset needed
+     * to center the image over the world point.
+     *
+     * @param graphics the Graphics2D context to draw on
+     * @param worldPoint the world point where the image should be centered
+     * @param image the BufferedImage to draw
+     * @param width the desired width of the image in pixels
+     * @param height the desired height of the image in pixels
+     */
+    public static void drawImageAtWorldPointCentered(Graphics2D graphics, WorldPoint worldPoint,
+                                                     BufferedImage image, int width, int height) {
+        // Calculate offsets to center the image
+        int offsetX = -width / 2;
+        int offsetY = -height / 2;
+
+        drawImageAtWorldPoint(graphics, worldPoint, image, width, height, offsetX, offsetY);
+    }
+
+    /**
+     * Draws a smooth, fluid teardrop/pin marker pointing to a WorldPoint on the floating world map.
+     * <p>
+     * This method renders a Google Maps-style marker with smooth curves using Bezier paths.
+     * The point is positioned exactly on the specified world coordinates.
+     *
+     * @param graphics the Graphics2D context to draw on
+     * @param worldPoint the world point where the marker point should be positioned
+     * @param color the fill color of the marker
+     * @param size the size of the marker (recommended: 20-40 for good visibility)
+     */
+    public static void drawMapMarker(Graphics2D graphics, WorldPoint worldPoint, Color color, int size) {
+        if (graphics == null || worldPoint == null || color == null) {
+            return;
+        }
+
+        Client client = Static.getClient();
+        if (client == null) {
+            return;
+        }
+
+        // Check if world map is open
+        Widget mapWidget = client.getWidget(InterfaceID.Worldmap.MAP_CONTAINER);
+        if (mapWidget == null || mapWidget.isHidden()) {
+            return;
+        }
+
+        // Get screen coordinates for the world point
+        Integer screenX = mapWorldPointToScreenX(client, worldPoint);
+        Integer screenY = mapWorldPointToScreenY(client, worldPoint);
+
+        if (screenX == null || screenY == null) {
+            return;
+        }
+
+        // Get the map clipping area
+        Area mapClipArea = getWorldMapClipArea(mapWidget.getBounds());
+
+        // Check if the marker position is within the map area
+        if (!mapClipArea.contains(screenX, screenY)) {
+            return;
+        }
+
+        // Save the current state
+        Shape oldClip = graphics.getClip();
+        Object oldAntialiasing = graphics.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        Stroke oldStroke = graphics.getStroke();
+
+        // Set clip to map area and enable antialiasing for smooth curves
+        graphics.setClip(mapClipArea);
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // Calculate dimensions
+        double scale = size / 30.0; // Base size is 30
+
+        // Create the smooth teardrop shape
+        Path2D.Double markerPath = createFluidMarkerPath(screenX, screenY, scale);
+
+        // Draw shadow
+        Graphics2D g2 = (Graphics2D) graphics.create();
+        g2.translate(2 * scale, 3 * scale); // Shadow offset
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));
+
+        // Gradient shadow for more depth
+        GradientPaint shadowGradient = new GradientPaint(
+                screenX, (float)(screenY - 20 * scale), new Color(0, 0, 0, 60),
+                screenX, screenY, new Color(0, 0, 0, 30)
+        );
+        g2.setPaint(shadowGradient);
+        g2.fill(markerPath);
+        g2.dispose();
+
+        // Draw main marker with gradient for depth
+        GradientPaint markerGradient = new GradientPaint(
+                (float)(screenX - 10 * scale), (float)(screenY - 30 * scale),
+                brighter(color, 0.3f),
+                (float)(screenX + 10 * scale), (float)(screenY - 10 * scale),
+                color
+        );
+        graphics.setPaint(markerGradient);
+        graphics.fill(markerPath);
+
+        // Draw inner circle (the "hole" in the pin)
+        double innerCircleRadius = 5 * scale;
+        double innerCircleY = screenY - 28 * scale;
+        Ellipse2D.Double innerCircle = new Ellipse2D.Double(
+                screenX - innerCircleRadius,
+                innerCircleY - innerCircleRadius,
+                innerCircleRadius * 2,
+                innerCircleRadius * 2
+        );
+
+        // Inner circle with slight transparency
+        graphics.setColor(new Color(255, 255, 255, 200));
+        graphics.fill(innerCircle);
+
+        // Draw border
+        graphics.setColor(darker(color, 0.4f));
+        graphics.setStroke(new BasicStroke((float)(1.2 * scale)));
+        graphics.draw(markerPath);
+
+        // Draw inner circle border
+        graphics.setColor(new Color(255, 255, 255, 150));
+        graphics.setStroke(new BasicStroke((float)(0.8 * scale)));
+        graphics.draw(innerCircle);
+
+        // Add highlight for glossy effect
+        Graphics2D g3 = (Graphics2D) graphics.create();
+        g3.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+
+        // Create highlight shape
+        Path2D.Double highlight = new Path2D.Double();
+        highlight.moveTo(screenX - 8 * scale, screenY - 32 * scale);
+        highlight.quadTo(
+                screenX, screenY - 35 * scale,
+                screenX + 8 * scale, screenY - 32 * scale
+        );
+        highlight.quadTo(
+                screenX + 6 * scale, screenY - 28 * scale,
+                screenX, screenY - 26 * scale
+        );
+        highlight.quadTo(
+                screenX - 6 * scale, screenY - 28 * scale,
+                screenX - 8 * scale, screenY - 32 * scale
+        );
+        highlight.closePath();
+
+        GradientPaint highlightGradient = new GradientPaint(
+                screenX, (float)(screenY - 35 * scale), new Color(255, 255, 255, 180),
+                screenX, (float)(screenY - 26 * scale), new Color(255, 255, 255, 0)
+        );
+        g3.setPaint(highlightGradient);
+        g3.fill(highlight);
+        g3.dispose();
+
+        // Restore original state
+        graphics.setClip(oldClip);
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldAntialiasing);
+        graphics.setStroke(oldStroke);
+    }
+
+    /**
+     * Creates a smooth, fluid marker path using Bezier curves.
+     */
+    private static Path2D.Double createFluidMarkerPath(int x, int y, double scale) {
+        Path2D.Double path = new Path2D.Double();
+
+        // Start from the point tip
+        path.moveTo(x, y);
+
+        // Left curve up to the bulb
+        path.curveTo(
+                x - 3 * scale, y - 8 * scale,   // Control point 1
+                x - 8 * scale, y - 15 * scale,  // Control point 2
+                x - 11 * scale, y - 22 * scale  // End point
+        );
+
+        // Left side of bulb
+        path.curveTo(
+                x - 14 * scale, y - 26 * scale,  // Control point 1
+                x - 14 * scale, y - 31 * scale,  // Control point 2
+                x - 12 * scale, y - 35 * scale   // End point
+        );
+
+        // Top curve of bulb
+        path.curveTo(
+                x - 9 * scale, y - 39 * scale,   // Control point 1
+                x - 4 * scale, y - 41 * scale,   // Control point 2
+                x, y - 41 * scale                 // Top center
+        );
+
+        // Right side - mirror of left
+        path.curveTo(
+                x + 4 * scale, y - 41 * scale,   // Control point 1
+                x + 9 * scale, y - 39 * scale,   // Control point 2
+                x + 12 * scale, y - 35 * scale   // End point
+        );
+
+        // Right side of bulb
+        path.curveTo(
+                x + 14 * scale, y - 31 * scale,  // Control point 1
+                x + 14 * scale, y - 26 * scale,  // Control point 2
+                x + 11 * scale, y - 22 * scale   // End point
+        );
+
+        // Right curve down to the point
+        path.curveTo(
+                x + 8 * scale, y - 15 * scale,   // Control point 1
+                x + 3 * scale, y - 8 * scale,    // Control point 2
+                x, y                              // Back to point tip
+        );
+
+        path.closePath();
+        return path;
+    }
+
+    /**
+     * Helper method to create a brighter version of a color.
+     */
+    private static Color brighter(Color color, float factor) {
+        int r = Math.min(255, (int)(color.getRed() + (255 - color.getRed()) * factor));
+        int g = Math.min(255, (int)(color.getGreen() + (255 - color.getGreen()) * factor));
+        int b = Math.min(255, (int)(color.getBlue() + (255 - color.getBlue()) * factor));
+        return new Color(r, g, b, color.getAlpha());
+    }
+
+    /**
+     * Helper method to create a darker version of a color.
+     */
+    private static Color darker(Color color, float factor) {
+        int r = Math.max(0, (int)(color.getRed() * (1 - factor)));
+        int g = Math.max(0, (int)(color.getGreen() * (1 - factor)));
+        int b = Math.max(0, (int)(color.getBlue() * (1 - factor)));
+        return new Color(r, g, b, color.getAlpha());
+    }
+
+    /**
+     * Convenience method to draw a standard-sized red marker.
+     *
+     * @param graphics the Graphics2D context to draw on
+     * @param worldPoint the world point where the marker should be positioned
+     */
+    public static void drawRedMapMarker(Graphics2D graphics, WorldPoint worldPoint) {
+        drawMapMarker(graphics, worldPoint, new Color(220, 20, 60), 30); // Crimson red, size 30
+    }
+
+    /**
+     * Convenience method to draw a standard-sized cyan marker.
+     *
+     * @param graphics the Graphics2D context to draw on
+     * @param worldPoint the world point where the marker should be positioned
+     */
+    public static void drawGreenMapMarker(Graphics2D graphics, WorldPoint worldPoint) {
+        drawMapMarker(graphics, worldPoint, Color.GREEN, 30); // Crimson red, size 30
     }
 }

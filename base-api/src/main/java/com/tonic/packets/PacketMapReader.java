@@ -99,10 +99,6 @@ public class PacketMapReader
                 if(entry.getName().startsWith("OP_GAME_OBJECT_ACTION_") && entry.getArgs().get(i).equals("identifier"))
                 {
                     name = StaticIntFinder.find(ObjectID.class, (int) num);
-//                    if(name.equals(num + ""))
-//                    {
-//                        name = StaticIntFinder.find(ObjectID1.class, (int) num);
-//                    }
                     out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
                     continue;
                 }

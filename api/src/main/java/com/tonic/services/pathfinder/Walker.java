@@ -24,6 +24,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.*;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
@@ -96,9 +97,43 @@ public class Walker
         instance.walk(target, useTeleports);
     }
 
+    //!
+
+    public static void walkTo(List<WorldArea> areas, int eatAtHp, boolean useTeleports, PrayerAPI... prayers)
+    {
+        instance.setHealthHandler(eatAtHp);
+        instance.setPrayers(prayers);
+        instance.walk(areas, useTeleports);
+    }
+
+    public static void walkTo(List<WorldArea> areas, boolean useTeleports)
+    {
+        instance.walk(areas, useTeleports);
+    }
+
+    //!/
+
     public static void walkTo(List<Step> steps, Teleport teleport)
     {
         instance.walk(steps, teleport);
+    }
+
+    public void walk(List<WorldArea> targets, boolean useTeleports)
+    {
+        if(running)
+        {
+            return;
+        }
+        running = true;
+
+        reset();
+        final Pathfinder engine = new Pathfinder(targets);
+
+        List<Step> steps = engine.find();
+        if(useTeleports && engine.getTeleport() != null)
+            teleport = engine.getTeleport();
+        walkTo(steps);
+        running = false;
     }
 
     public void walk(WorldPoint target, boolean useTeleports)

@@ -19,7 +19,10 @@ import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.Tile;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,12 +41,24 @@ public class Pathfinder
     private LocalCollisionMap localMap;
     @Getter
     private Teleport teleport;
-    private final WorldPoint targetWorldPoint;
+    private WorldPoint targetWorldPoint;
+
+    private int[] worldAreaPoints;
     private boolean inInstance = false;
     private int transportsUsed;
 
     public Pathfinder(final WorldPoint target) {
         this.targetWorldPoint = target;
+    }
+
+    public Pathfinder(WorldArea... worldAreas)
+    {
+        worldAreaPoints = WorldPointUtil.toCompressedPoints(worldAreas);
+    }
+
+    public Pathfinder(List<WorldArea> worldAreas)
+    {
+        worldAreaPoints = WorldPointUtil.toCompressedPoints(worldAreas.toArray(new WorldArea[0]));
     }
 
     public List<Step> find() {
@@ -121,6 +136,28 @@ public class Pathfinder
 
         if(targetWorldPoint != null)
             return findWorldPoint(visited, queue);
+        if(worldAreaPoints != null && worldAreaPoints.length > 0)
+            return findAreaPoint(visited, queue);
+        return new ArrayList<>();
+    }
+
+    private List<Step> findAreaPoint(final BFSCache visited, final HybridIntQueue queue) {
+        int current;
+        while(!queue.isEmpty())
+        {
+            if(visited.size() > 10_000_000)
+            {
+                return new ArrayList<>();
+            }
+            current = queue.dequeue();
+            if(ArrayUtils.contains(worldAreaPoints, current))
+            {
+                Logger.info("Nodes visited: " + visited.size());
+                return visited.path(current);
+
+            }
+            addNeighbors(current, queue, visited);
+        }
         return new ArrayList<>();
     }
 

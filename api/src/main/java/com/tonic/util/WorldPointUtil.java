@@ -4,10 +4,12 @@ import com.tonic.Static;
 import net.runelite.api.Client;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static net.runelite.api.Constants.*;
 
@@ -177,5 +179,20 @@ public class WorldPointUtil {
     public static int dxy(int compressed, int nx, int ny)
     {
         return compressed + nx + (ny << 14);
+    }
+
+    public static int[] toCompressedPoints(WorldArea... area)
+    {
+        List<WorldPoint> points = new ArrayList<>();
+        for(WorldArea a : area)
+        {
+            points.addAll(a.toWorldPointList());
+        }
+        int[] compressed = new int[points.size()];
+        for(int i = 0; i < points.size(); i++)
+        {
+            compressed[i] = compress(points.get(i));
+        }
+        return compressed;
     }
 }
