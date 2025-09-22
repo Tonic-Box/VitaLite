@@ -328,7 +328,7 @@ public class InventoryAPI
         if(item == null || npc == null)
             return;
 
-        WidgetAPI.onNpc(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), npc.getId(), false);
+        WidgetAPI.onNpc(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), npc.getIndex(), false);
     }
 
     public static void useOn(ItemEx item, ItemEx target)
