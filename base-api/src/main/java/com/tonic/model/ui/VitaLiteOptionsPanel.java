@@ -135,6 +135,12 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         contentPanel.add(Box.createVerticalStrut(12));
         contentPanel.add(pointSpinner);
 
+        contentPanel.add(Box.createVerticalStrut(12));
+
+        FancyButton transportButton = new FancyButton("Transport Editor");
+        transportButton.addActionListener(e -> toggleTransportsEditor());
+        contentPanel.add(transportButton);
+
         contentPanel.add(Box.createVerticalStrut(20));
         JLabel debugLabel = new JLabel("Debug");
         debugLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
@@ -156,12 +162,6 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         FancyButton mouseButton = new FancyButton("Check Mouse Values");
         mouseButton.addActionListener(e -> checkMouseValues());
         contentPanel.add(mouseButton);
-
-        contentPanel.add(Box.createVerticalStrut(12));
-
-        FancyButton transportButton = new FancyButton("Transport Editor");
-        transportButton.addActionListener(e -> toggleTransportsEditor());
-        contentPanel.add(transportButton);
 
         add(contentPanel);
     }
