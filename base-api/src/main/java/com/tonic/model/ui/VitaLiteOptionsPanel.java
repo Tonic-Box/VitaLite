@@ -180,7 +180,9 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         mouseButton.addActionListener(e -> checkMouseValues());
         contentPanel.add(mouseButton);
 
-        add(contentPanel);
+        add(new JScrollPane(contentPanel,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
     }
 
     private JFrame getTransportsEditor()

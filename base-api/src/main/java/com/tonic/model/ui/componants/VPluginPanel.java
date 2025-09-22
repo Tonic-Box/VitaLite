@@ -101,6 +101,6 @@ public abstract class VPluginPanel extends JPanel
     public Dimension getMinimumSize()
     {
         int width = this == wrappedPanel ? PANEL_WIDTH + SCROLLBAR_WIDTH : PANEL_WIDTH;
-        return new Dimension(width, super.getMinimumSize().height);
+        return new Dimension(width, 0);
     }
 }
