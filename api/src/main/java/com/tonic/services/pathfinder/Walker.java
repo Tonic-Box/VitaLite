@@ -86,6 +86,11 @@ public class Walker
         instance.walk(target, useTeleports);
     }
 
+    public static void walkTo(List<Step> steps, Teleport teleport)
+    {
+        instance.walk(steps, teleport);
+    }
+
     public void walk(WorldPoint target, boolean useTeleports)
     {
         if(running)
@@ -100,6 +105,21 @@ public class Walker
         List<Step> steps = engine.find();
         if(useTeleports && engine.getTeleport() != null)
             teleport = engine.getTeleport();
+        walkTo(steps);
+        running = false;
+    }
+
+    public void walk(List<Step> steps, Teleport teleport)
+    {
+        if(running)
+        {
+            return;
+        }
+        running = true;
+
+        reset();
+        if(teleport != null)
+            this.teleport = teleport;
         walkTo(steps);
         running = false;
     }
@@ -175,12 +195,6 @@ public class Walker
             System.out.println("Pathfinder took: " + (client.getTickCount() - timer) + " ticks");
             timer = 0;
         }
-    }
-
-    public List<Step> getStepMap(WorldPoint target)
-    {
-        Pathfinder engine = new Pathfinder(target);
-        return engine.find();
     }
 
     /**

@@ -5,6 +5,7 @@ import com.tonic.util.WorldPointUtil;
 import net.runelite.api.coords.WorldPoint;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Step {
     public final int position;
@@ -28,5 +29,10 @@ public class Step {
     public boolean hasTransport()
     {
         return transport != null;
+    }
+
+    public static List<WorldPoint> toWorldPoints(List<Step> steps)
+    {
+        return steps.stream().map(Step::getPosition).collect(Collectors.toList());
     }
 }
