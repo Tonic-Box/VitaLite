@@ -232,20 +232,9 @@ public class WorldMapAPI
         }
 
         Area mapClipArea = getWorldMapClipArea(WidgetAPI.get(InterfaceID.Worldmap.MAP_CONTAINER).getBounds());
-        WorldPoint last = null;
         for(WorldPoint point : worldPoints)
         {
-            if(last != null && last.distanceTo(point) > 2)
-            {
-                Point p1 = mapWorldPointToGraphicsPoint(last);
-                Point p2 = mapWorldPointToGraphicsPoint(point);
-                if(p1 != null && p2 != null)
-                {
-                    drawLine(graphics, p1, p2, color);
-                }
-            }
             drawOnMap(graphics, mapClipArea, point, color);
-            last = point;
         }
     }
 
@@ -327,7 +316,7 @@ public class WorldMapAPI
             yGraphDiff += (int) worldMapRect.getY();
             xGraphDiff += (int) worldMapRect.getX();
 
-            return new Point(xGraphDiff, yGraphDiff);
+            return new Point(xGraphDiff - 10, yGraphDiff);
         }
         return null;
     }
@@ -478,6 +467,9 @@ public class WorldMapAPI
         if (screenX == null || screenY == null) {
             return;
         }
+
+        screenX -= 7;
+        screenY += 3;
 
         // Get the map clipping area
         Area mapClipArea = getWorldMapClipArea(mapWidget.getBounds());
