@@ -37,6 +37,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ToggleSlider headlessToggle;
     private final ToggleSlider logPacketsToggle;
     private final ToggleSlider logMenuActionsToggle;
+    private final ToggleSlider hideLoggerToggle;
     private JFrame transportsEditor;
 
     private VitaLiteOptionsPanel() {
@@ -105,6 +106,15 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 "Enable menu action logging",
                 logMenuActionsToggle,
                 () -> {}
+        ));
+        contentPanel.add(Box.createVerticalStrut(12));
+
+        hideLoggerToggle = new ToggleSlider();
+        contentPanel.add(createToggleOption(
+                "Hide Logger",
+                "Hide the logger panel",
+                hideLoggerToggle,
+                () -> Logger.setLoggerVisible(!hideLoggerToggle.isSelected())
         ));
         contentPanel.add(Box.createVerticalStrut(12));
 

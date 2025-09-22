@@ -1,20 +1,36 @@
 package com.tonic.services;
 
 import com.tonic.Static;
+import com.tonic.api.widgets.MinimapAPI;
 import com.tonic.data.TileItemEx;
 import com.tonic.data.TileObjectEx;
+import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.transports.TransportLoader;
+import com.tonic.util.ThreadPool;
 import net.runelite.api.*;
+import net.runelite.api.Point;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
+import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.widgets.Widget;
+import net.runelite.api.worldmap.WorldMap;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.SpriteManager;
+import net.runelite.client.ui.overlay.worldmap.WorldMapPoint;
+import org.lwjgl.system.linux.Stat;
+
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class GameCache
+public class GameManager
 {
     //static api
     public static int getTickCount()
@@ -104,7 +120,7 @@ public class GameCache
 
 
     //singleton instance
-    private final static GameCache INSTANCE = new GameCache();
+    private final static GameManager INSTANCE = new GameManager();
 
 
     /**
@@ -115,7 +131,7 @@ public class GameCache
     {
     }
 
-    private GameCache()
+    private GameManager()
     {
         Static.getRuneLite()
                 .getEventBus()
@@ -127,6 +143,7 @@ public class GameCache
     private final List<TileItemEx> tileItemCache = new CopyOnWriteArrayList<>();
     private Actor lastInteracting = null;
     private int tickCount = 0;
+    private Point lastMenuOpenedPoint;
 
     @Subscribe
     public void onGameTick(GameTick event)
@@ -183,5 +200,47 @@ public class GameCache
                 ex.getWorldLocation().equals(WorldPoint.fromLocal(Static.getClient(), event.getTile().getLocalLocation())) &&
                 ex.getLocalPoint().equals(event.getTile().getLocalLocation())
         );
+    }
+
+    @Subscribe
+    public void onMenuOpened(MenuOpened event) {
+        final Client client = Static.getClient();
+        lastMenuOpenedPoint = client.getMouseCanvasPosition();
+    }
+
+    @Subscribe
+    public void onMenuEntryAdded(MenuEntryAdded event) {
+
+
+        final Client client = Static.getClient();
+        final Widget map = client.getWidget(ComponentID.WORLD_MAP_MAPVIEW);
+        if(map == null)
+            return;
+
+        Point lastMenuOpenedPoint = client.getMouseCanvasPosition();
+        final WorldPoint wp = MinimapAPI.convertMapClickToWorldPoint(client, lastMenuOpenedPoint.getX(), lastMenuOpenedPoint.getY());
+
+        if (wp != null) {
+            addMenuEntry(event, wp);
+        }
+    }
+
+    private void addMenuEntry(MenuEntryAdded event, WorldPoint wp) {
+        final Client client = Static.getClient();
+        List<MenuEntry> entries = new LinkedList<>(Arrays.asList(client.getMenuEntries()));
+
+        if (entries.stream().anyMatch(e -> e.getOption().equals("Pathfind") && e.getTarget().equals("Here"))) {
+            return;
+        }
+
+        String color = "<col=00ff00>";
+        client.createMenuEntry(0)
+                .setOption("Walk ")
+                .setTarget(color + wp.toString() + " ")
+                .setParam0(event.getActionParam0())
+                .setParam1(event.getActionParam1())
+                .setIdentifier(event.getIdentifier())
+                .setType(MenuAction.RUNELITE)
+                .onClick(e -> ThreadPool.submit(() -> Walker.walkTo(wp)));
     }
 }

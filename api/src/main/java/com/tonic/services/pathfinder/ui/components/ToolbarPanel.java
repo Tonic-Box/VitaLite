@@ -1,6 +1,10 @@
 package com.tonic.services.pathfinder.ui.components;
 
+import com.tonic.Static;
+import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.services.pathfinder.ui.TransportEditorFrame;
+import com.tonic.services.pathfinder.ui.TransportOverlay;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -27,6 +31,7 @@ public class ToolbarPanel extends JPanel {
 
     // Checkbox
     private JCheckBox highlightTransportsCheckbox;
+    private final TransportOverlay overlay = new TransportOverlay();
 
     public ToolbarPanel(TransportEditorFrame parent) {
         this.parent = parent;
@@ -46,11 +51,11 @@ public class ToolbarPanel extends JPanel {
         newTransportButton = createToolbarButton("New Transport", "Add a new transport");
 
         // Create highlight checkbox
-        highlightTransportsCheckbox = new JCheckBox("Highlight Transports");
+        highlightTransportsCheckbox = new JCheckBox("Enable In-Game Interop");
         highlightTransportsCheckbox.setBackground(BACKGROUND_COLOR);
         highlightTransportsCheckbox.setForeground(Color.WHITE);
         highlightTransportsCheckbox.setFocusPainted(false);
-        highlightTransportsCheckbox.setToolTipText("Highlight transport objects in game world");
+        highlightTransportsCheckbox.setToolTipText("Enable transport highlighting and menu options in-game");
 
         // Initially disable save button
         saveButton.setEnabled(false);
@@ -91,7 +96,16 @@ public class ToolbarPanel extends JPanel {
         // Highlight checkbox event handler
         highlightTransportsCheckbox.addActionListener(e -> {
             boolean isSelected = highlightTransportsCheckbox.isSelected();
-            System.out.println("Highlight Transports checkbox changed: " + isSelected);
+            OverlayManager overlayManager = Static.getInjector().getInstance(OverlayManager.class);
+            if (isSelected) {
+                TransportLoader.refreshTransports(false);
+                overlayManager.add(overlay);
+                overlay.setActive(true);
+            } else {
+                Static.getRuneLite().getEventBus().unregister(overlay);
+                overlayManager.remove(overlay);
+                overlay.setActive(false);
+            }
         });
     }
 

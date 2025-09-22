@@ -8,6 +8,7 @@ import com.tonic.services.pathfinder.ui.components.TransportListPanel;
 import com.tonic.services.pathfinder.ui.components.ToolbarPanel;
 import com.tonic.services.pathfinder.ui.utils.JsonFileManager;
 import com.tonic.util.ThreadPool;
+import net.runelite.api.coords.WorldPoint;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
  * Provides a clean, modern interface for managing transport JSON data.
  */
 public class TransportEditorFrame extends JFrame {
+    public static TransportEditorFrame INSTANCE;
     private static final String TITLE = "VitaLite Transport Editor";
     private static final Dimension PREFERRED_SIZE = new Dimension(1400, 900);
     private static final Color BACKGROUND_COLOR = new Color(45, 47, 49);
@@ -48,6 +50,7 @@ public class TransportEditorFrame extends JFrame {
 
         // Auto-load transports on startup
         SwingUtilities.invokeLater(this::loadTransportsFromFile);
+        INSTANCE = this;
     }
 
     private void initializeFrame() {
@@ -101,9 +104,7 @@ public class TransportEditorFrame extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (confirmDiscardChanges()) {
-                    dispose();
-                }
+                dispose();
             }
         });
     }
@@ -169,16 +170,34 @@ public class TransportEditorFrame extends JFrame {
     }
 
     public void deleteTransport(TransportDto transport) {
+        System.out.println("deleteTransport called with transport: " + (transport != null ? transport.getAction() : "null"));
+
         if (transport != null && confirmDeleteTransport()) {
-            transports.remove(transport);
-            listPanel.refreshTransportList(transports);
+            System.out.println("User confirmed deletion, removing transport...");
+
+            boolean removed = transports.remove(transport);
+            System.out.println("Transport removed from list: " + removed);
+
+            System.out.println("Clearing detail panel selection first...");
             detailPanel.clearSelection();
+            System.out.println("Detail panel cleared");
+
+            System.out.println("Refreshing transport list...");
+            listPanel.refreshTransportList(transports);
+            System.out.println("Transport list refreshed");
+
+            System.out.println("Setting unsaved changes flag...");
             setHasUnsavedChanges(true);
+            System.out.println("deleteTransport completed successfully");
+        } else {
+            System.out.println("Deletion cancelled or transport was null");
         }
     }
 
     public void onTransportSelected(TransportDto transport) {
+        System.out.println("onTransportSelected called with: " + (transport != null ? transport.getAction() : "null"));
         detailPanel.displayTransport(transport);
+        System.out.println("detailPanel.displayTransport completed");
     }
 
     public void onTransportModified() {
@@ -199,6 +218,10 @@ public class TransportEditorFrame extends JFrame {
 
     public List<TransportDto> getTransports() {
         return transports;
+    }
+
+    public boolean selectTransportByObjectAndSource(int objectId, WorldPoint worldPoint) {
+        return selectTransportByObjectAndSource(objectId, worldPoint.getX(), worldPoint.getY(), worldPoint.getPlane());
     }
 
     /**

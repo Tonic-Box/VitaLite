@@ -1,7 +1,7 @@
 package com.tonic.queries;
 
 import com.tonic.queries.abstractions.AbstractActorQuery;
-import com.tonic.services.GameCache;
+import com.tonic.services.GameManager;
 import net.runelite.api.NPC;
 import net.runelite.api.NPCComposition;
 
@@ -9,7 +9,7 @@ public class NpcQuery extends AbstractActorQuery<NPC, NpcQuery>
 {
     public NpcQuery()
     {
-        super(GameCache.npcList());
+        super(GameManager.npcList());
     }
 
     public NpcQuery withIds(int... ids)

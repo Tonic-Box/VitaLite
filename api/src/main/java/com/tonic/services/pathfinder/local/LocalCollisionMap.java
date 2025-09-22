@@ -1,7 +1,7 @@
 package com.tonic.services.pathfinder.local;
 
 import com.tonic.Static;
-import com.tonic.services.GameCache;
+import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.Pathfinder;
 import com.tonic.util.WorldPointUtil;
 import gnu.trove.map.hash.TIntIntHashMap;
@@ -126,7 +126,7 @@ public class LocalCollisionMap
     private List<Integer> getDoored()
     {
         return Static.invoke(() ->
-                GameCache.objectStream()
+                GameManager.objectStream()
                         .filter(o -> {
                             String name = o.getName().toLowerCase();
                             return (name.contains("door") || name.contains("gate")) && !name.contains("trapdoor");

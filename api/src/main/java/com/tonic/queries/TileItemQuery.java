@@ -1,7 +1,7 @@
 package com.tonic.queries;
 
 import com.tonic.queries.abstractions.AbstractQuery;
-import com.tonic.services.GameCache;
+import com.tonic.services.GameManager;
 import com.tonic.data.TileItemEx;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
@@ -13,7 +13,7 @@ import java.awt.geom.Point2D;
 public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
 {
     public TileItemQuery() {
-        super(GameCache.tileItemList());
+        super(GameManager.tileItemList());
     }
 
     public TileItemQuery withId(int... id)

@@ -129,7 +129,7 @@ public class PluginManagerMixin {
                 )
 
                 .invokeStatic(
-                        "com/tonic/services/GameCache",
+                        "com/tonic/services/GameManager",
                         "init",
                         "()V"
                 )
