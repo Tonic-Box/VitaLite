@@ -225,11 +225,11 @@ public class WorldMapAPI
     //drawing
     public static void drawPath(Graphics2D graphics, List<WorldPoint> worldPoints, Color color)
     {
-        if (WidgetAPI.get(WidgetInfo.WORLD_MAP_VIEW) == null) {
+        if (WidgetAPI.get(InterfaceID.Worldmap.MAP_CONTAINER) == null) {
             return;
         }
 
-        Area mapClipArea = getWorldMapClipArea(WidgetAPI.get(WidgetInfo.WORLD_MAP_VIEW).getBounds());
+        Area mapClipArea = getWorldMapClipArea(WidgetAPI.get(InterfaceID.Worldmap.MAP_CONTAINER).getBounds());
         WorldPoint last = null;
         for(WorldPoint point : worldPoints)
         {
@@ -248,8 +248,8 @@ public class WorldMapAPI
     }
 
     private static Area getWorldMapClipArea(Rectangle baseRectangle) {
-        final Widget overview = WidgetAPI.get(WidgetInfo.WORLD_MAP_OVERVIEW_MAP);
-        final Widget surfaceSelector = WidgetAPI.get(WidgetInfo.WORLD_MAP_SURFACE_SELECTOR);
+        final Widget overview = WidgetAPI.get(InterfaceID.Worldmap.OVERVIEW_CONTAINER);
+        final Widget surfaceSelector = WidgetAPI.get(InterfaceID.Worldmap.MAPLIST_BOX_GRAPHIC0);
 
         Area clipArea = new Area(baseRectangle);
 
@@ -299,7 +299,7 @@ public class WorldMapAPI
 
         float pixelsPerTile = worldMap.getWorldMapZoom();
 
-        Widget map = WidgetAPI.get(WidgetInfo.WORLD_MAP_VIEW);
+        Widget map = WidgetAPI.get(InterfaceID.Worldmap.MAP_CONTAINER);
         if (map != null)
         {
             Rectangle worldMapRect = map.getBounds();

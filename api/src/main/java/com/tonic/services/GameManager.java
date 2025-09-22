@@ -12,16 +12,13 @@ import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.ThreadPool;
 import net.runelite.api.*;
 import net.runelite.api.Point;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.*;
-
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -303,11 +300,12 @@ public class GameManager extends Overlay {
             MiniMapAPI.drawPath(graphics, testPoints, Color.MAGENTA);
         }
 
-        if(pathPoints == null || pathPoints.isEmpty())
-            return null;
+        if(pathPoints != null && !pathPoints.isEmpty())
+        {
+            WorldMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
+            MiniMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
+        }
 
-        WorldMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
-        MiniMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
         return null;
     }
 }
