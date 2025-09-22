@@ -20,13 +20,13 @@ import java.util.List;
 public class LongTransport extends Transport
 {
     public LongTransport(WorldPoint source, WorldPoint destination, int sourceRadius, int destinationRadius, List<Runnable> handler) {
-        super(source, destination, sourceRadius, destinationRadius, null);
+        super(source, destination, sourceRadius, destinationRadius, null, -1);
         this.handler = handler;
         this.duration = handler.size();
     }
 
     public LongTransport(WorldPoint source, WorldPoint destination, int sourceRadius, int destinationRadius, List<Runnable> handler, Requirements requirements, int delay) {
-        super(WorldPointUtil.compress(source), WorldPointUtil.compress(destination), sourceRadius, destinationRadius, delay, handler, requirements);
+        super(WorldPointUtil.compress(source), WorldPointUtil.compress(destination), sourceRadius, destinationRadius, delay, handler, requirements, -1);
         this.source = WorldPointUtil.compress(source);
         this.destination = WorldPointUtil.compress(destination);
         this.sourceRadius = sourceRadius;

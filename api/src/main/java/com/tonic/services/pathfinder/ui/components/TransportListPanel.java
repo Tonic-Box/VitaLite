@@ -33,6 +33,7 @@ public class TransportListPanel extends JPanel {
 
     private List<TransportDto> allTransports = new ArrayList<>();
     private List<TransportDto> filteredTransports = new ArrayList<>();
+    private javax.swing.event.ListSelectionListener selectionListener;
 
     public TransportListPanel(TransportEditorFrame parent) {
         this.parent = parent;
@@ -191,13 +192,19 @@ public class TransportListPanel extends JPanel {
         // Action filter listener
         actionFilter.addActionListener(e -> applyFilters());
 
-        // List selection listener
-        transportList.addListSelectionListener(e -> {
+        // Create and store the selection listener
+        selectionListener = e -> {
+            System.out.println("List selection event: valueIsAdjusting=" + e.getValueIsAdjusting());
             if (!e.getValueIsAdjusting()) {
                 TransportDto selected = transportList.getSelectedValue();
+                System.out.println("Selection changed to: " + (selected != null ? selected.getAction() : "null"));
                 parent.onTransportSelected(selected);
+                System.out.println("onTransportSelected completed");
             }
-        });
+        };
+
+        // Add the selection listener
+        transportList.addListSelectionListener(selectionListener);
 
         // Double-click to edit
         transportList.addMouseListener(new MouseAdapter() {
@@ -216,9 +223,13 @@ public class TransportListPanel extends JPanel {
     // Public API
 
     public void refreshTransportList(List<TransportDto> transports) {
+        System.out.println("refreshTransportList called with " + transports.size() + " transports");
         this.allTransports = new ArrayList<>(transports);
+        System.out.println("allTransports updated, calling updateActionFilter...");
         updateActionFilter();
+        System.out.println("updateActionFilter completed, calling applyFilters...");
         applyFilters();
+        System.out.println("refreshTransportList completed");
     }
 
     public void selectTransport(TransportDto transport) {
@@ -253,16 +264,21 @@ public class TransportListPanel extends JPanel {
     }
 
     private void applyFilters() {
+        System.out.println("applyFilters called");
         String searchText = searchField.getText().toLowerCase().trim();
         String selectedAction = (String) actionFilter.getSelectedItem();
+        System.out.println("Search text: '" + searchText + "', Selected action: '" + selectedAction + "'");
 
         filteredTransports = allTransports.stream()
             .filter(transport -> matchesSearch(transport, searchText))
             .filter(transport -> matchesActionFilter(transport, selectedAction))
             .collect(Collectors.toList());
 
+        System.out.println("Filtered to " + filteredTransports.size() + " transports, calling updateListModel...");
         updateListModel();
+        System.out.println("updateListModel completed, calling updateCountLabel...");
         updateCountLabel();
+        System.out.println("applyFilters completed");
     }
 
     private boolean matchesSearch(TransportDto transport, String searchText) {
@@ -304,10 +320,24 @@ public class TransportListPanel extends JPanel {
     }
 
     private void updateListModel() {
-        listModel.clear();
-        for (TransportDto transport : filteredTransports) {
-            listModel.addElement(transport);
+        System.out.println("updateListModel called with " + filteredTransports.size() + " elements");
+
+        // Temporarily remove listener to prevent events during update
+        transportList.removeListSelectionListener(selectionListener);
+
+        try {
+            // Use setListData for better performance with large datasets
+            TransportDto[] transportArray = filteredTransports.toArray(new TransportDto[0]);
+            System.out.println("Setting list data with " + transportArray.length + " elements...");
+            transportList.setListData(transportArray);
+            System.out.println("List data set successfully");
+        } finally {
+            // Always re-add the listener, even if there's an exception
+            transportList.addListSelectionListener(selectionListener);
+            System.out.println("Selection listener re-added");
         }
+
+        System.out.println("updateListModel completed");
     }
 
     private void updateCountLabel() {
@@ -340,10 +370,17 @@ public class TransportListPanel extends JPanel {
     }
 
     private void onDeleteTransport(ActionEvent e) {
+        System.out.println("onDeleteTransport called from UI button");
+
         TransportDto selected = transportList.getSelectedValue();
+        System.out.println("Selected transport: " + (selected != null ? selected.getAction() : "null"));
+
         if (selected != null) {
+            System.out.println("Calling parent.deleteTransport...");
             parent.deleteTransport(selected);
+            System.out.println("parent.deleteTransport returned");
         } else {
+            System.out.println("No transport selected, showing message dialog");
             JOptionPane.showMessageDialog(this,
                 "Please select a transport to delete.",
                 "No Selection",

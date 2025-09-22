@@ -3,14 +3,11 @@ package com.tonic.api.threaded;
 import com.tonic.Static;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.util.Coroutine;
-import com.tonic.services.GameCache;
+import com.tonic.services.GameManager;
 import net.runelite.api.Client;
 import net.runelite.api.Player;
 
 import java.util.function.Supplier;
-
-import static net.runelite.api.GameState.LOADING;
-import static net.runelite.api.GameState.LOGGED_IN;
 
 /**
  * Utility class for handling delays and ticks in the game. (For threaded automation)
@@ -30,10 +27,10 @@ public class Delays
      */
     public static void tick(int ticks)
     {
-        int tick = GameCache.getTickCount() + ticks;
-        int start = GameCache.getTickCount();
+        int tick = GameManager.getTickCount() + ticks;
+        int start = GameManager.getTickCount();
         Client client = Static.getClient();
-        while(GameCache.getTickCount() < tick && GameCache.getTickCount() >= start)
+        while(GameManager.getTickCount() < tick && GameManager.getTickCount() >= start)
         {
             if(Thread.currentThread().isInterrupted() || Coroutine._isCancelled())
             {
@@ -104,10 +101,10 @@ public class Delays
     public static boolean waitUntil(Supplier<Boolean> condition, int ticks)
     {
 
-        int end = GameCache.getTickCount() + ticks;
+        int end = GameManager.getTickCount() + ticks;
         while(!condition.get())
         {
-            if(GameCache.getTickCount() >= end)
+            if(GameManager.getTickCount() >= end)
             {
                 return false;
             }

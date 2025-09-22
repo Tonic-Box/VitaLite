@@ -106,13 +106,18 @@ public class TransportLoader
 
     public static void refreshTransports()
     {
+        refreshTransports(true);
+    }
+
+    public static void refreshTransports(boolean filter)
+    {
         boolean lock = Static.invoke(() ->
         {
             List<Transport> filteredStatic = new ArrayList<>();
             for (ArrayList<Transport> list : ALL_STATIC_TRANSPORTS.valueCollection()) {
                 for(var transport : list)
                 {
-                    if(transport.getRequirements().fulfilled())
+                    if(transport.getRequirements().fulfilled() || !filter)
                     {
                         filteredStatic.add(transport);
                     }
@@ -125,7 +130,7 @@ public class TransportLoader
 
             if (gold >= 30)
             {
-                if (Quests.isFinished(Quest.PIRATES_TREASURE))
+                if (Quests.isFinished(Quest.PIRATES_TREASURE) || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(3027, 3218, 0), new WorldPoint(2956, 3143, 1), 3644, "Pay-fare"));
                     transports.add(npcTransport(new WorldPoint(2954, 3147, 0), new WorldPoint(3032, 3217, 1), 3648, "Pay-Fare"));
@@ -137,7 +142,7 @@ public class TransportLoader
                 }
             }
 
-            if (WorldsAPI.inMembersWorld())
+            if (WorldsAPI.inMembersWorld() || !filter)
             {
                 //Shamans
                 transports.add(objectTransport(new WorldPoint(1312, 3685, 0), new WorldPoint(1312, 10086, 0), 34405, "Enter"));
@@ -155,7 +160,7 @@ public class TransportLoader
                 transports.add(objectTransport(new WorldPoint(1326, 10096, 0), new WorldPoint(1324, 10096, 0), 34642, "Pass"));
 
                 // Crabclaw island
-                if (gold >= 10_000)
+                if (gold >= 10_000 || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(1782, 3458, 0), new WorldPoint(1778, 3417, 0), 7483, "Travel"));
                 }
@@ -163,9 +168,9 @@ public class TransportLoader
                 transports.add(npcTransport(new WorldPoint(1779, 3418, 0), new WorldPoint(1784, 3458, 0), 7484, "Travel"));
 
                 // Port sarim
-                if (VarAPI.getVar(VarbitID.ZEAH_PLAYERHASVISITED) == 0) // First time talking to Veos
+                if (VarAPI.getVar(VarbitID.ZEAH_PLAYERHASVISITED) == 0 || !filter) // First time talking to Veos
                 {
-                    if (VarAPI.getVar(VarbitID.CLUEQUEST) >= 7)
+                    if (VarAPI.getVar(VarbitID.CLUEQUEST) >= 7 || !filter)
                     {
                         transports.add(npcDialogTransport(new WorldPoint(3054, 3245, 0),
                                 new WorldPoint(1824, 3691, 0),
@@ -180,7 +185,7 @@ public class TransportLoader
                                 "That's great, can you take me there please?"));
                     }
                 }
-                else if (Quests.isFinished(Quest.A_KINGDOM_DIVIDED)) // Veos is replaced during/after quest
+                else if (Quests.isFinished(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
                 {
                     transports.add(npcTransport(new WorldPoint(3053, 3245, 0),
                             new WorldPoint(1824, 3695, 1),
@@ -199,40 +204,13 @@ public class TransportLoader
                             "Port Piscarilius"));
                 }
 
-                // Charter Ships
-//                if (Static.getUnethicaliteConfig().useCharterShips())
-//                {
-//                    transports.addAll(CharterShipLocation.getCharterShips(gold));
-//                }
-
-                if (Quests.getState(Quest.LUNAR_DIPLOMACY) != QuestState.NOT_STARTED)
+                if (Quests.getState(Quest.LUNAR_DIPLOMACY) != QuestState.NOT_STARTED || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(2222, 3796, 2), new WorldPoint(2130, 3899, 2), NpcID.CAPTAIN_BENTLEY_6650, "Travel"));
                     transports.add(npcTransport(new WorldPoint(2130, 3899, 2), new WorldPoint(2222, 3796, 2), NpcID.CAPTAIN_BENTLEY_6650, "Travel"));
                 }
 
-                // Spirit Trees
-//                if (Quests.isFinished(Quest.TREE_GNOME_VILLAGE))
-//                {
-//                    for (var source : SPIRIT_TREES)
-//                    {
-//                        if (source.location.equals("Gnome Stronghold") && !Quests.isFinished(Quest.THE_GRAND_TREE))
-//                        {
-//                            continue;
-//                        }
-//                        for (var target : SPIRIT_TREES)
-//                        {
-//                            if (source == target)
-//                            {
-//                                continue;
-//                            }
-//
-//                            transports.add(spritTreeTransport(source.position, target.position, target.location));
-//                        }
-//                    }
-//                }
-
-                if (Quests.isFinished(Quest.THE_LOST_TRIBE))
+                if (Quests.isFinished(Quest.THE_LOST_TRIBE) || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(3229, 9610, 0), new WorldPoint(3316, 9613, 0), "Kazgar",
                             "Mines"));
@@ -241,21 +219,21 @@ public class TransportLoader
                 }
 
                 // Tree Gnome Village
-                if (Quests.getState(Quest.TREE_GNOME_VILLAGE) != QuestState.NOT_STARTED)
+                if (Quests.getState(Quest.TREE_GNOME_VILLAGE) != QuestState.NOT_STARTED || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(2504, 3192, 0), new WorldPoint(2515, 3159, 0), 4968, "Follow"));
                     transports.add(npcTransport(new WorldPoint(2515, 3159, 0), new WorldPoint(2504, 3192, 0), 4968, "Follow"));
                 }
 
                 // Gnome Battlefield
-                if (VarAPI.getVarp(VarPlayerID.TREEQUEST) >= 5)
+                if (VarAPI.getVarp(VarPlayerID.TREEQUEST) >= 5 || !filter)
                 {
                     transports.add(objectDialogTransport(new WorldPoint(2509, 3252, 0),
                             new WorldPoint(2509, 3254, 0), 2185,
                             "Climb-over"));
                 }
                 // Eagles peak cave
-                if (VarAPI.getVarp(934) >= 15)
+                if (VarAPI.getVarp(934) >= 15 || !filter)
                 {
                     // Entrance
                     transports.add(objectTransport(new WorldPoint(2328, 3496, 0), new WorldPoint(1994, 4983, 3), 19790,
@@ -265,7 +243,7 @@ public class TransportLoader
                 }
 
                 // Waterbirth island
-                if (Quests.isFinished(Quest.THE_FREMENNIK_TRIALS) || gold >= 1000)
+                if (Quests.isFinished(Quest.THE_FREMENNIK_TRIALS) || gold >= 1000 || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(2544, 3760, 0), new WorldPoint(2620, 3682, 0), 10407, "Rellekka"));
                     transports.add(npcTransport(new WorldPoint(2620, 3682, 0), new WorldPoint(2547, 3759, 0), 5937, "Waterbirth Island"));
@@ -276,7 +254,7 @@ public class TransportLoader
                 transports.add(npcTransport(new WorldPoint(2213, 3794, 0), new WorldPoint(2620, 3692, 0), NpcID.LOKAR_SEARUNNER_9306, "Rellekka"));
 
                 // Corsair's Cove
-                if (Skills.getBoostedLevel(Skill.AGILITY) >= 10)
+                if (Skills.getBoostedLevel(Skill.AGILITY) >= 10 || !filter)
                 {
                     transports.add(objectTransport(new WorldPoint(2546, 2871, 0), new WorldPoint(2546, 2873, 0), 31757,
                             "Climb"));
@@ -285,7 +263,7 @@ public class TransportLoader
                 }
 
                 // Lumbridge castle dining room, ignore if RFD is in progress.
-                if (Quests.getState(Quest.RECIPE_FOR_DISASTER) != QuestState.IN_PROGRESS)
+                if (Quests.getState(Quest.RECIPE_FOR_DISASTER) != QuestState.IN_PROGRESS || !filter)
                 {
 
                     transports.add(objectTransport(new WorldPoint(3213, 3221, 0), new WorldPoint(3212, 3221, 0), 12349, "Open"));
@@ -297,7 +275,7 @@ public class TransportLoader
                 }
 
                 // Digsite gate
-                if (VarAPI.getVar(VarbitID.VM_KUDOS) >= 153)
+                if (VarAPI.getVar(VarbitID.VM_KUDOS) >= 153 || !filter)
                 {
                     transports.add(objectTransport(new WorldPoint(3295, 3429, 0), new WorldPoint(3296, 3429, 0), 24561,
                             "Open"));
@@ -309,58 +287,9 @@ public class TransportLoader
                             "Open"));
                 }
 
-                // Fairy Rings
-//                if (EquipmentAPI.isEquipped(ItemID.DRAMEN_STAFF) || EquipmentAPI.isEquipped(ItemID.LUNAR_MOONCLAN_LIMINAL_STAFF)
-//                        && Quests.getState(Quest.FAIRYTALE_II__CURE_A_QUEEN) != QuestState.NOT_STARTED)
-//                {
-//                    for (FairyRingLocation sourceRing : FairyRingLocation.values())
-//                    {
-//                        for (FairyRingLocation destRing : FairyRingLocation.values())
-//                        {
-//                            if (sourceRing != destRing)
-//                            {
-//                                transports.add(fairyRingTransport(sourceRing, destRing));
-//                            }
-//                        }
-//                    }
-//                }
-
                 // Al Kharid to and from Ruins of Unkah
                 transports.add(npcTransport(new WorldPoint(3272, 3144, 0), new WorldPoint(3148, 2842, 0), NpcID.FERRYMAN_SATHWOOD, "Ferry"));
                 transports.add(npcTransport(new WorldPoint(3148, 2842, 0), new WorldPoint(3272, 3144, 0), NpcID.FERRYMAN_NATHWOOD, "Ferry"));
-
-                // Gnome Gliders
-//                if (Quests.isFinished(Quest.THE_GRAND_TREE))
-//                {
-//                    for (var source : GnomeGliderLocation.values())
-//                    {
-//                        for (var target : GnomeGliderLocation.values())
-//                        {
-//                            if (source.getWorldPoint() == GnomeGliderLocation.LEMANTO_ANDRA.getWorldPoint())
-//                            {
-//                                continue;
-//                            }
-//                            if ((source.getWorldPoint() == GnomeGliderLocation.LEMANTOLLY_UNDRI.getWorldPoint() ||
-//                                    target.getWorldPoint() == GnomeGliderLocation.LEMANTOLLY_UNDRI.getWorldPoint()) &&
-//                                    !Quests.isFinished(Quest.ONE_SMALL_FAVOUR))
-//                            {
-//                                continue;
-//                            }
-//                            if ((source.getWorldPoint() == GnomeGliderLocation.OOKOOKOLLY_UNDRI.getWorldPoint() ||
-//                                    target.getWorldPoint() == GnomeGliderLocation.OOKOOKOLLY_UNDRI.getWorldPoint()) &&
-//                                    !Quests.isFinished(Quest.MONKEY_MADNESS_II))
-//                            {
-//                                continue;
-//                            }
-//
-//                            if (source != target)
-//                            {
-//                                transports.add(gnomeGliderTransport(source.getWorldPoint(), target.getWorldPoint(), target.getWidgetID()));
-//                            }
-//                        }
-//                    }
-//                }
-//            }
 
                 // Entrana
                 transports.add(npcTransport(new WorldPoint(3041, 3237, 0), new WorldPoint(2834, 3331, 1), 1166, "Take-boat"));
@@ -382,17 +311,6 @@ public class TransportLoader
                         "Travel",
                         "Row to the barge and travel to the Digsite."));
 
-                // Magic Mushtrees
-//            for (var source : MUSHTREES)
-//            {
-//                for (var target : MUSHTREES)
-//                {
-//                    if (source.position != target.position)
-//                    {
-//                        transports.add(mushtreeTransport(source.position, target.position, target.widget));
-//                    }
-//                }
-//            }
                 // Tower of Life
                 transports.add(trapDoorTransport(new WorldPoint(2648, 3213, 0), new WorldPoint(3038, 4376, 0), ObjectID.TRAPDOOR_21921, ObjectID.TRAPDOOR_21922));
                 transports.add(objectTransport(new WorldPoint(3038, 4376, 0), new WorldPoint(2649, 3212, 0), ObjectID.LADDER_17974, "Climb-up"));
@@ -408,7 +326,7 @@ public class TransportLoader
                 transports.add(trapDoorTransport(new WorldPoint(3422, 3484, 0), new WorldPoint(3440, 9887, 0), 3432, 3433));
 
                 // Port Piscarilius
-                if (Quests.isFinished(Quest.A_KINGDOM_DIVIDED)) // Veos is replaced during/after quest
+                if (Quests.isFinished(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
                 {
                     transports.add(npcTransport(new WorldPoint(1826, 3691, 0), new WorldPoint(3055, 3242, 1), 10932, "Port Sarim"));
                     transports.add(npcTransport(new WorldPoint(1826, 3691, 0), new WorldPoint(1504, 3395, 1), 10932, "Land's End"));
@@ -445,7 +363,7 @@ public class TransportLoader
                 // Draynor manor basement
                 for (var entry : MovementConstants.DRAYNOR_MANOR_BASEMENT_DOORS.entrySet())
                 {
-                    if (VarAPI.getVar(entry.getKey()) == 1)
+                    if (VarAPI.getVar(entry.getKey()) == 1 || !filter)
                     {
                         var points = entry.getValue();
                         transports.add(lockingDoorTransport(points.getLeft(), points.getRight(), 11450));
@@ -466,12 +384,12 @@ public class TransportLoader
                 transports.add(objectTransport(new WorldPoint(2012, 9004, 1), new WorldPoint(2523, 2860, 0), 31790, "Climb"));
 
                 // Rimmington docks to and from Corsair Cove using Captain Tock's ship
-                if (Quests.isFinished(Quest.THE_CORSAIR_CURSE))
+                if (Quests.isFinished(Quest.THE_CORSAIR_CURSE) || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(2910, 3226, 0), new WorldPoint(2578, 2837, 1), NpcID.CABIN_BOY_COLIN_7967, "Travel"));
                     transports.add(npcTransport(new WorldPoint(2574, 2835, 1), new WorldPoint(2909, 3230, 1), NpcID.CABIN_BOY_COLIN_7967, "Travel"));
                 }
-                else if (VarAPI.getVar(VarbitID.CORSCURS_PROGRESS) >= 15)
+                else if (VarAPI.getVar(VarbitID.CORSCURS_PROGRESS) >= 15 || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(2910, 3226, 0), new WorldPoint(2578, 2837, 1), NpcID.CAPTAIN_TOCK_7958, "Travel"));
                     transports.add(npcTransport(new WorldPoint(2574, 2835, 1), new WorldPoint(2909, 3230, 1), NpcID.CAPTAIN_TOCK_7958, "Travel"));
@@ -481,7 +399,7 @@ public class TransportLoader
                 transports.add(lockingDoorTransport(new WorldPoint(3123, 3244, 0), new WorldPoint(3123, 3243, 0), ObjectID.PRISON_GATE_2881));
                 transports.add(lockingDoorTransport(new WorldPoint(3123, 3243, 0), new WorldPoint(3123, 3244, 0), ObjectID.PRISON_GATE_2881));
 
-                if (InventoryAPI.contains(SLASH_ITEMS) || EquipmentAPI.isEquipped(i -> ArrayUtils.contains(SLASH_ITEMS, i.getId())))
+                if (InventoryAPI.contains(SLASH_ITEMS) || EquipmentAPI.isEquipped(i -> ArrayUtils.contains(SLASH_ITEMS, i.getId())) || !filter)
                 {
                     for (Pair<WorldPoint, WorldPoint> pair : SLASH_WEB_POINTS)
                     {
@@ -499,7 +417,7 @@ public class TransportLoader
             hardcodedBullshit(LAST_TRANSPORT_LIST);
 
             addManholes(LAST_TRANSPORT_LIST);
-            if(WorldsAPI.inMembersWorld())
+            if(WorldsAPI.inMembersWorld() || !filter)
             {
                 zannerisDoor(LAST_TRANSPORT_LIST);
                 veos(LAST_TRANSPORT_LIST);
@@ -512,11 +430,11 @@ public class TransportLoader
                 dwarvenCarts(LAST_TRANSPORT_LIST);
                 canoes(LAST_TRANSPORT_LIST);
             }
-            if(VarAPI.getVar(279) == 1 || InventoryAPI.contains(ItemID.ROPE))
+            if(VarAPI.getVar(279) == 1 || InventoryAPI.contains(ItemID.ROPE) || !filter)
             {
                 computeIfAbsent(LAST_TRANSPORT_LIST, lumbyCave());
             }
-            if(InventoryAPI.count(ItemID.COINS_995) > 10 || InventoryAPI.contains(ItemID.SHANTAY_PASS))
+            if(InventoryAPI.count(ItemID.COINS_995) > 10 || InventoryAPI.contains(ItemID.SHANTAY_PASS) || !filter)
             {
                 computeIfAbsent(LAST_TRANSPORT_LIST, shantyPass());
             }
@@ -529,8 +447,12 @@ public class TransportLoader
                 computeIfAbsent(LAST_TRANSPORT_LIST, transport);
             }
 
-            LAST_TRANSPORT_LIST.forEachValue(list -> list.removeIf(t -> !t.getRequirements().fulfilled()));
-            LAST_TRANSPORT_LIST.retainEntries((key, value) ->  !value.isEmpty());
+            if(filter)
+            {
+                LAST_TRANSPORT_LIST.forEachValue(list -> list.removeIf(t -> !t.getRequirements().fulfilled()));
+                LAST_TRANSPORT_LIST.retainEntries((key, value) ->  !value.isEmpty());
+            }
+
 
             System.out.println("Refreshed transports, found " + LAST_TRANSPORT_LIST.size() + " transport nodes");
             return true;
@@ -552,7 +474,7 @@ public class TransportLoader
             List<Runnable> consumers = new ArrayList<>();
             consumers.add(cart::rideBack);
 
-            Transport transport = new Transport(WorldPointUtil.compress(cart.getLocation()), WorldPointUtil.compress(cart.getDestination()), 6, 1, 22, consumers, cart.getRequirements());
+            Transport transport = new Transport(WorldPointUtil.compress(cart.getLocation()), WorldPointUtil.compress(cart.getDestination()), 6, 1, 22, consumers, cart.getRequirements(), -1);
             computeIfAbsent(transports, WorldPointUtil.compress(cart.getLocation()), transport);
         }
 
@@ -561,7 +483,7 @@ public class TransportLoader
             List<Runnable> consumers = new ArrayList<>();
             consumers.add(cart::rideThere);
 
-            Transport transport = new Transport(WorldPointUtil.compress(DwarvenCart.KELDEGRIM_WORLDPOINT), WorldPointUtil.compress(cart.getLocation()), 6, 1, 21, consumers, cart.getRequirements());
+            Transport transport = new Transport(WorldPointUtil.compress(DwarvenCart.KELDEGRIM_WORLDPOINT), WorldPointUtil.compress(cart.getLocation()), 6, 1, 21, consumers, cart.getRequirements(), -1);
             computeIfAbsent(transports, WorldPointUtil.compress(DwarvenCart.KELDEGRIM_WORLDPOINT), transport);
         }
     }
@@ -591,7 +513,7 @@ public class TransportLoader
                     merged.addRequirements(ring.getRequirements().getAll());
                     merged.addRequirements(destination.getRequirements().getAll());
 
-                    Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, consumers, merged);
+                    Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, consumers, merged, -1);
                     computeIfAbsent(transports, WorldPointUtil.compress(ring.getLocation()), transport);
                     continue;
                 }
@@ -613,7 +535,7 @@ public class TransportLoader
                 merged.addRequirements(ring.getRequirements().getAll());
                 merged.addRequirements(destination.getRequirements().getAll());
 
-                Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, consumers, merged);
+                Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, consumers, merged, -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(ring.getLocation()), transport);
             }
         }
@@ -641,7 +563,7 @@ public class TransportLoader
                     Delays.waitUntil(() -> WidgetAPI.get(138, 0) != null);
                     WidgetAPI.interact(0, destination.getIndex(), -1, -1);
                 });
-                Transport transport = new Transport(WorldPointUtil.compress(glider.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 4, consumers, destination.getRequirements());
+                Transport transport = new Transport(WorldPointUtil.compress(glider.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 4, consumers, destination.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(glider.getLocation()), transport);
             }
         }
@@ -667,7 +589,7 @@ public class TransportLoader
                     Delays.tick();
                     DialogueAPI.resumePause(12255235, destination.getIndex());
                 });
-                Transport transport = new Transport(WorldPointUtil.compress(minecart.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 5, consumers, MinecartNetwork.getRequirements());
+                Transport transport = new Transport(WorldPointUtil.compress(minecart.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 5, consumers, MinecartNetwork.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(minecart.getLocation()), transport);
             }
         }
@@ -693,7 +615,7 @@ public class TransportLoader
                     Delays.waitUntil(() -> WidgetAPI.get(12255235) != null);
                     DialogueAPI.resumePause(12255235, destination.getIndex());
                 });
-                Transport transport = new Transport(WorldPointUtil.compress(tree.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 3, consumers, destination.getRequirements());
+                Transport transport = new Transport(WorldPointUtil.compress(tree.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 3, consumers, destination.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(tree.getLocation()), transport);
             }
         }
@@ -726,7 +648,8 @@ public class TransportLoader
                         WorldPointUtil.compress(destination.getArival()),
                         6, 1, 4,
                         actions,
-                        destination.getRequirements()
+                        destination.getRequirements(),
+                        -1
                 );
                 computeIfAbsent(transports, WorldPointUtil.compress(charterShip.getLocation()), transport);
             }
@@ -746,7 +669,7 @@ public class TransportLoader
                     NpcAPI.interact(npc, destination.getOption());
                     Delays.waitUntil(() -> !MovementAPI.isMoving());
                 });
-                Transport transport = new Transport(WorldPointUtil.compress(barnabyShip.getLocation()), WorldPointUtil.compress(destination.getArival()), 6, 1, 7, consumers, map.getRequirements());
+                Transport transport = new Transport(WorldPointUtil.compress(barnabyShip.getLocation()), WorldPointUtil.compress(destination.getArival()), 6, 1, 7, consumers, map.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(barnabyShip.getLocation()), transport);
             }
         }
@@ -765,7 +688,7 @@ public class TransportLoader
                     .node("take me", " Port ")
                     .process();
         });
-        Transport transport = new Transport(source, destination, 2, 2, consumers, 4);
+        Transport transport = new Transport(source, destination, 2, 2, consumers, 4, -1);
         computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
 
         //sarim -> Lands End
@@ -784,7 +707,7 @@ public class TransportLoader
                 Walker.walkTo(destination2);
             }
         });
-        Transport transport2 = new Transport(source2, destination2, 2, 2, consumers2, 0);
+        Transport transport2 = new Transport(source2, destination2, 2, 2, consumers2, 0, -1);
         computeIfAbsent(transports, WorldPointUtil.compress(source2), transport2);
     }
 
@@ -840,7 +763,7 @@ public class TransportLoader
             {
                 TileObjectAPI.interact(openDoor, "Open");
             }
-        });
+        }, -1);
     }
 
     public static Transport trapDoorTransport(
@@ -871,7 +794,7 @@ public class TransportLoader
                 TileObjectAPI.interact(openedTrapdoor, 0);
                 return;
             }
-        });
+        }, -1);
     }
 
     public static Transport itemUseTransport(
@@ -897,7 +820,7 @@ public class TransportLoader
             {
                 InventoryAPI.useOn(item, transport);
             }
-        });
+        }, -1);
     }
 
     public static Transport npcTransport(
@@ -917,7 +840,7 @@ public class TransportLoader
             {
                 NpcAPI.interact(npc, action);
             }
-        });
+        }, -1);
     }
 
     public static Transport npcTransport(
@@ -937,7 +860,7 @@ public class TransportLoader
             {
                 NpcAPI.interact(npc, action);
             }
-        });
+        }, -1);
     }
 
     public static Transport npcDialogTransport(
@@ -995,7 +918,7 @@ public class TransportLoader
             }
 
             TileObjectAPI.interact(first, actions);
-        });
+        }, -1);
     }
 
     public static Transport objectTransport(
@@ -1027,7 +950,7 @@ public class TransportLoader
             {
                 TileObjectAPI.interact(obj, actions);
             }
-        }, requirements);
+        }, requirements, objId);
     }
 
     public static Transport objectDialogTransport(
@@ -1077,7 +1000,7 @@ public class TransportLoader
             {
                 TileObjectAPI.interact(web, "Slash");
             }
-        });
+        }, -1);
     }
 
     private static void addManholes(final TIntObjectHashMap<ArrayList<Transport>> transports)

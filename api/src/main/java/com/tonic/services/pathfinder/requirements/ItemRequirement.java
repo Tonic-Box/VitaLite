@@ -11,7 +11,7 @@ import java.util.List;
 public class ItemRequirement implements Requirement
 {
     Reduction reduction;
-    boolean equipped;
+    Boolean equipped;
     List<Integer> ids;
     int amount;
 
@@ -25,13 +25,21 @@ public class ItemRequirement implements Requirement
         }
     }
 
+    public Boolean isEquipped() {
+        return equipped;
+    }
+
     @Override
     public Boolean get()
     {
         switch (reduction)
         {
             case AND:
-                if (equipped)
+                if(equipped == null)
+                {
+                    return ids.stream().allMatch(it -> (EquipmentAPI.getCount(it) + InventoryAPI.getCount(it)) >= amount);
+                }
+                else if (equipped)
                 {
                     return ids.stream().allMatch(it -> EquipmentAPI.getCount(it) >= amount);
                 }
@@ -40,7 +48,11 @@ public class ItemRequirement implements Requirement
                     return ids.stream().allMatch(it -> InventoryAPI.getCount(it) >= amount);
                 }
             case OR:
-                if (equipped)
+                if(equipped == null)
+                {
+                    return ids.stream().anyMatch(it -> (EquipmentAPI.getCount(it) + InventoryAPI.getCount(it)) >= amount);
+                }
+                else if (equipped)
                 {
                     return ids.stream().anyMatch(it -> EquipmentAPI.getCount(it) >= amount);
                 }
@@ -49,7 +61,11 @@ public class ItemRequirement implements Requirement
                     return ids.stream().anyMatch(it -> InventoryAPI.getCount(it) >= amount);
                 }
             case NOT:
-                if (equipped)
+                if (equipped == null)
+                {
+                    return ids.stream().noneMatch(it -> (EquipmentAPI.getCount(it) + InventoryAPI.getCount(it)) >= amount);
+                }
+                else if (equipped)
                 {
                     return ids.stream().noneMatch(it -> EquipmentAPI.getCount(it) >= amount);
                 }
