@@ -235,20 +235,35 @@ public class GameManager extends Overlay {
         }
 
         String color = "<col=00ff00>";
-        client.getMenu().createMenuEntry(0)
-                .setOption("Walk ")
-                .setTarget(color + wp.toString() + " ")
-                .setParam0(event.getActionParam0())
-                .setParam1(event.getActionParam1())
-                .setIdentifier(event.getIdentifier())
-                .setType(MenuAction.RUNELITE)
-                .onClick(e -> ThreadPool.submit(() -> {
-                    Pathfinder engine = new Pathfinder(wp);
-                    List<Step> path = engine.find();
-                    pathPoints = Step.toWorldPoints(path);
-                    Walker.walkTo(path, engine.getTeleport());
-                    pathPoints = null;
-                }));
+        if(!Walker.isWalking())
+        {
+            client.getMenu().createMenuEntry(0)
+                    .setOption("Walk ")
+                    .setTarget(color + wp.toString() + " ")
+                    .setParam0(event.getActionParam0())
+                    .setParam1(event.getActionParam1())
+                    .setIdentifier(event.getIdentifier())
+                    .setType(MenuAction.RUNELITE)
+                    .onClick(e -> ThreadPool.submit(() -> {
+                        Pathfinder engine = new Pathfinder(wp);
+                        List<Step> path = engine.find();
+                        pathPoints = Step.toWorldPoints(path);
+                        Walker.walkTo(path, engine.getTeleport());
+                        pathPoints = null;
+                    }));
+        }
+        else
+        {
+            client.getMenu().createMenuEntry(0)
+                    .setOption("Cancel ")
+                    .setTarget(color + "Walker ")
+                    .setParam0(event.getActionParam0())
+                    .setParam1(event.getActionParam1())
+                    .setIdentifier(event.getIdentifier())
+                    .setType(MenuAction.RUNELITE)
+                    .onClick(e -> Walker.cancelWalk());
+        }
+
 
         color = "<col=9B59B6>";
         client.getMenu().createMenuEntry(0)
@@ -261,6 +276,8 @@ public class GameManager extends Overlay {
                 .onClick(e -> ThreadPool.submit(() -> {
                     Pathfinder engine = new Pathfinder(wp);
                     List<Step> path = engine.find();
+                    if(path == null || path.isEmpty())
+                        return;
                     testPoints = Step.toWorldPoints(path);
                 }));
         color = "<col=FF0000>";

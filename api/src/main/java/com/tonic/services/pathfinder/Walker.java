@@ -57,6 +57,16 @@ public class Walker
         prayerDangerZone = client.getRealSkillLevel(Skill.PRAYER) / 2;
     }
 
+    public static void cancelWalk()
+    {
+        instance.cancel();
+    }
+
+    public static boolean isWalking()
+    {
+        return instance.running;
+    }
+
     public static void walkTo(WorldPoint target, int eatAtHp)
     {
         instance.setHealthHandler(eatAtHp);
@@ -163,6 +173,14 @@ public class Walker
             WorldPoint end = path.get(path.size() - 1).getPosition();
             while(traverse(path))
             {
+                if(!running)
+                {
+                    prayers = null;
+                    healthHandler = 0;
+                    running = false;
+                    timer = 0;
+                    return;
+                }
                 Delays.tick();
             }
             int timeout = 50;
@@ -186,15 +204,28 @@ public class Walker
                     Delays.tick();
                 }
                 worldPoint = Static.invoke(() -> client.getLocalPlayer().getWorldLocation());
+                if(!running)
+                {
+                    prayers = null;
+                    healthHandler = 0;
+                    running = false;
+                    timer = 0;
+                    return;
+                }
             }
         }
         finally {
             prayers = null;
             healthHandler = 0;
             running = false;
-            System.out.println("Pathfinder took: " + (client.getTickCount() - timer) + " ticks");
             timer = 0;
+            System.out.println("Pathfinder took: " + (client.getTickCount() - timer) + " ticks");
         }
+    }
+
+    private void cancel()
+    {
+        running = false;
     }
 
     /**
