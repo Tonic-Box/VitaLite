@@ -25,6 +25,8 @@ dependencies {
     implementation("io.netty:netty-all:5.0.0.Alpha2")
     implementation("com.google.code.gson:gson:2.8.9")
     compileOnly("com.google.inject:guice:5.1.0")
+    implementation("org.apache.commons:commons-configuration2:2.8.0")
+    implementation("commons-beanutils:commons-beanutils:1.11.0")
     implementation(group = "com.fifesoft", name = "rsyntaxtextarea", version = "3.1.2")
     implementation(group = "com.fifesoft", name = "autocomplete", version = "3.1.1")
     implementation("org.antlr:antlr4:4.13.1")

@@ -63,8 +63,8 @@ public class Install
     }
 
     private List<Path> findJars() {
-        Path external   = Main.RUNELITE_DIR.resolve("externalplugins");
-        Path sideloaded = Main.RUNELITE_DIR.resolve("sideloaded-plugins");
+        Path external   = Static.RUNELITE_DIR.resolve("externalplugins");
+        Path sideloaded = Static.RUNELITE_DIR.resolve("sideloaded-plugins");
 
         try {
             Files.createDirectories(external);

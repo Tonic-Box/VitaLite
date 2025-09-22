@@ -21,7 +21,6 @@ import static com.tonic.vitalite.Versioning.isRunningFromShadedJar;
 
 public class Main {
     public static final Path RUNELITE_REPOSITORY_DIR = Path.of(System.getProperty("user.home"), ".runelite", "repository2");
-    public static final Path RUNELITE_DIR = Path.of(System.getProperty("user.home"), ".runelite");
     public static final VitaLiteOptions optionsParser = new VitaLiteOptions();
     private static URL[] URLS = null;
     public static Libs LIBS;

@@ -6,12 +6,15 @@ import com.tonic.headless.HeadlessMode;
 import com.tonic.model.RuneLite;
 import lombok.Getter;
 
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public class Static
 {
+    public static final Path RUNELITE_DIR = Path.of(System.getProperty("user.home"), ".runelite");
+    public static final Path VITA_DIR = Path.of(RUNELITE_DIR.toString(), "vitalite");
     @Getter
     private static boolean headless = false;
     private static Object CLIENT_OBJECT;

@@ -6,14 +6,13 @@ import com.tonic.events.PacketSent;
 import com.tonic.model.ui.componants.*;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
+import com.tonic.services.ConfigManager;
 import com.tonic.util.ReflectBuilder;
 import com.tonic.util.ReflectUtil;
 import com.tonic.util.ThreadPool;
 
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Map;
 
 public class VitaLiteOptionsPanel extends VPluginPanel {
@@ -39,9 +38,17 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ToggleSlider logMenuActionsToggle;
     private final ToggleSlider hideLoggerToggle;
     private JFrame transportsEditor;
+    private final ConfigManager config = new ConfigManager("VitaLiteOptions");
 
     private VitaLiteOptionsPanel() {
         super(true);
+
+        Map<String,Object> defaults = Map.of(
+                "clickStrategy", ClickStrategy.STATIC.name(),
+                "clickPointX", -1,
+                "clickPointY", -1
+        );
+        config.ensure(defaults);
 
         JPanel contentPanel = new JPanel() {
             @Override
@@ -120,14 +127,24 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
         FancyDualSpinner pointSpinner = new FancyDualSpinner(
                 "Static Click Point",
-                Integer.MIN_VALUE, Integer.MAX_VALUE, ClickManager.getPoint().get().x,
-                Integer.MIN_VALUE, Integer.MAX_VALUE, ClickManager.getPoint().get().y
+                Integer.MIN_VALUE, Integer.MAX_VALUE, config.getInt("clickPointX"),
+                Integer.MIN_VALUE, Integer.MAX_VALUE, config.getInt("clickPointY")
         );
-        pointSpinner.addChangeListener(e -> ClickManager.setPoint(pointSpinner.getLeftValue().intValue(), pointSpinner.getRightValue().intValue()));
+        ClickManager.setPoint(pointSpinner.getLeftValue().intValue(), pointSpinner.getRightValue().intValue());
+        pointSpinner.addChangeListener(e -> {
+            config.setProperty("clickPointX", pointSpinner.getLeftValue().intValue());
+            config.setProperty("clickPointY", pointSpinner.getRightValue().intValue());
+            ClickManager.setPoint(pointSpinner.getLeftValue().intValue(), pointSpinner.getRightValue().intValue());
+        });
         pointSpinner.setVisible(ClickManager.getStrategy() == ClickStrategy.STATIC);
 
         FancyDropdown<ClickStrategy> clickStrategyDropdown = new FancyDropdown<>("Click Strategy", ClickStrategy.class);
+        String name = config.getString("clickStrategy");
+        clickStrategyDropdown.setSelectedItem(ClickStrategy.valueOf(name));
+        ClickManager.setStrategy(clickStrategyDropdown.getSelectedItem());
+        pointSpinner.setVisible(ClickManager.getStrategy() == ClickStrategy.STATIC);
         clickStrategyDropdown.addSelectionListener(event -> {
+            config.setProperty("clickStrategy", clickStrategyDropdown.getSelectedItem().name());
             ClickManager.setStrategy(clickStrategyDropdown.getSelectedItem());
             pointSpinner.setVisible(ClickManager.getStrategy() == ClickStrategy.STATIC);
         });
