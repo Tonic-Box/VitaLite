@@ -55,4 +55,26 @@ public class VitaPlugin extends Plugin
             }
         }));
     }
+
+    /**
+     * Gracefully prematurely end/cancel a running async loop().
+     * @param callback callback
+     */
+    public void haltLoop(Runnable callback)
+    {
+        if(loopFuture == null || loopFuture.isDone())
+            callback.run();
+        Coroutine._cancel();
+        ThreadPool.submit(() -> {
+            while(!loopFuture.isDone())
+            {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException ignored) {
+                }
+            }
+            if(callback != null)
+                callback.run();
+        });
+    }
 }
