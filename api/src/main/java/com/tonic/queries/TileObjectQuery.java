@@ -6,6 +6,8 @@ import com.tonic.data.TileObjectEx;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.util.Text;
+import net.runelite.client.util.WildcardMatcher;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.geom.Point2D;
@@ -40,6 +42,11 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
     public TileObjectQuery<T> withNamesContains(String... names)
     {
         return keepIf(o -> o.getName() != null && TextUtil.containsIgnoreCase(o.getName(), names));
+    }
+
+    public TileObjectQuery<T> withNameMatches(String namePart)
+    {
+        return keepIf(o -> o.getName() != null && WildcardMatcher.matches(namePart.toLowerCase(), Text.removeTags(o.getName().toLowerCase())));
     }
 
     public TileObjectQuery<T> withAction(String action)

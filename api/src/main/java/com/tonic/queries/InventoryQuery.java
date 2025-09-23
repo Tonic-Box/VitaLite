@@ -7,6 +7,8 @@ import com.tonic.data.ItemEx;
 import com.tonic.data.ShopID;
 import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
+import net.runelite.client.util.Text;
+import net.runelite.client.util.WildcardMatcher;
 import org.apache.commons.lang3.ArrayUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,6 +144,11 @@ public class InventoryQuery extends AbstractQuery<ItemEx, InventoryQuery>
     public InventoryQuery withNameContains(String namePart)
     {
         return removeIf(o -> !o.getName().toLowerCase().contains(namePart.toLowerCase()));
+    }
+
+    public InventoryQuery withNameMatches(String namePart)
+    {
+        return removeIf(o -> !WildcardMatcher.matches(namePart.toLowerCase(), Text.removeTags(o.getName().toLowerCase())));
     }
 
     public InventoryQuery withAction(String action)
