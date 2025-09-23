@@ -74677,10 +74677,12 @@
         "isStatic": false
       },
       {
+        "name": "getDeviceId2",
         "obfuscatedName": "br",
         "owner": "PlatformInfo",
         "ownerObfuscatedName": "vj",
         "descriptor": "(Lvj;IB)Ljava/lang/String;",
+        "garbageValue": 0,
         "isStatic": true
       },
       {
@@ -74712,10 +74714,12 @@
         "isStatic": true
       },
       {
+        "name": "getDeviceId",
         "obfuscatedName": "at",
         "owner": "PlatformInfo",
         "ownerObfuscatedName": "vj",
         "descriptor": "(IB)Ljava/lang/String;",
+        "garbageValue": 0,
         "isStatic": false
       }
     ]

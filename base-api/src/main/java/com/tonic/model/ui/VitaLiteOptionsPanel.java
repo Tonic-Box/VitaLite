@@ -3,6 +3,7 @@ package com.tonic.model.ui;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.events.PacketSent;
+import com.tonic.model.DeviceID;
 import com.tonic.model.RandomDat;
 import com.tonic.model.ui.componants.*;
 import com.tonic.services.ClickManager;
@@ -48,7 +49,8 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 "clickStrategy", ClickStrategy.STATIC.name(),
                 "clickPointX", -1,
                 "clickPointY", -1,
-                "cachedRandomDat", true
+                "cachedRandomDat", true,
+                "cachedDeviceID", true
         );
         config.ensure(defaults);
 
@@ -144,6 +146,21 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 }
         ));
         cachedRandomDat.setSelected(config.getBoolean("cachedRandomDat"));
+        RandomDat.setUseCachedRandomDat(cachedRandomDat.isSelected());
+        contentPanel.add(Box.createVerticalStrut(12));
+
+        ToggleSlider cachedDeviceID = new ToggleSlider();
+        contentPanel.add(createToggleOption(
+                "Cached DeviceID",
+                "Spoof and cache per-account DeviceID",
+                cachedDeviceID,
+                () -> {
+                    DeviceID.setUseCachedUUID(cachedDeviceID.isSelected());
+                    config.setProperty("cachedDeviceID", cachedDeviceID.isSelected());
+                }
+        ));
+        cachedDeviceID.setSelected(config.getBoolean("cachedDeviceID"));
+        DeviceID.setUseCachedUUID(cachedDeviceID.isSelected());
         contentPanel.add(Box.createVerticalStrut(12));
 
         FancyDualSpinner pointSpinner = new FancyDualSpinner(
