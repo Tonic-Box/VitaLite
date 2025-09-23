@@ -411,9 +411,9 @@ public class InstructionMatcher {
     }
     
     private static AbstractInsnNode applyShift(AbstractInsnNode insn, At pattern) {
-        String shiftType = getShiftType(pattern);
+        Shift shiftType = getShiftType(pattern);
 
-        if (shiftType.equalsIgnoreCase("TAIL")) {
+        if (shiftType == Shift.TAIL) {
             return insn;
         }
         return insn.getPrevious();
@@ -422,15 +422,27 @@ public class InstructionMatcher {
     /**
      * Get the shift type, supporting both enum and legacy string values.
      */
-    private static String getShiftType(At pattern) {
+    private static Shift getShiftType(At pattern) {
         try {
-            return pattern.shift().name();
+            return pattern.shift();
+        } catch (ClassCastException e) {
+            try {
+                Object shiftObj = getRawAnnotationValue(pattern, "shift");
+                if (shiftObj instanceof String) {
+                    String shiftStr = (String) shiftObj;
+                    return Shift.valueOf(shiftStr.toUpperCase());
+                }
+            } catch (Exception ex) {
+                System.err.println("Error getting shift type: " + ex.getMessage());
+            }
+            // Default fallback
+            return Shift.TAIL;
         } catch (Exception e) {
             System.err.println("Error getting shift type: " + e.getMessage());
             e.printStackTrace();
         }
-        
-        return "TAIL";
+
+        return Shift.TAIL;
     }
     
     private static class SliceImpl implements Slice {

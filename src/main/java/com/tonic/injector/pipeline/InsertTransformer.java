@@ -175,7 +175,21 @@ public class InsertTransformer {
      * @return shift type
      */
     private static Shift getShiftType(At pattern) {
-        return pattern.shift();
+        try {
+            return pattern.shift();
+        } catch (ClassCastException e) {
+            try {
+                Object shiftObj = getRawAnnotationValue(pattern, "shift");
+                if (shiftObj instanceof String) {
+                    String shiftStr = (String) shiftObj;
+                    return Shift.valueOf(shiftStr.toUpperCase());
+                }
+            } catch (Exception ex) {
+                System.err.println("Error getting shift type: " + ex.getMessage());
+            }
+            // Default fallback
+            return Shift.TAIL;
+        }
     }
     
     /**

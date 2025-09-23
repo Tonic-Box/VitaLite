@@ -1263,9 +1263,11 @@
         "isStatic": false
       },
       {
+        "name": "randomDatData2",
         "obfuscatedName": "po",
         "ownerObfuscatedName": "av",
         "descriptor": "(Lwb;I)V",
+        "garbageValue": 53261324,
         "isStatic": true
       },
       {
@@ -28994,7 +28996,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "characterId",
         "obfuscatedName": "ou",
         "ownerObfuscatedName": "hs",
         "descriptor": "Ljava/lang/String;",
@@ -67813,6 +67815,7 @@
     "fields": [],
     "methods": [
       {
+        "name": "writeRandomDat",
         "obfuscatedName": "af",
         "ownerObfuscatedName": "sa",
         "descriptor": "([BI[BII)V",

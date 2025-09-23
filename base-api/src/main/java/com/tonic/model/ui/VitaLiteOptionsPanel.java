@@ -3,6 +3,7 @@ package com.tonic.model.ui;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.events.PacketSent;
+import com.tonic.model.RandomDat;
 import com.tonic.model.ui.componants.*;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
@@ -46,7 +47,8 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         Map<String,Object> defaults = Map.of(
                 "clickStrategy", ClickStrategy.STATIC.name(),
                 "clickPointX", -1,
-                "clickPointY", -1
+                "clickPointY", -1,
+                "cachedRandomDat", true
         );
         config.ensure(defaults);
 
@@ -125,6 +127,19 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         ));
         contentPanel.add(Box.createVerticalStrut(12));
 
+        ToggleSlider cachedRandomDat = new ToggleSlider();
+        contentPanel.add(createToggleOption(
+                "Cached RandomDat",
+                "Spoof and cache per-account Random dat data",
+                cachedRandomDat,
+                () -> {
+                    RandomDat.setUseCachedRandomDat(cachedRandomDat.isSelected());
+                    config.setProperty("cachedRandomDat", cachedRandomDat.isSelected());
+                }
+        ));
+        cachedRandomDat.setSelected(config.getBoolean("cachedRandomDat"));
+        contentPanel.add(Box.createVerticalStrut(12));
+
         FancyDualSpinner pointSpinner = new FancyDualSpinner(
                 "Static Click Point",
                 Integer.MIN_VALUE, Integer.MAX_VALUE, config.getInt("clickPointX"),
@@ -180,9 +195,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         mouseButton.addActionListener(e -> checkMouseValues());
         contentPanel.add(mouseButton);
 
-        add(new JScrollPane(contentPanel,
-                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER));
+        add(contentPanel);
     }
 
     private JFrame getTransportsEditor()

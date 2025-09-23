@@ -16,12 +16,4 @@ public enum Shift {
      * The injected code will be executed after the target instruction
      */
     TAIL;
-    
-    /**
-     * Convert enum to string for backwards compatibility with existing string-based logic.
-     */
-    @Override
-    public String toString() {
-        return name();
-    }
 }

@@ -36,7 +36,7 @@ public class DisableTransformer
             return;
         }
 
-        InsnList call = MethodUtil.generateContextAwareInvoke(mixin, toHook, method, false);
+        InsnList call = MethodUtil.generateContextAwareInvoke(gamepack, toHook, method, false);
 
         InsnList instructions = BytecodeBuilder.create()
                 .ifBlock(
