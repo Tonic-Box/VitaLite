@@ -42,7 +42,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ConfigManager config = new ConfigManager("VitaLiteOptions");
 
     private VitaLiteOptionsPanel() {
-        super(true);
+        super(false); // Don't use default wrapping, we'll handle scrolling ourselves
 
         Map<String,Object> defaults = Map.of(
                 "clickStrategy", ClickStrategy.STATIC.name(),
@@ -51,6 +51,10 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 "cachedRandomDat", true
         );
         config.ensure(defaults);
+
+        // Set up the main panel layout
+        setLayout(new BorderLayout());
+        setOpaque(false);
 
         JPanel contentPanel = new JPanel() {
             @Override
@@ -69,6 +73,8 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         };
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setOpaque(false);
+
+
         contentPanel.add(Box.createVerticalStrut(10));
 
         JPanel titlePanel = createGlowPanel();
@@ -195,7 +201,78 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         mouseButton.addActionListener(e -> checkMouseValues());
         contentPanel.add(mouseButton);
 
-        add(contentPanel);
+        // Now set the proper dimensions after all components are added
+        contentPanel.setPreferredSize(new Dimension(PANEL_WIDTH, contentPanel.getPreferredSize().height));
+        contentPanel.setMaximumSize(new Dimension(PANEL_WIDTH, Integer.MAX_VALUE));
+
+        // Create custom styled scroll pane
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        customizeScrollPane(scrollPane);
+
+        add(scrollPane, BorderLayout.CENTER);
+    }
+
+    private void customizeScrollPane(JScrollPane scrollPane) {
+        // Configure scroll pane for dark theme
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        scrollPane.setBorder(null);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+        // Style the vertical scrollbar
+        scrollPane.getVerticalScrollBar().setOpaque(false);
+        scrollPane.getVerticalScrollBar().setBackground(new Color(40, 40, 40));
+        scrollPane.getVerticalScrollBar().setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(80, 80, 85);
+                this.thumbDarkShadowColor = new Color(60, 60, 65);
+                this.thumbHighlightColor = new Color(100, 100, 105);
+                this.thumbLightShadowColor = new Color(70, 70, 75);
+                this.trackColor = new Color(40, 40, 40);
+                this.trackHighlightColor = new Color(50, 50, 55);
+            }
+
+            @Override
+            protected JButton createDecreaseButton(int orientation) {
+                return createZeroButton();
+            }
+
+            @Override
+            protected JButton createIncreaseButton(int orientation) {
+                return createZeroButton();
+            }
+
+            private JButton createZeroButton() {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                button.setMinimumSize(new Dimension(0, 0));
+                button.setMaximumSize(new Dimension(0, 0));
+                return button;
+            }
+
+            @Override
+            protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                g2d.setColor(thumbColor);
+                g2d.fillRoundRect(thumbBounds.x + 2, thumbBounds.y + 2,
+                                thumbBounds.width - 4, thumbBounds.height - 4, 6, 6);
+            }
+
+            @Override
+            protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+                Graphics2D g2d = (Graphics2D) g;
+                g2d.setColor(trackColor);
+                g2d.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+            }
+        });
+
+        // Smooth scrolling
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.getVerticalScrollBar().setBlockIncrement(64);
     }
 
     private JFrame getTransportsEditor()
