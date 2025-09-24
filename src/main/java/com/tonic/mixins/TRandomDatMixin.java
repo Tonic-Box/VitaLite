@@ -31,7 +31,7 @@ public abstract class TRandomDatMixin
         String identifier = username != null && !username.isEmpty() ? username : characterId;
 
         RandomDat.writeCachedRandomDatData(identifier, newRandomDatData);
-        Logger.info("Storing cached random.dat data for user " + characterId);
+        Logger.info("Storing cached random.dat data for user " + identifier);
     }
 
     @Disable("randomDatData2")
@@ -56,7 +56,7 @@ public abstract class TRandomDatMixin
                 buffer.writeByte(-1);
             }
         }
-        Logger.info("Using cached random.dat data for user " + characterId);
+        Logger.info("Using cached random.dat data for user " + identifier);
         return false;
     }
 }
