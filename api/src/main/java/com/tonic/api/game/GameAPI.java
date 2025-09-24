@@ -1,7 +1,9 @@
 package com.tonic.api.game;
 
 import com.tonic.Static;
+import com.tonic.api.TClient;
 import com.tonic.api.widgets.WidgetAPI;
+import com.tonic.services.ClickManager;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
@@ -84,5 +86,15 @@ public class GameAPI
     {
         Client client = Static.getClient();
         return Static.invoke(() -> client.getSkillExperience(skill));
+    }
+
+    public static void invokeMenuAction(int identifier, int opcode, int param0, int param1, int itemId)
+    {
+        TClient client = Static.getClient();
+        boolean lock = Static.invoke(() -> {
+            ClickManager.click();
+            client.invokeMenuAction("", "", identifier, opcode, param0, param1, itemId, -1, -1);
+            return true;
+        });
     }
 }
