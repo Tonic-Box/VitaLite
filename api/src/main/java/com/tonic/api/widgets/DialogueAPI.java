@@ -126,8 +126,12 @@ public class DialogueAPI
                 }
             }
             if(WidgetAPI.get(InterfaceID.Messagebox.CONTINUE) != null) {
-                client.getPacketWriter().resumePauseWidgetPacket(InterfaceID.Messagebox.CONTINUE, -1);
-                return true;
+                Widget w = WidgetAPI.get(InterfaceID.Messagebox.CONTINUE);
+                if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
+                {
+                    client.getPacketWriter().resumePauseWidgetPacket(InterfaceID.Messagebox.CONTINUE, -1);
+                    return true;
+                }
             }
             return false;
         });

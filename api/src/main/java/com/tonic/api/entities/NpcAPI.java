@@ -34,7 +34,16 @@ public class NpcAPI
         if(npc == null)
             return;
         Static.invoke(() -> {
-            NPCComposition composition = npc.getComposition().transform();
+            NPCComposition composition;
+            if(npc.getComposition().getConfigs() != null)
+            {
+                composition = npc.getComposition().transform();
+            }
+            else
+            {
+                composition = npc.getComposition();
+            }
+
             if(composition == null || composition.getActions() == null)
                 return;
             String[] actions = composition.getActions();

@@ -3,6 +3,8 @@ package com.tonic.services.pathfinder.transports;
 import com.tonic.Static;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.TileObjectAPI;
+import com.tonic.api.threaded.Delays;
+import com.tonic.api.threaded.Dialogues;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.NpcQuery;
@@ -40,6 +42,7 @@ public class LongTransport extends Transport
         actions.add(() -> {
             NPC npc = new NpcQuery()
                     .withName(npcName)
+                    .keepIf(n -> n.getComposition() != null)
                     .sortNearest()
                     .first();
             if(NumberUtils.isCreatable(option))
@@ -47,18 +50,7 @@ public class LongTransport extends Transport
             else
                 NpcAPI.interact(npc, option);
         });
-        for(String opt : dialogueOptions)
-        {
-            if(opt == null || opt.isBlank())
-            {
-                actions.add(DialogueAPI::continueDialogue);
-            }
-            else
-            {
-                actions.add(() -> DialogueAPI.selectOption(opt));
-            }
-        }
-        actions.add(DialogueAPI::continueDialogue);
+        actions.add(() -> Dialogues.processDialogues(dialogueOptions));
 
         return new LongTransport(source, destination, npcRadious, 2, actions, requirements, delay);
     }
