@@ -12,6 +12,8 @@ import com.tonic.runelite.jvm.JvmParams;
 import com.tonic.injector.Injector;
 import com.tonic.injector.RLInjector;
 import com.tonic.model.Libs;
+import com.tonic.services.CatFacts;
+
 import javax.swing.*;
 import java.io.File;
 import java.net.URL;
@@ -45,7 +47,7 @@ public class Main {
         MappingProvider.getMappings().clear();
         CLASSLOADER.launch(args);
         Install.install();
-        Logger.norm("VitaLite started.");
+        Logger.norm("VitaLite started. - Did you know... " + CatFacts.get(-1));
     }
 
     private static void loadArtifacts()
