@@ -81219,5 +81219,35 @@
     "action": "Climb-down",
     "objectId": 11802,
     "requirements": {}
+  },
+  {
+    "source": {
+      "x": 3301,
+      "y": 3036,
+      "plane": 0
+    },
+    "destination": {
+      "x": 3278,
+      "y": 9427,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 2675,
+    "requirements": {}
+  },
+  {
+    "source": {
+      "x": 3278,
+      "y": 9427,
+      "plane": 0
+    },
+    "destination": {
+      "x": 3301,
+      "y": 3036,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 2690,
+    "requirements": {}
   }
 ]
