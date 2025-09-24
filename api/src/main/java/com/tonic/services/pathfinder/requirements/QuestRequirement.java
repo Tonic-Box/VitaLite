@@ -1,6 +1,7 @@
 package com.tonic.services.pathfinder.requirements;
 
 import com.tonic.Static;
+import com.tonic.api.game.QuestAPI;
 import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.Quest;
@@ -29,7 +30,6 @@ public class QuestRequirement implements Requirement
     @Override
     public Boolean get()
     {
-        Client client = Static.getClient();
-        return states.contains(quest.getState(client));
+        return states.contains(QuestAPI.getState(quest));
     }
 }

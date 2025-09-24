@@ -1,6 +1,7 @@
 package com.tonic.data.magic.spellbooks;
 
 import com.tonic.Static;
+import com.tonic.api.game.QuestAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
@@ -865,7 +866,7 @@ public enum Standard implements Spell
             return true;
         }
 
-        if (questRequirement != null && questRequirement.getState(client) != QuestState.FINISHED)
+        if (questRequirement != null && QuestAPI.getState(questRequirement) != QuestState.FINISHED)
         {
             return false;
         }

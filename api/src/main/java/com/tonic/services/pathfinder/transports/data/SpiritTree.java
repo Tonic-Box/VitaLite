@@ -1,6 +1,7 @@
 package com.tonic.services.pathfinder.transports.data;
 
 import com.tonic.Static;
+import com.tonic.api.game.QuestAPI;
 import com.tonic.services.pathfinder.requirements.*;
 import lombok.Getter;
 import net.runelite.api.Client;
@@ -27,7 +28,7 @@ public enum SpiritTree
         this.location = location;
         this.index = index;
         this.requirements = new Requirements();
-        this.requirements.addRequirement(new OtherRequirement(() -> Quest.TREE_GNOME_VILLAGE.getState(client).equals(QuestState.FINISHED) || Quest.THE_GRAND_TREE.getState(client).equals(QuestState.FINISHED)));
+        this.requirements.addRequirement(new OtherRequirement(() -> QuestAPI.getState(Quest.TREE_GNOME_VILLAGE).equals(QuestState.FINISHED) || QuestAPI.getState(Quest.THE_GRAND_TREE).equals(QuestState.FINISHED)));
         this.requirements.addRequirements(requirements);
         this.requirements.addRequirement(new WorldRequirement(true));
     }

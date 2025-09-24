@@ -1,6 +1,7 @@
 package com.tonic.data.locatables;
 
 import com.tonic.Static;
+import com.tonic.api.game.QuestAPI;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.Step;
 import com.tonic.util.WorldPointUtil;
@@ -55,15 +56,13 @@ public enum BankLocations {
     //	HALLOWED_SEPULCHRE_BANK(new WorldArea(2393, 5975, 15, 15, 0)), has quest requirements
     CANIFIS_BANK(new WorldArea(3508, 3474, 6, 10, 0), () ->
     {
-        Client client = Static.getClient();
-        QuestState state = Quest.PRIEST_IN_PERIL.getState(client);
+        QuestState state = QuestAPI.getState(Quest.PRIEST_IN_PERIL);
         return state != null && state.equals(QuestState.FINISHED);
     }),
     //	MOTHERLODE_MINE_BANK(new WorldArea(3754, 5664, 4, 3, 0)), has pickaxe requirement
     BURGH_DE_ROTT_BANK(new WorldArea(3492, 3208, 10, 6, 0), () ->
     {
-        Client client = Static.getClient();
-        QuestState state = Quest.PRIEST_IN_PERIL.getState(client);
+        QuestState state = QuestAPI.getState(Quest.PRIEST_IN_PERIL);
         return state != null && state.equals(QuestState.FINISHED);
     }),
     VER_SINHAZA_BANK(new WorldArea(3646, 3204, 10, 13, 0)),
@@ -71,13 +70,13 @@ public enum BankLocations {
     BURTHORPE_BANK(new WorldArea(3037, 4961, 13, 17, 1)),
     ZANERIS_BANK(new WorldArea(2379, 4453, 6, 7, 0), () -> {
         Client client = Static.getClient();
-        QuestState state = Quest.CHILDREN_OF_THE_SUN.getState(client);
+        QuestState state = QuestAPI.getState(Quest.CHILDREN_OF_THE_SUN);
         return state != null && state.equals(QuestState.FINISHED);
     }),
 
     CIVITAS_ILLA_FORTIS(new WorldArea(1777, 3093, 9, 11, 0), () -> {
         Client client = Static.getClient();
-        QuestState state = Quest.LOST_CITY.getState(client);
+        QuestState state = QuestAPI.getState(Quest.LOST_CITY);
         return state != null && state.equals(QuestState.FINISHED);
     }),
 

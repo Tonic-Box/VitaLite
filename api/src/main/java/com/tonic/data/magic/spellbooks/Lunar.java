@@ -2,6 +2,7 @@ package com.tonic.data.magic.spellbooks;
 
 import com.tonic.Static;
 import com.tonic.api.game.GameAPI;
+import com.tonic.api.game.QuestAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.MagicAPI;
 import com.tonic.data.magic.Rune;
@@ -416,8 +417,7 @@ public enum Lunar implements Spell
             return MagicAPI.isHomeTeleportOnCooldown();
         }
 
-        Client client = Static.getClient();
-        if (this.dreamMentorRequired && Quest.DREAM_MENTOR.getState(client) != QuestState.FINISHED)
+        if (this.dreamMentorRequired && QuestAPI.getState(Quest.DREAM_MENTOR) != QuestState.FINISHED)
         {
             return false;
         }

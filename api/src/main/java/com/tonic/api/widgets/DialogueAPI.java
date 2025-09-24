@@ -85,23 +85,23 @@ public class DialogueAPI
                 client.getPacketWriter().resumePauseWidgetPacket(WidgetInfoExtended.DIALOG_NPC_CONTINUE.getId(), -1);
                 return true;
             }
-            else if (WidgetAPI.get(633, 0) != null) {
+            if (WidgetAPI.get(633, 0) != null) {
                 client.getPacketWriter().resumePauseWidgetPacket(WidgetInfo.PACK(633, 0), -1);
                 return true;
             }
-            else if (WidgetAPI.get(WidgetInfoExtended.DIALOG_PLAYER_CONTINUE) != null) {
+            if (WidgetAPI.get(WidgetInfoExtended.DIALOG_PLAYER_CONTINUE) != null) {
                 client.getPacketWriter().resumePauseWidgetPacket(WidgetInfoExtended.DIALOG_PLAYER_CONTINUE.getId(), -1);
                 return true;
             }
-            else if (WidgetAPI.get(WidgetInfo.DIALOG_SPRITE) != null) {
+            if (WidgetAPI.get(WidgetInfo.DIALOG_SPRITE) != null) {
                 client.getPacketWriter().resumePauseWidgetPacket(WidgetInfo.DIALOG_SPRITE.getId(), 0);
                 return true;
             }
-            else if (WidgetAPI.get(WidgetInfoExtended.DIALOG2_SPRITE) != null) {
+            if (WidgetAPI.get(WidgetInfoExtended.DIALOG2_SPRITE) != null) {
                 client.getPacketWriter().resumePauseWidgetPacket(WidgetInfoExtended.DIALOG2_SPRITE_CONTINUE.getId(), -1);
                 return true;
             }
-            else if (WidgetAPI.get(WidgetInfoExtended.MINIGAME_DIALOG_CONTINUE) != null) {
+            if (WidgetAPI.get(WidgetInfoExtended.MINIGAME_DIALOG_CONTINUE) != null) {
                 Widget w = WidgetAPI.get(WidgetInfoExtended.MINIGAME_DIALOG_CONTINUE);
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                 {
@@ -109,7 +109,7 @@ public class DialogueAPI
                     return true;
                 }
             }
-            else if (WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_CONTINUE) != null) {
+            if (WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_CONTINUE) != null) {
                 Widget w = WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_CONTINUE);
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                 {
@@ -117,7 +117,7 @@ public class DialogueAPI
                     return true;
                 }
             }
-            else if (WidgetAPI.get(WidgetInfoExtended.LEVEL_UP_CONTINUE) != null) {
+            if (WidgetAPI.get(WidgetInfoExtended.LEVEL_UP_CONTINUE) != null) {
                 Widget w = WidgetAPI.get(WidgetInfoExtended.LEVEL_UP_CONTINUE);
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                 {
@@ -125,7 +125,7 @@ public class DialogueAPI
                     return true;
                 }
             }
-            else if(WidgetAPI.get(InterfaceID.Messagebox.CONTINUE) != null) {
+            if(WidgetAPI.get(InterfaceID.Messagebox.CONTINUE) != null) {
                 client.getPacketWriter().resumePauseWidgetPacket(InterfaceID.Messagebox.CONTINUE, -1);
                 return true;
             }
@@ -143,35 +143,37 @@ public class DialogueAPI
             if (WidgetAPI.get(WidgetInfoExtended.DIALOG_NPC_CONTINUE) != null) {
                 return true;
             }
-            else if (WidgetAPI.get(633, 0) != null) {
+            if (WidgetAPI.get(633, 0) != null) {
                 return true;
             }
-            else if (WidgetAPI.get(WidgetInfoExtended.DIALOG_PLAYER_CONTINUE) != null) {
+            if (WidgetAPI.get(WidgetInfoExtended.DIALOG_PLAYER_CONTINUE) != null) {
                 return true;
             }
-            else if (WidgetAPI.get(WidgetInfo.DIALOG_SPRITE) != null) {
+            if (WidgetAPI.get(WidgetInfo.DIALOG_SPRITE) != null) {
                 return true;
             }
-            else if (WidgetAPI.get(WidgetInfoExtended.DIALOG2_SPRITE) != null) {
+            if (WidgetAPI.get(WidgetInfoExtended.DIALOG2_SPRITE) != null) {
                 return true;
             }
-            else if (WidgetAPI.get(WidgetInfoExtended.MINIGAME_DIALOG_CONTINUE) != null) {
+            if (WidgetAPI.get(WidgetInfoExtended.MINIGAME_DIALOG_CONTINUE) != null) {
                 Widget w = WidgetAPI.get(WidgetInfoExtended.MINIGAME_DIALOG_CONTINUE);
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                     return true;
             }
-            else if (WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_CONTINUE) != null) {
+            if (WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_CONTINUE) != null) {
                 Widget w = WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_CONTINUE);
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                     return true;
             }
-            else if(WidgetAPI.get(WidgetInfoExtended.LEVEL_UP_CONTINUE) != null) {
+            if(WidgetAPI.get(WidgetInfoExtended.LEVEL_UP_CONTINUE) != null) {
                 Widget w = WidgetAPI.get(WidgetInfoExtended.LEVEL_UP_CONTINUE);
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                     return true;
             }
-            else if(WidgetAPI.get(InterfaceID.Messagebox.CONTINUE) != null) {
-                return true;
+            if(WidgetAPI.get(InterfaceID.Messagebox.CONTINUE) != null) {
+                Widget w = WidgetAPI.get(InterfaceID.Messagebox.CONTINUE);
+                if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
+                    return true;
             }
 
             return WidgetAPI.get(WidgetInfoExtended.DIALOG_OPTION_OPTION1) != null || WidgetAPI.get(WidgetInfo.DIALOG_OPTION_OPTIONS) != null;
