@@ -4,9 +4,7 @@ import com.tonic.Static;
 import com.tonic.util.TextUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.runelite.api.Client;
-import net.runelite.api.ObjectComposition;
-import net.runelite.api.TileObject;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 
@@ -66,7 +64,16 @@ public class TileObjectEx
     }
 
     public WorldPoint getWorldLocation() {
-        return tileObject.getWorldLocation();
+        WorldPoint wp = tileObject.getWorldLocation();
+        if(tileObject instanceof GameObject)
+        {
+            final Client client = Static.getClient();
+            WorldView wv = client.getTopLevelWorldView();
+            GameObject go = (GameObject) tileObject;
+            Point p = go.getSceneMinLocation();
+            wp = WorldPoint.fromScene(wv, p.getX(), p.getY(), wv.getPlane());
+        }
+        return wp;
     }
 
     public LocalPoint getLocalLocation() {

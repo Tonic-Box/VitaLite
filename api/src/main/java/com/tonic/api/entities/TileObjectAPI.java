@@ -68,20 +68,11 @@ public class TileObjectAPI
 
         int actionIndex = object.getActionIndex(action);
 
-        WorldPoint wp = object.getWorldLocation();
-        if(object.getTileObject() instanceof GameObject)
-        {
-            WorldView wv = client.getTopLevelWorldView();
-            GameObject go = (GameObject) object.getTileObject();
-            Point p = go.getSceneMinLocation();
-            wp = WorldPoint.fromScene(wv, p.getX(), p.getY(), wv.getPlane());
-        }
-
-        WorldPoint finalWp = wp;
+        final WorldPoint wp = object.getWorldLocation();
         Static.invoke(() ->
         {
             ClickManager.click();
-            tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), finalWp.getX(), finalWp.getY(), false);
+            tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), wp.getX(), wp.getY(), false);
         });
     }
 
