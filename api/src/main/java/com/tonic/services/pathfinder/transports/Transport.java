@@ -84,6 +84,26 @@ public class Transport
                      int sourceRadius,
                      int destinationRadius,
                      Runnable handler,
+                     int id,
+                     int duration
+    )
+    {
+        this.source = source;
+        this.destination = destination;
+        this.sourceRadius = sourceRadius;
+        this.destinationRadius = destinationRadius;
+        this.handler = new ArrayList<>();
+        this.handler.add(handler);
+        this.requirements = new Requirements();
+        this.duration = duration;
+        this.id = id;
+    }
+
+    public Transport(int source,
+                     int destination,
+                     int sourceRadius,
+                     int destinationRadius,
+                     Runnable handler,
                      Requirements requirements,
                      int id
     )

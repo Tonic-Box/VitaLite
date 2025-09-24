@@ -918,7 +918,7 @@ public class TransportLoader
             WorldPoint source,
             WorldPoint destination,
             int objId,
-            String actions,
+            String action,
             Requirements requirements
     )
     {
@@ -931,7 +931,7 @@ public class TransportLoader
             TileObjectEx first = new TileObjectQuery<>().atLocation(localSource).withId(objId).first();
             if (first != null)
             {
-                TileObjectAPI.interact(first, actions);
+                TileObjectAPI.interact(first, action);
                 return;
             }
             TileObjectEx obj = new TileObjectQuery<>()
@@ -941,7 +941,7 @@ public class TransportLoader
                     .first();
             if (obj != null)
             {
-                TileObjectAPI.interact(obj, actions);
+                TileObjectAPI.interact(obj, action);
             }
         }, requirements, objId);
     }
@@ -1178,8 +1178,8 @@ public class TransportLoader
         addObjectTransport(transports, 2, requirements2, new WorldPoint(3296, 3428, 0), new WorldPoint(3295, 3428, 0), 24561, "Open");
 
         //sarim
-        addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(3027, 3217, 0), new WorldPoint(2956, 3143, 1), "Captain Tobias", "Pay-fare");
-        addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(2956, 3146, 0), new WorldPoint(3032, 3217, 1), "Customs officer", "Pay-fare");
+        addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(3027, 3217, 0), new WorldPoint(2956, 3143, 1), "Captain Tobias", "Pay-fare", "Yes");
+        addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(2956, 3146, 0), new WorldPoint(3032, 3217, 1), "Customs officer", "Pay-fare", "Can I journey", "Search away", "Ok.");
     }
 
     private static void addNpcTransport(final TIntObjectHashMap<ArrayList<Transport>> transports, int delay, WorldPoint source, WorldPoint destination, String npcName, String option) {

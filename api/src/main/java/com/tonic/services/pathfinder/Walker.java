@@ -525,7 +525,7 @@ public class Walker
 
         if(!MovementAPI.isRunEnabled() && energy > 30)
         {
-            WidgetAPI.interact(0, WidgetInfo.MINIMAP_TOGGLE_RUN_ORB, -1, -1);
+            WidgetAPI.interact(1, WidgetInfo.MINIMAP_TOGGLE_RUN_ORB, -1, -1);
         }
 
         if(energy < 60 && !MovementAPI.staminaInEffect())
@@ -534,7 +534,7 @@ public class Walker
 
             if(stam != null)
             {
-                InventoryAPI.interact(stam, 1);
+                InventoryAPI.interact(stam, 2);
             }
         }
 
@@ -544,7 +544,7 @@ public class Walker
 
             if(stam != null)
             {
-                InventoryAPI.interact(stam, 1);
+                InventoryAPI.interact(stam, 2);
             }
         }
 
