@@ -5,10 +5,9 @@ import com.tonic.api.TClient;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.ClickManager;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
-import net.runelite.api.ObjectComposition;
-import net.runelite.api.TileObject;
+import com.tonic.util.WorldPointUtil;
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldPoint;
 
 import java.util.function.Predicate;
 
@@ -69,10 +68,20 @@ public class TileObjectAPI
 
         int actionIndex = object.getActionIndex(action);
 
+        WorldPoint wp = object.getWorldLocation();
+        if(object.getTileObject() instanceof GameObject)
+        {
+            WorldView wv = client.getTopLevelWorldView();
+            GameObject go = (GameObject) object.getTileObject();
+            Point p = go.getSceneMinLocation();
+            wp = WorldPoint.fromScene(wv, p.getX(), p.getY(), wv.getPlane());
+        }
+
+        WorldPoint finalWp = wp;
         Static.invoke(() ->
         {
             ClickManager.click();
-            tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false);
+            tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), finalWp.getX(), finalWp.getY(), false);
         });
     }
 

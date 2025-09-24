@@ -6,6 +6,7 @@ import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.data.VarrockMuseumAnswer;
 import com.tonic.data.WidgetInfoExtended;
 import com.tonic.services.ClickManager;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import java.util.ArrayList;
@@ -65,6 +66,9 @@ public class DialogueAPI
             else if (WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_TEXT) != null) {
                 return WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_TEXT).getText();
             }
+            else if(WidgetAPI.get(InterfaceID.Messagebox.TEXT) != null) {
+                return WidgetAPI.get(InterfaceID.Messagebox.TEXT).getText();
+            }
             return "";
         });
     }
@@ -121,6 +125,10 @@ public class DialogueAPI
                     return true;
                 }
             }
+            else if(WidgetAPI.get(InterfaceID.Messagebox.CONTINUE) != null) {
+                client.getPacketWriter().resumePauseWidgetPacket(InterfaceID.Messagebox.CONTINUE, -1);
+                return true;
+            }
             return false;
         });
     }
@@ -161,6 +169,9 @@ public class DialogueAPI
                 Widget w = WidgetAPI.get(WidgetInfoExtended.LEVEL_UP_CONTINUE);
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                     return true;
+            }
+            else if(WidgetAPI.get(InterfaceID.Messagebox.CONTINUE) != null) {
+                return true;
             }
 
             return WidgetAPI.get(WidgetInfoExtended.DIALOG_OPTION_OPTION1) != null || WidgetAPI.get(WidgetInfo.DIALOG_OPTION_OPTIONS) != null;
