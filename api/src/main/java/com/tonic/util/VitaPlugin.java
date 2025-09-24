@@ -33,7 +33,7 @@ public class VitaPlugin extends Plugin
         if (!ReflectUtil.isOverridden(this, "loop"))
             return;
 
-        if(loopFuture != null && !loopFuture.isDone() && !loopFuture.isCancelled())
+        if(loopFuture != null && !loopFuture.isDone())
             return;
 
         loopFuture = ThreadPool.submit(new Coroutine(() -> {
@@ -64,6 +64,7 @@ public class VitaPlugin extends Plugin
     {
         if(loopFuture == null || loopFuture.isDone())
             callback.run();
+        System.out.println("Halting " + getName() + " loop...");
         Coroutine._cancel();
         ThreadPool.submit(() -> {
             while(!loopFuture.isDone())
@@ -73,6 +74,7 @@ public class VitaPlugin extends Plugin
                 } catch (InterruptedException ignored) {
                 }
             }
+            System.out.println(getName() + " loop halted.");
             if(callback != null)
                 callback.run();
         });

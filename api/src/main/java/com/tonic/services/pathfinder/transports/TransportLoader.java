@@ -6,10 +6,7 @@ import com.tonic.Static;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
-import com.tonic.api.game.MovementAPI;
-import com.tonic.api.game.Skills;
-import com.tonic.api.game.VarAPI;
-import com.tonic.api.game.WorldsAPI;
+import com.tonic.api.game.*;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.threaded.DialogueNode;
 import com.tonic.api.widgets.DialogueAPI;
@@ -18,7 +15,6 @@ import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.ItemEx;
 import com.tonic.data.locatables.NpcLocations;
-import com.tonic.data.Quests;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
@@ -127,7 +123,7 @@ public class TransportLoader
 
             if (gold >= 30)
             {
-                if (Quests.isFinished(Quest.PIRATES_TREASURE) || !filter)
+                if (QuestAPI.isCompleted(Quest.PIRATES_TREASURE) || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(3027, 3218, 0), new WorldPoint(2956, 3143, 1), 3644, "Pay-fare"));
                     transports.add(npcTransport(new WorldPoint(2954, 3147, 0), new WorldPoint(3032, 3217, 1), 3648, "Pay-Fare"));
@@ -182,7 +178,7 @@ public class TransportLoader
                                 "That's great, can you take me there please?"));
                     }
                 }
-                else if (Quests.isFinished(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
+                else if (QuestAPI.isCompleted(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
                 {
                     transports.add(npcTransport(new WorldPoint(3053, 3245, 0),
                             new WorldPoint(1824, 3695, 1),
@@ -201,13 +197,13 @@ public class TransportLoader
                             "Port Piscarilius"));
                 }
 
-                if (Quests.getState(Quest.LUNAR_DIPLOMACY) != QuestState.NOT_STARTED || !filter)
+                if (QuestAPI.getState(Quest.LUNAR_DIPLOMACY) != QuestState.NOT_STARTED || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(2222, 3796, 2), new WorldPoint(2130, 3899, 2), NpcID.CAPTAIN_BENTLEY_6650, "Travel"));
                     transports.add(npcTransport(new WorldPoint(2130, 3899, 2), new WorldPoint(2222, 3796, 2), NpcID.CAPTAIN_BENTLEY_6650, "Travel"));
                 }
 
-                if (Quests.isFinished(Quest.THE_LOST_TRIBE) || !filter)
+                if (QuestAPI.isCompleted(Quest.THE_LOST_TRIBE) || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(3229, 9610, 0), new WorldPoint(3316, 9613, 0), "Kazgar",
                             "Mines"));
@@ -216,7 +212,7 @@ public class TransportLoader
                 }
 
                 // Tree Gnome Village
-                if (Quests.getState(Quest.TREE_GNOME_VILLAGE) != QuestState.NOT_STARTED || !filter)
+                if (QuestAPI.getState(Quest.TREE_GNOME_VILLAGE) != QuestState.NOT_STARTED || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(2504, 3192, 0), new WorldPoint(2515, 3159, 0), 4968, "Follow"));
                     transports.add(npcTransport(new WorldPoint(2515, 3159, 0), new WorldPoint(2504, 3192, 0), 4968, "Follow"));
@@ -240,7 +236,7 @@ public class TransportLoader
                 }
 
                 // Waterbirth island
-                if (Quests.isFinished(Quest.THE_FREMENNIK_TRIALS) || gold >= 1000 || !filter)
+                if (QuestAPI.isCompleted(Quest.THE_FREMENNIK_TRIALS) || gold >= 1000 || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(2544, 3760, 0), new WorldPoint(2620, 3682, 0), 10407, "Rellekka"));
                     transports.add(npcTransport(new WorldPoint(2620, 3682, 0), new WorldPoint(2547, 3759, 0), 5937, "Waterbirth Island"));
@@ -260,7 +256,7 @@ public class TransportLoader
                 }
 
                 // Lumbridge castle dining room, ignore if RFD is in progress.
-                if (Quests.getState(Quest.RECIPE_FOR_DISASTER) != QuestState.IN_PROGRESS || !filter)
+                if (QuestAPI.getState(Quest.RECIPE_FOR_DISASTER) != QuestState.IN_PROGRESS || !filter)
                 {
 
                     transports.add(objectTransport(new WorldPoint(3213, 3221, 0), new WorldPoint(3212, 3221, 0), 12349, "Open"));
@@ -323,7 +319,7 @@ public class TransportLoader
                 transports.add(trapDoorTransport(new WorldPoint(3422, 3484, 0), new WorldPoint(3440, 9887, 0), 3432, 3433));
 
                 // Port Piscarilius
-                if (Quests.isFinished(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
+                if (QuestAPI.isCompleted(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
                 {
                     transports.add(npcTransport(new WorldPoint(1826, 3691, 0), new WorldPoint(3055, 3242, 1), 10932, "Port Sarim"));
                     transports.add(npcTransport(new WorldPoint(1826, 3691, 0), new WorldPoint(1504, 3395, 1), 10932, "Land's End"));
@@ -381,7 +377,7 @@ public class TransportLoader
                 transports.add(objectTransport(new WorldPoint(2012, 9004, 1), new WorldPoint(2523, 2860, 0), 31790, "Climb"));
 
                 // Rimmington docks to and from Corsair Cove using Captain Tock's ship
-                if (Quests.isFinished(Quest.THE_CORSAIR_CURSE) || !filter)
+                if (QuestAPI.isCompleted(Quest.THE_CORSAIR_CURSE) || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(2910, 3226, 0), new WorldPoint(2578, 2837, 1), NpcID.CABIN_BOY_COLIN_7967, "Travel"));
                     transports.add(npcTransport(new WorldPoint(2574, 2835, 1), new WorldPoint(2909, 3230, 1), NpcID.CABIN_BOY_COLIN_7967, "Travel"));

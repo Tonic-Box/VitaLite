@@ -29,7 +29,6 @@ public class Delays
     {
         int tick = GameManager.getTickCount() + ticks;
         int start = GameManager.getTickCount();
-        Client client = Static.getClient();
         while(GameManager.getTickCount() < tick && GameManager.getTickCount() >= start)
         {
             if(Thread.currentThread().isInterrupted() || Coroutine._isCancelled())

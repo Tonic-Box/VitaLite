@@ -221,6 +221,6 @@ public class ShopAPI
      */
     public static void shopAction(int itemId, int slot, int action)
     {
-        WidgetAPI.interact(action, InterfaceID.Shopmain.ITEMS, slot, itemId);
+        WidgetAPI.interact(action, InterfaceID.Shopmain.ITEMS, slot + 1, itemId);
     }
 }

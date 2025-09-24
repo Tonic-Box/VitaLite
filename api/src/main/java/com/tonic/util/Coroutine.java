@@ -33,7 +33,7 @@ public class Coroutine implements Runnable {
 
     public static boolean _isCancelled()
     {
-        return live != null && canceled;
+        return canceled;
     }
 
     public boolean isCancelled()

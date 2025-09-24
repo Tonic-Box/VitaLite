@@ -2,6 +2,7 @@ package com.tonic.util;
 
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
+import com.tonic.services.pathfinder.collision.CollisionMap;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
@@ -221,5 +222,162 @@ public class Location {
     public static boolean isInWilderness(WorldPoint p) {
         return WILDERNESS_ABOVE_GROUND.distanceTo(p) == 0 ||
                 WILDERNESS_UNDERGROUND.distanceTo(p) == 0;
+    }
+
+    public static boolean hasLineOfSightTo(WorldPoint source, WorldPoint other)
+    {
+        Tile sourceTile = getTile(source);
+        Tile otherTile = getTile(other);
+        if(sourceTile == null || otherTile == null)
+            return false;
+        return hasLineOfSightTo(sourceTile, otherTile);
+    }
+
+    public static boolean hasLineOfSightTo(Tile source, Tile other)
+    {
+        // Thanks to Henke for this method :)
+
+        if (source.getPlane() != other.getPlane())
+        {
+            return false;
+        }
+
+        Client client = Static.getClient();
+
+        CollisionData[] collisionData = client.getTopLevelWorldView().getCollisionMaps();
+        if (collisionData == null)
+        {
+            return false;
+        }
+
+        int z = source.getPlane();
+        int[][] collisionDataFlags = collisionData[z].getFlags();
+
+        Point p1 = source.getSceneLocation();
+        Point p2 = other.getSceneLocation();
+        if (p1.getX() == p2.getX() && p1.getY() == p2.getY())
+        {
+            return true;
+        }
+
+        int dx = p2.getX() - p1.getX();
+        int dy = p2.getY() - p1.getY();
+        int dxAbs = Math.abs(dx);
+        int dyAbs = Math.abs(dy);
+
+        int xFlags = CollisionDataFlag.BLOCK_LINE_OF_SIGHT_FULL;
+        int yFlags = CollisionDataFlag.BLOCK_LINE_OF_SIGHT_FULL;
+        if (dx < 0)
+        {
+            xFlags |= CollisionDataFlag.BLOCK_LINE_OF_SIGHT_EAST;
+        }
+        else
+        {
+            xFlags |= CollisionDataFlag.BLOCK_LINE_OF_SIGHT_WEST;
+        }
+        if (dy < 0)
+        {
+            yFlags |= CollisionDataFlag.BLOCK_LINE_OF_SIGHT_NORTH;
+        }
+        else
+        {
+            yFlags |= CollisionDataFlag.BLOCK_LINE_OF_SIGHT_SOUTH;
+        }
+
+        if (dxAbs > dyAbs)
+        {
+            int x = p1.getX();
+            int yBig = p1.getY() << 16; // The y position is represented as a bigger number to handle rounding
+            int slope = (dy << 16) / dxAbs;
+            yBig += 0x8000; // Add half of a tile
+            if (dy < 0)
+            {
+                yBig--; // For correct rounding
+            }
+            int direction = dx < 0 ? -1 : 1;
+
+            while (x != p2.getX())
+            {
+                x += direction;
+                int y = yBig >>> 16;
+                if ((collisionDataFlags[x][y] & xFlags) != 0)
+                {
+                    // Collision while traveling on the x axis
+                    return false;
+                }
+                yBig += slope;
+                int nextY = yBig >>> 16;
+                if (nextY != y && (collisionDataFlags[x][nextY] & yFlags) != 0)
+                {
+                    // Collision while traveling on the y axis
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            int y = p1.getY();
+            int xBig = p1.getX() << 16; // The x position is represented as a bigger number to handle rounding
+            int slope = (dx << 16) / dyAbs;
+            xBig += 0x8000; // Add half of a tile
+            if (dx < 0)
+            {
+                xBig--; // For correct rounding
+            }
+            int direction = dy < 0 ? -1 : 1;
+
+            while (y != p2.getY())
+            {
+                y += direction;
+                int x = xBig >>> 16;
+                if ((collisionDataFlags[x][y] & yFlags) != 0)
+                {
+                    // Collision while traveling on the y axis
+                    return false;
+                }
+                xBig += slope;
+                int nextX = xBig >>> 16;
+                if (nextX != x && (collisionDataFlags[nextX][y] & xFlags) != 0)
+                {
+                    // Collision while traveling on the x axis
+                    return false;
+                }
+            }
+        }
+
+        // No collision
+        return true;
+    }
+
+    public static WorldPoint losTileNextTo(WorldPoint point) {
+        final Client client = Static.getClient();
+        return Static.invoke(() -> {
+            Tile tile = getTile(client.getLocalPlayer().getWorldLocation());
+            Tile thisTile = Location.getTile(point);
+            if(thisTile == null || tile == null)
+            {
+                return null;
+            }
+
+            WorldPoint player = client.getLocalPlayer().getWorldLocation();
+
+            WorldPoint north = new WorldPoint(player.getX(), player.getY() + 2, player.getPlane());
+            if(isReachable(player, north) && hasLineOfSightTo(player, north))
+                return north;
+
+            WorldPoint south = new WorldPoint(player.getX(), player.getY() - 2, player.getPlane());
+            if(isReachable(player, south) && hasLineOfSightTo(player, south))
+                return south;
+
+            WorldPoint east = new WorldPoint(player.getX() + 2, player.getY(), player.getPlane());
+            if(isReachable(player, east) && hasLineOfSightTo(player, east))
+                return east;
+
+            WorldPoint west = new WorldPoint(player.getX() - 2, player.getY(), player.getPlane());
+            if(isReachable(player, west) && hasLineOfSightTo(player, west))
+                return west;
+
+            return null;
+        });
     }
 }

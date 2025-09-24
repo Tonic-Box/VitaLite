@@ -187,6 +187,56 @@ public class InventoryAPI
     }
 
     /**
+     * drop all items from your inventory by list of ids
+     * @param ids item ids to drop
+     * @return number of ticks it will take
+     */
+    public static int dropAll(List<Integer> ids)
+    {
+        int count = 0;
+        for(int id : ids)
+        {
+            count = dropAll(id);
+        }
+        return (int) Math.ceil((double) count / 10);
+    }
+
+    /**
+     * drop all items from your inventory by list of ids
+     * @param ids item ids to drop
+     * @return number of ticks it will take
+     */
+    public static int dropAll(int... ids)
+    {
+        int count = 0;
+        for(int id : ids)
+        {
+            count = dropAll(id);
+        }
+        return (int) Math.ceil((double) count / 10);
+    }
+
+    /**
+     * drop all items from your inventory by list of ids
+     * @param id item id to drop
+     * @return number of ticks it will take
+     */
+    public static int dropAll(int id)
+    {
+        ItemContainerEx inventory = new ItemContainerEx(InventoryID.INV);
+        int count = 0;
+        for(ItemEx item : inventory.getItems())
+        {
+            if(item.getId() == id)
+            {
+                count++;
+                InventoryAPI.interact(item, 6);
+            }
+        }
+        return (int) Math.ceil((double) count / 10);
+    }
+
+    /**
      * check if your inventory is full
      * @return bool
      */

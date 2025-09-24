@@ -27,6 +27,16 @@ public abstract class AbstractActorQuery<T extends Actor, Q extends AbstractActo
     }
 
     /**
+     * filter by name
+     * @param name actor name
+     * @return ActorQuery
+     */
+    public Q withNameContains(String name)
+    {
+        return removeIf(o -> o.getName() == null ||  !TextUtil.sanitize(o.getName()).toLowerCase().contains(name.toLowerCase()));
+    }
+
+    /**
      * filter by distance
      * @param distance distance
      * @return ActorQuery

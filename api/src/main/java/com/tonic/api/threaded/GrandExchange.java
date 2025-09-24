@@ -54,6 +54,48 @@ public class GrandExchange
         Delays.tick();
     }
 
+    public static void buy(int id, int quantity, int price, boolean noted)
+    {
+        GrandExchangeSlot slot = startBuyOffer(id, quantity, price);
+        if(slot == null)
+        {
+            Logger.warn("Failed to buy '" + id + "' fromt he ge. No free slots.");
+            return;
+        }
+        while(!slot.isDone())
+        {
+            bypassHighOfferWarning();
+            Delays.tick();
+        }
+        ClientScriptAPI.closeNumericInputDialogue();
+        Delays.tick();
+        collectFromSlot(slot.getSlot(), noted, quantity);
+        Delays.tick();
+    }
+
+    public static void buy(int id, int quantity, boolean noted)
+    {
+        int slotNumber = freeSlot();
+        if(slotNumber == -1)
+            return;
+        GrandExchangeSlot slot = GrandExchangeSlot.getBySlot(slotNumber);
+        if(slot == null)
+        {
+            Logger.warn("Failed to buy '" + id + "' from the ge. No free slots.");
+            return;
+        }
+
+        int percents = 5;
+        while(!buyNow(id, quantity, slot, percents))
+        {
+            percents += 5;
+        }
+        ClientScriptAPI.closeNumericInputDialogue();
+        Delays.tick();
+        collectFromSlot(slotNumber, noted, quantity);
+        Delays.tick();
+    }
+
     private static boolean buyNow(int id, int quantity, GrandExchangeSlot slot, int percents)
     {
         startBuyOfferPercentage(id, quantity, percents, slot.getSlot());

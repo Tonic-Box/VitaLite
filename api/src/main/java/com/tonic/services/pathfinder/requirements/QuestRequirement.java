@@ -1,7 +1,6 @@
 package com.tonic.services.pathfinder.requirements;
 
 import com.tonic.Static;
-import com.tonic.data.Quests;
 import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.Quest;

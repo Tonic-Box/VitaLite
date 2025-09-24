@@ -31,7 +31,7 @@ public class WorldPointUtil {
      * @param worldPoint the instance worldpoint
      * @return the tile coordinate containing the local point
      */
-    private static WorldPoint fromInstance(WorldPoint worldPoint)
+    public static WorldPoint fromInstance(WorldPoint worldPoint)
     {
         //get local
         Client client = Static.getClient();

@@ -201,4 +201,15 @@ public class InventoryQuery extends AbstractQuery<ItemEx, InventoryQuery>
                 stream.mapToInt(item -> item.getQuantity() * item.getHighAlchValue()).sum()
         );
     }
+
+    public int count()
+    {
+        List<ItemEx> list = collect();
+        int count = 0;
+        for(ItemEx item : list)
+        {
+            count += item.getQuantity();
+        }
+        return count;
+    }
 }

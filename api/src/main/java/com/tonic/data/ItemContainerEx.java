@@ -13,6 +13,7 @@ import java.util.List;
 @Getter
 public class ItemContainerEx
 {
+    private final int containerId;
     private final List<ItemEx> items;
 
     public ItemContainerEx(InventoryID inventoryID)
@@ -21,6 +22,7 @@ public class ItemContainerEx
     }
     public ItemContainerEx(int containerId)
     {
+        this.containerId = containerId;
         Client client = Static.getClient();
         ItemContainer container = Static.invoke(() -> client.getItemContainer(containerId));
         if(container == null)
@@ -108,5 +110,22 @@ public class ItemContainerEx
             }
             return null;
         });
+    }
+
+    public int getNextEmptySlot() {
+        Client client = Static.getClient();
+        ItemContainer container = Static.invoke(() -> client.getItemContainer(containerId));
+        if(container == null)
+        {
+            return -1;
+        }
+        for(int i = 0; i < container.getItems().length; i++)
+        {
+            if(container.getItems()[i] == null || container.getItems()[i].getId() <= 0)
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 }

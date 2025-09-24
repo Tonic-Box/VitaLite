@@ -1,13 +1,17 @@
 package com.tonic.api.widgets;
 
+import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.VarAPI;
+import com.tonic.data.ItemContainerEx;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.data.ItemEx;
 import net.runelite.api.Client;
+import net.runelite.api.ItemContainer;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.widgets.WidgetInfo;
 
 /**
  * Bank API
@@ -283,5 +287,18 @@ public class BankAPI
         if(item == null)
             return;
         WidgetAPI.interact(9, InterfaceID.Bankside.ITEMS, item.getId(), item.getId());
+    }
+
+    public static void useGuessNextSlot(int itemId) {
+        int slot = Static.invoke(() -> {
+            ItemContainerEx inventory = new ItemContainerEx(InventoryID.INV);
+            return inventory.getNextEmptySlot();
+        });
+        if(slot == -1)
+        {
+            Logger.warn("[useGuessNextSlot] Inventory full already");
+            return;
+        }
+        WidgetAPI.interact(9, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), slot, itemId);
     }
 }

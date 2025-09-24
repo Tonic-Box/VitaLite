@@ -1,6 +1,7 @@
 package com.tonic.data;
 
 import com.tonic.Static;
+import com.tonic.util.TextUtil;
 import lombok.*;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
@@ -40,7 +41,7 @@ public class ItemEx {
 
     public String getName() {
         Client client = Static.getClient();
-        return Static.invoke(() -> client.getItemDefinition(item.getId()).getName());
+        return Static.invoke(() -> TextUtil.sanitize(client.getItemDefinition(item.getId()).getName()));
     }
 
     public int getQuantity() {
