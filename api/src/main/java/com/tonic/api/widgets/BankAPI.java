@@ -137,10 +137,10 @@ public class BankAPI
             WidgetAPI.interact(4, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else if(amount == -1) {
-            WidgetAPI.interact(6, InterfaceID.Bankmain.ITEMS, slot, id);
+            WidgetAPI.interact(7, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else {
-            WidgetAPI.interact(1, InterfaceID.Bankmain.ITEMS, slot, id);
+            WidgetAPI.interact(5, InterfaceID.Bankmain.ITEMS, slot, id);
         }
     }
 
@@ -153,19 +153,19 @@ public class BankAPI
     public static void depositAction(int id, int amount, int slot) {
         setX(amount);
         if(amount == 1) {
-            WidgetAPI.interact(2, InterfaceID.Bankside.ITEMS, slot, id);
-        }
-        else if(amount == 5) {
             WidgetAPI.interact(3, InterfaceID.Bankside.ITEMS, slot, id);
         }
-        else if(amount == 10) {
+        else if(amount == 5) {
             WidgetAPI.interact(4, InterfaceID.Bankside.ITEMS, slot, id);
         }
+        else if(amount == 10) {
+            WidgetAPI.interact(5, InterfaceID.Bankside.ITEMS, slot, id);
+        }
         else if(amount == -1) {
-            WidgetAPI.interact(7, InterfaceID.Bankside.ITEMS, slot, id);
+            WidgetAPI.interact(8, InterfaceID.Bankside.ITEMS, slot, id);
         }
         else {
-            WidgetAPI.interact(1, InterfaceID.Bankside.ITEMS, slot, id);
+            WidgetAPI.interact(2, InterfaceID.Bankside.ITEMS, slot, id);
         }
     }
 
