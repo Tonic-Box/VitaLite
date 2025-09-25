@@ -15,44 +15,38 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Install
-{
+public class Install {
     /**
      * Don't remove, call is injected see @{InjectSideLoadCallTransformer}
+     *
      * @param plugins list of plugin classes to load
      */
     public void injectSideLoadPlugins(List<Class<?>> plugins) {
-        List<ClassByte> pending = findJars().stream()
+        Queue<ClassByte> classesToLoad = findJars().stream()
                 .flatMap(jar -> listFilesInJar(jar).stream())
-                .collect(Collectors.toCollection(ArrayList::new));
+                .collect(Collectors.toCollection(LinkedList::new));
 
-        while (!pending.isEmpty()) {
-            int loadedThisPass = 0;
+        while (classesToLoad.peek() != null) {
+            ClassByte cb = classesToLoad.poll();
+            try {
+                Class<?> cls = Main.CLASSLOADER.lookupClass(cb.name, cb.bytes);
+                if (cls == null)
+                    continue;
 
-            for (Iterator<ClassByte> it = pending.iterator(); it.hasNext(); ) {
-                ClassByte cb  = it.next();
-                try
-                {
-                    Class<?>  cls = Main.CLASSLOADER.loadClass(cb.name, cb.bytes);
-                    if (cls == null) continue;
-                    CallStackFilter.processName(cls.getName());
-                    it.remove();
-                    loadedThisPass++;
-                    Class<?> parent = cls.getSuperclass();
-                    String parentName = parent != null ? parent.getName() : "null";
-                    if (parent != null && (parentName.endsWith(".Plugin") || parentName.endsWith(".VitaPlugin"))) {
-                        System.out.println("Loaded: " + cls.getName());
-                        plugins.add(cls);
-                    }
+                CallStackFilter.processName(cls.getName());
+                Class<?> parent = cls.getSuperclass();
+                if (parent == null)
+                    continue;
+
+                String parentName = parent.getName();
+                if (parentName.endsWith(".Plugin") || parentName.endsWith(".VitaPlugin")) {
+                    System.out.println("Loaded Sideloaded Plugin: " + parentName);
+                    plugins.add(cls);
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    System.out.println("Failed to load class: " + cb.name + " from jar");
-                }
-            }
-            if (loadedThisPass == 0) {
-                break;
+            } catch (NoClassDefFoundError e /*failed to load because it requires another class to load before it!*/) {
+                classesToLoad.add(cb);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -63,13 +57,14 @@ public class Install
     }
 
     private List<Path> findJars() {
-        Path external   = Static.RUNELITE_DIR.resolve("externalplugins");
+        Path external = Static.RUNELITE_DIR.resolve("externalplugins");
         Path sideloaded = Static.RUNELITE_DIR.resolve("sideloaded-plugins");
 
         try {
             Files.createDirectories(external);
             Files.createDirectories(sideloaded);
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
 
         return Stream.of(external, sideloaded)
                 .flatMap(dir -> {
