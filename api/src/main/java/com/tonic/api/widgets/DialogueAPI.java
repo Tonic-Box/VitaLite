@@ -6,6 +6,7 @@ import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.data.VarrockMuseumAnswer;
 import com.tonic.data.WidgetInfoExtended;
 import com.tonic.services.ClickManager;
+import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -231,7 +232,7 @@ public class DialogueAPI
     {
         TClient client = Static.getClient();
         Static.invoke(() -> {
-            ClickManager.click();
+            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
             client.getPacketWriter().resumeObjectDialoguePacket(id);
             ClientScriptAPI.closeNumericInputDialogue();
         });
@@ -246,7 +247,7 @@ public class DialogueAPI
     {
         TClient client = Static.getClient();
         Static.invoke(() -> {
-            ClickManager.click();
+            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
             client.getPacketWriter().resumeNameDialoguePacket(text);
             ClientScriptAPI.closeNumericInputDialogue();
         });
@@ -286,7 +287,7 @@ public class DialogueAPI
     {
         TClient client = Static.getClient();
         Static.invoke(() -> {
-            ClickManager.click();
+            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
             client.getPacketWriter().resumePauseWidgetPacket(17694734, quantity);
         });
     }

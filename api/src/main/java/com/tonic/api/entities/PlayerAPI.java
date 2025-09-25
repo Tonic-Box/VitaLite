@@ -3,6 +3,7 @@ package com.tonic.api.entities;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.services.ClickManager;
+import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.Client;
 import net.runelite.api.Player;
 
@@ -49,7 +50,7 @@ public class PlayerAPI
         TClient client = Static.getClient();
         Static.invoke(() ->
         {
-            ClickManager.click();
+            ClickManager.click(PacketInteractionType.PLAYER_INTERACT);
             client.getPacketWriter().playerActionPacket(option, index, false);
         });
     }

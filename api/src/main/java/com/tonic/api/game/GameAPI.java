@@ -4,6 +4,7 @@ import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.services.ClickManager;
+import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
@@ -92,7 +93,7 @@ public class GameAPI
     {
         TClient client = Static.getClient();
         boolean lock = Static.invoke(() -> {
-            ClickManager.click();
+            ClickManager.click(PacketInteractionType.UNBOUND_INTERACT);
             client.invokeMenuAction("", "", identifier, opcode, param0, param1, itemId, -1, -1);
             return true;
         });

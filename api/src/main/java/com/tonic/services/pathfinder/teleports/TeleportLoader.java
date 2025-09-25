@@ -7,6 +7,7 @@ import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.data.ItemEx;
 import com.tonic.services.ClickManager;
+import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
 import org.apache.commons.lang3.ArrayUtils;
@@ -288,7 +289,7 @@ public class TeleportLoader {
             add(() -> {
                 TClient tClient = Static.getClient();
                 Static.invoke(() -> {
-                    ClickManager.click();
+                    ClickManager.click(PacketInteractionType.UNBOUND_INTERACT);
                     tClient.invokeMenuAction("", "", 0, 30, option, WidgetId, -1, -1, -1);
                 });
             });
