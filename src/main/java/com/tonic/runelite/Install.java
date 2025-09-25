@@ -40,7 +40,7 @@ public class Install {
 
                 String parentName = parent.getName();
                 if (parentName.endsWith(".Plugin") || parentName.endsWith(".VitaPlugin")) {
-                    System.out.println("Loaded Sideloaded Plugin: " + parentName);
+                    System.out.println("Loaded Sideloaded Plugin: " + cls.getName());
                     plugins.add(cls);
                 }
             } catch (NoClassDefFoundError e /*failed to load because it requires another class to load before it!*/) {
