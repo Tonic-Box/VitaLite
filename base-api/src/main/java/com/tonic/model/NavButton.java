@@ -1,7 +1,7 @@
 package com.tonic.model;
 
 import com.tonic.Static;
-import com.tonic.model.ui.componants.VPluginPanel;
+import com.tonic.model.ui.components.VPluginPanel;
 import com.tonic.util.ReflectBuilder;
 
 import java.awt.image.BufferedImage;

@@ -1,4 +1,4 @@
-package com.tonic.model.ui.componants;
+package com.tonic.model.ui.components;
 
 import javax.swing.*;
 import java.awt.*;

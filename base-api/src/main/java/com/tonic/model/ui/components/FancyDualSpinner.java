@@ -1,4 +1,4 @@
-package com.tonic.model.ui.componants;
+package com.tonic.model.ui.components;
 
 import lombok.Getter;
 

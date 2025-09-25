@@ -1,6 +1,6 @@
 package com.tonic.model;
 
-import com.tonic.model.ui.componants.VPluginPanel;
+import com.tonic.model.ui.components.VPluginPanel;
 import com.tonic.util.ReflectBuilder;
 import javax.swing.*;
 import java.awt.*;

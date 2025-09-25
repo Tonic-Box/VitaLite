@@ -5,7 +5,7 @@ import com.tonic.Static;
 import com.tonic.events.PacketSent;
 import com.tonic.model.DeviceID;
 import com.tonic.model.RandomDat;
-import com.tonic.model.ui.componants.*;
+import com.tonic.model.ui.components.*;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
 import com.tonic.services.ConfigManager;
