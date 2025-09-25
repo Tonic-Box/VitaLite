@@ -1,8 +1,7 @@
 package com.tonic.model.ui;
 
 import com.tonic.Static;
-import com.tonic.events.PacketSent;
-import com.tonic.model.ui.componants.VPluginPanel;
+import com.tonic.model.ui.components.VPluginPanel;
 
 import javax.swing.*;
 import javax.swing.border.*;
