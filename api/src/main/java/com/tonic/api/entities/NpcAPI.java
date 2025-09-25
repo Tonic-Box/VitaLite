@@ -3,6 +3,7 @@ package com.tonic.api.entities;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.services.ClickManager;
+import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.NPC;
 import net.runelite.api.NPCComposition;
 
@@ -68,7 +69,7 @@ public class NpcAPI
         TClient client = Static.getClient();
         Static.invoke(() ->
         {
-            ClickManager.click();
+            ClickManager.click(PacketInteractionType.NPC_INTERACT);
             client.getPacketWriter().npcActionPacket(option, npcIndex, true);
         });
     }

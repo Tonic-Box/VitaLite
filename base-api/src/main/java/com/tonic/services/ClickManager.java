@@ -3,10 +3,14 @@ package com.tonic.services;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.TClient;
+import com.tonic.services.ClickPacket.ClickPacket;
+import com.tonic.services.ClickPacket.PacketInteractionType;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ClickManager
@@ -17,6 +21,8 @@ public class ClickManager
     @Getter
     private static final AtomicReference<Point> point = new AtomicReference<>(new Point(-1, -1));
     private static volatile Shape shape = null;
+    private static final List<ClickPacket> clickPackets = new ArrayList<>();
+
 
     public static void setPoint(int x, int y)
     {
@@ -38,7 +44,7 @@ public class ClickManager
         shape = null;
     }
 
-    public static void click()
+    public static void click(PacketInteractionType packetInteractionType)
     {
         Static.invoke(() -> {
             TClient client = Static.getClient();
@@ -47,32 +53,35 @@ public class ClickManager
             switch (strategy)
             {
                 case STATIC:
-                    client.getPacketWriter().clickPacket(0, px, py);
+                    defaultStaticClickPacket(packetInteractionType, client, px, py);
                     break;
                 case RANDOM:
                     Rectangle r = Static.getRuneLite().getGameApplet().getViewportArea();
                     if(r == null)
                     {
                         Logger.warn("Viewport area is null, defaulting to STATIC.");
-                        client.getPacketWriter().clickPacket(0, px, py);
+                        defaultStaticClickPacket(packetInteractionType, client, px, py);
                         break;
                     }
                     int rx = (int) (Math.random() * r.getWidth()) + r.x;
                     int ry = (int) (Math.random() * r.getHeight()) + r.y;
                     client.getPacketWriter().clickPacket(0, rx, ry);
+                    clickPackets.add(new ClickPacket(packetInteractionType, rx, ry));
                     break;
                 case CONTROLLED:
                     if(shape == null)
                     {
                         Logger.warn("Click box is null, defaulting to STATIC.");
-                        client.getPacketWriter().clickPacket(0, px, py);
+                        defaultStaticClickPacket(packetInteractionType, client, px, py);
                         break;
                     }
                     Point p = getRandomPointInShape(shape);
                     client.getPacketWriter().clickPacket(0, p.x, p.y);
+                    clickPackets.add(new ClickPacket(packetInteractionType, p.x, p.y));
                     break;
             }
         });
+        Logger.warn("Click packet position: " + clickPackets.get(clickPackets.size() - 1));
     }
 
     private static Point getRandomPointInShape(Shape shape) {
@@ -86,5 +95,10 @@ public class ClickManager
                 return new Point(x, y);
             }
         }
+    }
+
+    private static void defaultStaticClickPacket(PacketInteractionType packetInteractionType, TClient client, int x, int y) {
+        client.getPacketWriter().clickPacket(0, x, y);
+        clickPackets.add(new ClickPacket(packetInteractionType, x, y));
     }
 }

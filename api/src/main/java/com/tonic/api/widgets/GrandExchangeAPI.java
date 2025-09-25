@@ -8,6 +8,7 @@ import com.tonic.api.threaded.Delays;
 import com.tonic.data.GrandExchangeSlot;
 import com.tonic.data.ItemEx;
 import com.tonic.services.ClickManager;
+import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.Client;
 import net.runelite.api.GrandExchangeOffer;
 import net.runelite.api.GrandExchangeOfferState;
@@ -33,7 +34,7 @@ public class GrandExchangeAPI
             if(w == null || w.isHidden() || w.isSelfHidden())
                 return;
 
-            ClickManager.click();
+            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
             tclient.getPacketWriter().resumeCountDialoguePacket(1);
         });
     }
