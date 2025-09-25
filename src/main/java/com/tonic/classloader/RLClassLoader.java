@@ -2,7 +2,6 @@ package com.tonic.classloader;
 
 import com.tonic.VitaLite;
 import com.tonic.vitalite.Main;
-import com.tonic.api.TClient;
 import com.tonic.model.Libs;
 
 import java.io.ByteArrayInputStream;
@@ -16,14 +15,11 @@ import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
 import java.util.HashMap;
-import java.util.WeakHashMap;
 
-public class RLClassLoader extends URLClassLoader
-{
+public class RLClassLoader extends URLClassLoader {
     private final HashMap<String, byte[]> resources = new HashMap<>();
 
-    public RLClassLoader(URL[] urls)
-    {
+    public RLClassLoader(URL[] urls) {
         super(urls, Main.class.getClassLoader());
         loadEmbeddedJarAsURL();
     }
@@ -82,21 +78,18 @@ public class RLClassLoader extends URLClassLoader
     }
 
     @Override
-    public Class<?> loadClass(String name) throws ClassNotFoundException
-    {
-        try
-        {
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+        try {
             Class<?> loadedClass = this.findLoadedClass(name);
             if (loadedClass != null) {
                 return loadedClass;
             }
 
             byte[] bytes;
-            if(ProxyClassProvider.PROXY_CLASSES.containsKey(name))
-            {
+            if (ProxyClassProvider.PROXY_CLASSES.containsKey(name)) {
                 bytes = ProxyClassProvider.PROXY_CLASSES.get(name);
                 loadedClass = loadArtifactClass(name, bytes);
-                if(loadedClass != null)
+                if (loadedClass != null)
                     return loadedClass;
             }
 
@@ -105,23 +98,21 @@ public class RLClassLoader extends URLClassLoader
                 return super.loadClass(name);
             }
 
-            if(bytes == null)
+            if (bytes == null)
                 bytes = Main.LIBS.classByName(name);
 
             loadedClass = loadArtifactClass(name, bytes);
-            if(loadedClass != null)
+            if (loadedClass != null)
                 return loadedClass;
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored) {}
         return super.loadClass(name);
     }
 
-    private Class<?> loadArtifactClass(String name, byte[] bytes)
-    {
+    private Class<?> loadArtifactClass(String name, byte[] bytes) {
         Class<?> loadedClass;
         name = name.replace("/", ".");
-        if(bytes != null)
-        {
+        if (bytes != null) {
             try {
                 if (bytes.length > 0) {
                     ProtectionDomain pd = makeProtectionDomainFor(name);
@@ -130,8 +121,7 @@ public class RLClassLoader extends URLClassLoader
                         return loadedClass;
                     }
                 }
-            }
-            catch (Exception ignored) {
+            } catch (Exception ignored) {
             }
         }
         return null;
@@ -141,30 +131,17 @@ public class RLClassLoader extends URLClassLoader
         return Class.forName(className, true, this);
     }
 
-    public Class<?> loadClass(String name, byte[] bytes)
-    {
-        try
-        {
+    public Class<?> loadClass(String name, byte[] bytes) {
+        try {
             return super.loadClass(name);
-        }
-        catch (ClassNotFoundException | NoClassDefFoundError e)
-        {
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
             return lookupClass(name, bytes);
         }
     }
 
-    public Class<?> lookupClass(String name, byte[] bytes)
-    {
+    public Class<?> lookupClass(String name, byte[] bytes) {
         final ProtectionDomain protDomain = makeProtectionDomainFor(name);
-
-        try
-        {
-            return defineClass(name, bytes, 0, bytes.length, protDomain);
-        }
-        catch (LinkageError ex)
-        {
-            return null;
-        }
+        return defineClass(name, bytes, 0, bytes.length, protDomain);
     }
 
     @Override
