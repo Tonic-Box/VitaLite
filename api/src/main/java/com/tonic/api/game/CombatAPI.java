@@ -4,6 +4,7 @@ import com.tonic.Static;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.AttackStyle;
 import net.runelite.api.Client;
+import net.runelite.api.Skill;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
@@ -130,5 +131,11 @@ public class CombatAPI
     public static AttackStyle getAttackStyle()
     {
         return AttackStyle.fromIndex(VarAPI.getVarp(43));
+    }
+
+    public static int getHealth()
+    {
+        Client client = Static.getClient();
+        return Static.invoke(() -> client.getBoostedSkillLevel(Skill.HITPOINTS));
     }
 }
