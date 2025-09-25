@@ -1,0 +1,6734 @@
+[
+  {
+    "item_id": 11680,
+    "name": "Address form",
+    "coords": "2739, 3581, 1",
+    "location": "Sinclair Mansion - 1st floor"
+  },
+  {
+    "item_id": 6561,
+    "name": "Ahab's beer",
+    "coords": "3049, 3257, 0",
+    "location": "Port Sarim - Rusty Anchor Inn"
+  },
+  {
+    "item_id": 556,
+    "name": "Air rune",
+    "coords": "1399, 3158, 0",
+    "location": "West of Ralos' Rise"
+  },
+  {
+    "item_id": 556,
+    "name": "Air rune",
+    "coords": "2938, 3158, 0",
+    "location": "Musa Point - behind Luthas' house"
+  },
+  {
+    "item_id": 556,
+    "name": "Air rune",
+    "coords": "3030, 3637, 0",
+    "location": "Wilderness - Dark Warriors' Fortress"
+  },
+  {
+    "item_id": 556,
+    "name": "Air rune",
+    "coords": "3150, 3247, 0",
+    "location": "East of Draynor jail"
+  },
+  {
+    "item_id": 1595,
+    "name": "Amulet mould",
+    "coords": "2928, 3290, 0",
+    "location": "Crafting Guild"
+  },
+  {
+    "item_id": 6792,
+    "name": "Ancestral key",
+    "coords": "3432, 2928, 0",
+    "location": "Nardah - shrine to Elidinis"
+  },
+  {
+    "item_id": 708,
+    "name": "Arcenia root",
+    "coords": "3347, 9754, 0",
+    "location": "Digsite Dungeon"
+  },
+  {
+    "item_id": 10810,
+    "name": "Arctic pine logs",
+    "coords": "2858, 3928, 0",
+    "location": "Weiss"
+  },
+  {
+    "item_id": 1905,
+    "name": "Asgarnian ale",
+    "coords": "2906, 3538, 0",
+    "location": "Burthorpe - The Toad and Chicken pub"
+  },
+  {
+    "item_id": 592,
+    "name": "Ashes",
+    "coords": "1494, 3177, 0",
+    "location": "Bandits' camp north-east of Ralos' Rise"
+  },
+  {
+    "item_id": 592,
+    "name": "Ashes",
+    "coords": "3752, 9780, 0",
+    "location": "Sisterhood Sanctuary"
+  },
+  {
+    "item_id": 600,
+    "name": "Astronomy book",
+    "coords": "2438, 3187, 0",
+    "location": "Observatory reception west of Tree Gnome Village"
+  },
+  {
+    "item_id": 125,
+    "name": "Attack potion(1)",
+    "coords": "3026, 10325, 0",
+    "location": "Wilderness - Deep Wilderness Dungeon"
+  },
+  {
+    "item_id": 2407,
+    "name": "Ball",
+    "coords": "2935, 3460, 0",
+    "location": "Taverley - Nora T. Hagg's garden shed"
+  },
+  {
+    "item_id": 1759,
+    "name": "Ball of wool",
+    "coords": "1662, 3100, 1",
+    "location": "Civitas illa Fortis 1st floor"
+  },
+  {
+    "item_id": 1963,
+    "name": "Banana",
+    "coords": "2907, 3146, 0",
+    "location": "Musa Point - Karamja General Store"
+  },
+  {
+    "item_id": 1963,
+    "name": "Banana",
+    "coords": "3009, 3207, 0",
+    "location": "Port Sarim - Wydin's Food Store"
+  },
+  {
+    "item_id": 1841,
+    "name": "Barrel",
+    "coords": "2184, 3139, 0",
+    "location": "Tyras Camp"
+  },
+  {
+    "item_id": 1841,
+    "name": "Barrel",
+    "coords": "2208, 3259, 0",
+    "location": "Iorwerth Camp"
+  },
+  {
+    "item_id": 1841,
+    "name": "Barrel",
+    "coords": "2487, 3371, 0",
+    "location": "Kandarin - apple orchard west of Combat Training Camp"
+  },
+  {
+    "item_id": 530,
+    "name": "Bat bones",
+    "coords": "3753, 9780, 0",
+    "location": "Sisterhood Sanctuary"
+  },
+  {
+    "item_id": 1917,
+    "name": "Beer",
+    "coords": "1365, 3574, 0",
+    "location": "Shayziens' Wall - northern outpost"
+  },
+  {
+    "item_id": 1917,
+    "name": "Beer",
+    "coords": "1367, 3305, 0",
+    "location": "Nemus Retreat"
+  },
+  {
+    "item_id": 1917,
+    "name": "Beer",
+    "coords": "1388, 2859, 0",
+    "location": "Stick Your Ore Inn"
+  },
+  {
+    "item_id": 1917,
+    "name": "Beer",
+    "coords": "1560, 3586, 0",
+    "location": "Shayzien"
+  },
+  {
+    "item_id": 1917,
+    "name": "Beer",
+    "coords": "1729, 3618, 0",
+    "location": "Hosidius - The Golden Field pub"
+  },
+  {
+    "item_id": 1917,
+    "name": "Beer",
+    "coords": "1775, 3679, 0",
+    "location": "Port Piscarilius - The Legless Faun pub"
+  },
+  {
+    "item_id": 1917,
+    "name": "Beer",
+    "coords": "2517, 3378, 0",
+    "location": "Combat Training Camp"
+  },
+  {
+    "item_id": 1917,
+    "name": "Beer",
+    "coords": "2796, 3165, 0",
+    "location": "Brimhaven - Dead Man's Chest pub"
+  },
+  {
+    "item_id": 1917,
+    "name": "Beer",
+    "coords": "2952, 9962, 0",
+    "location": "Old School Museum - Lower floor (Telegrab only)"
+  },
+  {
+    "item_id": 1917,
+    "name": "Beer",
+    "coords": "3077, 3443, 0",
+    "location": "Barbarian Village"
+  },
+  {
+    "item_id": 1917,
+    "name": "Beer",
+    "coords": "3148, 3645, 0",
+    "location": "Ferox Enclave - The Old Nite pub"
+  },
+  {
+    "item_id": 1917,
+    "name": "Beer",
+    "coords": "3286, 3033, 1",
+    "location": "Desert Mining Camp"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "1222, 3114, 0",
+    "location": "Tal Teklan"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "1380, 2932, 0",
+    "location": "Aldarin - Sunlight's Sanctum"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "1391, 3352, 0",
+    "location": "Auburnvale"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "1392, 2860, 0",
+    "location": "Stick Your Ore Inn"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "1434, 9586, 0",
+    "location": "Cam Torum - basement of The Lost Pickaxe"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "1502, 3228, 0",
+    "location": "Quetzacalli Gorge - The Windbreaker"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "1531, 3638, 0",
+    "location": "Shayzien Encampment"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "1555, 9461, 0",
+    "location": "Hunter Guild - basement"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "1643, 3628, 0",
+    "location": "Hosidius - Mess hall"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "1673, 3155, 1",
+    "location": "Civitas illa Fortis - Sunrise Palace (1st floor)"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "1711, 3114, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "1724, 3073, 0",
+    "location": "Outer Fortis"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "2563, 2867, 1",
+    "location": "Corsair Cove (1st floor)"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "2794, 3165, 0",
+    "location": "Brimhaven"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "2907, 3538, 0",
+    "location": "Burthorpe"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "3238, 6119, 0",
+    "location": "Prifddinas - Hefin Inn"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "3323, 3136, 1",
+    "location": "Sorceress's Garden Building South of Al Kharid (1st floor) (search shelves)"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "3358, 2955, 0",
+    "location": "Pollnivneach"
+  },
+  {
+    "item_id": 1919,
+    "name": "Beer glass",
+    "coords": "3404, 3165, 0",
+    "location": "Citharede Abbey mine"
+  },
+  {
+    "item_id": 3803,
+    "name": "Beer tankard",
+    "coords": "1519, 2989, 1",
+    "location": "Sunset Coast 1st floor"
+  },
+  {
+    "item_id": 3803,
+    "name": "Beer tankard",
+    "coords": "1522, 2986, 2",
+    "location": "Sunset Coast 2nd floor"
+  },
+  {
+    "item_id": 3803,
+    "name": "Beer tankard",
+    "coords": "2658, 3676, 0",
+    "location": "Rellekka - longhall bar"
+  },
+  {
+    "item_id": 532,
+    "name": "Big bones",
+    "coords": "1441, 3616, 0",
+    "location": "Shayzien - Giant Pit"
+  },
+  {
+    "item_id": 532,
+    "name": "Big bones",
+    "coords": "1475, 9498, 1",
+    "location": "Wolf Den - after killing the Dire Wolf Alpha"
+  },
+  {
+    "item_id": 532,
+    "name": "Big bones",
+    "coords": "1626, 2930, 0",
+    "location": "Colossal Wyrm Remains (one requires telegrab)"
+  },
+  {
+    "item_id": 532,
+    "name": "Big bones",
+    "coords": "2767, 3855, 0",
+    "location": "Trollweiss Mountain summit"
+  },
+  {
+    "item_id": 532,
+    "name": "Big bones",
+    "coords": "3214, 3733, 0",
+    "location": "Wilderness - Bone Yard"
+  },
+  {
+    "item_id": 305,
+    "name": "Big fishing net",
+    "coords": "1507, 2984, 0",
+    "location": "Sunset Coast"
+  },
+  {
+    "item_id": 305,
+    "name": "Big fishing net",
+    "coords": "1578, 3307, 0",
+    "location": "Shipwreck Cove"
+  },
+  {
+    "item_id": 305,
+    "name": "Big fishing net",
+    "coords": "1755, 3803, 0",
+    "location": "Port Piscarilius"
+  },
+  {
+    "item_id": 305,
+    "name": "Big fishing net",
+    "coords": "2161, 2803, 0",
+    "location": "Isle of Souls"
+  },
+  {
+    "item_id": 305,
+    "name": "Big fishing net",
+    "coords": "2605, 3395, 0",
+    "location": "Fishing Guild"
+  },
+  {
+    "item_id": 10006,
+    "name": "Bird snare",
+    "coords": "3324, 2742, 0",
+    "location": "Necropolis camps - south-east of Sophanem"
+  },
+  {
+    "item_id": 21,
+    "name": "Black Cog",
+    "coords": "2613, 9639, 0",
+    "location": "Clock Tower Dungeon"
+  },
+  {
+    "item_id": 1217,
+    "name": "Black dagger",
+    "coords": "3180, 3824, 0",
+    "location": "Wilderness - Lava Dragon Isle"
+  },
+  {
+    "item_id": 581,
+    "name": "Black robe",
+    "coords": "1718, 3120, 2",
+    "location": "Civitas illa Fortis - Pub 2nd floor"
+  },
+  {
+    "item_id": 1327,
+    "name": "Black scimitar",
+    "coords": "2572, 3284, 1",
+    "location": "Ardougne Castle (1st floor)"
+  },
+  {
+    "item_id": 24774,
+    "name": "Blood pint",
+    "coords": "3596, 3388, 0",
+    "location": "Darkmeyer - The Crypt pub"
+  },
+  {
+    "item_id": 24774,
+    "name": "Blood pint",
+    "coords": "3603, 3317, 0",
+    "location": "Darkmeyer - Lord Mischa Myrmel's house"
+  },
+  {
+    "item_id": 24774,
+    "name": "Blood pint",
+    "coords": "3607, 3337, 1",
+    "location": "Darkmeyer - Lady Nadezhda Shadum's house (1st floor)"
+  },
+  {
+    "item_id": 565,
+    "name": "Blood rune",
+    "coords": "3283, 3819, 0",
+    "location": "Wilderness - south of Callisto"
+  },
+  {
+    "item_id": 565,
+    "name": "Blood rune",
+    "coords": "3297, 3890, 0",
+    "location": "Wilderness - Demonic Ruins"
+  },
+  {
+    "item_id": 22430,
+    "name": "Bloody bracer",
+    "coords": "3749, 3295, 0",
+    "location": "Slepe - Rat & Bat pub"
+  },
+  {
+    "item_id": 22420,
+    "name": "Bloody grimoire",
+    "coords": "3722, 9733, 0",
+    "location": "Sisterhood Sanctuary"
+  },
+  {
+    "item_id": 22,
+    "name": "Blue cog",
+    "coords": "2574, 9633, 0",
+    "location": "Clock Tower Dungeon"
+  },
+  {
+    "item_id": 243,
+    "name": "Blue dragon scale",
+    "coords": "1236, 9497, 0",
+    "location": "Dragon Nest"
+  },
+  {
+    "item_id": 243,
+    "name": "Blue dragon scale",
+    "coords": "1602, 9613, 0",
+    "location": "Ruins of Tapoyauik - west blue dragon room"
+  },
+  {
+    "item_id": 243,
+    "name": "Blue dragon scale",
+    "coords": "1643, 9612, 0",
+    "location": "Ruins of Tapoyauik - east blue dragon room"
+  },
+  {
+    "item_id": 243,
+    "name": "Blue dragon scale",
+    "coords": "1922, 8967, 0",
+    "location": "Myths' Guild basement<ref group=\"l\">Requires completion of Dragon Slayer II</ref>"
+  },
+  {
+    "item_id": 243,
+    "name": "Blue dragon scale",
+    "coords": "2135, 9306, 0",
+    "location": "Isle of Souls Dungeon"
+  },
+  {
+    "item_id": 243,
+    "name": "Blue dragon scale",
+    "coords": "2912, 9786, 0",
+    "location": "Taverley Dungeon"
+  },
+  {
+    "item_id": 660,
+    "name": "Blue hat",
+    "coords": "2379, 4712, 0",
+    "location": "Viyeldi Caves"
+  },
+  {
+    "item_id": 559,
+    "name": "Body rune",
+    "coords": "3021, 3637, 0",
+    "location": "Wilderness - Dark Warriors' Fortress"
+  },
+  {
+    "item_id": 559,
+    "name": "Body rune",
+    "coords": "3091, 3865, 0",
+    "location": "Wilderness - Lava Maze"
+  },
+  {
+    "item_id": 559,
+    "name": "Body rune",
+    "coords": "3194, 3495, 0",
+    "location": "Varrock - east of the Grand Exchange"
+  },
+  {
+    "item_id": 559,
+    "name": "Body rune",
+    "coords": "3223, 3583, 0",
+    "location": "Wilderness - south of the Chaos Temple"
+  },
+  {
+    "item_id": 559,
+    "name": "Body rune",
+    "coords": "3226, 9910, 0",
+    "location": "Varrock Sewers"
+  },
+  {
+    "item_id": 559,
+    "name": "Body rune",
+    "coords": "3290, 3191, 1",
+    "location": "Zeke's Superior Scimitars. - 1st floor"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1346, 3792, 0",
+    "location": "Kebos Lowlands - south-west of Mount Karuulm"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1411, 2858, 0",
+    "location": "East of Mistrock"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1420, 3589, 0",
+    "location": "Shayzien - Giants' Den entrance"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1442, 3583, 0",
+    "location": "Shayzien - south of the Secluded Chapel"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1449, 3621, 0",
+    "location": "Shayzien - Giant Pit"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1478, 3533, 0",
+    "location": "Shayzien - south of the Graveyard of Heroes (4 spawns)"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1497, 3425, 0",
+    "location": "Land's End"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1545, 3327, 0",
+    "location": "Shipwreck Cove"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1588, 3765, 0",
+    "location": "Lovakengj - north-west of the Kourend Castle"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1636, 2934, 0",
+    "location": "Colossal Wyrm (2 require telegrab)"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1683, 9604, 2",
+    "location": "Ruins of Tapoyauik"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1720, 2935, 0",
+    "location": "South-west of Stonecutter Outpost"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1828, 3139, 0",
+    "location": "North of the Fortis Colosseum"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "1936, 9448, 0",
+    "location": "Isle of Souls - Crumbling Tower (basement)"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2362, 9404, 0",
+    "location": "Observatory Dungeon"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2453, 3230, 0",
+    "location": "Ourania Cave entrance"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2485, 2926, 0",
+    "location": "Feldip Hills"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2501, 9427, 0",
+    "location": "Skavid Caves"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2503, 3118, 0",
+    "location": "Kandarin - south of Tree Gnome Village"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2508, 3086, 0",
+    "location": "Kandarin - island north of Gu'Tanoth"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2541, 3028, 0",
+    "location": "Inside Gu'Tanoth"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2592, 9740, 0",
+    "location": "Chaos Druid Tower dungeon"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2613, 9441, 0",
+    "location": "Ogre Enclave"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2653, 9421, 0",
+    "location": "Brimhaven Dungeon (task-only area)"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2670, 9821, 0",
+    "location": "Temple of Ikov"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2675, 3719, 0",
+    "location": "Rellekka - near the rock crabs"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2776, 3781, 0",
+    "location": "Base of Trollweiss Mountain"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2829, 9764, 0",
+    "location": "Entrana Dungeon"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2830, 9565, 0",
+    "location": "Crandor and Karamja Dungeon"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2854, 10338, 0",
+    "location": "Weiss - Salt Mines"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2900, 9113, 0",
+    "location": "Kruk's Dungeon - hunter area"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2917, 9796, 0",
+    "location": "Taverley Dungeon"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2925, 3251, 2",
+    "location": "Melzar's Maze, (2nd floor)"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2978, 3763, 0",
+    "location": "Wilderness - The Forgotten Cemetery"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2984, 3683, 0",
+    "location": "Wilderness - western Ruins"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "2992, 3920, 0",
+    "location": "Wilderness Agility Course"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3003, 10340, 0",
+    "location": "Wilderness - Deep Wilderness Dungeon"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3087, 9800, 0",
+    "location": "Edgeville Dungeon - Obor's lair"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3100, 3697, 0",
+    "location": "Wilderness - north-west of the Graveyard of Shadows"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3106, 9514, 0",
+    "location": "Tutorial Island Dungeon"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3116, 9950, 0",
+    "location": "Edgeville Dungeon - Wilderness"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3120, 9894, 0",
+    "location": "Edgeville Dungeon"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3126, 3647, 0",
+    "location": "Wilderness - north-west of Ferox Enclave"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3162, 3601, 0",
+    "location": "Wilderness - south-east of Ferox Enclave"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3173, 9903, 0",
+    "location": "Varrock Sewers"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3182, 3722, 0",
+    "location": "Wilderness - eastern Ruins"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3216, 3741, 0",
+    "location": "Wilderness - Bone Yard"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3232, 3605, 0",
+    "location": "Wilderness - Chaos Temple"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3232, 3948, 0",
+    "location": "Wilderness - Scorpion Pit"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3268, 3660, 0",
+    "location": "Wilderness - by Larran's small chest"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3280, 9415, 0",
+    "location": "Desert Mining Camp - underground mine"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3354, 3426, 0",
+    "location": "Digsite"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3364, 9749, 0",
+    "location": "Digsite Dungeon"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3377, 3157, 0",
+    "location": "Giants' Plateau"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3393, 2800, 0",
+    "location": "Ruins of Ullek"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3425, 9935, 0",
+    "location": "Slayer Tower basement"
+  },
+  {
+    "item_id": 526,
+    "name": "Bones",
+    "coords": "3718, 3349, 0",
+    "location": "Slepe - Crombwick Manor"
+  },
+  {
+    "item_id": null,
+    "name": "Bones (Ape Atoll)",
+    "coords": "2709, 9116, 0",
+    "location": "Ape Atoll Dungeon"
+  },
+  {
+    "item_id": 88,
+    "name": "Boots of lightness",
+    "coords": "2654, 9767, 0",
+    "location": "Temple of Ikov basement"
+  },
+  {
+    "item_id": 26965,
+    "name": "Bottle of 'tonic'",
+    "coords": "3383, 2794, 0",
+    "location": "Campsite east of Sophanem"
+  },
+  {
+    "item_id": 1923,
+    "name": "Bowl",
+    "coords": "1208, 3093, 0",
+    "location": "Tal Teklan"
+  },
+  {
+    "item_id": 1923,
+    "name": "Bowl",
+    "coords": "1431, 2962, 1",
+    "location": "Aldarin 1st floor"
+  },
+  {
+    "item_id": 1923,
+    "name": "Bowl",
+    "coords": "1476, 9553, 1",
+    "location": "Cam Torum"
+  },
+  {
+    "item_id": 1923,
+    "name": "Bowl",
+    "coords": "1764, 3100, 1",
+    "location": "Civitas illa Fortis 1st floor"
+  },
+  {
+    "item_id": 1923,
+    "name": "Bowl",
+    "coords": "1768, 3103, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1923,
+    "name": "Bowl",
+    "coords": "1768, 3589, 0",
+    "location": "Hosidius - Little Shop of Horace"
+  },
+  {
+    "item_id": 1923,
+    "name": "Bowl",
+    "coords": "2667, 3387, 0",
+    "location": "Kandarin - north of the East Ardougne allotment patch"
+  },
+  {
+    "item_id": 1923,
+    "name": "Bowl",
+    "coords": "2816, 3351, 1",
+    "location": "Entrana - house west of furnace (1st floor)"
+  },
+  {
+    "item_id": 1923,
+    "name": "Bowl",
+    "coords": "3141, 3450, 1",
+    "location": "Cooks' Guild - 1st floor"
+  },
+  {
+    "item_id": 1923,
+    "name": "Bowl",
+    "coords": "3208, 3214, 0",
+    "location": "Lumbridge Castle kitchen"
+  },
+  {
+    "item_id": 1921,
+    "name": "Bowl of water",
+    "coords": "1639, 3572, 0",
+    "location": "Hosidius - Watson's house"
+  },
+  {
+    "item_id": 1921,
+    "name": "Bowl of water",
+    "coords": "1665, 3120, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1921,
+    "name": "Bowl of water",
+    "coords": "3291, 3034, 0",
+    "location": "Desert Mining Camp"
+  },
+  {
+    "item_id": 1921,
+    "name": "Bowl of water",
+    "coords": "3621, 3378, 0",
+    "location": "Darkmeyer - middle tier"
+  },
+  {
+    "item_id": 1921,
+    "name": "Bowl of water",
+    "coords": "3703, 3331, 1",
+    "location": "Slepe - eastern and western houses (1st floor)"
+  },
+  {
+    "item_id": 10008,
+    "name": "Box trap",
+    "coords": "1631, 3092, 0",
+    "location": "Civitas illa Fortis - upstairs on a table in the small building in south-west corner. Note: Ironmen cannot loot it."
+  },
+  {
+    "item_id": 10008,
+    "name": "Box trap",
+    "coords": "2164, 2983, 0",
+    "location": "Isle of Souls - near spinning wheel (telegrab) \nNote: Ironmen cannot loot it."
+  },
+  {
+    "item_id": 11065,
+    "name": "Bracelet mould",
+    "coords": "2928, 3289, 0",
+    "location": "Crafting Guild"
+  },
+  {
+    "item_id": 983,
+    "name": "Brass key",
+    "coords": "3131, 9862, 0",
+    "location": "Edgeville Dungeon"
+  },
+  {
+    "item_id": 1009,
+    "name": "Brass necklace",
+    "coords": "3122, 9881, 0",
+    "location": "Edgeville Dungeon"
+  },
+  {
+    "item_id": 1009,
+    "name": "Brass necklace",
+    "coords": "3191, 9820, 0",
+    "location": "Varrock - west bank basement{{Refn|name=telegrab|This spawn requires telekinetic grab to obtain.}}"
+  },
+  {
+    "item_id": 2309,
+    "name": "Bread",
+    "coords": "1311, 3470, 0",
+    "location": "South of Mount Quidamortem"
+  },
+  {
+    "item_id": 2309,
+    "name": "Bread",
+    "coords": "1415, 9555, 0",
+    "location": "Cam Torum - basement of the south-western homes"
+  },
+  {
+    "item_id": 2309,
+    "name": "Bread",
+    "coords": "1521, 2987, 2",
+    "location": "Sunset Coast 2nd floor"
+  },
+  {
+    "item_id": 2309,
+    "name": "Bread",
+    "coords": "1669, 3250, 0",
+    "location": "Varlamore - near the Twilight Temple"
+  },
+  {
+    "item_id": 2309,
+    "name": "Bread",
+    "coords": "1672, 3159, 1",
+    "location": "Sunrise Palace 1st floor"
+  },
+  {
+    "item_id": 2309,
+    "name": "Bread",
+    "coords": "1770, 3072, 1",
+    "location": "Outer Fortis 1st floor"
+  },
+  {
+    "item_id": 2309,
+    "name": "Bread",
+    "coords": "2037, 8980, 0",
+    "location": "Corsair Cove Dungeon"
+  },
+  {
+    "item_id": 2309,
+    "name": "Bread",
+    "coords": "2209, 3414, 0",
+    "location": "Gwenith - inside Preswylwyr Dall's home"
+  },
+  {
+    "item_id": 2309,
+    "name": "Bread",
+    "coords": "2564, 9670, 0",
+    "location": "East Ardougne - basement of the Carnillean Mansion"
+  },
+  {
+    "item_id": 8989,
+    "name": "Brewin' Guide",
+    "coords": "3804, 3010, 0",
+    "location": "Trouble Brewing"
+  },
+  {
+    "item_id": 8989,
+    "name": "Brewin' Guide",
+    "coords": "3804, 3010, 0",
+    "location": "Trouble Brewing"
+  },
+  {
+    "item_id": 687,
+    "name": "Broken arrow",
+    "coords": "1402, 3699, 0",
+    "location": "Kebos Lowlands - Battlefront"
+  },
+  {
+    "item_id": 687,
+    "name": "Broken arrow",
+    "coords": "1522, 3247, 0",
+    "location": "North-east of Quetzacalli Gorge"
+  },
+  {
+    "item_id": 687,
+    "name": "Broken arrow",
+    "coords": "2573, 3056, 0",
+    "location": "Kandarin - south of Yanille"
+  },
+  {
+    "item_id": 687,
+    "name": "Broken arrow",
+    "coords": "2643, 9853, 0",
+    "location": "Temple of Ikov"
+  },
+  {
+    "item_id": 687,
+    "name": "Broken arrow",
+    "coords": "2657, 3424, 0",
+    "location": "Ranging Guild"
+  },
+  {
+    "item_id": 687,
+    "name": "Broken arrow",
+    "coords": "2667, 3425, 2",
+    "location": "Ranging Guild tower"
+  },
+  {
+    "item_id": 687,
+    "name": "Broken arrow",
+    "coords": "3129, 3621, 2",
+    "location": "Ferox Enclave - Clan Wars building (2nd floor)"
+  },
+  {
+    "item_id": 6662,
+    "name": "Broken fishing rod",
+    "coords": "2984, 3112, 0",
+    "location": "Mudskipper Point"
+  },
+  {
+    "item_id": 1469,
+    "name": "Broken glass",
+    "coords": "1427, 9581, 0",
+    "location": "Cam Torum - basement of The Lost Pickaxe"
+  },
+  {
+    "item_id": 1469,
+    "name": "Broken glass",
+    "coords": "1591, 3528, 2",
+    "location": "Xeric's Lookout - 2nd floor"
+  },
+  {
+    "item_id": 1469,
+    "name": "Broken glass",
+    "coords": "1680, 3680, 2",
+    "location": "Kingstown - Councillor Hughes' house (2nd floor)"
+  },
+  {
+    "item_id": 1469,
+    "name": "Broken glass",
+    "coords": "1725, 3079, 0",
+    "location": "Outer Fortis (inaccessible)"
+  },
+  {
+    "item_id": 1469,
+    "name": "Broken glass",
+    "coords": "1726, 3076, 1",
+    "location": "Outer Fortis - 1st floor (inaccessible)"
+  },
+  {
+    "item_id": 1469,
+    "name": "Broken glass",
+    "coords": "2766, 3277, 0",
+    "location": "Fishing Platform"
+  },
+  {
+    "item_id": 1469,
+    "name": "Broken glass",
+    "coords": "2912, 10221, 0",
+    "location": "Keldagrim - Drunken Dwarf's house"
+  },
+  {
+    "item_id": 1469,
+    "name": "Broken glass",
+    "coords": "3152, 3638, 0",
+    "location": "Ferox Enclave - The Old Nite pub"
+  },
+  {
+    "item_id": 1469,
+    "name": "Broken glass",
+    "coords": "3715, 3356, 1",
+    "location": "Slepe - Crombwick Manor (1st floor)"
+  },
+  {
+    "item_id": 1469,
+    "name": "Broken glass",
+    "coords": "3734, 3358, 0",
+    "location": "Slepe - Crombwick Manor"
+  },
+  {
+    "item_id": 4496,
+    "name": "Broken pole",
+    "coords": "2770, 3676, 0",
+    "location": "Mountain Camp"
+  },
+  {
+    "item_id": 882,
+    "name": "Bronze arrow",
+    "coords": "1541, 3700, 0",
+    "location": "Great Kourend - eastern end of Lizardman Canyon"
+  },
+  {
+    "item_id": 882,
+    "name": "Bronze arrow",
+    "coords": "2680, 3424, 0",
+    "location": "Ranging Guild - shooting range"
+  },
+  {
+    "item_id": 882,
+    "name": "Bronze arrow",
+    "coords": "2944, 3332, 0",
+    "location": "Falador - Herquin's Gems"
+  },
+  {
+    "item_id": 882,
+    "name": "Bronze arrow",
+    "coords": "2957, 3205, 0",
+    "location": "Rimmington - Brian's Archery Supplies"
+  },
+  {
+    "item_id": 882,
+    "name": "Bronze arrow",
+    "coords": "3098, 3596, 0",
+    "location": "Wilderness - south-west of Ferox Enclave"
+  },
+  {
+    "item_id": 882,
+    "name": "Bronze arrow",
+    "coords": "3130, 9903, 0",
+    "location": "Edgeville Dungeon"
+  },
+  {
+    "item_id": 882,
+    "name": "Bronze arrow",
+    "coords": "3205, 3227, 0",
+    "location": "Lumbridge Castle"
+  },
+  {
+    "item_id": 882,
+    "name": "Bronze arrow",
+    "coords": "3391, 3087, 0",
+    "location": "Kharidian Desert - Uzer Hunter area"
+  },
+  {
+    "item_id": 39,
+    "name": "Bronze arrowtips",
+    "coords": "2672, 3433, 0",
+    "location": "Ranging Guild - table by Bow and Arrow salesman"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "1297, 3133, 0",
+    "location": "Tlati Rainforest"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "1582, 3273, 0",
+    "location": "The Proudspire"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "1683, 2975, 0",
+    "location": "Avium Savannah - near Marcellus's house"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "2678, 3731, 0",
+    "location": "Rellekka - near the rock crabs"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "2729, 3479, 0",
+    "location": "Seers' Village - near Friendly Forester"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "2795, 3161, 0",
+    "location": "Brimhaven - Dead Man's Chest pub"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "2805, 3703, 0",
+    "location": "Mountain Camp - in the cave"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "2825, 3088, 0",
+    "location": "Tai Bwo Wannai - Hardwood Grove"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "2970, 3376, 1",
+    "location": "Falador - upstairs of the furnace building"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "3097, 3239, 0",
+    "location": "Draynor Village - near Friendly Forester"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "3185, 3277, 0",
+    "location": "Lumbridge - outside Fred the Farmer's house"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "3232, 3296, 0",
+    "location": "Lumbridge - outside Seth Groats's house"
+  },
+  {
+    "item_id": 1351,
+    "name": "Bronze axe",
+    "coords": "3368, 3238, 0",
+    "location": "Emir's Arena"
+  },
+  {
+    "item_id": 2349,
+    "name": "Bronze bar",
+    "coords": "1620, 3292, 0",
+    "location": "Salius' Armour Shop"
+  },
+  {
+    "item_id": 2349,
+    "name": "Bronze bar",
+    "coords": "2636, 9463, 0",
+    "location": "Brimhaven Dungeon (task-only area)"
+  },
+  {
+    "item_id": 877,
+    "name": "Bronze bolts",
+    "coords": "3016, 3244, 1",
+    "location": "Port Sarim - Grum's Gold Exchange (1st floor)"
+  },
+  {
+    "item_id": 877,
+    "name": "Bronze bolts",
+    "coords": "3097, 3695, 0",
+    "location": "Wilderness - north-west of the Graveyard of Shadows"
+  },
+  {
+    "item_id": 1103,
+    "name": "Bronze chainbody",
+    "coords": "1694, 3270, 0",
+    "location": "North-east of Twilight Temple"
+  },
+  {
+    "item_id": 1103,
+    "name": "Bronze chainbody",
+    "coords": "2985, 9817, 0",
+    "location": "Dwarven Mines - western end"
+  },
+  {
+    "item_id": 1205,
+    "name": "Bronze dagger",
+    "coords": "1312, 3471, 0",
+    "location": "South of Mount Quidamortem"
+  },
+  {
+    "item_id": 1205,
+    "name": "Bronze dagger",
+    "coords": "1425, 3280, 0",
+    "location": "Mons Gratia"
+  },
+  {
+    "item_id": 1205,
+    "name": "Bronze dagger",
+    "coords": "1624, 3166, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1205,
+    "name": "Bronze dagger",
+    "coords": "1724, 3075, 1",
+    "location": "Outer Fortis - 1st floor (inaccessible)"
+  },
+  {
+    "item_id": 1205,
+    "name": "Bronze dagger",
+    "coords": "2801, 4572, 0",
+    "location": "Abandoned Mine - level 2"
+  },
+  {
+    "item_id": 1205,
+    "name": "Bronze dagger",
+    "coords": "3140, 3622, 2",
+    "location": "Ferox Enclave - Clan Wars building (2nd floor)"
+  },
+  {
+    "item_id": 1205,
+    "name": "Bronze dagger",
+    "coords": "3213, 3216, 1",
+    "location": "Lumbridge Castle (1st floor)"
+  },
+  {
+    "item_id": 1205,
+    "name": "Bronze dagger",
+    "coords": "3730, 3356, 0",
+    "location": "Slepe - Crombwick Manor"
+  },
+  {
+    "item_id": 1422,
+    "name": "Bronze mace",
+    "coords": "3320, 3137, 0",
+    "location": "Al Kharid - Sorceress' house"
+  },
+  {
+    "item_id": 1139,
+    "name": "Bronze med helm",
+    "coords": "3077, 9778, 0",
+    "location": "Draynor Manor (Count Draynor's basement)"
+  },
+  {
+    "item_id": 1139,
+    "name": "Bronze med helm",
+    "coords": "3122, 3360, 0",
+    "location": "Draynor Manor (ground floor)"
+  },
+  {
+    "item_id": 4819,
+    "name": "Bronze nails",
+    "coords": "1769, 3114, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 4819,
+    "name": "Bronze nails",
+    "coords": "3325, 2727, 0",
+    "location": "Necropolis"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "1535, 3290, 0",
+    "location": "The Darkfrost - Hueycoatl base camp"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "1731, 2973, 0",
+    "location": "Stonecutter Outpost"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "1773, 3509, 0",
+    "location": "Hosidius - ruins north of the Hosidius mine"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "1935, 9453, 0",
+    "location": "Isle of Souls - Crumbling Tower (basement)"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "2795, 4579, 0",
+    "location": "Abandoned Mine - level 2"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "2800, 2797, 0",
+    "location": "Ape Atoll - Temple of Marimbo"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "2801, 4493, 0",
+    "location": "Abandoned Mine - level 4"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "2963, 3216, 0",
+    "location": "Rimmington - Anja and Hengel's house"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "3009, 3342, 0",
+    "location": "Mining Guild building"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "3081, 3429, 0",
+    "location": "Barbarian Village - house with spinning wheel"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "3229, 3215, 2",
+    "location": "Lumbridge Castle gatehouse (2nd floor)"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "3288, 9431, 0",
+    "location": "Desert Mining Camp - underground mine"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "3315, 2704, 0",
+    "location": "Necropolis - south-east of Sophanem"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "3360, 3107, 0",
+    "location": "Kharidian Desert - northern end of the River Elid"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "3362, 3166, 0",
+    "location": "Giants' Plateau"
+  },
+  {
+    "item_id": 1265,
+    "name": "Bronze pickaxe",
+    "coords": "3556, 3236, 0",
+    "location": "Morytania - woods east of Burgh de Rott"
+  },
+  {
+    "item_id": 1321,
+    "name": "Bronze scimitar",
+    "coords": "2557, 2855, 1",
+    "location": "Corsair Cove - Arsen the Thief's house (1st floor)"
+  },
+  {
+    "item_id": 1321,
+    "name": "Bronze scimitar",
+    "coords": "2965, 3211, 1",
+    "location": "Rimmington - Anja and Hengel's house (1st floor)"
+  },
+  {
+    "item_id": 1321,
+    "name": "Bronze scimitar",
+    "coords": "3362, 3154, 0",
+    "location": "Giants' Plateau"
+  },
+  {
+    "item_id": 1237,
+    "name": "Bronze spear",
+    "coords": "2808, 4572, 0",
+    "location": "Abandoned Mine - level 2"
+  },
+  {
+    "item_id": 1173,
+    "name": "Bronze sq shield",
+    "coords": "3294, 3935, 1",
+    "location": "Wilderness - Rogues' Castle (1st floor)"
+  },
+  {
+    "item_id": 1277,
+    "name": "Bronze sword",
+    "coords": "2483, 2929, 0",
+    "location": "Feldip Hills - western coast"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1239, 3133, 0",
+    "location": "Tal Teklan"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1251, 3736, 0",
+    "location": "Farming Guild"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1333, 3119, 0",
+    "location": "Tlati Rainforest"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1354, 2914, 0",
+    "location": "Moonrise Brewery and Winery"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1358, 3060, 0",
+    "location": "Kastori"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1388, 2851, 0",
+    "location": "Stick Your Ore Inn"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1420, 3374, 0",
+    "location": "Auburnvale"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1486, 3861, 1",
+    "location": "Blast mine - in the south building"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1521, 3587, 0",
+    "location": "Shayzien - Jennifer's General Supplies"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1541, 3542, 1",
+    "location": "Shayzien - upstairs in Amelia's house"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1644, 2926, 0",
+    "location": "Colossal Wyrm Remains"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1667, 3124, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1705, 3530, 0",
+    "location": "Hosidius - centre of the saltpetre deposits"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1737, 2966, 0",
+    "location": "Stonecutter Outpost"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1784, 3590, 1",
+    "location": "Hosidius - house east of Little Shop of Horace (1st floor)"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "1943, 4956, 0",
+    "location": "Keldagrim - Blast Furnace"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "2041, 8985, 0",
+    "location": "Corsair Cove Dungeon"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "2397, 4461, 0",
+    "location": "Zanaris - east of the bank"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "2564, 3332, 0",
+    "location": "East Ardougne - Edmond and Alrena's house"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "2616, 3255, 0",
+    "location": "East Ardougne - well south of the Ardougne Zoo"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "2633, 9908, 0",
+    "location": "Temple of Ikov"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "2766, 3441, 0",
+    "location": "Beehives - south of Camelot"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "2849, 10332, 0",
+    "location": "Weiss - Salt Mines"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "2853, 3930, 0",
+    "location": "Weiss - near the herb patch"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "2858, 3586, 0",
+    "location": "Death Plateau"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "2958, 3510, 0",
+    "location": "Goblin Village - general's house"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3026, 3289, 0",
+    "location": "Falador farm"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3121, 3359, 0",
+    "location": "Draynor Manor"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3216, 9625, 0",
+    "location": "Lumbridge Castle cellar"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3221, 3497, 1",
+    "location": "Varrock Palace (1st floor)"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3225, 3294, 0",
+    "location": "Lumbridge - farm house south of the hops patch"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3307, 3195, 0",
+    "location": "Al Kharid - tent east of the silk trader"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3346, 2966, 0",
+    "location": "Pollnivneach - camel shop"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3354, 9759, 0",
+    "location": "Digsite Dungeon"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3359, 4777, 0",
+    "location": "Clan Wars - Free for all"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3408, 3176, 0",
+    "location": "Citharede Abbey"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3478, 3234, 0",
+    "location": "Burgh de Rott - by the exit"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3605, 3251, 1",
+    "location": "Meiyerditch - upper floor of a building"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3624, 3211, 0",
+    "location": "Meiyerditch - all around the city"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3624, 3345, 0",
+    "location": "Darkmeyer"
+  },
+  {
+    "item_id": 1925,
+    "name": "Bucket",
+    "coords": "3719, 3361, 0",
+    "location": "Slepe - Crombwick Manor"
+  },
+  {
+    "item_id": 1927,
+    "name": "Bucket of milk",
+    "coords": "2685, 3683, 0",
+    "location": "Rellekka"
+  },
+  {
+    "item_id": 1783,
+    "name": "Bucket of sand",
+    "coords": "1804, 3628, 0",
+    "location": "Hosidius - north-eastern coast"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "1352, 2946, 0",
+    "location": "Aldarin"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "1388, 2866, 1",
+    "location": "Shields of Mistrock (1st floor)"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "1435, 9587, 2",
+    "location": "Cam Torum - 1st floor of The Lost Pickaxe"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "1500, 3236, 0",
+    "location": "Quetzacalli Gorge"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "1522, 3618, 2",
+    "location": "Shayzien Advanced Course - just before the final obstacle"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "1533, 3643, 2",
+    "location": "Shayzien Basic Course - just before the final obstacle"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "1545, 3037, 0",
+    "location": "Hunter Guild"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "1746, 3078, 0",
+    "location": "Outer Fortis"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "1764, 3095, 1",
+    "location": "Civitas illa Fortis 1st floor"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "2213, 3415, 0",
+    "location": "Gwenith - inside Preswylwyr Dall's home"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "2790, 3199, 0",
+    "location": "Brimhaven - south-west of the spirit tree patch"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "2820, 3452, 0",
+    "location": "Catherby - Caleb's house"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "2823, 3449, 0",
+    "location": "Catherby - house north of Hickton's Archery Emporium"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "2885, 3945, 0",
+    "location": "Weiss - north-eastern building"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "3148, 3642, 0",
+    "location": "Ferox Enclave - The Old Nite pub"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "3604, 3252, 1",
+    "location": "Meiyerditch - upper floor of buildings"
+  },
+  {
+    "item_id": 1929,
+    "name": "Bucket of water",
+    "coords": "3622, 3223, 0",
+    "location": "Meiyerditch - all around the city"
+  },
+  {
+    "item_id": 4548,
+    "name": "Bullseye lantern",
+    "coords": "3613, 3337, 0",
+    "location": "Darkmeyer - Lady Nadezhda Shadum's house (1st floor)"
+  },
+  {
+    "item_id": 2144,
+    "name": "Burnt Chicken",
+    "coords": "1476, 9554, 1",
+    "location": "Cam Torum"
+  },
+  {
+    "item_id": null,
+    "name": "Burnt Fish (herring)",
+    "coords": "2820, 3453, 0",
+    "location": "Catherby - Caleb's house"
+  },
+  {
+    "item_id": 528,
+    "name": "Burnt bones",
+    "coords": "1400, 3703, 0",
+    "location": "Kebos Lowlands - Battlefront"
+  },
+  {
+    "item_id": 528,
+    "name": "Burnt bones",
+    "coords": "1427, 3593, 0",
+    "location": "Shayzien - Secluded Chapel"
+  },
+  {
+    "item_id": 528,
+    "name": "Burnt bones",
+    "coords": "1456, 10094, 0",
+    "location": "Chasm of Fire - lowest level"
+  },
+  {
+    "item_id": 528,
+    "name": "Burnt bones",
+    "coords": "1484, 3702, 0",
+    "location": "Great Kourend - Lizardman Canyon"
+  },
+  {
+    "item_id": 528,
+    "name": "Burnt bones",
+    "coords": "1809, 9466, 0",
+    "location": "Cave south of Colosseum(inaccessible)"
+  },
+  {
+    "item_id": 528,
+    "name": "Burnt bones",
+    "coords": "2023, 5609, 0",
+    "location": "Crash Site Cavern entrance"
+  },
+  {
+    "item_id": 528,
+    "name": "Burnt bones",
+    "coords": "2489, 5985, 0",
+    "location": "Hallowed Sepulchre - floor 2"
+  },
+  {
+    "item_id": 528,
+    "name": "Burnt bones",
+    "coords": "3178, 3852, 0",
+    "location": "Wilderness - Lava Dragon Isle island"
+  },
+  {
+    "item_id": 528,
+    "name": "Burnt bones",
+    "coords": "3213, 3821, 0",
+    "location": "Wilderness - Lava Dragon Isle"
+  },
+  {
+    "item_id": 528,
+    "name": "Burnt bones",
+    "coords": "3313, 3890, 0",
+    "location": "Wilderness - Demonic Ruins"
+  },
+  {
+    "item_id": 2311,
+    "name": "Burnt bread",
+    "coords": "1976, 9077, 1",
+    "location": "Corsair Cove Resource Area"
+  },
+  {
+    "item_id": 323,
+    "name": "Burnt fish",
+    "coords": "2026, 5621, 0",
+    "location": "Crash Site Cavern entrance (unreachable)"
+  },
+  {
+    "item_id": 323,
+    "name": "Burnt fish",
+    "coords": "2477, 2860, 1",
+    "location": "Feldip Hills - tower north-east of Myths' Guild (1st floor)"
+  },
+  {
+    "item_id": 2146,
+    "name": "Burnt meat",
+    "coords": "2876, 3921, 0",
+    "location": "Weiss"
+  },
+  {
+    "item_id": 7954,
+    "name": "Burnt shrimp",
+    "coords": "2034, 8984, 0",
+    "location": "Corsair Cove Dungeon"
+  },
+  {
+    "item_id": 7954,
+    "name": "Burnt shrimp",
+    "coords": "3767, 3383, 0",
+    "location": "Slepe - north-east of Crombwick Manor"
+  },
+  {
+    "item_id": 1965,
+    "name": "Cabbage",
+    "coords": "1376, 3750, 0",
+    "location": "Kebos Lowlands - Battlefront"
+  },
+  {
+    "item_id": 1965,
+    "name": "Cabbage",
+    "coords": "3217, 9622, 0",
+    "location": "Lumbridge Castle cellar"
+  },
+  {
+    "item_id": 1965,
+    "name": "Cabbage",
+    "coords": "3285, 3175, 0",
+    "location": "Al Kharid Palace - western room"
+  },
+  {
+    "item_id": 5462,
+    "name": "Cabbages(2)",
+    "coords": "1625, 3288, 0",
+    "location": "Salvager Overlook - General Store"
+  },
+  {
+    "item_id": 1887,
+    "name": "Cake tin",
+    "coords": "2987, 3686, 0",
+    "location": "Wilderness - western Ruins"
+  },
+  {
+    "item_id": 1887,
+    "name": "Cake tin",
+    "coords": "3141, 3452, 1",
+    "location": "Cooks' Guild  (1st floor)"
+  },
+  {
+    "item_id": 36,
+    "name": "Candle",
+    "coords": "1635, 3621, 1",
+    "location": "Hosidius - Mess hall (1st floor)"
+  },
+  {
+    "item_id": 36,
+    "name": "Candle",
+    "coords": "1644, 3284, 1",
+    "location": "Salvager Overlook (1st floor)"
+  },
+  {
+    "item_id": 36,
+    "name": "Candle",
+    "coords": "1645, 3285, 0",
+    "location": "Salvager Overlook - East Tower (ground floor)"
+  },
+  {
+    "item_id": 36,
+    "name": "Candle",
+    "coords": "1646, 3283, 2",
+    "location": "Salvager Overlook - East Tower (2nd floor)"
+  },
+  {
+    "item_id": 36,
+    "name": "Candle",
+    "coords": "1680, 3232, 0",
+    "location": "South of Twilight Temple"
+  },
+  {
+    "item_id": 36,
+    "name": "Candle",
+    "coords": "1794, 3613, 0",
+    "location": "Hosidius - eastern house with Fruit Stalls (telekinetic grab)"
+  },
+  {
+    "item_id": 4529,
+    "name": "Candle lantern",
+    "coords": "1700, 3272, 0",
+    "location": "North-east of Twilight Temple"
+  },
+  {
+    "item_id": 278,
+    "name": "Cattleprod",
+    "coords": "2604, 3357, 0",
+    "location": "Kandarin - Farmer Brumty's sheep pen"
+  },
+  {
+    "item_id": 2398,
+    "name": "Cave nightshade",
+    "coords": "2528, 9415, 0",
+    "location": "Skavid Caves"
+  },
+  {
+    "item_id": 562,
+    "name": "Chaos rune",
+    "coords": "2806, 3770, 0",
+    "location": "Trollweiss Mountain - first slide down"
+  },
+  {
+    "item_id": 562,
+    "name": "Chaos rune",
+    "coords": "3021, 3640, 0",
+    "location": "Wilderness - Dark Warriors' Fortress"
+  },
+  {
+    "item_id": 562,
+    "name": "Chaos rune",
+    "coords": "3139, 3814, 0",
+    "location": "Wilderness - Between the Lava Maze and Lava Dragon Isle"
+  },
+  {
+    "item_id": 973,
+    "name": "Charcoal",
+    "coords": "1722, 3063, 0",
+    "location": "Outer Fortis"
+  },
+  {
+    "item_id": 1985,
+    "name": "Cheese",
+    "coords": "1644, 3092, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1985,
+    "name": "Cheese",
+    "coords": "3018, 3232, 0",
+    "location": "Port Sarim - Rat Pits (in the rat trap next to the bar; deals 3 damage)"
+  },
+  {
+    "item_id": 1985,
+    "name": "Cheese",
+    "coords": "3039, 3707, 0",
+    "location": "Wilderness - Bandit Camp"
+  },
+  {
+    "item_id": 1985,
+    "name": "Cheese",
+    "coords": "3083, 3260, 0",
+    "location": "Draynor Village - Aggie's house"
+  },
+  {
+    "item_id": 1985,
+    "name": "Cheese",
+    "coords": "3390, 3268, 0",
+    "location": "Emir's Arena{{Refn|name=telegrab|This spawn must be telekinetic grabbed.}}"
+  },
+  {
+    "item_id": 1985,
+    "name": "Cheese",
+    "coords": "3717, 9706, 0",
+    "location": "Slepe - basement of house next to Sisterhood Sanctuary entrance"
+  },
+  {
+    "item_id": 29963,
+    "name": "Chichilihui ros\u00e9",
+    "coords": "1198, 3111, 2",
+    "location": "Tal Teklan"
+  },
+  {
+    "item_id": 29963,
+    "name": "Chichilihui ros\u00e9",
+    "coords": "1387, 2950, 0",
+    "location": "Aldarin"
+  },
+  {
+    "item_id": 90,
+    "name": "Child's blanket",
+    "coords": "2570, 9604, 0",
+    "location": "East Ardougne - Clock Tower Dungeon"
+  },
+  {
+    "item_id": 1755,
+    "name": "Chisel",
+    "coords": "1452, 9585, 0",
+    "location": "Cam Torum - on a crate in blacksmith basement"
+  },
+  {
+    "item_id": 1755,
+    "name": "Chisel",
+    "coords": "1657, 3142, 0",
+    "location": "Civitas illa Fortis - on a crate in the Fortis Blacksmith store"
+  },
+  {
+    "item_id": 1755,
+    "name": "Chisel",
+    "coords": "1764, 3863, 0",
+    "location": "Dense essence mine"
+  },
+  {
+    "item_id": 1755,
+    "name": "Chisel",
+    "coords": "2217, 2789, 0",
+    "location": "Isle of Souls - bench near anvil"
+  },
+  {
+    "item_id": 1755,
+    "name": "Chisel",
+    "coords": "2407, 5645, 0",
+    "location": "Guardians of the Rift"
+  },
+  {
+    "item_id": 1755,
+    "name": "Chisel",
+    "coords": "2543, 3287, 0",
+    "location": "West Ardougne - office east of the church"
+  },
+  {
+    "item_id": 1755,
+    "name": "Chisel",
+    "coords": "2683, 3318, 0",
+    "location": "East Ardougne - Wizard Cromperty's house"
+  },
+  {
+    "item_id": 1755,
+    "name": "Chisel",
+    "coords": "2800, 4500, 0",
+    "location": "Abandoned Mine - level 4"
+  },
+  {
+    "item_id": 1755,
+    "name": "Chisel",
+    "coords": "2935, 3286, 0",
+    "location": "Crafting Guild"
+  },
+  {
+    "item_id": 1755,
+    "name": "Chisel",
+    "coords": "3252, 6061, 0",
+    "location": "Prifddinas - on a table in Aneirin's Armour"
+  },
+  {
+    "item_id": 1755,
+    "name": "Chisel",
+    "coords": "3320, 2708, 0",
+    "location": "Necropolis mine - south-east of Sophanem"
+  },
+  {
+    "item_id": 1755,
+    "name": "Chisel",
+    "coords": "3325, 2740, 0",
+    "location": "Necropolis camps - south-east of Sophanem"
+  },
+  {
+    "item_id": 1973,
+    "name": "Chocolate bar",
+    "coords": "1364, 3040, 1",
+    "location": "Kastori (1st floor)"
+  },
+  {
+    "item_id": 1973,
+    "name": "Chocolate bar",
+    "coords": "2384, 4440, 0",
+    "location": "Zanaris - south of the bank"
+  },
+  {
+    "item_id": 1973,
+    "name": "Chocolate bar",
+    "coords": "3143, 3453, 0",
+    "location": "Cooks' Guild"
+  },
+  {
+    "item_id": 7074,
+    "name": "Chopped Garlic",
+    "coords": "3719, 3303, 0",
+    "location": "Slepe - house next to Sisterhood Sanctuary entrance"
+  },
+  {
+    "item_id": 1871,
+    "name": "Chopped onion",
+    "coords": "3629, 3382, 0",
+    "location": "Darkmeyer - middle tier"
+  },
+  {
+    "item_id": 5763,
+    "name": "Cider",
+    "coords": "1392, 3351, 0",
+    "location": "Auburnvale"
+  },
+  {
+    "item_id": 434,
+    "name": "Clay",
+    "coords": "3647, 3370, 0",
+    "location": "Darkmeyer - lower tier"
+  },
+  {
+    "item_id": 2026,
+    "name": "Cocktail glass",
+    "coords": "1374, 3502, 0",
+    "location": "Shayziens' Wall - southern outpost"
+  },
+  {
+    "item_id": 2026,
+    "name": "Cocktail glass",
+    "coords": "2483, 3482, 1",
+    "location": "Grand Tree - 1st floor"
+  },
+  {
+    "item_id": 2025,
+    "name": "Cocktail shaker",
+    "coords": "2449, 3510, 1",
+    "location": "Grand Tree - 1st floor"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "1395, 3118, 0",
+    "location": "Moss giants west of Ralos' Rise"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "1439, 3590, 0",
+    "location": "Shayzien - Secluded Chapel"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "1469, 3057, 0",
+    "location": "Cam Torum entrance - south"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "1531, 3637, 0",
+    "location": "Shayzien Encampment"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "1569, 3321, 0",
+    "location": "Shipwreck Cove"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "1859, 3546, 0",
+    "location": "Hosidius - east of the Vinery"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "2012, 8994, 0",
+    "location": "Corsair Cove Dungeon"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "2017, 4949, 0",
+    "location": "Eagles' Peak Dungeon"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "2498, 9434, 0",
+    "location": "Skavid Caves"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "2765, 3198, 0",
+    "location": "Brimhaven"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "2770, 4516, 0",
+    "location": "Abandoned Mine - level 4"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "2856, 9645, 0",
+    "location": "Crandor and Karamja Dungeon"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "2915, 9503, 0",
+    "location": "Rashiliyia's Tomb"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "2917, 9850, 0",
+    "location": "Taverley Dungeon"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "2988, 9584, 0",
+    "location": "Asgarnian Ice Dungeon"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "2990, 3675, 0",
+    "location": "Wilderness - western Ruins"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3003, 9801, 0",
+    "location": "Dwarven Mine"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3076, 3845, 0",
+    "location": "Wilderness - Lava Maze"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3088, 9898, 0",
+    "location": "Edgeville Dungeon"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3105, 10252, 0",
+    "location": "King Black Dragon Lair"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3108, 3534, 0",
+    "location": "Wilderness - north of Edgeville"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3169, 9880, 0",
+    "location": "Varrock Sewers"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3188, 9820, 0",
+    "location": "Varrock - west bank basement"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3215, 9929, 0",
+    "location": "Bryophyta's lair"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3221, 3829, 0",
+    "location": "Wilderness - Lava Dragon Isle"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3228, 3504, 0",
+    "location": "Varrock Palace - bear cage"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3234, 3556, 0",
+    "location": "Wilderness - south of the Chaos Temple"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3338, 3234, 0",
+    "location": "Emir's Arena"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3371, 9252, 0",
+    "location": "Scabaras Dungeon"
+  },
+  {
+    "item_id": 617,
+    "name": "Coins",
+    "coords": "3381, 3156, 0",
+    "location": "Giants' Plateau"
+  },
+  {
+    "item_id": 2140,
+    "name": "Cooked chicken",
+    "coords": "2971, 3382, 1",
+    "location": "Falador - Cassie's Shield Shop (1st floor)"
+  },
+  {
+    "item_id": 2142,
+    "name": "Cooked meat",
+    "coords": "1367, 3575, 0",
+    "location": "Shayziens' Wall - northern outpost"
+  },
+  {
+    "item_id": 2142,
+    "name": "Cooked meat",
+    "coords": "1384, 3764, 0",
+    "location": "Kebos Lowlands - General Vir's tent in the Battlefront"
+  },
+  {
+    "item_id": 2142,
+    "name": "Cooked meat",
+    "coords": "2558, 2856, 1",
+    "location": "Corsair Cove - Arsen the Thief's house (1st floor)"
+  },
+  {
+    "item_id": 2142,
+    "name": "Cooked meat",
+    "coords": "3077, 3441, 0",
+    "location": "Barbarian Village - Long Hall"
+  },
+  {
+    "item_id": 5988,
+    "name": "Cooked sweetcorn",
+    "coords": "1356, 3040, 1",
+    "location": "Kastori (1st floor){{Refn|name=telegrab|This spawn requires telekinetic grab to obtain.}}"
+  },
+  {
+    "item_id": 1955,
+    "name": "Cooking apple",
+    "coords": "2645, 3363, 0",
+    "location": "East Ardougne - Richard's Farming shop"
+  },
+  {
+    "item_id": 1955,
+    "name": "Cooking apple",
+    "coords": "3140, 3447, 1",
+    "location": "Cooks' Guild - 1st floor"
+  },
+  {
+    "item_id": 1955,
+    "name": "Cooking apple",
+    "coords": "3141, 3447, 2",
+    "location": "Cooks' Guild - 2nd floor"
+  },
+  {
+    "item_id": 564,
+    "name": "Cosmic rune",
+    "coords": "2947, 3898, 0",
+    "location": "Frozen Waste Plateau - south of the gate"
+  },
+  {
+    "item_id": 1813,
+    "name": "Criminal's dagger",
+    "coords": "2746, 3578, 0",
+    "location": "Sinclair Mansion"
+  },
+  {
+    "item_id": 837,
+    "name": "Crossbow",
+    "coords": "1512, 3423, 0",
+    "location": "Land's End - Hugor's house"
+  },
+  {
+    "item_id": 837,
+    "name": "Crossbow",
+    "coords": "3174, 3663, 0",
+    "location": "Wilderness - Graveyard of Shadows"
+  },
+  {
+    "item_id": 837,
+    "name": "Crossbow",
+    "coords": "3284, 3719, 0",
+    "location": "Wilderness - south-east of the Bone Yard"
+  },
+  {
+    "item_id": 4707,
+    "name": "Crumbling tome",
+    "coords": "3571, 3312, 0",
+    "location": "Barrows - entrance"
+  },
+  {
+    "item_id": 1978,
+    "name": "Cup of Tea",
+    "coords": "2593, 3103, 1",
+    "location": "Yanille - building north of the Wizards' Guild"
+  },
+  {
+    "item_id": 1978,
+    "name": "Cup of tea",
+    "coords": "1375, 3034, 1",
+    "location": "Kastori (1st floor)"
+  },
+  {
+    "item_id": 1978,
+    "name": "Cup of tea",
+    "coords": "1621, 3501, 0",
+    "location": "Woodcutting Guild - inside Sawmill operator building"
+  },
+  {
+    "item_id": 1978,
+    "name": "Cup of tea",
+    "coords": "2886, 3412, 0",
+    "location": "Taverley - south-west of Jatix's Herblore Shop"
+  },
+  {
+    "item_id": 1978,
+    "name": "Cup of tea",
+    "coords": "2903, 3441, 0",
+    "location": "Taverley - building directly west of the tree patch"
+  },
+  {
+    "item_id": 1978,
+    "name": "Cup of tea",
+    "coords": "3271, 3413, 0",
+    "location": "Varrock - Ye olde Tea Shoppe."
+  },
+  {
+    "item_id": 1978,
+    "name": "Cup of tea",
+    "coords": "3490, 3059, 0",
+    "location": "Uzer Oasis - inside Ali the Tea Seller's house"
+  },
+  {
+    "item_id": 697,
+    "name": "Damaged armour",
+    "coords": "1377, 3723, 0",
+    "location": "Kebos Lowlands - Battlefront"
+  },
+  {
+    "item_id": 697,
+    "name": "Damaged armour",
+    "coords": "2679, 3425, 0",
+    "location": "Ranging Guild - shooting range"
+  },
+  {
+    "item_id": 1467,
+    "name": "Damp sticks",
+    "coords": "2784, 3289, 0",
+    "location": "Fishing Platform"
+  },
+  {
+    "item_id": 11940,
+    "name": "Dark fishing bait",
+    "coords": "2998, 3705, 0",
+    "location": "Wilderness - western Ruins"
+  },
+  {
+    "item_id": 560,
+    "name": "Death rune",
+    "coords": "2500, 2967, 0",
+    "location": "Feldip Hills - west of the gnome glider"
+  },
+  {
+    "item_id": 22426,
+    "name": "Deed",
+    "coords": "3732, 3361, 0",
+    "location": "Slepe - Crombwick Manor"
+  },
+  {
+    "item_id": null,
+    "name": "Diary (Witch's House)",
+    "coords": "2903, 3471, 0",
+    "location": "Taverley - Nora T. Hagg's house"
+  },
+  {
+    "item_id": 1573,
+    "name": "Doogle leaves",
+    "coords": "2560, 2971, 0",
+    "location": "Feldip Hills - east of the gnome glider"
+  },
+  {
+    "item_id": 1573,
+    "name": "Doogle leaves",
+    "coords": "2736, 3640, 0",
+    "location": "Fremennik Province - around the swaying tree"
+  },
+  {
+    "item_id": 1573,
+    "name": "Doogle leaves",
+    "coords": "3151, 3399, 0",
+    "location": "Varrock - behind Gertrude's house"
+  },
+  {
+    "item_id": null,
+    "name": "Door key (Witch's House)",
+    "coords": "2905, 3475, 1",
+    "location": "Witch's house"
+  },
+  {
+    "item_id": 1911,
+    "name": "Dragon bitter",
+    "coords": "2258, 4086, 0",
+    "location": "Ungael"
+  },
+  {
+    "item_id": 1615,
+    "name": "Dragonstone",
+    "coords": "3353, 9635, 0",
+    "location": "Mage Training Arena - Enchanting Chamber"
+  },
+  {
+    "item_id": 2957,
+    "name": "Druid pouch",
+    "coords": "3443, 9741, 1",
+    "location": "Nature Grotto"
+  },
+  {
+    "item_id": 1590,
+    "name": "Dusty key",
+    "coords": "2900, 9766, 0",
+    "location": "Taverley Dungeon - Lava eel fishing spot"
+  },
+  {
+    "item_id": 0,
+    "name": "Dwarf remains",
+    "coords": "2567, 3444, 2",
+    "location": "Watchtower south of Coal Trucks"
+  },
+  {
+    "item_id": 1913,
+    "name": "Dwarven stout",
+    "coords": "2863, 9875, 0",
+    "location": "White Wolf Tunnel"
+  },
+  {
+    "item_id": 2126,
+    "name": "Dwellberries",
+    "coords": "2638, 3479, 0",
+    "location": "McGrubor's Wood"
+  },
+  {
+    "item_id": 557,
+    "name": "Earth rune",
+    "coords": "1394, 3116, 0",
+    "location": "Moss giants west of Ralos' Rise"
+  },
+  {
+    "item_id": 557,
+    "name": "Earth rune",
+    "coords": "3032, 3637, 0",
+    "location": "Wilderness - Dark Warriors' Fortress"
+  },
+  {
+    "item_id": 557,
+    "name": "Earth rune",
+    "coords": "3185, 9888, 0",
+    "location": "Varrock Sewers - western end"
+  },
+  {
+    "item_id": 557,
+    "name": "Earth rune",
+    "coords": "3195, 3515, 0",
+    "location": "Varrock - north-east of the Grand Exchange"
+  },
+  {
+    "item_id": 29415,
+    "name": "Eclipse red",
+    "coords": "1555, 3035, 2",
+    "location": "Guildmaster Apatura's quarters, top floor"
+  },
+  {
+    "item_id": 403,
+    "name": "Edible seaweed",
+    "coords": "3717, 3848, 0",
+    "location": "Fossil Island - beach areas"
+  },
+  {
+    "item_id": 403,
+    "name": "Edible seaweed",
+    "coords": "3811, 3056, 0",
+    "location": "Mos Le'Harmless - islands off the north-east coast"
+  },
+  {
+    "item_id": 1944,
+    "name": "Egg",
+    "coords": "1238, 3136, 0",
+    "location": "Tal Teklan"
+  },
+  {
+    "item_id": 1944,
+    "name": "Egg",
+    "coords": "1252, 3690, 0",
+    "location": "Kebos Lowlands - Mary and Gordon's farm"
+  },
+  {
+    "item_id": 1944,
+    "name": "Egg",
+    "coords": "2453, 4476, 0",
+    "location": "Zanaris - Chicken shrine"
+  },
+  {
+    "item_id": 1944,
+    "name": "Egg",
+    "coords": "2851, 3372, 0",
+    "location": "Entrana - house north of the bridge"
+  },
+  {
+    "item_id": 1944,
+    "name": "Egg",
+    "coords": "3016, 3295, 0",
+    "location": "Falador farm"
+  },
+  {
+    "item_id": 1944,
+    "name": "Egg",
+    "coords": "3169, 3291, 0",
+    "location": "Lumbridge - north-west of Fred the Farmer's house"
+  },
+  {
+    "item_id": 1944,
+    "name": "Egg",
+    "coords": "3226, 3301, 0",
+    "location": "Lumbridge - farm house south of the hops patch"
+  },
+  {
+    "item_id": 4686,
+    "name": "Embalming manual",
+    "coords": "3287, 2754, 1",
+    "location": "Sophanem - Embalmer's house"
+  },
+  {
+    "item_id": 1980,
+    "name": "Empty cup",
+    "coords": "1643, 3625, 0",
+    "location": "Hosidius - Mess hall"
+  },
+  {
+    "item_id": 5418,
+    "name": "Empty sack",
+    "coords": "1744, 3172, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 7967,
+    "name": "Engine",
+    "coords": "2504, 10287, 0",
+    "location": "Miscellania and Etceteria Dungeon"
+  },
+  {
+    "item_id": 2128,
+    "name": "Equa leaves",
+    "coords": "2639, 2952, 0",
+    "location": "Feldip Hills - south-east of Rantz's home"
+  },
+  {
+    "item_id": 22418,
+    "name": "Explosive discovery",
+    "coords": "3734, 3318, 2",
+    "location": "Slepe - church (2nd floor)"
+  },
+  {
+    "item_id": 4164,
+    "name": "Facemask",
+    "coords": "1617, 3680, 2",
+    "location": "Kourend Castle - 2nd floor"
+  },
+  {
+    "item_id": 314,
+    "name": "Feather",
+    "coords": "1250, 3687, 0",
+    "location": "Kebos Lowlands - Mary and Gordon's farm"
+  },
+  {
+    "item_id": 314,
+    "name": "Feather",
+    "coords": "1506, 2984, 0",
+    "location": "Sunset Coast"
+  },
+  {
+    "item_id": 314,
+    "name": "Feather",
+    "coords": "1751, 3585, 1",
+    "location": "Hosidius - Jonathan's house (1st floor) (Telegrab)"
+  },
+  {
+    "item_id": 10179,
+    "name": "Feathered journal",
+    "coords": "2004, 4983, 0",
+    "location": "Eagles' Peak Dungeon"
+  },
+  {
+    "item_id": 2384,
+    "name": "Fingernails",
+    "coords": "2505, 9441, 0",
+    "location": "Skavid Caves"
+  },
+  {
+    "item_id": 554,
+    "name": "Fire rune",
+    "coords": "1450, 10099, 0",
+    "location": "Chasm of Fire - lowest level"
+  },
+  {
+    "item_id": 554,
+    "name": "Fire rune",
+    "coords": "2768, 3500, 1",
+    "location": "Camelot - 1st floor of castle"
+  },
+  {
+    "item_id": 554,
+    "name": "Fire rune",
+    "coords": "2842, 9552, 0",
+    "location": "Crandor and Karamja Dungeon - lesser demon area"
+  },
+  {
+    "item_id": 554,
+    "name": "Fire rune",
+    "coords": "3026, 3637, 0",
+    "location": "Wilderness - Dark Warriors' Fortress"
+  },
+  {
+    "item_id": 554,
+    "name": "Fire rune",
+    "coords": "3304, 3311, 0",
+    "location": "Al Kharid mine - northern end"
+  },
+  {
+    "item_id": 272,
+    "name": "Fish food",
+    "coords": "3109, 3357, 1",
+    "location": "Draynor Manor - 1st floor"
+  },
+  {
+    "item_id": 313,
+    "name": "Fishing bait",
+    "coords": "1375, 3035, 0",
+    "location": "Kastori"
+  },
+  {
+    "item_id": 307,
+    "name": "Fishing rod",
+    "coords": "1331, 3330, 0",
+    "location": "Auburn Valley"
+  },
+  {
+    "item_id": 307,
+    "name": "Fishing rod",
+    "coords": "1557, 2959, 0",
+    "location": "Sunset Coast"
+  },
+  {
+    "item_id": 307,
+    "name": "Fishing rod",
+    "coords": "2198, 3001, 0",
+    "location": "Isle of Souls"
+  },
+  {
+    "item_id": 307,
+    "name": "Fishing rod",
+    "coords": "2860, 3335, 0",
+    "location": "Entrana - building next to fishing platform"
+  },
+  {
+    "item_id": 307,
+    "name": "Fishing rod",
+    "coords": "3154, 2816, 0",
+    "location": "Ruins of Unkah"
+  },
+  {
+    "item_id": 307,
+    "name": "Fishing rod",
+    "coords": "3595, 9754, 0",
+    "location": "Meiyerditch Laboratories"
+  },
+  {
+    "item_id": 5559,
+    "name": "Flash powder",
+    "coords": "2969, 4999, 0",
+    "location": "Rogues' Den"
+  },
+  {
+    "item_id": 309,
+    "name": "Fly fishing rod",
+    "coords": "1530, 2979, 0",
+    "location": "Sunset Coast"
+  },
+  {
+    "item_id": 309,
+    "name": "Fly fishing rod",
+    "coords": "2263, 2886, 0",
+    "location": "Isle of Souls"
+  },
+  {
+    "item_id": 6663,
+    "name": "Forlorn boot",
+    "coords": "2984, 3114, 0",
+    "location": "Mudskipper Point"
+  },
+  {
+    "item_id": 1550,
+    "name": "Garlic",
+    "coords": "2646, 3299, 0",
+    "location": "East Ardougne"
+  },
+  {
+    "item_id": 1550,
+    "name": "Garlic",
+    "coords": "2714, 3478, 0",
+    "location": "Seers' Village"
+  },
+  {
+    "item_id": 11656,
+    "name": "Glassblowing book",
+    "coords": "2438, 3185, 0",
+    "location": "Observatory - reception area"
+  },
+  {
+    "item_id": 1785,
+    "name": "Glassblowing pipe",
+    "coords": "2652, 3454, 0",
+    "location": "Hemenster - Grandpa Jack's house"
+  },
+  {
+    "item_id": 1785,
+    "name": "Glassblowing pipe",
+    "coords": "2822, 3355, 0",
+    "location": "Entrana - house west of furnace"
+  },
+  {
+    "item_id": 2357,
+    "name": "Gold bar",
+    "coords": "1743, 3176, 1",
+    "location": "Civitas illa Fortis - Thieves hideout (1st floor){{Refn|name=telegrab|This spawn requires telekinetic grab to obtain.}}"
+  },
+  {
+    "item_id": 2357,
+    "name": "Gold bar",
+    "coords": "1965, 9082, 0",
+    "location": "Corsair Cove Dungeon - northern end{{Refn|name=dragon_slayer|This spawn requires completion of Dragon Slayer I and permission from Haris to access the area.}}"
+  },
+  {
+    "item_id": 2357,
+    "name": "Gold bar",
+    "coords": "2057, 8985, 0",
+    "location": "Corsair Cove Dungeon - eastern end{{Refn|name=telegrab}}"
+  },
+  {
+    "item_id": 2357,
+    "name": "Gold bar",
+    "coords": "3192, 9822, 0",
+    "location": "Varrock - west bank basement{{Refn|name=telegrab|This spawn requires telekinetic grab to obtain.}}"
+  },
+  {
+    "item_id": 1654,
+    "name": "Gold necklace",
+    "coords": "2068, 8986, 0",
+    "location": "Corsair Cove Dungeon{{Refn|name=telegrab|This spawn requires telekinetic grab to obtain.}}"
+  },
+  {
+    "item_id": 1654,
+    "name": "Gold necklace",
+    "coords": "3065, 3864, 0",
+    "location": "Wilderness - Lava Maze"
+  },
+  {
+    "item_id": 1654,
+    "name": "Gold necklace",
+    "coords": "3192, 9821, 0",
+    "location": "Varrock - west bank basement{{Refn|This spawn requires telekinetic grab to obtain.|group=s}}"
+  },
+  {
+    "item_id": 444,
+    "name": "Gold ore",
+    "coords": "2733, 3224, 0",
+    "location": "North Brimhaven mine"
+  },
+  {
+    "item_id": 444,
+    "name": "Gold ore",
+    "coords": "3165, 3739, 0",
+    "location": "Ruins (east), level 27 Wilderness"
+  },
+  {
+    "item_id": 444,
+    "name": "Gold ore",
+    "coords": "3195, 9821, 0",
+    "location": "Varrock - west bank basement{{Refn|name=telegrab|This spawn requires telekinetic grab to obtain.}}"
+  },
+  {
+    "item_id": 444,
+    "name": "Gold ore",
+    "coords": "3283, 3936, 3",
+    "location": "Rogues' Castle (3rd floor), level 53 Wilderness"
+  },
+  {
+    "item_id": 444,
+    "name": "Gold ore",
+    "coords": "3292, 3933, 0",
+    "location": "Rogues' Castle (ground floor), level 53 Wilderness"
+  },
+  {
+    "item_id": 1635,
+    "name": "Gold ring",
+    "coords": "0",
+    "location": "Hallowed Sepulchre"
+  },
+  {
+    "item_id": 1635,
+    "name": "Gold ring",
+    "coords": "2056, 9004, 0",
+    "location": "Corsair Cove Dungeon (unobtainable)"
+  },
+  {
+    "item_id": 1635,
+    "name": "Gold ring",
+    "coords": "2398, 5867, 2",
+    "location": "Hallowed Sepulchre - floor 3"
+  },
+  {
+    "item_id": 1635,
+    "name": "Gold ring",
+    "coords": "2553, 5855, 2",
+    "location": "Hallowed Sepulchre - floor 4"
+  },
+  {
+    "item_id": 1635,
+    "name": "Gold ring",
+    "coords": "3107, 10268, 0",
+    "location": "King Black Dragon Lair"
+  },
+  {
+    "item_id": 1635,
+    "name": "Gold ring",
+    "coords": "3369, 9246, 0",
+    "location": "Scabaras Dungeon"
+  },
+  {
+    "item_id": 17,
+    "name": "Grail bell",
+    "coords": "2762, 4694, 0",
+    "location": "In front of the castle entrance ruins - Dilapidated Fisher Realm"
+  },
+  {
+    "item_id": 1947,
+    "name": "Grain",
+    "coords": "1296, 3717, 0",
+    "location": "Kebos Lowlands - Keith's house"
+  },
+  {
+    "item_id": 1947,
+    "name": "Grain",
+    "coords": "1512, 2996, 1",
+    "location": "Sunset Coast (1st floor)"
+  },
+  {
+    "item_id": 1947,
+    "name": "Grain",
+    "coords": "1561, 3045, 2",
+    "location": "Hunter Guild (1st floor)"
+  },
+  {
+    "item_id": 1947,
+    "name": "Grain",
+    "coords": "1682, 3677, 2",
+    "location": "Kingstown - Councillor Hughes' house (2nd floor)"
+  },
+  {
+    "item_id": 1947,
+    "name": "Grain",
+    "coords": "1773, 3602, 0",
+    "location": "Hosidius - grain storage"
+  },
+  {
+    "item_id": 28817,
+    "name": "Granite tablet",
+    "coords": "2768, 10284, 0",
+    "location": "Zemouregal's Fort - basement tunnels"
+  },
+  {
+    "item_id": 1987,
+    "name": "Grapes",
+    "coords": "3144, 3450, 2",
+    "location": "Cooks' Guild (2nd floor)"
+  },
+  {
+    "item_id": 1987,
+    "name": "Grapes",
+    "coords": "3237, 9761, 0",
+    "location": "Varrock - Phoenix Gang Hideout"
+  },
+  {
+    "item_id": 2526,
+    "name": "Grey toy horsey",
+    "coords": "1243, 3678, 1",
+    "location": "Kebos Lowlands - Mary and Gordon's house (1st floor)"
+  },
+  {
+    "item_id": 199,
+    "name": "Grimy guam leaf",
+    "coords": "3044, 10313, 0",
+    "location": "Deep Wilderness Dungeon"
+  },
+  {
+    "item_id": 1856,
+    "name": "Guide Book",
+    "coords": "2638, 3292, 0",
+    "location": "East Ardougne - estate agent"
+  },
+  {
+    "item_id": 9652,
+    "name": "Haemalchemy volume 1",
+    "coords": "3624, 9690, 0",
+    "location": "Meiyerditch Laboratories"
+  },
+  {
+    "item_id": 2333,
+    "name": "Half a redberry pie",
+    "coords": "3042, 3952, 0",
+    "location": "Wilderness - Pirates' Hideout"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1207, 3108, 0",
+    "location": "Tal Teklan"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1259, 3686, 0",
+    "location": "Kebos Lowlands - Mary and Gordon's farm"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1373, 2949, 0",
+    "location": "Aldarin"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1381, 3370, 0",
+    "location": "Auburnvale"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1401, 2866, 0",
+    "location": "Mistrock"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1420, 3186, 0",
+    "location": "Ralos' Rise"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1452, 9587, 1",
+    "location": "Cam Torum Blacksmith"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1513, 2996, 0",
+    "location": "Sunset Coast"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1639, 2924, 0",
+    "location": "Colossal Wyrm Remains"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1770, 3114, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1773, 3060, 0",
+    "location": "Outer Fortis"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1778, 3507, 0",
+    "location": "Hosidius - west of the Tithe Farm"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "1953, 4974, 0",
+    "location": "Keldagrim - Blast Furnace"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "2157, 2803, 0",
+    "location": "Isle of Souls"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "2351, 9383, 0",
+    "location": "Observatory Dungeon"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "2579, 3463, 0",
+    "location": "Dwarven Mine"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "2684, 3318, 0",
+    "location": "East Ardougne"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "2934, 3286, 0",
+    "location": "Crafting Guild"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "2954, 3060, 0",
+    "location": "Karamja - Ship Yard"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "2961, 5802, 0",
+    "location": "Ruins of Camdozaal"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "2975, 3368, 1",
+    "location": "Falador - upstairs of the furnace building"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "3251, 6061, 0",
+    "location": "Prifddinas - on a table in Aneirin's Armour"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "3350, 3162, 0",
+    "location": "Giants' Plateau"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "3429, 9931, 0",
+    "location": "Slayer Tower basement"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "3435, 2835, 0",
+    "location": "Ruins of Ullek"
+  },
+  {
+    "item_id": 2347,
+    "name": "Hammer",
+    "coords": "3492, 3242, 1",
+    "location": "Burgh de Rott - upstairs"
+  },
+  {
+    "item_id": 311,
+    "name": "Harpoon",
+    "coords": "2605, 3396, 0",
+    "location": "Fishing Guild"
+  },
+  {
+    "item_id": 311,
+    "name": "Harpoon",
+    "coords": "3170, 2838, 0",
+    "location": "Ruins of Unkah"
+  },
+  {
+    "item_id": 53,
+    "name": "Headless arrow",
+    "coords": "3240, 3940, 0",
+    "location": "Wilderness - Scorpion Pit"
+  },
+  {
+    "item_id": 347,
+    "name": "Herring",
+    "coords": "2563, 9511, 0",
+    "location": "Yanille Agility Dungeon"
+  },
+  {
+    "item_id": 19,
+    "name": "Holy grail",
+    "coords": "2649, 4684, 2",
+    "location": "Realm of the Fisher King - 2nd floor of castle"
+  },
+  {
+    "item_id": 1599,
+    "name": "Holy mould",
+    "coords": "1746, 3489, 0",
+    "location": "Hosidius - Monk's camp"
+  },
+  {
+    "item_id": 1599,
+    "name": "Holy mould",
+    "coords": "2931, 3287, 1",
+    "location": "Crafting Guild - 1st floor"
+  },
+  {
+    "item_id": 5610,
+    "name": "Hourglass",
+    "coords": "2475, 4956, 0",
+    "location": "Temple Knight training grounds"
+  },
+  {
+    "item_id": 28,
+    "name": "Insect repellent",
+    "coords": "2807, 3450, 0",
+    "location": "Catherby - house north of the bank"
+  },
+  {
+    "item_id": 884,
+    "name": "Iron arrow",
+    "coords": "1723, 2936, 0",
+    "location": "South-west of Stonecutter Outpost"
+  },
+  {
+    "item_id": 1349,
+    "name": "Iron axe",
+    "coords": "1399, 3371, 0",
+    "location": "Auburnvale"
+  },
+  {
+    "item_id": 1349,
+    "name": "Iron axe",
+    "coords": "1717, 3119, 1",
+    "location": "Civitas illa Fortis 1st floor"
+  },
+  {
+    "item_id": 1349,
+    "name": "Iron axe",
+    "coords": "2821, 3086, 0",
+    "location": "Tai Bwo Wannai - Hardwood Grove"
+  },
+  {
+    "item_id": 1349,
+    "name": "Iron axe",
+    "coords": "3162, 9888, 0",
+    "location": "Varrock Sewers"
+  },
+  {
+    "item_id": 2351,
+    "name": "Iron bar",
+    "coords": "1385, 2868, 1",
+    "location": "Shields of Mistrock (1st floor)"
+  },
+  {
+    "item_id": 2351,
+    "name": "Iron bar",
+    "coords": "1513, 2995, 0",
+    "location": "Sunset Coast"
+  },
+  {
+    "item_id": 2351,
+    "name": "Iron bar",
+    "coords": "2169, 3430, 0",
+    "location": "Mynydd"
+  },
+  {
+    "item_id": 2351,
+    "name": "Iron bar",
+    "coords": "2682, 9463, 0",
+    "location": "Brimhaven Dungeon (task-only area)"
+  },
+  {
+    "item_id": 2351,
+    "name": "Iron bar",
+    "coords": "2918, 10327, 0",
+    "location": "Ghorrock Dungeon"
+  },
+  {
+    "item_id": 2351,
+    "name": "Iron bar",
+    "coords": "3111, 3657, 0",
+    "location": "Wilderness - north-west of Ferox Enclave"
+  },
+  {
+    "item_id": 1363,
+    "name": "Iron battleaxe",
+    "coords": "1700, 3185, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1203,
+    "name": "Iron dagger",
+    "coords": "1385, 3217, 0",
+    "location": "Gloomthorn Trail"
+  },
+  {
+    "item_id": 1203,
+    "name": "Iron dagger",
+    "coords": "1519, 3225, 1",
+    "location": "Quetzacalli Gorge(1st floor)"
+  },
+  {
+    "item_id": 1203,
+    "name": "Iron dagger",
+    "coords": "1537, 3582, 0",
+    "location": "Shayzien - house south-east of general store"
+  },
+  {
+    "item_id": 1203,
+    "name": "Iron dagger",
+    "coords": "1573, 3140, 1",
+    "location": "Ortus Farm (1st floor)"
+  },
+  {
+    "item_id": 1203,
+    "name": "Iron dagger",
+    "coords": "3156, 3683, 0",
+    "location": "Wilderness - Graveyard of Shadows"
+  },
+  {
+    "item_id": 1203,
+    "name": "Iron dagger",
+    "coords": "3192, 2838, 0",
+    "location": "Ruins of Unkah"
+  },
+  {
+    "item_id": 1203,
+    "name": "Iron dagger",
+    "coords": "3242, 3383, 1",
+    "location": "Varrock - Phoenix Gang weapon storage (1st floor)"
+  },
+  {
+    "item_id": 1203,
+    "name": "Iron dagger",
+    "coords": "3248, 3245, 0",
+    "location": "Lumbridge - goblin house"
+  },
+  {
+    "item_id": 1203,
+    "name": "Iron dagger",
+    "coords": "3279, 3938, 3",
+    "location": "Wilderness - Rogue's Castle (3rd floor)"
+  },
+  {
+    "item_id": 807,
+    "name": "Iron dart",
+    "coords": "1614, 3176, 1",
+    "location": "Civitas illa Fortis 1st floor"
+  },
+  {
+    "item_id": 1153,
+    "name": "Iron full helm",
+    "coords": "3069, 3831, 0",
+    "location": "Wilderness - Lava Maze"
+  },
+  {
+    "item_id": 1191,
+    "name": "Iron kiteshield",
+    "coords": "3247, 3795, 0",
+    "location": "Wilderness - south-east of Lava Dragon Isle"
+  },
+  {
+    "item_id": 863,
+    "name": "Iron knife",
+    "coords": "1545, 3035, 0",
+    "location": "Hunter Guild"
+  },
+  {
+    "item_id": 863,
+    "name": "Iron knife",
+    "coords": "2170, 3432, 0",
+    "location": "Mynydd summit"
+  },
+  {
+    "item_id": 1293,
+    "name": "Iron longsword",
+    "coords": "2976, 9555, 0",
+    "location": "Asgarnian Ice Cave, near the shortcut"
+  },
+  {
+    "item_id": 1420,
+    "name": "Iron mace",
+    "coords": "1776, 3060, 0",
+    "location": "Spike's Spikes shop in Outer Fortis"
+  },
+  {
+    "item_id": 1420,
+    "name": "Iron mace",
+    "coords": "2675, 3299, 0",
+    "location": "East Ardougne marketplace"
+  },
+  {
+    "item_id": 1420,
+    "name": "Iron mace",
+    "coords": "3111, 3517, 0",
+    "location": "Edgeville - jailhouse"
+  },
+  {
+    "item_id": 1137,
+    "name": "Iron med helm",
+    "coords": "1538, 3545, 0",
+    "location": "Shayzien - Amelia's house"
+  },
+  {
+    "item_id": 1137,
+    "name": "Iron med helm",
+    "coords": "1616, 2963, 0",
+    "location": "Avium Savannah"
+  },
+  {
+    "item_id": 1137,
+    "name": "Iron med helm",
+    "coords": "2540, 3249, 0",
+    "location": "Kandarin - east of the Battlefield"
+  },
+  {
+    "item_id": 1137,
+    "name": "Iron med helm",
+    "coords": "2562, 5985, 1",
+    "location": "Hallowed Sepulchre - floor 2"
+  },
+  {
+    "item_id": 1137,
+    "name": "Iron med helm",
+    "coords": "3178, 3684, 0",
+    "location": "Wilderness - Graveyard of Shadows"
+  },
+  {
+    "item_id": 4820,
+    "name": "Iron nails",
+    "coords": "1439, 3588, 0",
+    "location": "Shayzien - Secluded Chapel"
+  },
+  {
+    "item_id": 1267,
+    "name": "Iron pickaxe",
+    "coords": "1499, 3860, 0",
+    "location": "Blast mine"
+  },
+  {
+    "item_id": 1267,
+    "name": "Iron pickaxe",
+    "coords": "1690, 2904, 0",
+    "location": "Varlamore - between the Harpie bug swarms"
+  },
+  {
+    "item_id": 1267,
+    "name": "Iron pickaxe",
+    "coords": "2672, 3728, 0",
+    "location": "Rellekka - near the rock crabs"
+  },
+  {
+    "item_id": 1267,
+    "name": "Iron pickaxe",
+    "coords": "2843, 10337, 0",
+    "location": "Weiss - Salt Mines"
+  },
+  {
+    "item_id": 1267,
+    "name": "Iron pickaxe",
+    "coords": "3347, 9753, 0",
+    "location": "Digsite Dungeon - next to Doug Deeping"
+  },
+  {
+    "item_id": 1115,
+    "name": "Iron platebody",
+    "coords": "3253, 6060, 0",
+    "location": "Prifddinas - on a table in Aneirin's Armour"
+  },
+  {
+    "item_id": 1323,
+    "name": "Iron scimitar",
+    "coords": "1098, 3339, 0",
+    "location": "South-west corner of the south-western temple in the Stranglewood (must be telegrabbed)"
+  },
+  {
+    "item_id": 1323,
+    "name": "Iron scimitar",
+    "coords": "1398, 2977, 2",
+    "location": "Northern most villa in Aldarin - 2nd floor"
+  },
+  {
+    "item_id": 1323,
+    "name": "Iron scimitar",
+    "coords": "1466, 3513, 0",
+    "location": "Ruins of Morra (must be telegrabbed)"
+  },
+  {
+    "item_id": 1323,
+    "name": "Iron scimitar",
+    "coords": "1500, 3131, 0",
+    "location": "West of Ortus Farm"
+  },
+  {
+    "item_id": 1323,
+    "name": "Iron scimitar",
+    "coords": "3214, 3730, 0",
+    "location": "Wilderness - Bone Yard"
+  },
+  {
+    "item_id": 7225,
+    "name": "Iron spit",
+    "coords": "2875, 3920, 0",
+    "location": "Weiss"
+  },
+  {
+    "item_id": 1279,
+    "name": "Iron sword",
+    "coords": "1494, 3177, 0",
+    "location": "Bandits' camp north-east of Ralos' Rise"
+  },
+  {
+    "item_id": 1279,
+    "name": "Iron sword",
+    "coords": "1569, 3547, 0",
+    "location": "Shayzien - Briget's Weapons"
+  },
+  {
+    "item_id": 1279,
+    "name": "Iron sword",
+    "coords": "2561, 5983, 1",
+    "location": "Hallowed Sepulchre - floor 2"
+  },
+  {
+    "item_id": 1279,
+    "name": "Iron sword",
+    "coords": "3425, 9951, 0",
+    "location": "Slayer Tower basement"
+  },
+  {
+    "item_id": 1335,
+    "name": "Iron warhammer",
+    "coords": "1590, 3589, 0",
+    "location": "Shayzia Ruin"
+  },
+  {
+    "item_id": 247,
+    "name": "Jangerberries",
+    "coords": "2516, 3086, 0",
+    "location": "Kandarin - island north of Gu'Tanoth"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "1358, 2920, 1",
+    "location": "Moonrise Brewery and Winery 1st floor"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "1372, 9312, 0",
+    "location": "Moonrise Brewery and Winery cellar"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "1394, 3352, 1",
+    "location": "Auburn Valley (1st floor)"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "1439, 3324, 0",
+    "location": "Auburn Valley"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "1669, 2982, 0",
+    "location": "Locus Oasis"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "1737, 3168, 0",
+    "location": "Civitas illa Fortis{{Refn|name=telegrab|This spawn requires telekinetic grab to obtain.}}"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "2905, 3146, 0",
+    "location": "Musa Point - Karamja General Store"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "2936, 3292, 0",
+    "location": "Crafting Guild"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "3142, 3447, 0",
+    "location": "Cooks' Guild"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "3211, 3212, 0",
+    "location": "Lumbridge Castle kitchen"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "3211, 9625, 0",
+    "location": "Lumbridge Castle cellar"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "3272, 3409, 0",
+    "location": "Varrock - Ye olde Tea Shoppe"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "3512, 3049, 0",
+    "location": "Uzer Oasis - Cassim's house"
+  },
+  {
+    "item_id": 1935,
+    "name": "Jug",
+    "coords": "3718, 3357, 1",
+    "location": "Slepe - Crombwick Manor"
+  },
+  {
+    "item_id": 1937,
+    "name": "Jug of water",
+    "coords": "1414, 2973, 1",
+    "location": "Aldarin - Aldarin General Store (1st floor)"
+  },
+  {
+    "item_id": 1937,
+    "name": "Jug of water",
+    "coords": "1649, 2906, 2",
+    "location": "Colossal Wyrm Agility Course - advanced route"
+  },
+  {
+    "item_id": 1937,
+    "name": "Jug of water",
+    "coords": "1667, 3249, 0",
+    "location": "Varlamore - near the Twilight Temple"
+  },
+  {
+    "item_id": 1937,
+    "name": "Jug of water",
+    "coords": "1794, 3611, 0",
+    "location": "Hosidius - eastern house with Fruit Stalls"
+  },
+  {
+    "item_id": 1937,
+    "name": "Jug of water",
+    "coords": "2568, 3102, 0",
+    "location": "Yanille - Frenita's Cookery Shop"
+  },
+  {
+    "item_id": 1937,
+    "name": "Jug of water",
+    "coords": "3302, 3170, 0",
+    "location": "Al Kharid Palace - eastern room"
+  },
+  {
+    "item_id": 1937,
+    "name": "Jug of water",
+    "coords": "3485, 3056, 0",
+    "location": "Uzer Oasis - Ali the Tea Seller's house"
+  },
+  {
+    "item_id": 1993,
+    "name": "Jug of wine",
+    "coords": "1315, 2917, 0",
+    "location": "Darkmoon Ravine (inaccessible)"
+  },
+  {
+    "item_id": 1993,
+    "name": "Jug of wine",
+    "coords": "1376, 2925, 1",
+    "location": "Aldarin - Sunlight's Sanctum 1st floor"
+  },
+  {
+    "item_id": 1993,
+    "name": "Jug of wine",
+    "coords": "1712, 3115, 1",
+    "location": "Civitas illa Fortis 1st floor"
+  },
+  {
+    "item_id": 1993,
+    "name": "Jug of wine",
+    "coords": "1718, 3065, 0",
+    "location": "Outer Fortis"
+  },
+  {
+    "item_id": 1993,
+    "name": "Jug of wine",
+    "coords": "2806, 3449, 1",
+    "location": "Catherby - house north of the bank (1st floor)"
+  },
+  {
+    "item_id": 1993,
+    "name": "Jug of wine",
+    "coords": "3291, 3033, 1",
+    "location": "Desert Mining Camp - Captain Siad's office (1st floor)"
+  },
+  {
+    "item_id": 1993,
+    "name": "Jug of wine",
+    "coords": "3511, 3049, 0",
+    "location": "Uzer Oasis - Cassim's house"
+  },
+  {
+    "item_id": 1993,
+    "name": "Jug of wine",
+    "coords": "3663, 3380, 0",
+    "location": "Darkmeyer - middle tier"
+  },
+  {
+    "item_id": 1993,
+    "name": "Jug of wine",
+    "coords": "3721, 3353, 0",
+    "location": "Slepe - Crombwick Manor"
+  },
+  {
+    "item_id": 1971,
+    "name": "Kebab",
+    "coords": "2843, 3369, 0",
+    "location": "Entrana - house north of the bridge"
+  },
+  {
+    "item_id": 10885,
+    "name": "Keg",
+    "coords": "3801, 2870, 1",
+    "location": "Harmony Island - 1st floor of crashed ship"
+  },
+  {
+    "item_id": 10885,
+    "name": "Keg",
+    "coords": "3801, 2870, 1",
+    "location": "Harmony Island - 1st floor of crashed ship"
+  },
+  {
+    "item_id": 3711,
+    "name": "Keg of beer",
+    "coords": "2660, 3676, 0",
+    "location": "Rellekka - longhall bar"
+  },
+  {
+    "item_id": 275,
+    "name": "Key",
+    "coords": "2569, 9897, 0",
+    "location": "Waterfall Dungeon"
+  },
+  {
+    "item_id": 2162,
+    "name": "King worm",
+    "coords": "1363, 3636, 0",
+    "location": "Kebos Lowlands - Molch Island"
+  },
+  {
+    "item_id": 2162,
+    "name": "King worm",
+    "coords": "2425, 3515, 0",
+    "location": "Tree Gnome Stronghold - swamp enclosure"
+  },
+  {
+    "item_id": 2162,
+    "name": "King worm",
+    "coords": "2896, 3414, 0",
+    "location": "Taverley"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "1297, 3721, 0",
+    "location": "Kebos Lowlands - Keith's house"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "1369, 3635, 0",
+    "location": "Kebos Lowlands - Molch Island"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "1371, 3316, 0",
+    "location": "Nemus Retreat"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "1377, 9451, 0",
+    "location": "Citlalli's basement"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "1381, 3350, 0",
+    "location": "Auburnvale (1st floor)"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "1439, 3351, 0",
+    "location": "Auburnvale"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "1476, 9555, 1",
+    "location": "Cam Torum"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "1497, 3254, 0",
+    "location": "Quetzacalli Gorge"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "1587, 3277, 0",
+    "location": "The Proudspire"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "1629, 3302, 0",
+    "location": "Salvager Overlook"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2163, 2979, 0",
+    "location": "Isle of Souls - near spinning wheel"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2288, 2790, 0",
+    "location": "Isle of Souls - near Sand Crabs"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2529, 3030, 0",
+    "location": "Gu'Tanoth"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2543, 3288, 0",
+    "location": "West Ardougne - building east of the church"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2564, 9669, 0",
+    "location": "East Ardougne - basement of the Carnillean Mansion"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2567, 9526, 0",
+    "location": "Yanille Agility Dungeon"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2653, 9767, 0",
+    "location": "Temple of Ikov basement"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2681, 3717, 0",
+    "location": "Rellekka - near the rock crabs"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2700, 3407, 0",
+    "location": "Sorcerer's Tower (ground floor)"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2704, 3475, 0",
+    "location": "Seers' Village - house north of the church"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2820, 3450, 0",
+    "location": "Catherby - Caleb's house"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2903, 3148, 0",
+    "location": "Musa Point - Karamja General Store"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "2934, 5773, 0",
+    "location": "Ruins of Camdozaal - near the Offering Altar"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "3061, 3851, 0",
+    "location": "Wilderness - Lava Maze"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "3106, 3956, 0",
+    "location": "Wilderness - Mage Arena (after the web)."
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "3205, 3212, 0",
+    "location": "Lumbridge Castle kitchen"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "3215, 9625, 0",
+    "location": "Lumbridge Castle cellar"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "3218, 3418, 1",
+    "location": "Varrock General Store (1st floor)"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "3218, 9887, 0",
+    "location": "Varrock Sewers"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "3224, 3202, 0",
+    "location": "Lumbridge - behind Bob's Brilliant Axes"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "3411, 9949, 0",
+    "location": "Slayer Tower basement"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "3618, 3387, 0",
+    "location": "Darkmeyer"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "3626, 3248, 1",
+    "location": "Meiyerditch - 1st floor of a building"
+  },
+  {
+    "item_id": 946,
+    "name": "Knife",
+    "coords": "3717, 3358, 0",
+    "location": "Slepe - Crombwick Manor"
+  },
+  {
+    "item_id": 2528,
+    "name": "Lamp",
+    "coords": "3369, 9317, 0",
+    "location": "Nardah - Genie Cave"
+  },
+  {
+    "item_id": 1741,
+    "name": "Leather",
+    "coords": "1529, 3646, 0",
+    "location": "Shayzien Encampment (only obtainable with Telekinetic Grab)"
+  },
+  {
+    "item_id": 1129,
+    "name": "Leather body",
+    "coords": "3247, 3407, 0",
+    "location": "Varrock - building next to Aubury's Rune Shop"
+  },
+  {
+    "item_id": 1061,
+    "name": "Leather boots",
+    "coords": "1531, 3578, 0",
+    "location": "Shayzien - house south-east of general store"
+  },
+  {
+    "item_id": 1061,
+    "name": "Leather boots",
+    "coords": "1590, 3128, 1",
+    "location": "Ortus Farm (1st floor)"
+  },
+  {
+    "item_id": 1061,
+    "name": "Leather boots",
+    "coords": "1629, 3302, 1",
+    "location": "Salvager Overlook (1st floor)"
+  },
+  {
+    "item_id": 1061,
+    "name": "Leather boots",
+    "coords": "1701, 3186, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1061,
+    "name": "Leather boots",
+    "coords": "3111, 3159, 0",
+    "location": "Wizards' Tower (ground floor)"
+  },
+  {
+    "item_id": 1061,
+    "name": "Leather boots",
+    "coords": "3112, 3155, 1",
+    "location": "Wizards' Tower (1st floor)"
+  },
+  {
+    "item_id": 1061,
+    "name": "Leather boots",
+    "coords": "3210, 9615, 0",
+    "location": "Lumbridge Castle cellar"
+  },
+  {
+    "item_id": 1061,
+    "name": "Leather boots",
+    "coords": "3244, 3386, 1",
+    "location": "Varrock - Phoenix Gang weapon storage (1st floor)"
+  },
+  {
+    "item_id": 1061,
+    "name": "Leather boots",
+    "coords": "3302, 3190, 0",
+    "location": "Al Kharid"
+  },
+  {
+    "item_id": 1059,
+    "name": "Leather gloves",
+    "coords": "1354, 2965, 1",
+    "location": "Aldarin 1st floor"
+  },
+  {
+    "item_id": 1059,
+    "name": "Leather gloves",
+    "coords": "1532, 3578, 0",
+    "location": "Shayzien - house south-east of general store"
+  },
+  {
+    "item_id": 1059,
+    "name": "Leather gloves",
+    "coords": "1718, 3115, 2",
+    "location": "Civitas illa Fortis 2nd floor"
+  },
+  {
+    "item_id": 1059,
+    "name": "Leather gloves",
+    "coords": "1936, 9449, 0",
+    "location": "Isle of Souls - Crumbling Tower (basement)"
+  },
+  {
+    "item_id": 1059,
+    "name": "Leather gloves",
+    "coords": "3097, 3486, 0",
+    "location": "Edgeville - south of the bank"
+  },
+  {
+    "item_id": 1059,
+    "name": "Leather gloves",
+    "coords": "3148, 3177, 0",
+    "location": "Lumbridge Swamp - Father Urhney's house"
+  },
+  {
+    "item_id": 1059,
+    "name": "Leather gloves",
+    "coords": "3242, 3385, 1",
+    "location": "Varrock - Phoenix Gang weapon storage (1st floor)"
+  },
+  {
+    "item_id": 5062,
+    "name": "Left boot",
+    "coords": "2838, 10220, 0",
+    "location": "Keldagrim - Dromund's house"
+  },
+  {
+    "item_id": null,
+    "name": "Letter (The Golem)",
+    "coords": "3479, 3092, 0",
+    "location": "Kharidian Desert - Ruins of Uzer"
+  },
+  {
+    "item_id": 83,
+    "name": "Lever",
+    "coords": "2637, 9819, 0",
+    "location": "Temple of Ikov"
+  },
+  {
+    "item_id": 7972,
+    "name": "Lift manual",
+    "coords": "2506, 10289, 0",
+    "location": "Miscellania and Etceteria Dungeon"
+  },
+  {
+    "item_id": 33,
+    "name": "Lit candle",
+    "coords": "1451, 3193, 0",
+    "location": "The Teomat - northern building"
+  },
+  {
+    "item_id": 33,
+    "name": "Lit candle",
+    "coords": "1500, 3431, 0",
+    "location": "Land's End - north-western house"
+  },
+  {
+    "item_id": 33,
+    "name": "Lit candle",
+    "coords": "2547, 3114, 0",
+    "location": "Yanille Watchtower"
+  },
+  {
+    "item_id": 33,
+    "name": "Lit candle",
+    "coords": "2598, 3211, 0",
+    "location": "Ardougne Monastery"
+  },
+  {
+    "item_id": 33,
+    "name": "Lit candle",
+    "coords": "3208, 3395, 1",
+    "location": "Varrock Swordshop (1st floor)"
+  },
+  {
+    "item_id": 33,
+    "name": "Lit candle",
+    "coords": "3644, 3360, 0",
+    "location": "Darkmeyer - lower tier"
+  },
+  {
+    "item_id": 33,
+    "name": "Lit candle",
+    "coords": "3698, 3339, 1",
+    "location": "Slepe - western house (1st floor)"
+  },
+  {
+    "item_id": 33,
+    "name": "Lit candle",
+    "coords": "3715, 3302, 0",
+    "location": "Slepe - building west of the Sisterhood Sanctuary entrance"
+  },
+  {
+    "item_id": 33,
+    "name": "Lit candle",
+    "coords": "3750, 3339, 1",
+    "location": "Slepe - eastern house (1st floor)"
+  },
+  {
+    "item_id": 301,
+    "name": "Lobster pot",
+    "coords": "1529, 2978, 0",
+    "location": "Sunset Coast"
+  },
+  {
+    "item_id": 301,
+    "name": "Lobster pot",
+    "coords": "2087, 2896, 0",
+    "location": "Isle of Souls"
+  },
+  {
+    "item_id": 301,
+    "name": "Lobster pot",
+    "coords": "2608, 3397, 0",
+    "location": "Fishing Guild"
+  },
+  {
+    "item_id": 301,
+    "name": "Lobster pot",
+    "coords": "3171, 2829, 0",
+    "location": "Ruins of Unkah"
+  },
+  {
+    "item_id": 1523,
+    "name": "Lockpick",
+    "coords": "2631, 9480, 0",
+    "location": "Yanille Agility Dungeon - In the area before Salarin the twisted, near the pile of rubble."
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "1256, 3741, 0",
+    "location": "Kebos Lowlands - outside the Farming Guild"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "1388, 2869, 1",
+    "location": "Shields of Mistrock (1st floor)"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "153, 3293, 0",
+    "location": "The Darkfrost - Hueycoatl base camp"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "1541, 3678, 0",
+    "location": "Great Kourend - eastern end of Lizardman Canyon"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "1619, 3292, 0",
+    "location": "Salius' Armour Shop"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "1743, 3167, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "1746, 3079, 0",
+    "location": "Outer Fortis"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "2958, 3205, 0",
+    "location": "Rimmington - Brian's Archery Supplies"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "3089, 3265, 0",
+    "location": "Draynor Village - Spria's house"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "3100, 3094, 0",
+    "location": "Tutorial Island - north of the Survival Expert"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "3105, 3159, 0",
+    "location": "Wizards' Tower - staircase on (ground floor)"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "3205, 3224, 2",
+    "location": "Lumbridge Castle (2nd floor)"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "3244, 3398, 0",
+    "location": "Varrock - Old Man Yarlo's house"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "3302, 3502, 0",
+    "location": "Varrock Sawmill"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "3411, 3183, 0",
+    "location": "Citharede Abbey"
+  },
+  {
+    "item_id": 1511,
+    "name": "Logs",
+    "coords": "3591, 9743, 0",
+    "location": "Meiyerditch Laboratories"
+  },
+  {
+    "item_id": 839,
+    "name": "Longbow",
+    "coords": "2678, 3427, 0",
+    "location": "Ranging Guild"
+  },
+  {
+    "item_id": 16,
+    "name": "Magic whistle",
+    "coords": "2626, 4722, 0",
+    "location": "Realm of the Fisher King"
+  },
+  {
+    "item_id": 6332,
+    "name": "Mahogany logs",
+    "coords": "3314, 6119, 0",
+    "location": "Prifddinas"
+  },
+  {
+    "item_id": 5586,
+    "name": "Metal spade",
+    "coords": "2473, 4941, 0",
+    "location": "Temple Knight training grounds"
+  },
+  {
+    "item_id": 558,
+    "name": "Mind rune",
+    "coords": "1392, 3118, 0",
+    "location": "Moss giants west of Ralos' Rise"
+  },
+  {
+    "item_id": 558,
+    "name": "Mind rune",
+    "coords": "3023, 3640, 0",
+    "location": "Wilderness - Dark Warriors' Fortress"
+  },
+  {
+    "item_id": 558,
+    "name": "Mind rune",
+    "coords": "3206, 3208, 0",
+    "location": "Lumbridge Castle (ground floor)"
+  },
+  {
+    "item_id": 558,
+    "name": "Mind rune",
+    "coords": "3224, 9910, 0",
+    "location": "Varrock Sewers"
+  },
+  {
+    "item_id": 558,
+    "name": "Mind rune",
+    "coords": "3283, 3728, 0",
+    "location": "Wilderness - Bone Yard"
+  },
+  {
+    "item_id": 888,
+    "name": "Mithril arrow",
+    "coords": "2681, 3426, 0",
+    "location": "Ranging Guild - shooting range"
+  },
+  {
+    "item_id": 542,
+    "name": "Monk's robe",
+    "coords": "3059, 3488, 1",
+    "location": "Edgeville Monastery - (1st floor)"
+  },
+  {
+    "item_id": 544,
+    "name": "Monk's robe top",
+    "coords": "3059, 3487, 1",
+    "location": "Edgeville Monastery - (1st floor)"
+  },
+  {
+    "item_id": 4034,
+    "name": "Monkey skull",
+    "coords": "2769, 9203, 0",
+    "location": "Temple of Marimbo Dungeon"
+  },
+  {
+    "item_id": 4492,
+    "name": "Muddy rock",
+    "coords": "2812, 3680, 0",
+    "location": "Mountain Camp"
+  },
+  {
+    "item_id": 561,
+    "name": "Nature rune",
+    "coords": "2671, 3737, 0",
+    "location": "Rellekka - on a small island near the rock crabs{{Refn|name=telegrab|This spawn requires telekinetic grab to obtain.}}"
+  },
+  {
+    "item_id": 561,
+    "name": "Nature rune",
+    "coords": "3311, 3853, 0",
+    "location": "Wilderness - on a small island south-east of the Demonic Ruins{{Refn|name=telegrab|This spawn requires telekinetic grab to obtain.}}"
+  },
+  {
+    "item_id": 1597,
+    "name": "Necklace mould",
+    "coords": "2932, 3287, 1",
+    "location": "Crafting Guild - 1st floor"
+  },
+  {
+    "item_id": 1733,
+    "name": "Needle",
+    "coords": "1244, 3685, 1",
+    "location": "Kebos Lowlands - Mary and Gordon's house (1st floor)"
+  },
+  {
+    "item_id": 1733,
+    "name": "Needle",
+    "coords": "1368, 3358, 0",
+    "location": "Auburnvale"
+  },
+  {
+    "item_id": 1733,
+    "name": "Needle",
+    "coords": "1448, 3195, 1",
+    "location": "Ralos' Rise 1st floor"
+  },
+  {
+    "item_id": 1733,
+    "name": "Needle",
+    "coords": "1529, 3645, 0",
+    "location": "Shayzien Encampment"
+  },
+  {
+    "item_id": 1733,
+    "name": "Needle",
+    "coords": "1566, 3035, 0",
+    "location": "Hunter Guild"
+  },
+  {
+    "item_id": 1733,
+    "name": "Needle",
+    "coords": "1765, 3103, 1",
+    "location": "Civitas illa Fortis 1st floor"
+  },
+  {
+    "item_id": 1733,
+    "name": "Needle",
+    "coords": "3229, 6068, 0",
+    "location": "Prifddinas - west inside Lliann's Wares"
+  },
+  {
+    "item_id": 1733,
+    "name": "Needle",
+    "coords": "3602, 3379, 0",
+    "location": "Darkmeyer Seamstress"
+  },
+  {
+    "item_id": 10150,
+    "name": "Noose wand",
+    "coords": "1259, 9781, 0",
+    "location": "Stalker Den (1st floor)"
+  },
+  {
+    "item_id": 22251,
+    "name": "Oak shield",
+    "coords": "2656, 3424, 0",
+    "location": "Ranging Guild - table by shield master"
+  },
+  {
+    "item_id": 843,
+    "name": "Oak shortbow",
+    "coords": "1711, 3112, 2",
+    "location": "Civitas illa Fortis 2nd floor"
+  },
+  {
+    "item_id": 26963,
+    "name": "Odd spectacles",
+    "coords": "3383, 2793, 0",
+    "location": "Campsite east of Sophanem"
+  },
+  {
+    "item_id": 4537,
+    "name": "Oil Lantern",
+    "coords": "1645, 3285, 2",
+    "location": "Salvager Overlook - East Tower (2nd floor)"
+  },
+  {
+    "item_id": 277,
+    "name": "Oil can",
+    "coords": "3092, 9755, 0",
+    "location": "Draynor Manor basement"
+  },
+  {
+    "item_id": 4522,
+    "name": "Oil lamp",
+    "coords": "2030, 9005, 0",
+    "location": "Corsair Cove Dungeon - Francois' inaccessible exit"
+  },
+  {
+    "item_id": 1493,
+    "name": "Old Journal",
+    "coords": "2417, 9673, 0",
+    "location": "Underground Pass - first level"
+  },
+  {
+    "item_id": 22428,
+    "name": "Old key",
+    "coords": "3726, 9780, 0",
+    "location": "Sisterhood Sanctuary"
+  },
+  {
+    "item_id": 24682,
+    "name": "Old note",
+    "coords": "1440, 3586, 0",
+    "location": "Shayzien - Secluded Chapel"
+  },
+  {
+    "item_id": 1957,
+    "name": "Onion",
+    "coords": "1376, 2865, 0",
+    "location": "Mistrock"
+  },
+  {
+    "item_id": 1957,
+    "name": "Onion",
+    "coords": "3211, 3247, 1",
+    "location": "Lumbridge General Store - 1st floor"
+  },
+  {
+    "item_id": 1769,
+    "name": "Orange dye",
+    "coords": "1512, 3589, 0",
+    "location": "Shayzien Styles"
+  },
+  {
+    "item_id": 677,
+    "name": "Panning tray",
+    "coords": "3369, 3378, 0",
+    "location": "Digsite"
+  },
+  {
+    "item_id": 970,
+    "name": "Papyrus",
+    "coords": "1383, 3766, 0",
+    "location": "Kebos Lowlands - General Vir's tent in the Battlefront"
+  },
+  {
+    "item_id": 970,
+    "name": "Papyrus",
+    "coords": "1452, 3193, 0",
+    "location": "The Teomat - northern building"
+  },
+  {
+    "item_id": 970,
+    "name": "Papyrus",
+    "coords": "1542, 3544, 0",
+    "location": "Shayzien - Amelia's house (Unobtainable)"
+  },
+  {
+    "item_id": 970,
+    "name": "Papyrus",
+    "coords": "1672, 3159, 1",
+    "location": "Civitas illa Fortis - Sunrise Palace (1st floor)"
+  },
+  {
+    "item_id": 970,
+    "name": "Papyrus",
+    "coords": "1750, 3585, 1",
+    "location": "Hosidius - Jonathan's house (1st floor)"
+  },
+  {
+    "item_id": 970,
+    "name": "Papyrus",
+    "coords": "1794, 3612, 0",
+    "location": "Hosidius - eastern house with Fruit Stalls (Telekinetic Grab)"
+  },
+  {
+    "item_id": 970,
+    "name": "Papyrus",
+    "coords": "2724, 3367, 0",
+    "location": "Legends' Guild - building outside guild entrance"
+  },
+  {
+    "item_id": 970,
+    "name": "Papyrus",
+    "coords": "3290, 3033, 1",
+    "location": "Desert Mining Camp - Captain Siad's office (1st floor)"
+  },
+  {
+    "item_id": 970,
+    "name": "Papyrus",
+    "coords": "3698, 3338, 1",
+    "location": "Slepe - eastern and western houses (1st floor)"
+  },
+  {
+    "item_id": 6697,
+    "name": "Pat of butter",
+    "coords": "1647, 3286, 0",
+    "location": "Salvager Overlook"
+  },
+  {
+    "item_id": 24788,
+    "name": "Pat of not garlic butter",
+    "coords": "3610, 3325, 0",
+    "location": "Darkmeyer - upper tier"
+  },
+  {
+    "item_id": 233,
+    "name": "Pestle and mortar",
+    "coords": "1667, 3068, 0",
+    "location": "Outer Fortis"
+  },
+  {
+    "item_id": 233,
+    "name": "Pestle and mortar",
+    "coords": "2132, 2998, 2",
+    "location": "Isle of Souls - Crumbling Tower, 2nd floor"
+  },
+  {
+    "item_id": 767,
+    "name": "Phoenix crossbow",
+    "coords": "3243, 3383, 1",
+    "location": "Varrock - Phoenix Gang Hideout"
+  },
+  {
+    "item_id": 4199,
+    "name": "Pickled brain",
+    "coords": "3492, 3474, 0",
+    "location": "Canifis - Hair of the Dog tavern"
+  },
+  {
+    "item_id": 1510,
+    "name": "Picture",
+    "coords": "2576, 3334, 0",
+    "location": "East Ardougne - Edmond and Alrena's house"
+  },
+  {
+    "item_id": 2313,
+    "name": "Pie dish",
+    "coords": "1604, 3099, 0",
+    "location": "Ortus Farm"
+  },
+  {
+    "item_id": 2313,
+    "name": "Pie dish",
+    "coords": "1731, 3579, 1",
+    "location": "Hosidius chapel"
+  },
+  {
+    "item_id": 2313,
+    "name": "Pie dish",
+    "coords": "2813, 3449, 1",
+    "location": "Catherby - Caleb's house (1st floor)"
+  },
+  {
+    "item_id": 2313,
+    "name": "Pie dish",
+    "coords": "2820, 3455, 0",
+    "location": "Catherby - Caleb's house"
+  },
+  {
+    "item_id": 2313,
+    "name": "Pie dish",
+    "coords": "2993, 9847, 0",
+    "location": "Near Nurmof in the Dwarven Mine"
+  },
+  {
+    "item_id": 2313,
+    "name": "Pie dish",
+    "coords": "3142, 3447, 0",
+    "location": "Cooks' Guild (1st floor)"
+  },
+  {
+    "item_id": 2313,
+    "name": "Pie dish",
+    "coords": "3222, 3494, 0",
+    "location": "Varrock Palace"
+  },
+  {
+    "item_id": 424,
+    "name": "Pigeon cage",
+    "coords": "2618, 3323, 0",
+    "location": "East Ardougne - Jerico's house"
+  },
+  {
+    "item_id": 2114,
+    "name": "Pineapple",
+    "coords": "3231, 6087, 0",
+    "location": "Prifddinas - west on a table in Tatie's home"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "1203, 3652, 0",
+    "location": "Kebos Lowlands mine"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "1235, 3074, 0",
+    "location": "Tlati Rainforest"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "1563, 3316, 0",
+    "location": "Shipwreck Cove"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "1636, 2922, 0",
+    "location": "Colossal Wyrm Remains"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "1745, 3181, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "2265, 2888, 0",
+    "location": "Isle of Souls"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "2435, 9726, 0",
+    "location": "Underground Pass - first level"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "2509, 10290, 1",
+    "location": "Miscellania and Etceteria Dungeon - up the lift"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "2550, 3575, 0",
+    "location": "Barbarian Outpost - north of the agility course"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "2648, 3156, 0",
+    "location": "Port Khazard"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "2701, 2717, 0",
+    "location": "Ape Atoll - hut in south-western coast"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "2846, 3384, 0",
+    "location": "Entrana - near the Law Altar entrance"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "2847, 3232, 0",
+    "location": "Crandor - crashed ship at the south-eastern coast. 3 require Telekinetic Grab."
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "2915, 10342, 0",
+    "location": "Ghorrock Dungeon"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "3148, 3671, 0",
+    "location": "Wilderness - Graveyard of Shadows"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "3275, 3664, 0",
+    "location": "Wilderness - by Larran's small chest"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "3323, 2733, 0",
+    "location": "Necropolis - south-east of Sophanem"
+  },
+  {
+    "item_id": 960,
+    "name": "Plank",
+    "coords": "3734, 3805, 0",
+    "location": "Fossil Island - Museum Camp"
+  },
+  {
+    "item_id": null,
+    "name": "Poison (item)",
+    "coords": "3097, 3366, 0",
+    "location": "Draynor Manor"
+  },
+  {
+    "item_id": 4494,
+    "name": "Pole",
+    "coords": "2813, 3685, 0",
+    "location": "Mountain Camp"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "1239, 3682, 1",
+    "location": "Kebos Lowlands - Mary and Gordon's house (1st floor)"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "1243, 3111, 1",
+    "location": "Tal Teklan (1st floor)"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "1244, 3680, 0",
+    "location": "Kebos Lowlands - Mary and Gordon's house (ground floor)"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "1391, 2859, 1",
+    "location": "Stick Your Ore Inn (1st floor)"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "1395, 2895, 2",
+    "location": "Aldarin windmill 2nd floor"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "1517, 3587, 0",
+    "location": "Shayzien - Jennifer's General Supplies"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "1583, 3130, 0",
+    "location": "Ortus Farm"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "1658, 3044, 2",
+    "location": "Outer Fortis windmill 2nd floor"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "1666, 3124, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "1705, 3070, 1",
+    "location": "Outer Fortis 1st floor"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "1766, 3589, 0",
+    "location": "Hosidius - Little Shop of Horace"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "2199, 3257, 0",
+    "location": "Iorwerth Camp"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "2918, 10191, 1",
+    "location": "Keldagrim - Laughing Miner Pub (1st floor)"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "3074, 3431, 0",
+    "location": "Barbarian Village - Helmet Shop"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "3144, 3449, 2",
+    "location": "Cooks' Guild (2nd floor)"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "3148, 3211, 0",
+    "location": "Lumbridge Swamp - north-western end"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "3209, 3214, 0",
+    "location": "Lumbridge Castle kitchen"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "3228, 6058, 0",
+    "location": "Prifddinas - south-west in Guinevere's Dyes"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "3232, 3399, 0",
+    "location": "Varrock - the Blue Moon Inn"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "3479, 3221, 1",
+    "location": "Burgh de Rott - upstairs"
+  },
+  {
+    "item_id": 1931,
+    "name": "Pot",
+    "coords": "3646, 3369, 0",
+    "location": "Darkmeyer"
+  },
+  {
+    "item_id": 1933,
+    "name": "Pot of flour",
+    "coords": "1432, 2960, 0",
+    "location": "Aldarin"
+  },
+  {
+    "item_id": 1942,
+    "name": "Potato",
+    "coords": "1440, 3354, 1",
+    "location": "Auburnvale - eastern building with the belladonna patch (1st floor)"
+  },
+  {
+    "item_id": 1942,
+    "name": "Potato",
+    "coords": "1645, 3284, 0",
+    "location": "Salvager Overlook - East Tower (ground floor)"
+  },
+  {
+    "item_id": 1942,
+    "name": "Potato",
+    "coords": "1659, 3121, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1942,
+    "name": "Potato",
+    "coords": "3623, 3395, 0",
+    "location": "Darkmeyer - middle tier"
+  },
+  {
+    "item_id": 3138,
+    "name": "Potato cactus",
+    "coords": "3172, 9484, 0",
+    "location": "Kalphite Lair"
+  },
+  {
+    "item_id": 3138,
+    "name": "Potato cactus",
+    "coords": "3179, 9421, 0",
+    "location": "Kalphite Lair - Queen's chamber"
+  },
+  {
+    "item_id": 2028,
+    "name": "Premade blurb' sp.",
+    "coords": "2972, 2972, 0",
+    "location": "Karamja - gnome glider station"
+  },
+  {
+    "item_id": 2030,
+    "name": "Premade choc s'dy",
+    "coords": "2411, 9818, 0",
+    "location": "Brimstail's cave"
+  },
+  {
+    "item_id": 1812,
+    "name": "Pungent pot",
+    "coords": "2747, 3579, 0",
+    "location": "Sinclair Mansion - north-east bedroom"
+  },
+  {
+    "item_id": 1773,
+    "name": "Purple dye",
+    "coords": "1731, 3578, 1",
+    "location": "Hosidius - chapel north of allotment patch (1st floor)"
+  },
+  {
+    "item_id": 1773,
+    "name": "Purple dye",
+    "coords": "2563, 3261, 0",
+    "location": "East Ardougne - north of the Clock Tower"
+  },
+  {
+    "item_id": 10562,
+    "name": "Queen help book",
+    "coords": "2584, 5273, 0",
+    "location": "Barbarian Assault lobby"
+  },
+  {
+    "item_id": 5341,
+    "name": "Rake",
+    "coords": "2852, 10191, 0",
+    "location": "Keldagrim - south of farming patch"
+  },
+  {
+    "item_id": 24,
+    "name": "Rat poison",
+    "coords": "2564, 9662, 0",
+    "location": "East Ardougne - Clock Tower dungeon"
+  },
+  {
+    "item_id": 345,
+    "name": "Raw herring",
+    "coords": "2861, 3928, 0",
+    "location": "Weiss - south-western building"
+  },
+  {
+    "item_id": 2134,
+    "name": "Raw rat meat",
+    "coords": "3617, 3387, 0",
+    "location": "Darkmeyer Meat Shop"
+  },
+  {
+    "item_id": 2134,
+    "name": "Raw rat meat",
+    "coords": "3728, 3361, 0",
+    "location": "Slepe - Crombwick Manor"
+  },
+  {
+    "item_id": 317,
+    "name": "Raw shrimps",
+    "coords": "1376, 3749, 0",
+    "location": "Kebos Lowlands - Battlefront"
+  },
+  {
+    "item_id": 317,
+    "name": "Raw shrimps",
+    "coords": "2033, 8983, 0",
+    "location": "Corsair Cove Dungeon"
+  },
+  {
+    "item_id": 317,
+    "name": "Raw shrimps",
+    "coords": "3720, 3303, 0",
+    "location": "Slepe - house next to Sisterhood Sanctuary entrance"
+  },
+  {
+    "item_id": 359,
+    "name": "Raw tuna",
+    "coords": "2037, 8978, 0",
+    "location": "Corsair Cove Dungeon"
+  },
+  {
+    "item_id": 23,
+    "name": "Red cog",
+    "coords": "2583, 9613, 0",
+    "location": "Clock Tower Dungeon"
+  },
+  {
+    "item_id": 1763,
+    "name": "Red dye",
+    "coords": "3769, 9731, 0",
+    "location": "Sisterhood Sanctuary"
+  },
+  {
+    "item_id": 223,
+    "name": "Red spiders' eggs",
+    "coords": "1850, 9960, 0",
+    "location": "Forthos Dungeon"
+  },
+  {
+    "item_id": 223,
+    "name": "Red spiders' eggs",
+    "coords": "2336, 3316, 0",
+    "location": "Arandar"
+  },
+  {
+    "item_id": 223,
+    "name": "Red spiders' eggs",
+    "coords": "2832, 9586, 0",
+    "location": "Crandor and Karamja Dungeon"
+  },
+  {
+    "item_id": 223,
+    "name": "Red spiders' eggs",
+    "coords": "3128, 9956, 0",
+    "location": "Edgeville Dungeon - Wilderness area"
+  },
+  {
+    "item_id": 223,
+    "name": "Red spiders' eggs",
+    "coords": "3177, 9880, 0",
+    "location": "Varrock Sewers"
+  },
+  {
+    "item_id": 5063,
+    "name": "Right boot",
+    "coords": "2836, 10226, 0",
+    "location": "Keldagrim - Dromund's house"
+  },
+  {
+    "item_id": 1592,
+    "name": "Ring mould",
+    "coords": "2935, 3283, 1",
+    "location": "Crafting Guild - 1st floor"
+  },
+  {
+    "item_id": null,
+    "name": "Rock (elemental)",
+    "coords": "2443, 9653, 0",
+    "location": "Underground Pass - first level fail area"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "1297, 3720, 0",
+    "location": "Kebos Lowlands - east of the Farming Guild"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "1326, 3318, 0",
+    "location": "Custodia Pass"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "1383, 2862, 0",
+    "location": "Mistrock"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "1442, 2959, 0",
+    "location": "Aldarin"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "1493, 3859, 1",
+    "location": "Blast mine - in the south building"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "1518, 2996, 1",
+    "location": "Sunset Coast (1st floor)"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "1574, 3312, 0",
+    "location": "Shipwreck Cove"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "1582, 3124, 0",
+    "location": "Ortus Farm"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "1765, 3103, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "1769, 3100, 1",
+    "location": "Civitas illa Fortis (1st floor)"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "1771, 3039, 0",
+    "location": "Outer Fortis"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "2023, 8985, 0",
+    "location": "Corsair Cove Dungeon"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "2137, 2993, 1",
+    "location": "Crumbling Tower on the Isle of Souls"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "2571, 3026, 0",
+    "location": "Gu'Tanoth - Toban's island"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "2700, 10163, 0",
+    "location": "Brine Rat Cavern"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "2700, 10163, 0",
+    "location": "Brine Rat Cavern"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "2728, 10220, 0",
+    "location": "Rellekka Hunter area - polar eagle lair"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "2785, 3279, 0",
+    "location": "Fishing Platform"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "2885, 3943, 0",
+    "location": "Weiss"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "2904, 3152, 0",
+    "location": "Musa Point - Karamja General Store"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "3169, 2836, 0",
+    "location": "Ruins of Unkah"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "3223, 9933, 0",
+    "location": "Bryophyta's lair"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "3395, 2799, 0",
+    "location": "Ruins of Ullek"
+  },
+  {
+    "item_id": 954,
+    "name": "Rope",
+    "coords": "3642, 3337, 0",
+    "location": "Darkmeyer - lower tier"
+  },
+  {
+    "item_id": 1984,
+    "name": "Rotten apple",
+    "coords": "2535, 3333, 0",
+    "location": "West Ardougne - Mourner Headquarters and nearby"
+  },
+  {
+    "item_id": 11044,
+    "name": "Rotten barrel",
+    "coords": "2710, 10157, 0",
+    "location": "Brine Rat Cavern"
+  },
+  {
+    "item_id": 11044,
+    "name": "Rotten barrel",
+    "coords": "2710, 10157, 0",
+    "location": "Brine Rat Cavern"
+  },
+  {
+    "item_id": 2959,
+    "name": "Rotten food",
+    "coords": "3752, 3297, 1",
+    "location": "Slepe - Rat & Bat pub (inaccessible)"
+  },
+  {
+    "item_id": 2518,
+    "name": "Rotten tomato",
+    "coords": "1623, 2933, 2",
+    "location": "Colossal Wyrm Agility Course"
+  },
+  {
+    "item_id": 276,
+    "name": "Rubber Tube",
+    "coords": "3111, 3367, 0",
+    "location": "Draynor Manor"
+  },
+  {
+    "item_id": 1641,
+    "name": "Ruby ring",
+    "coords": "3196, 9822, 0",
+    "location": "Varrock - west bank basement{{Refn|name=cracktheclue|This spawn requires completing the steps to obtain the Robes of Ruin from Crack the Clue III to obtain.}}"
+  },
+  {
+    "item_id": 1607,
+    "name": "Sapphire",
+    "coords": "2679, 3740, 0",
+    "location": "Rellekka - on a small island near the rock crabs"
+  },
+  {
+    "item_id": 1607,
+    "name": "Sapphire",
+    "coords": "2775, 3850, 0",
+    "location": "Trollweiss Mountain summit"
+  },
+  {
+    "item_id": 1607,
+    "name": "Sapphire",
+    "coords": "3170, 3885, 0",
+    "location": "Wilderness - hill of spiders north-west of Lava Dragon Isle"
+  },
+  {
+    "item_id": 8794,
+    "name": "Saw",
+    "coords": "1212, 3093, 0",
+    "location": "Tal Teklan"
+  },
+  {
+    "item_id": 8794,
+    "name": "Saw",
+    "coords": "1239, 3696, 0",
+    "location": "Kebos Lowlands - Mary and Gordon's farm"
+  },
+  {
+    "item_id": 8794,
+    "name": "Saw",
+    "coords": "1522, 3638, 0",
+    "location": "Shayzien Encampment"
+  },
+  {
+    "item_id": 8794,
+    "name": "Saw",
+    "coords": "3241, 3470, 0",
+    "location": "Varrock estate agent"
+  },
+  {
+    "item_id": 401,
+    "name": "Seaweed",
+    "coords": "1308, 2934, 0",
+    "location": "North of Darkmoon Ravine (1 telegrabbable, rest inaccessible)"
+  },
+  {
+    "item_id": 401,
+    "name": "Seaweed",
+    "coords": "1315, 2885, 0",
+    "location": "South of Darkmoon Ravine (inaccessible)"
+  },
+  {
+    "item_id": 401,
+    "name": "Seaweed",
+    "coords": "1557, 3324, 0",
+    "location": "Shipwreck Cove (one requires telegrab)"
+  },
+  {
+    "item_id": 401,
+    "name": "Seaweed",
+    "coords": "1570, 2951, 0",
+    "location": "Varlamore - south coast"
+  },
+  {
+    "item_id": 401,
+    "name": "Seaweed",
+    "coords": "1628, 3313, 0",
+    "location": "Around Salvager Overlook{{Refn|name=telegrab|These spawns require telekinetic grab to obtain. One is not reachable.}}"
+  },
+  {
+    "item_id": 401,
+    "name": "Seaweed",
+    "coords": "1686, 3459, 0",
+    "location": "Kourend - all around the south-east coast"
+  },
+  {
+    "item_id": 401,
+    "name": "Seaweed",
+    "coords": "1785, 3026, 0",
+    "location": "Varlamore - east coast"
+  },
+  {
+    "item_id": 401,
+    "name": "Seaweed",
+    "coords": "2254, 2785, 0",
+    "location": "Isle of Souls"
+  },
+  {
+    "item_id": 401,
+    "name": "Seaweed",
+    "coords": "2693, 3727, 0",
+    "location": "Fremennik Province - north of Keldagrim entrance"
+  },
+  {
+    "item_id": 401,
+    "name": "Seaweed",
+    "coords": "2753, 3119, 0",
+    "location": "Karamja - all around the east and west coast"
+  },
+  {
+    "item_id": 401,
+    "name": "Seaweed",
+    "coords": "2803, 3382, 0",
+    "location": "Entrana - north-western coast"
+  },
+  {
+    "item_id": 401,
+    "name": "Seaweed",
+    "coords": "3808, 3060, 0",
+    "location": "Mos Le'Harmless - islands off the north-east coast"
+  },
+  {
+    "item_id": 28819,
+    "name": "Shale tablet",
+    "coords": "2800, 10265, 0",
+    "location": "Zemouregal's Fort - basement tunnels"
+  },
+  {
+    "item_id": 2397,
+    "name": "Shaman robe",
+    "coords": "2617, 9437, 0",
+    "location": "Ogre Enclave"
+  },
+  {
+    "item_id": 1735,
+    "name": "Shears",
+    "coords": "1653, 3571, 0",
+    "location": "Hosidius - Watson's house"
+  },
+  {
+    "item_id": 1735,
+    "name": "Shears",
+    "coords": "1776, 3654, 0",
+    "location": "Hosidius - east of flax field"
+  },
+  {
+    "item_id": 1735,
+    "name": "Shears",
+    "coords": "2930, 3285, 1",
+    "location": "Crafting Guild (1st floor)"
+  },
+  {
+    "item_id": 1735,
+    "name": "Shears",
+    "coords": "3126, 3356, 0",
+    "location": "Draynor Manor"
+  },
+  {
+    "item_id": 1735,
+    "name": "Shears",
+    "coords": "3192, 3272, 0",
+    "location": "Lumbridge - farm north-west"
+  },
+  {
+    "item_id": 85,
+    "name": "Shiny key",
+    "coords": "2628, 9859, 0",
+    "location": "Temple of Ikov"
+  },
+  {
+    "item_id": 6790,
+    "name": "Shoes",
+    "coords": "3439, 2913, 0",
+    "location": "Nardah - mayor's house (ground floor)"
+  },
+  {
+    "item_id": 841,
+    "name": "Shortbow",
+    "coords": "2914, 3439, 1",
+    "location": "Taverley - building directly west of the tree patch (1st floor)"
+  },
+  {
+    "item_id": 841,
+    "name": "Shortbow",
+    "coords": "3389, 3123, 0",
+    "location": "Kharidian Desert - north-west of the Uzer Hunter area"
+  },
+  {
+    "item_id": 950,
+    "name": "Silk",
+    "coords": "1662, 3103, 1",
+    "location": "Civitas illa Fortis 1st floor"
+  },
+  {
+    "item_id": 950,
+    "name": "Silk",
+    "coords": "3230, 6070, 0",
+    "location": "Prifddinas - west inside Lliann's Wares"
+  },
+  {
+    "item_id": 950,
+    "name": "Silk",
+    "coords": "3602, 3378, 0",
+    "location": "Darkmeyer Seamstress"
+  },
+  {
+    "item_id": 964,
+    "name": "Skull",
+    "coords": "1469, 3570, 0",
+    "location": "Shayzien"
+  },
+  {
+    "item_id": 964,
+    "name": "Skull",
+    "coords": "1591, 3760, 0",
+    "location": "Lovakengj - north-west of the Kourend Castle"
+  },
+  {
+    "item_id": 964,
+    "name": "Skull",
+    "coords": "2485, 2928, 0",
+    "location": "Feldip Hills - north of the Corsair Cove Resource Area"
+  },
+  {
+    "item_id": 964,
+    "name": "Skull",
+    "coords": "2977, 3529, 0",
+    "location": "Wilderness - north-east of Goblin Village"
+  },
+  {
+    "item_id": 964,
+    "name": "Skull",
+    "coords": "3217, 3745, 0",
+    "location": "Wilderness - Bone Yard"
+  },
+  {
+    "item_id": 964,
+    "name": "Skull",
+    "coords": "3752, 9781, 0",
+    "location": "Sisterhood Sanctuary"
+  },
+  {
+    "item_id": 28818,
+    "name": "Slate tablet",
+    "coords": "2785, 10284, 0",
+    "location": "Zemouregal's Fort - basement tunnels"
+  },
+  {
+    "item_id": 4083,
+    "name": "Sled",
+    "coords": "2804, 3785, 0",
+    "location": "Trollweiss Mountain - first slide down"
+  },
+  {
+    "item_id": 1895,
+    "name": "Slice of cake",
+    "coords": "2691, 3218, 0",
+    "location": "Karamja - Moss Giant Island"
+  },
+  {
+    "item_id": 7080,
+    "name": "Sliced mushrooms",
+    "coords": "3629, 3381, 0",
+    "location": "Darkmeyer - middle tier"
+  },
+  {
+    "item_id": 303,
+    "name": "Small fishing net",
+    "coords": "1523, 2976, 0",
+    "location": "Sunset Coast"
+  },
+  {
+    "item_id": 303,
+    "name": "Small fishing net",
+    "coords": "1572, 3319, 0",
+    "location": "Shipwreck Cove"
+  },
+  {
+    "item_id": 303,
+    "name": "Small fishing net",
+    "coords": "2037, 8986, 0",
+    "location": "Corsair Cove Dungeon"
+  },
+  {
+    "item_id": 303,
+    "name": "Small fishing net",
+    "coords": "2169, 2983, 0",
+    "location": "Isle of Souls - near spinning wheel"
+  },
+  {
+    "item_id": 303,
+    "name": "Small fishing net",
+    "coords": "2608, 3398, 0",
+    "location": "Fishing Guild"
+  },
+  {
+    "item_id": 303,
+    "name": "Small fishing net",
+    "coords": "2935, 5779, 0",
+    "location": "Ruins of Camdozaal - near fishing spot"
+  },
+  {
+    "item_id": 303,
+    "name": "Small fishing net",
+    "coords": "3000, 3699, 0",
+    "location": "Wilderness - western Ruins"
+  },
+  {
+    "item_id": 303,
+    "name": "Small fishing net",
+    "coords": "3167, 2838, 0",
+    "location": "Ruins of Unkah - near Gita Prymes"
+  },
+  {
+    "item_id": 303,
+    "name": "Small fishing net",
+    "coords": "3244, 3159, 0",
+    "location": "Lumbridge Swamp - by the Fishing tutor"
+  },
+  {
+    "item_id": 303,
+    "name": "Small fishing net",
+    "coords": "3511, 3189, 0",
+    "location": "Burgh de Rott - southernmost house"
+  },
+  {
+    "item_id": 733,
+    "name": "Smashed glass",
+    "coords": "3481, 3277, 0",
+    "location": "Mort'ton"
+  },
+  {
+    "item_id": 733,
+    "name": "Smashed glass",
+    "coords": "3768, 3382, 0",
+    "location": "Slepe - north-east of Crombwick Manor"
+  },
+  {
+    "item_id": 20798,
+    "name": "Smelly journal",
+    "coords": "1691, 3939, 0",
+    "location": "Great Kourend - Fishing Hamlet"
+  },
+  {
+    "item_id": 231,
+    "name": "Snape grass",
+    "coords": "1736, 3168, 0",
+    "location": "Civitas illa Fortis{{Refn|name=telegrab|This spawn requires telekinetic grab to obtain.}}"
+  },
+  {
+    "item_id": 231,
+    "name": "Snape grass",
+    "coords": "1835, 3640, 0",
+    "location": "Hosidius - north-eastern peninsula with hobgoblins"
+  },
+  {
+    "item_id": 231,
+    "name": "Snape grass",
+    "coords": "2500, 3730, 0",
+    "location": "Waterbirth Island"
+  },
+  {
+    "item_id": 231,
+    "name": "Snape grass",
+    "coords": "2906, 3297, 0",
+    "location": "Hobgoblin Peninsula west of the Crafting Guild"
+  },
+  {
+    "item_id": 1761,
+    "name": "Soft clay",
+    "coords": "1765, 3095, 1",
+    "location": "Civitas illa Fortis 1st floor"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "1251, 3735, 0",
+    "location": "Farming Guild"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "1405, 2938, 0",
+    "location": "Aldarin"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "1500, 3655, 0",
+    "location": "Shayzien Encampment"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "1641, 3052, 0",
+    "location": "Outer Fortis"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "1657, 3569, 0",
+    "location": "Hosidius - outside Watson's house"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "1951, 4964, 0",
+    "location": "Keldagrim - Blast Furnace"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "2031, 8984, 0",
+    "location": "Corsair Cove Dungeon"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "2566, 3330, 0",
+    "location": "East Ardougne - Edmond and Alrena's house"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "2981, 3370, 0",
+    "location": "Falador - estate agent"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "3120, 3359, 0",
+    "location": "Draynor Manor"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "3218, 3412, 1",
+    "location": "Varrock General Store (1st floor)"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "3219, 6058, 0",
+    "location": "Prifddinas - west in Alwyn's house (estate agent)"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "3355, 2758, 0",
+    "location": "Necropolis"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "3426, 9958, 0",
+    "location": "Slayer Tower basement (requires Telekinetic Grab)"
+  },
+  {
+    "item_id": 952,
+    "name": "Spade",
+    "coords": "3572, 3312, 0",
+    "location": "Barrows - entrance"
+  },
+  {
+    "item_id": 1379,
+    "name": "Staff",
+    "coords": "1399, 3159, 0",
+    "location": "West of Ralos' Rise"
+  },
+  {
+    "item_id": 1379,
+    "name": "Staff",
+    "coords": "3371, 3144, 0",
+    "location": "Giants' Plateau"
+  },
+  {
+    "item_id": 84,
+    "name": "Staff of armadyl",
+    "coords": "2638, 9906, 0",
+    "location": "Temple of Ikov"
+  },
+  {
+    "item_id": 1385,
+    "name": "Staff of earth",
+    "coords": "3100, 3862, 0",
+    "location": "Wilderness - Lava Maze"
+  },
+  {
+    "item_id": 29412,
+    "name": "Steamforge brew",
+    "coords": "1389, 2857, 0",
+    "location": "Aldarin - on the bar of Stick Your Ore Inn in Mistrock"
+  },
+  {
+    "item_id": 29412,
+    "name": "Steamforge brew",
+    "coords": "1467, 9553, 2",
+    "location": "Cam Torum - upstairs in house east of Sonalo"
+  },
+  {
+    "item_id": 886,
+    "name": "Steel arrow",
+    "coords": "1633, 2906, 2",
+    "location": "Colossal Wyrm Agility Course advanced route"
+  },
+  {
+    "item_id": 41,
+    "name": "Steel arrowtips",
+    "coords": "3125, 9997, 0",
+    "location": "Edgeville Dungeon - Wilderness area"
+  },
+  {
+    "item_id": 2353,
+    "name": "Steel bar",
+    "coords": "2630, 9422, 0",
+    "location": "Brimhaven Dungeon (task-only area)"
+  },
+  {
+    "item_id": 1207,
+    "name": "Steel dagger",
+    "coords": "3158, 3672, 0",
+    "location": "Wilderness - Graveyard of Shadows"
+  },
+  {
+    "item_id": 1207,
+    "name": "Steel dagger",
+    "coords": "3312, 3769, 0",
+    "location": "Wilderness - north-east of the Bone Yard"
+  },
+  {
+    "item_id": 865,
+    "name": "Steel knife",
+    "coords": "2805, 3703, 0",
+    "location": "Mountain Camp - in the cave"
+  },
+  {
+    "item_id": 1295,
+    "name": "Steel longsword",
+    "coords": "2812, 4566, 0",
+    "location": "Abandoned Mine - level 2"
+  },
+  {
+    "item_id": 1269,
+    "name": "Steel pickaxe",
+    "coords": "2812, 4571, 0",
+    "location": "Abandoned Mine - level 2"
+  },
+  {
+    "item_id": 1269,
+    "name": "Steel pickaxe",
+    "coords": "3428, 9960, 0",
+    "location": "Slayer Tower basement (inaccessible)"
+  },
+  {
+    "item_id": 1269,
+    "name": "Steel pickaxe",
+    "coords": "3670, 9772, 0",
+    "location": "Daeyalt essence mine"
+  },
+  {
+    "item_id": 1269,
+    "name": "Steel pickaxe",
+    "coords": "3895, 9731, 0",
+    "location": "Sisterhood Sanctuary mine"
+  },
+  {
+    "item_id": 1119,
+    "name": "Steel platebody",
+    "coords": "3085, 3859, 0",
+    "location": "Wilderness - Lava Maze"
+  },
+  {
+    "item_id": 1069,
+    "name": "Steel platelegs",
+    "coords": "3184, 3733, 0",
+    "location": "Wilderness - eastern Ruins"
+  },
+  {
+    "item_id": 1325,
+    "name": "Steel scimitar",
+    "coords": "3258, 6057, 0",
+    "location": "Prifddinas - on a table in Iorwerth's Arms"
+  },
+  {
+    "item_id": 1241,
+    "name": "Steel spear",
+    "coords": "1349, 9565, 0",
+    "location": "Neypotzli"
+  },
+  {
+    "item_id": 1281,
+    "name": "Steel sword",
+    "coords": "1741, 3189, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1281,
+    "name": "Steel sword",
+    "coords": "3283, 3658, 0",
+    "location": "Wilderness - north-east of the Chaos Temple"
+  },
+  {
+    "item_id": 4179,
+    "name": "Stick",
+    "coords": "3542, 9911, 0",
+    "location": "Werewolf Agility Course"
+  },
+  {
+    "item_id": 3109,
+    "name": "Stone ball",
+    "coords": "2893, 3561, 0",
+    "location": "Burthorpe Castle"
+  },
+  {
+    "item_id": 699,
+    "name": "Stone tablet",
+    "coords": "2764, 10278, 0",
+    "location": "Zemouregal's Fort - basement tunnels"
+  },
+  {
+    "item_id": 4619,
+    "name": "Strange implement",
+    "coords": "2713, 4913, 0",
+    "location": "Uzer temple"
+  },
+  {
+    "item_id": 5504,
+    "name": "Strawberry",
+    "coords": "1376, 3503, 0",
+    "location": "Shayziens' Wall - southern outpost"
+  },
+  {
+    "item_id": 29409,
+    "name": "Sunbeam ale",
+    "coords": "1376, 2960, 0",
+    "location": "Aldarin -2nd floor"
+  },
+  {
+    "item_id": 29409,
+    "name": "Sunbeam ale",
+    "coords": "1378, 2934, 0",
+    "location": "Aldarin - Sunlight's Sanctum"
+  },
+  {
+    "item_id": 29409,
+    "name": "Sunbeam ale",
+    "coords": "1716, 3117, 0",
+    "location": "Civitas illa Fortis - The Flaming Arrow"
+  },
+  {
+    "item_id": 185,
+    "name": "Superantipoison(1)",
+    "coords": "2467, 3176, 0",
+    "location": "Observatory Dungeon entrance"
+  },
+  {
+    "item_id": 1939,
+    "name": "Swamp tar",
+    "coords": "3181, 3193, 0",
+    "location": "Lumbridge Swamp"
+  },
+  {
+    "item_id": 1939,
+    "name": "Swamp tar",
+    "coords": "3472, 3446, 0",
+    "location": "Mort Myre Swamp"
+  },
+  {
+    "item_id": 2150,
+    "name": "Swamp toad",
+    "coords": "2406, 3405, 0",
+    "location": "Tree Gnome Stronghold - south-western area"
+  },
+  {
+    "item_id": 2150,
+    "name": "Swamp toad",
+    "coords": "2407, 3516, 0",
+    "location": "Tree Gnome Stronghold - swamp enclosure"
+  },
+  {
+    "item_id": 2150,
+    "name": "Swamp toad",
+    "coords": "2903, 3400, 0",
+    "location": "Taverley - west of the lake"
+  },
+  {
+    "item_id": 5986,
+    "name": "Sweetcorn",
+    "coords": "1476, 9552, 1",
+    "location": "Cam Torum"
+  },
+  {
+    "item_id": 5986,
+    "name": "Sweetcorn",
+    "coords": "1574, 3139, 1",
+    "location": "Ortus Farm"
+  },
+  {
+    "item_id": 3805,
+    "name": "Tankard",
+    "coords": "2659, 3676, 0",
+    "location": "Rellekka - longhall bar"
+  },
+  {
+    "item_id": 10587,
+    "name": "Tarn's diary",
+    "coords": "3179, 4634, 0",
+    "location": "Tarn's Lair"
+  },
+  {
+    "item_id": 8780,
+    "name": "Teak plank",
+    "coords": "2289, 3357, 0",
+    "location": "Prifddinas - sawmill in Crwys district (only with Telekinetic grab)"
+  },
+  {
+    "item_id": 10029,
+    "name": "Teasing stick",
+    "coords": "2775, 2994, 0",
+    "location": "Karamja Hunter area"
+  },
+  {
+    "item_id": 22416,
+    "name": "The turncloak",
+    "coords": "3730, 3354, 1",
+    "location": "Slepe - Crombwick Manor (1st floor)"
+  },
+  {
+    "item_id": 1734,
+    "name": "Thread",
+    "coords": "1244, 3684, 1",
+    "location": "Kebos Lowlands - Mary and Gordon's house (1st floor)"
+  },
+  {
+    "item_id": 1734,
+    "name": "Thread",
+    "coords": "1499, 3251, 0",
+    "location": "Quetzacalli Gorge"
+  },
+  {
+    "item_id": 1734,
+    "name": "Thread",
+    "coords": "1511, 3591, 0",
+    "location": "Shayzien Styles"
+  },
+  {
+    "item_id": 1734,
+    "name": "Thread",
+    "coords": "1656, 3096, 0",
+    "location": "Civitas illa Fortis"
+  },
+  {
+    "item_id": 1734,
+    "name": "Thread",
+    "coords": "3229, 6069, 0",
+    "location": "Prifddinas - west inside Lliann's Wares"
+  },
+  {
+    "item_id": 1734,
+    "name": "Thread",
+    "coords": "3286, 3491, 0",
+    "location": "Varrock - Jolly Boar Inn"
+  },
+  {
+    "item_id": 1734,
+    "name": "Thread",
+    "coords": "3599, 3379, 0",
+    "location": "Darkmeyer Seamstress"
+  },
+  {
+    "item_id": 5523,
+    "name": "Tiara mould",
+    "coords": "2935, 3282, 1",
+    "location": "Crafting Guild &ndash; 1st floor"
+  },
+  {
+    "item_id": 966,
+    "name": "Tile",
+    "coords": "3002, 3698, 0",
+    "location": "Wilderness - Western ruins"
+  },
+  {
+    "item_id": 966,
+    "name": "Tile",
+    "coords": "3149, 3674, 0",
+    "location": "Wilderness - Graveyard of Shadows"
+  },
+  {
+    "item_id": 966,
+    "name": "Tile",
+    "coords": "3271, 3656, 0",
+    "location": "Wilderness - by Larran's small chest"
+  },
+  {
+    "item_id": 5569,
+    "name": "Tiles",
+    "coords": "3018, 5080, 0",
+    "location": "Rogues' Den"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "1241, 3703, 0",
+    "location": "Kebos Lowlands - Mary and Gordon's farm"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "1327, 3319, 0",
+    "location": "Custodia Pass"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "1359, 3036, 0",
+    "location": "Kastori"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "1425, 9557, 2",
+    "location": "Cam Torum General Store - (1st floor)"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "1520, 2982, 1",
+    "location": "Sunset Coast (1st floor)"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "1521, 3591, 0",
+    "location": "Shayzien - Jennifer's General Supplies"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "1625, 3287, 0",
+    "location": "Salvager Overlook - General Store"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "1715, 3268, 0",
+    "location": "East of Twilight Temple"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "1737, 3169, 0",
+    "location": "Civitas illa Fortis{{Refn|name=telegrab|This spawn requires telekinetic grab to obtain.}}"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "1742, 3604, 0",
+    "location": "Hosidius - behind the bank"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "2324, 9800, 0",
+    "location": "Underground Pass dwarf camp"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "2368, 3135, 0",
+    "location": "Castle Wars - Zamorakian's base"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "2376, 3127, 1",
+    "location": "Castle Wars - Zamorakian's base (1st floor)"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "2423, 3080, 1",
+    "location": "Castle Wars - Saradominist's base (1st floor)"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "2431, 3072, 0",
+    "location": "Castle Wars - Saradominist's base"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "3112, 3369, 2",
+    "location": "Draynor Manor (2nd floor)"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "3362, 3167, 0",
+    "location": "Giants' Plateau"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "3405, 9937, 0",
+    "location": "Slayer Tower basement"
+  },
+  {
+    "item_id": 590,
+    "name": "Tinderbox",
+    "coords": "3644, 3359, 0",
+    "location": "Darkmeyer - lower tier"
+  },
+  {
+    "item_id": 2255,
+    "name": "Toad batta",
+    "coords": "3139, 4554, 0",
+    "location": "Tarn's Lair"
+  },
+  {
+    "item_id": 1982,
+    "name": "Tomato",
+    "coords": "2584, 2966, 0",
+    "location": "Feldip Hills - east of the gnome glider"
+  },
+  {
+    "item_id": 1982,
+    "name": "Tomato",
+    "coords": "3039, 3706, 0",
+    "location": "Wilderness - Bandit Camp"
+  },
+  {
+    "item_id": 1982,
+    "name": "Tomato",
+    "coords": "3085, 3261, 0",
+    "location": "Draynor Village - Aggie's house"
+  },
+  {
+    "item_id": 29277,
+    "name": "Trapper's tipple",
+    "coords": "1561, 9452, 0",
+    "location": "Hunter Guild - The Burrow pub"
+  },
+  {
+    "item_id": 6962,
+    "name": "Triangle sandwich",
+    "coords": "1620, 3501, 0",
+    "location": "Woodcutting Guild - inside Sawmill operator building"
+  },
+  {
+    "item_id": 1623,
+    "name": "Uncut sapphire",
+    "coords": "2788, 3870, 0",
+    "location": "Trollweiss Mountain summit"
+  },
+  {
+    "item_id": 1623,
+    "name": "Uncut sapphire",
+    "coords": "3110, 10264, 0",
+    "location": "King Black Dragon Lair"
+  },
+  {
+    "item_id": 7051,
+    "name": "Unlit bug lantern",
+    "coords": "1689, 9661, 0",
+    "location": "Ruins of Tapoyauik{{Refn|name=telegrab|This spawn requires telekinetic grab to obtain.}}"
+  },
+  {
+    "item_id": 596,
+    "name": "Unlit torch",
+    "coords": "1508, 2984, 1",
+    "location": "Sunset Coast (1st floor)"
+  },
+  {
+    "item_id": 229,
+    "name": "Vial",
+    "coords": "1393, 2917, 0",
+    "location": "Aldarin - Alchemical Society"
+  },
+  {
+    "item_id": 229,
+    "name": "Vial",
+    "coords": "1767, 3589, 0",
+    "location": "Hosidius - Little Shop of Horace"
+  },
+  {
+    "item_id": 229,
+    "name": "Vial",
+    "coords": "2472, 4941, 0",
+    "location": "Temple Knight training grounds"
+  },
+  {
+    "item_id": 229,
+    "name": "Vial",
+    "coords": "2587, 3090, 2",
+    "location": "Wizards' Guild - 2nd floor"
+  },
+  {
+    "item_id": 229,
+    "name": "Vial",
+    "coords": "2808, 3343, 0",
+    "location": "Entrana - Frincos' Fabulous Herb Store"
+  },
+  {
+    "item_id": 229,
+    "name": "Vial",
+    "coords": "3188, 3839, 0",
+    "location": "Wilderness - Lava Dragon Isle"
+  },
+  {
+    "item_id": 229,
+    "name": "Vial",
+    "coords": "3481, 3278, 0",
+    "location": "Mort'ton, south-western building"
+  },
+  {
+    "item_id": 229,
+    "name": "Vial",
+    "coords": "3716, 3358, 0",
+    "location": "Slepe - Crombwick Manor"
+  },
+  {
+    "item_id": 227,
+    "name": "Vial of water",
+    "coords": "1668, 3068, 0",
+    "location": "Outer Fortis"
+  },
+  {
+    "item_id": 2964,
+    "name": "Washing bowl",
+    "coords": "3437, 3337, 0",
+    "location": "Nature Grotto"
+  },
+  {
+    "item_id": 555,
+    "name": "Water rune",
+    "coords": "2960, 3899, 0",
+    "location": "Wilderness - Frozen Waste Plateau"
+  },
+  {
+    "item_id": 555,
+    "name": "Water rune",
+    "coords": "3028, 3637, 0",
+    "location": "Wilderness - Dark Warriors' Fortress"
+  },
+  {
+    "item_id": 555,
+    "name": "Water rune",
+    "coords": "3298, 3316, 0",
+    "location": "Al Kharid mine - northern end"
+  },
+  {
+    "item_id": 1831,
+    "name": "Waterskin(0)",
+    "coords": "3172, 2857, 0",
+    "location": "Ruins of Unkah"
+  },
+  {
+    "item_id": 1823,
+    "name": "Waterskin(4)",
+    "coords": "3302, 2739, 0",
+    "location": "Necropolis"
+  },
+  {
+    "item_id": 20,
+    "name": "White Cog",
+    "coords": "2578, 9655, 0",
+    "location": "Clock Tower Dungeon"
+  },
+  {
+    "item_id": 1005,
+    "name": "White apron",
+    "coords": "3009, 3204, 0",
+    "location": "Port Sarim - Wydin's Food Store"
+  },
+  {
+    "item_id": 1005,
+    "name": "White apron",
+    "coords": "3016, 3229, 0",
+    "location": "Port Sarim - Gerrant's Fishy Business"
+  },
+  {
+    "item_id": 1005,
+    "name": "White apron",
+    "coords": "3016, 3229, 0",
+    "location": "Port Sarim - Gerrant's Fishy Business"
+  },
+  {
+    "item_id": 239,
+    "name": "White berries",
+    "coords": "2262, 3168, 0",
+    "location": "Isafdar - north of the Elf Tracker, beyond the tripwire"
+  },
+  {
+    "item_id": 239,
+    "name": "White berries",
+    "coords": "3214, 3809, 0",
+    "location": "Wilderness - Lava Dragon Isle"
+  },
+  {
+    "item_id": 245,
+    "name": "Wine of zamorak",
+    "coords": "2930, 3515, 0",
+    "location": "Asgarnia - Chaos Temple"
+  },
+  {
+    "item_id": 245,
+    "name": "Wine of zamorak",
+    "coords": "2938, 3517, 1",
+    "location": "Asgarnia - Chaos Temple (1st floor)"
+  },
+  {
+    "item_id": 245,
+    "name": "Wine of zamorak",
+    "coords": "2950, 3824, 0",
+    "location": "Wilderness - Chaos Temple"
+  },
+  {
+    "item_id": 245,
+    "name": "Wine of zamorak",
+    "coords": "3018, 10353, 0",
+    "location": "Wilderness - Deep Wilderness Dungeon"
+  },
+  {
+    "item_id": 245,
+    "name": "Wine of zamorak",
+    "coords": "3018, 10353, 0",
+    "location": "Wilderness - Deep Wilderness Dungeon"
+  },
+  {
+    "item_id": 1017,
+    "name": "Wizard hat",
+    "coords": "1505, 3591, 0",
+    "location": "Shayzien Styles"
+  },
+  {
+    "item_id": 2859,
+    "name": "Wolf bones",
+    "coords": "2848, 3921, 0",
+    "location": "Weiss"
+  },
+  {
+    "item_id": 2859,
+    "name": "Wolf bones",
+    "coords": "3751, 9780, 0",
+    "location": "Sisterhood Sanctuary"
+  },
+  {
+    "item_id": 1171,
+    "name": "Wooden shield",
+    "coords": "1313, 3473, 0",
+    "location": "South of Mount Quidamortem"
+  },
+  {
+    "item_id": 1171,
+    "name": "Wooden shield",
+    "coords": "1619, 2957, 0",
+    "location": "Avium Savannah"
+  },
+  {
+    "item_id": 1171,
+    "name": "Wooden shield",
+    "coords": "3204, 3515, 0",
+    "location": "North of Varrock Palace"
+  },
+  {
+    "item_id": 1171,
+    "name": "Wooden shield",
+    "coords": "3361, 3154, 0",
+    "location": "Giants' Plateau"
+  }
+]
