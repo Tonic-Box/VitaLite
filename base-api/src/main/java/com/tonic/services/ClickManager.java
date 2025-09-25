@@ -81,7 +81,6 @@ public class ClickManager
                     break;
             }
         });
-        Logger.warn("Click packet position: " + clickPackets.get(clickPackets.size() - 1));
     }
 
     private static Point getRandomPointInShape(Shape shape) {
