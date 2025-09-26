@@ -70,7 +70,7 @@ public class NpcAPI
         Static.invoke(() ->
         {
             ClickManager.click(PacketInteractionType.NPC_INTERACT);
-            client.getPacketWriter().npcActionPacket(option, npcIndex, true);
+            client.getPacketWriter().npcActionPacket(option, npcIndex, false);
         });
     }
 }
