@@ -533,7 +533,6 @@ public class Walker
 
         if(energy < 60 && !MovementAPI.staminaInEffect())
         {
-            System.out.println("Energy: " + energy + "%, Stamina: " + MovementAPI.staminaInEffect());
             ItemEx stam = InventoryAPI.getItem(i -> ArrayUtils.contains(stamina, i.getId()));
 
             if(stam != null)
