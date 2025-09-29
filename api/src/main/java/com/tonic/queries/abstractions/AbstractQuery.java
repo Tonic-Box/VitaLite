@@ -73,9 +73,7 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
                 Comparator<T> combined = sorters.stream()
                         .reduce(Comparator::thenComparing)
                         .orElse(null);
-                if (combined != null) {
-                    stream = stream.sorted(combined);
-                }
+                stream = stream.sorted(combined);
             }
 
             return stream.collect(Collectors.toList());
