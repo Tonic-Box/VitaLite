@@ -97,7 +97,7 @@ public class CodeEvalFrame extends JFrame {
         JPanel codePanel = new JPanel(new BorderLayout());
         codePanel.setBorder(BorderFactory.createTitledBorder("Code (Ctrl+Enter to run)"));
 
-        codeArea = new RSyntaxTextArea(15, 60);
+        codeArea = new RSyntaxTextArea(20, 120);
         codeArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         codeArea.setCodeFoldingEnabled(true);
         codeArea.setAntiAliasingEnabled(true);
@@ -152,7 +152,7 @@ public class CodeEvalFrame extends JFrame {
         JPanel outputPanel = new JPanel(new BorderLayout());
         outputPanel.setBorder(BorderFactory.createTitledBorder("Output"));
 
-        outputArea = new JTextArea(10, 60);
+        outputArea = new JTextArea(20, 120);
         outputArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         outputArea.setEditable(false);
         outputArea.setBackground(Color.BLACK);
@@ -181,7 +181,7 @@ public class CodeEvalFrame extends JFrame {
         // Assemble UI
         splitPane.setTopComponent(codePanel);
         splitPane.setBottomComponent(outputPanel);
-        splitPane.setDividerLocation(400);
+        splitPane.setDividerLocation(500);
 
         add(splitPane, BorderLayout.CENTER);
 
