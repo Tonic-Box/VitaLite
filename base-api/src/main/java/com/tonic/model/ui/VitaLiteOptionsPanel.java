@@ -197,12 +197,6 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         transportButton.addActionListener(e -> toggleTransportsEditor());
         contentPanel.add(transportButton);
 
-        contentPanel.add(Box.createVerticalStrut(12));
-
-        FancyButton codeEvalButton = new FancyButton("Code Evaluator");
-        codeEvalButton.addActionListener(e -> openCodeEvaluator());
-        contentPanel.add(codeEvalButton);
-
         contentPanel.add(Box.createVerticalStrut(20));
         JLabel debugLabel = new JLabel("Debug");
         debugLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
