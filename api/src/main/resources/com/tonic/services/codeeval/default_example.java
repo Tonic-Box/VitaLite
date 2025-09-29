@@ -1,7 +1,7 @@
 // Example code showing how to use the VitaLite runtime environment
 
 // Get the RuneLite client instance with proper typing
-Client client = client();
+Client client = Static.getClient();
 
 Player localPlayer = client.getLocalPlayer();
 if (localPlayer != null) {

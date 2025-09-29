@@ -77,9 +77,6 @@ public class %CLASS_NAME% {
         }
     }
 
-    // Convenience methods for common classes
-    private static Client client() { return inject("net.runelite.api.Client"); }
-
     public Object run() {
         %USER_CODE%
         return null;

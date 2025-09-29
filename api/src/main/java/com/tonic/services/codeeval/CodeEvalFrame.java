@@ -8,11 +8,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.Theme;
+import org.fife.ui.autocomplete.*;
 
 public class CodeEvalFrame extends JFrame {
     private static CodeEvalFrame INSTANCE;
     private SimpleCodeEvaluator evaluator;
-    private final JTextArea codeArea;
+    private final RSyntaxTextArea codeArea;
     private final JTextArea outputArea;
 
     public static CodeEvalFrame get() {
@@ -87,9 +91,26 @@ public class CodeEvalFrame extends JFrame {
         JPanel codePanel = new JPanel(new BorderLayout());
         codePanel.setBorder(BorderFactory.createTitledBorder("Code (Ctrl+Enter to run)"));
 
-        codeArea = new JTextArea(15, 60);
+        codeArea = new RSyntaxTextArea(15, 60);
+        codeArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+        codeArea.setCodeFoldingEnabled(true);
+        codeArea.setAntiAliasingEnabled(true);
         codeArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.setTabSize(4);
+
+        // Apply dark theme
+        try {
+            Theme theme = Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/dark.xml"));
+            theme.apply(codeArea);
+        } catch (Exception e) {
+            // Fallback to manual dark theme
+            codeArea.setBackground(new Color(40, 40, 40));
+            codeArea.setForeground(Color.WHITE);
+            codeArea.setCurrentLineHighlightColor(new Color(50, 50, 50));
+        }
+
+        // Setup basic autocompletion
+        setupAutoCompletion();
 
         // Load default code example from resources
         try {
@@ -156,6 +177,45 @@ public class CodeEvalFrame extends JFrame {
 
         pack();
         setLocationRelativeTo(null);
+    }
+
+    private void setupAutoCompletion() {
+        // Create a simple completion provider with basic completions
+        DefaultCompletionProvider provider = new DefaultCompletionProvider();
+
+        // Add basic Java completions
+        provider.addCompletion(new BasicCompletion(provider, "System.out.println"));
+        provider.addCompletion(new BasicCompletion(provider, "out.println"));
+
+        // Add VitaLite-specific completions
+        provider.addCompletion(new BasicCompletion(provider, "client()", "Get RuneLite Client instance"));
+        provider.addCompletion(new BasicCompletion(provider, "inject(\"className\")", "Inject class via Guice"));
+        provider.addCompletion(new BasicCompletion(provider, "loadClass(\"className\")", "Load class dynamically"));
+
+        // Add GameManager static methods
+        provider.addCompletion(new BasicCompletion(provider, "GameManager.playerList()", "Get list of players"));
+        provider.addCompletion(new BasicCompletion(provider, "GameManager.npcList()", "Get list of NPCs"));
+        provider.addCompletion(new BasicCompletion(provider, "GameManager.objectList()", "Get list of objects"));
+        provider.addCompletion(new BasicCompletion(provider, "GameManager.tileItemList()", "Get list of ground items"));
+
+        // Add Static utilities
+        provider.addCompletion(new BasicCompletion(provider, "Static.getClient()", "Get RuneLite client"));
+        provider.addCompletion(new BasicCompletion(provider, "Static.getInjector()", "Get Guice injector"));
+
+        // Create and install the auto completion
+        AutoCompletion ac = new AutoCompletion(provider);
+        ac.setAutoCompleteEnabled(true);
+        ac.setAutoActivationEnabled(true);
+        ac.setAutoActivationDelay(300);
+        ac.setShowDescWindow(true);
+        ac.install(codeArea);
+
+        // Set trigger key
+        try {
+            ac.setTriggerKey(KeyStroke.getKeyStroke("ctrl SPACE"));
+        } catch (Exception e) {
+            // Fallback trigger
+        }
     }
 
     private void runCode() {
