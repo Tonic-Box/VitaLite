@@ -222,16 +222,16 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }
 
-    @Inject
-    @Override
-    public void resumeNameDialoguePacket(String text)
-    {
-        MapEntry entry = PacketMapReader.get("OP_RESUME_NAMEDIALOG");
-        Map<String,Object> args = new HashMap<>();
-        args.put("length", text.length());
-        args.put("var7", text);
-        this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
-    }
+//    @Inject
+//    @Override
+//    public void resumeNameDialoguePacket(String text)
+//    {
+//        MapEntry entry = PacketMapReader.get("OP_RESUME_NAMEDIALOG");
+//        Map<String,Object> args = new HashMap<>();
+//        args.put("length", text.length());
+//        args.put("var7", text);
+//        this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
+//    }
 
     @Inject
     @Override
@@ -340,14 +340,14 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }
 
-    @Inject
-    @Override
-    public void interfaceClosePacket()
-    {
-        MapEntry entry = PacketMapReader.get("OP_INTERFACE_CLOSE");
-        Map<String,Object> args = new HashMap<>();
-        this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
-    }
+//    @Inject
+//    @Override
+//    public void interfaceClosePacket()
+//    {
+//        MapEntry entry = PacketMapReader.get("OP_INTERFACE_CLOSE");
+//        Map<String,Object> args = new HashMap<>();
+//        this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
+//    }
 
     @Inject
     @Override

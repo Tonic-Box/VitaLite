@@ -238,20 +238,20 @@ public class DialogueAPI
         });
     }
 
-    /**
-     * Resumes a name dialogue
-     *
-     * @param text The name to input
-     */
-    public static void resumeNameDialogue(String text)
-    {
-        TClient client = Static.getClient();
-        Static.invoke(() -> {
-            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
-            client.getPacketWriter().resumeNameDialoguePacket(text);
-            ClientScriptAPI.closeNumericInputDialogue();
-        });
-    }
+//    /**
+//     * Resumes a name dialogue
+//     *
+//     * @param text The name to input
+//     */
+//    public static void resumeNameDialogue(String text)
+//    {
+//        TClient client = Static.getClient();
+//        Static.invoke(() -> {
+//            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
+//            client.getPacketWriter().resumeNameDialoguePacket(text);
+//            ClientScriptAPI.closeNumericInputDialogue();
+//        });
+//    }
 
     /**
      * Resumes a numeric dialogue

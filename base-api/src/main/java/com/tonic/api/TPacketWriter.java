@@ -160,12 +160,12 @@ public interface TPacketWriter
      */
     void widgetOnWidgetPacket(int selectedWidgetId, int itemId, int slot, int targetWidgetId, int itemId2, int slot2);
 
-    /**
-     * Sends a resume name dialogue packet.
-     *
-     * @param text the name text
-     */
-    void resumeNameDialoguePacket(String text);
+//    /**
+//     * Sends a resume name dialogue packet.
+//     *
+//     * @param text the name text
+//     */
+//    void resumeNameDialoguePacket(String text);
 
     /**
      * Sends a widget on ground item packet.
@@ -180,10 +180,10 @@ public interface TPacketWriter
      */
     void widgetOnGroundItemPacket(int selectedWidgetId, int itemId, int slot, int groundItemID, int worldX, int worldY, boolean ctrl);
 
-    /**
-     * Sends an interface close packet.
-     */
-    void interfaceClosePacket();
+//    /**
+//     * Sends an interface close packet.
+//     */
+//    void interfaceClosePacket();
 
     /**
      * Sends a chat packet.
