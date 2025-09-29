@@ -50,12 +50,12 @@ public class ClientScriptAPI
 
     /**
      * Runs a client script with the specified id and arguments
-     * @param id The script id
-     * @param args The script arguments
+
+     * @param args The script id followed by arguments
      */
-    public static void runScript(int id, Object... args)
+    public static void runScript(Object... args)
     {
         Client client = Static.getClient();
-        Static.invoke(() -> client.runScript(id, args));
+        Static.invoke(() -> client.runScript(args));
     }
 }
