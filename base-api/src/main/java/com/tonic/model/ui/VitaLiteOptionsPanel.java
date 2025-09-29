@@ -40,6 +40,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ToggleSlider logMenuActionsToggle;
     private final ToggleSlider hideLoggerToggle;
     private JFrame transportsEditor;
+    private JFrame jShell;
     private final ConfigManager config = new ConfigManager("VitaLiteOptions");
 
     private VitaLiteOptionsPanel() {
@@ -196,6 +197,12 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         transportButton.addActionListener(e -> toggleTransportsEditor());
         contentPanel.add(transportButton);
 
+        contentPanel.add(Box.createVerticalStrut(12));
+
+        FancyButton codeEvalButton = new FancyButton("Code Evaluator");
+        codeEvalButton.addActionListener(e -> openCodeEvaluator());
+        contentPanel.add(codeEvalButton);
+
         contentPanel.add(Box.createVerticalStrut(20));
         JLabel debugLabel = new JLabel("Debug");
         debugLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
@@ -203,15 +210,6 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         debugLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         debugLabel.add(Box.createVerticalStrut(10));
         contentPanel.add(debugLabel);
-        contentPanel.add(Box.createVerticalStrut(12));
-
-        FancyButton checkButton = new FancyButton("Check Platform Info");
-        checkButton.addActionListener(e -> {
-            checkShit();
-            Logger.info("Platform info checked and logged.");
-        });
-        contentPanel.add(checkButton);
-
         contentPanel.add(Box.createVerticalStrut(12));
 
         FancyButton mouseButton = new FancyButton("Check Mouse Values");
@@ -315,6 +313,20 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         SwingUtilities.invokeLater(() -> transportsEditor.setVisible(!transportsEditor.isVisible()));
     }
 
+    private void openCodeEvaluator()
+    {
+        try
+        {
+            Class<?> codeEvalFrameClass = Static.getClient().getClass().getClassLoader().loadClass("com.tonic.services.codeeval.CodeEvalFrame");
+            java.lang.reflect.Method getMethod = codeEvalFrameClass.getMethod("get");
+            getMethod.invoke(null);
+        }
+        catch (Exception e)
+        {
+            Logger.error("Failed to open Code Evaluator: " + e.getMessage());
+        }
+    }
+
     private void checkMouseValues()
     {
         Object client = Static.getClient();
@@ -334,15 +346,6 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         short info = (short)(time << 1);
 
         Logger.info("Client last pressed: " + client_latsPressed + ", MouseHandler last pressed: " + mh_lastPressed + ", Diff: " + time + ", Info: " + info);
-    }
-
-    private void checkShit()
-    {
-        Object platInfo = ReflectBuilder.ofClass("le")
-                .staticField("wc")
-                .get();
-
-        ReflectUtil.inspectNonStaticFields(platInfo);
     }
 
     private JPanel createToggleOption(String title, String description, ToggleSlider toggle, Runnable onClick) {
