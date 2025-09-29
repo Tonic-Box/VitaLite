@@ -17,6 +17,7 @@ import com.tonic.queries.InventoryQuery;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.pathfinder.model.Step;
 import com.tonic.services.pathfinder.teleports.Teleport;
+import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.Coroutine;
 import com.tonic.util.Location;
 import com.tonic.util.WorldPointUtil;
@@ -127,6 +128,7 @@ public class Walker
         running = true;
 
         reset();
+        TransportLoader.refreshTransports();
         final Pathfinder engine = new Pathfinder(targets);
 
         List<Step> steps = engine.find();
@@ -145,6 +147,7 @@ public class Walker
         running = true;
 
         reset();
+        TransportLoader.refreshTransports();
         final Pathfinder engine = new Pathfinder(target);
 
         List<Step> steps = engine.find();
@@ -521,7 +524,7 @@ public class Walker
         {
             return;
         }
-        int energy = client.getEnergy();
+        int energy = client.getEnergy() / 100;
 
         if(!MovementAPI.isRunEnabled() && energy > 30)
         {
@@ -530,6 +533,7 @@ public class Walker
 
         if(energy < 60 && !MovementAPI.staminaInEffect())
         {
+            System.out.println("Energy: " + energy + "%, Stamina: " + MovementAPI.staminaInEffect());
             ItemEx stam = InventoryAPI.getItem(i -> ArrayUtils.contains(stamina, i.getId()));
 
             if(stam != null)

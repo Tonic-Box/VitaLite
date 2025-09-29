@@ -440,14 +440,17 @@ public class TransportLoader
                 computeIfAbsent(LAST_TRANSPORT_LIST, transport);
             }
 
+            System.out.println("Before removal:  " + LAST_TRANSPORT_LIST.size() + " transport nodes");
+
             if(filter)
             {
                 LAST_TRANSPORT_LIST.forEachValue(list -> list.removeIf(t -> !t.getRequirements().fulfilled()));
+                        LAST_TRANSPORT_LIST.forEachValue(list -> {
+                    list.removeIf(t -> !t.getRequirements().fulfilled());
+                    return true;
+                });
                 LAST_TRANSPORT_LIST.retainEntries((key, value) ->  !value.isEmpty());
             }
-
-
-            System.out.println("Refreshed transports, found " + LAST_TRANSPORT_LIST.size() + " transport nodes");
             return true;
         });
     }

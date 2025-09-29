@@ -30,8 +30,14 @@ public class Requirements
 
     public boolean fulfilled()
     {
-        List<Requirement> all = getAll();
-        return all.stream().allMatch(Supplier::get);
+        for(Requirement req : getAll())
+        {
+            if(!req.get())
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public List<Requirement> getAll()

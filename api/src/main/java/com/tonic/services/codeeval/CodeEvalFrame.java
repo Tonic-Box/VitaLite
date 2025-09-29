@@ -4,10 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
+
+import net.runelite.client.util.ImageUtil;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
@@ -76,6 +79,9 @@ public class CodeEvalFrame extends JFrame {
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        final BufferedImage iconImage = ImageUtil.loadImageResource(CodeEvalFrame.class, "jshell.png");
+        setIconImage(iconImage);
+
         // Add window listener to handle cleanup when window is closed
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -114,7 +120,7 @@ public class CodeEvalFrame extends JFrame {
 
         // Load default code example from resources
         try {
-            InputStream exampleStream = getClass().getResourceAsStream("/com/tonic/services/codeeval/default_example.java");
+            InputStream exampleStream = getClass().getResourceAsStream("default_example.java");
             if (exampleStream != null) {
                 try (Scanner scanner = new Scanner(exampleStream, "UTF-8")) {
                     scanner.useDelimiter("\\A");
@@ -163,8 +169,12 @@ public class CodeEvalFrame extends JFrame {
         JButton clearButton = new JButton("Clear Output");
         clearButton.addActionListener(e -> outputArea.setText(""));
 
+        JCheckBox alwaysOnTopCheckbox = new JCheckBox("Always on Top", true);
+        alwaysOnTopCheckbox.addActionListener(e -> setAlwaysOnTop(alwaysOnTopCheckbox.isSelected()));
+
         buttonPanel.add(runButton);
         buttonPanel.add(clearButton);
+        buttonPanel.add(alwaysOnTopCheckbox);
 
         codePanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -174,6 +184,9 @@ public class CodeEvalFrame extends JFrame {
         splitPane.setDividerLocation(400);
 
         add(splitPane, BorderLayout.CENTER);
+
+        // Set always on top by default
+        setAlwaysOnTop(true);
 
         pack();
         setLocationRelativeTo(null);

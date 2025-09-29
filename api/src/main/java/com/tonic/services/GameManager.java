@@ -166,7 +166,7 @@ public class GameManager extends Overlay {
 
         final BufferedImage iconImage = ImageUtil.loadImageResource(CodeEvalFrame.class, "jshell.png");
         titleBarButton = NavigationButton.builder()
-                .tooltip("jShell")
+                .tooltip("JavaShell")
                 .icon(iconImage)
                 .onClick(() -> CodeEvalFrame.get().toggle())
                 .build();

@@ -48,16 +48,19 @@ public class Pathfinder
     private int transportsUsed;
 
     public Pathfinder(final WorldPoint target) {
+        TransportLoader.refreshTransports();
         this.targetWorldPoint = target;
     }
 
     public Pathfinder(WorldArea... worldAreas)
     {
+        TransportLoader.refreshTransports();
         worldAreaPoints = WorldPointUtil.toCompressedPoints(worldAreas);
     }
 
     public Pathfinder(List<WorldArea> worldAreas)
     {
+        TransportLoader.refreshTransports();
         worldAreaPoints = WorldPointUtil.toCompressedPoints(worldAreas.toArray(new WorldArea[0]));
     }
 
@@ -71,7 +74,6 @@ public class Pathfinder
             Client client = Static.getClient();
             this.inInstance = client.getTopLevelWorldView().isInstance();
             List<Teleport> teleports = Teleport.buildTeleportLinks();
-            TransportLoader.refreshTransports();
 
             final List<Integer> startPoints = new ArrayList<>();
 

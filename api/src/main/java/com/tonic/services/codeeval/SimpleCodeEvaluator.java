@@ -52,7 +52,7 @@ public class SimpleCodeEvaluator {
     private String buildClassCode(String className, String userCode) {
         try {
             // Load template from resources
-            InputStream templateStream = getClass().getResourceAsStream("/com/tonic/services/codeeval/code_template.java");
+            InputStream templateStream = getClass().getResourceAsStream("code_template.java");
             if (templateStream == null) {
                 throw new RuntimeException("Could not find code template");
             }
