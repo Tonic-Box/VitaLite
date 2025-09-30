@@ -103,7 +103,7 @@ public final class SelfUpdate {
      * @param currentVitaLiteVersion current VitaLite version string
      * @param targetRLVersion target RuneLite version string
      */
-    private void showUpdateAvailableDialog(final String currentVitaLiteVersion, final String targetRLVersion) {
+    public static void showUpdateAvailableDialog(final String currentVitaLiteVersion, final String targetRLVersion) {
         try {
             final int result = JOptionPane.showConfirmDialog(
                 null,
@@ -185,7 +185,7 @@ public final class SelfUpdate {
      * Opens the GitHub release page in the system's default browser.
      * @param version the version to link to
      */
-    private void openReleasePageInBrowser(final String version) {
+    private static void openReleasePageInBrowser(final String version) {
         try {
             final String releaseUrl = "https://github.com/Tonic-Box/VitaLite/releases/tag/v" + version;
 
@@ -207,7 +207,7 @@ public final class SelfUpdate {
      * @param currentVersion current version
      * @param latestVersion latest version
      */
-    private void showConsoleUpdateMessage(final String currentVersion, final String latestVersion) {
+    private static void showConsoleUpdateMessage(final String currentVersion, final String latestVersion) {
         System.out.println("=== VitaLite Update Available ===");
         System.out.println("Current: v" + currentVersion);
         System.out.println("Latest:  v" + latestVersion);
