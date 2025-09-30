@@ -44,6 +44,11 @@ public class ClickManager
         shape = null;
     }
 
+    public static void click()
+    {
+        click(PacketInteractionType.UNBOUND_INTERACT);
+    }
+
     public static void click(PacketInteractionType packetInteractionType)
     {
         Static.invoke(() -> {

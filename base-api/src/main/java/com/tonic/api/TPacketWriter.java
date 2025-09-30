@@ -36,6 +36,17 @@ public interface TPacketWriter
     void widgetActionPacket(int type, int widgetId, int childId, int itemId);
 
     /**
+     * Sends a widget action sub operation packet.
+     *
+     * @param type the action type
+     * @param subOp the subtype
+     * @param widgetId the widget id
+     * @param childId the child id
+     * @param itemId the item id
+     */
+    void widgetActionSubOpPacket(int type, int subOp, int widgetId, int childId, int itemId);
+
+    /**
      * Sends a resume count dialogue packet.
      *
      * @param count the count value

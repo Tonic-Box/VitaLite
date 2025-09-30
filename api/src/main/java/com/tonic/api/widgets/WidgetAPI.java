@@ -51,6 +51,22 @@ public class WidgetAPI
     }
 
     /**
+     * invoke a widget packet
+     * @param action action type
+     * @param widgetId packed widget ID
+     * @param childId child ID
+     * @param itemId item ID
+     */
+    public static void interact(int action, int subOp, int widgetId, int childId, int itemId)
+    {
+        TClient client = Static.getClient();
+        Static.invoke(() -> {
+            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
+            client.getPacketWriter().widgetActionSubOpPacket(action, subOp, widgetId, childId, itemId);
+        });
+    }
+
+    /**
      * invoke a widget action
      * @param action action type
      * @param widgetInfo widget info
