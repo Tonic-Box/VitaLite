@@ -1,7 +1,7 @@
 package com.tonic.data.magic.spellbooks;
 
 import com.tonic.api.game.GameAPI;
-import com.tonic.api.game.WorldsAPI;
+import com.tonic.api.threaded.WorldsAPI;
 import com.tonic.api.widgets.MagicAPI;
 import com.tonic.data.magic.Rune;
 import com.tonic.data.magic.RuneRequirement;

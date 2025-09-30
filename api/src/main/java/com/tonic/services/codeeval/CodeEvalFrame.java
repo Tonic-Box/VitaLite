@@ -9,7 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
-
+import com.tonic.services.GameManager;
 import net.runelite.client.util.ImageUtil;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -74,7 +74,7 @@ public class CodeEvalFrame extends JFrame {
         super("VitaLite Code Evaluator");
 
         // Initialize evaluator with RLClassLoader - will be refreshed on each open() call
-        this.evaluator = new SimpleCodeEvaluator(com.tonic.services.GameManager.class.getClassLoader());
+        this.evaluator = new SimpleCodeEvaluator(GameManager.class.getClassLoader());
 
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -261,4 +261,6 @@ public class CodeEvalFrame extends JFrame {
             outputArea.setCaretPosition(outputArea.getDocument().getLength());
         }
     }
+
+
 }

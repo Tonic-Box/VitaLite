@@ -2,6 +2,8 @@ package com.tonic.services.pathfinder.ui;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.tonic.data.locatables.BankLocations;
+import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.TransportDto;
 import com.tonic.services.pathfinder.ui.components.TransportDetailPanel;
 import com.tonic.services.pathfinder.ui.components.TransportListPanel;
@@ -12,6 +14,8 @@ import net.runelite.api.coords.WorldPoint;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -41,6 +45,10 @@ public class TransportEditorFrame extends JFrame {
     // Data
     private List<TransportDto> transports = new ArrayList<>();
     private boolean hasUnsavedChanges = false;
+    private JMenu testsMenu;
+    private JMenuItem cancel;
+    private final List<JMenuItem> tests = new ArrayList<>();
+    private Color origonalColor;
 
     public TransportEditorFrame() {
         initializeFrame();
@@ -69,6 +77,9 @@ public class TransportEditorFrame extends JFrame {
         } catch (Exception e) {
             // Icon not found, continue without
         }
+
+        // Create menu bar
+        createMenuBar();
     }
 
     private void initializeComponents() {
@@ -107,6 +118,66 @@ public class TransportEditorFrame extends JFrame {
                 dispose();
             }
         });
+    }
+
+    private void createMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+
+        // Tests menu
+        testsMenu = new JMenu("Tests");
+        origonalColor = testsMenu.getForeground();
+
+        // Add menu listener to execute code when menu is opened
+        testsMenu.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) {
+                onTestsMenuOpened();
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent e) {
+                // Called when menu is closed/deselected
+            }
+
+            @Override
+            public void menuCanceled(MenuEvent e) {
+                // Called when menu is canceled (e.g., ESC key)
+            }
+        });
+
+        cancel = new JMenuItem("Cancel Test");
+        cancel.addActionListener(e -> Walker.cancelWalk());
+        testsMenu.add(cancel);
+        JMenuItem bankMenuItem = new JMenuItem("Bank");
+        bankMenuItem.addActionListener(e -> ThreadPool.submit(BankLocations::walkToNearest));
+        tests.add(bankMenuItem);
+        testsMenu.add(bankMenuItem);
+
+        menuBar.add(testsMenu);
+        setJMenuBar(menuBar);
+    }
+
+    private void onTestsMenuOpened() {
+        if(Walker.isWalking())
+        {
+            testsMenu.setForeground(Color.GREEN);
+            cancel.setEnabled(true);
+            cancel.setVisible(true);
+            for(JMenuItem item : tests)
+            {
+                item.setEnabled(false);
+            }
+        }
+        else
+        {
+            testsMenu.setForeground(origonalColor);
+            cancel.setEnabled(false);
+            cancel.setVisible(false);
+            for(JMenuItem item : tests)
+            {
+                item.setEnabled(true);
+            }
+        }
     }
 
     // Public API for components

@@ -1,7 +1,8 @@
-package com.tonic.api.game;
+package com.tonic.api.threaded;
 
 import com.tonic.Static;
 import com.tonic.api.TClient;
+import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.queries.WorldQuery;
@@ -75,15 +76,8 @@ public class WorldsAPI
     public static void hop(World world)
     {
         Client client = Static.getClient();
-        Static.invoke(() -> {
-            if (client.getWidget(InterfaceID.Worldswitcher.BUTTONS) == null) {
-                ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
-                WidgetAPI.interact(1, InterfaceID.Logout.WORLD_SWITCHER, -1);
-            }
-            if (client.getWidget(InterfaceID.Objectbox.UNIVERSE) != null) {
-                ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
-                DialogueAPI.resumePause(InterfaceID.Objectbox.UNIVERSE, 1);
-            }
+        if (client.getGameState() == GameState.LOGIN_SCREEN)
+        {
             final net.runelite.api.World rsWorld = client.createWorld();
             rsWorld.setActivity(world.getActivity());
             rsWorld.setAddress(world.getAddress());
@@ -92,12 +86,25 @@ public class WorldsAPI
             rsWorld.setLocation(world.getLocation());
             rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
 
-            if (client.getGameState() == GameState.LOGIN_SCREEN)
-            {
-                client.changeWorld(rsWorld);
-            }
+            client.changeWorld(rsWorld);
             client.hopToWorld(rsWorld);
-        });
+            return;
+        }
+
+        if (client.getWidget(InterfaceID.Worldswitcher.BUTTONS) == null) {
+            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
+            WidgetAPI.interact(1, InterfaceID.Logout.WORLD_SWITCHER, -1);
+            Delays.tick();
+        }
+
+        WidgetAPI.interact(1, InterfaceID.Worldswitcher.BUTTONS, world.getId(), -1);
+        Delays.tick();
+
+        if (client.getWidget(InterfaceID.Objectbox.UNIVERSE) != null) {
+            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
+            DialogueAPI.resumePause(InterfaceID.Objectbox.UNIVERSE, 1);
+        }
+        Delays.tick();
     }
 
     public static boolean inMembersWorld() {

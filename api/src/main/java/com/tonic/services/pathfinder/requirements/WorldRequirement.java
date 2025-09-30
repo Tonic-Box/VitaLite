@@ -1,6 +1,6 @@
 package com.tonic.services.pathfinder.requirements;
 
-import com.tonic.api.game.WorldsAPI;
+import com.tonic.api.threaded.WorldsAPI;
 import lombok.Value;
 
 @Value

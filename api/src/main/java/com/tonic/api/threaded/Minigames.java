@@ -4,7 +4,6 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.api.game.VarAPI;
-import com.tonic.api.game.WorldsAPI;
 import com.tonic.api.widgets.TabsAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.Tab;

@@ -1,9 +1,11 @@
 package com.tonic.services.pathfinder.ui.components;
 
 import com.tonic.Static;
+import com.tonic.data.locatables.BankLocations;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.services.pathfinder.ui.TransportEditorFrame;
 import com.tonic.services.pathfinder.ui.TransportOverlay;
+import com.tonic.util.ThreadPool;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import javax.swing.*;
@@ -134,6 +136,7 @@ public class ToolbarPanel extends JPanel {
 
         return button;
     }
+
 
     private Component createSeparator() {
         JSeparator separator = new JSeparator(SwingConstants.VERTICAL);

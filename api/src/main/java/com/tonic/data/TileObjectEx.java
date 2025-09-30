@@ -30,6 +30,10 @@ public class TileObjectEx
         Client client = Static.getClient();
         return Static.invoke(() -> {
             ObjectComposition composition = client.getObjectDefinition(tileObject.getId());
+            if(composition.getImpostorIds() != null)
+            {
+                composition = composition.getImpostor();
+            }
             if(composition == null)
                 return null;
             return TextUtil.sanitize(composition.getName());
@@ -42,6 +46,10 @@ public class TileObjectEx
             Client client = Static.getClient();
             actions = Static.invoke(() -> {
                 ObjectComposition composition = client.getObjectDefinition(tileObject.getId());
+                if(composition.getImpostorIds() != null)
+                {
+                    composition = composition.getImpostor();
+                }
                 if(composition == null)
                     return new String[]{};
                 return composition.getActions();
