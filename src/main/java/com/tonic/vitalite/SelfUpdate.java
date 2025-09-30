@@ -59,7 +59,7 @@ public final class SelfUpdate {
             }
 
             // Release exists - show update available dialog
-            showUpdateAvailableDialog(currentVitaLiteVersion, liveRLVersion);
+            showUpdateAvailableDialog(currentVitaLiteVersion, liveRLVersion, false);
             return true;
 
         } catch (final Exception e) {
