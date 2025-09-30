@@ -4,390 +4,214 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-import javax.swing.BorderFactory;
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Dimension;
+import javax.swing.JOptionPane;
+import java.awt.Desktop;
 
 /**
- * Handles self-updating of VitaLite by checking GitHub releases and downloading new versions.
+ * Handles update checking for VitaLite by displaying informational popups about available updates.
  */
 public final class SelfUpdate {
     
-    private static final String GITHUB_API_URL = "https://api.github.com/repos/Tonic-Box/VitaLite/releases/latest";
+    private static final String GITHUB_RELEASES_BASE_URL = "https://api.github.com/repos/Tonic-Box/VitaLite/releases/tags";
     private static final String USER_AGENT = "VitaLite-Updater/1.0";
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
     
     private final HttpClient httpClient;
-    private final String currentJarPath;
-    private final List<String> jvmArgs;
-    private final List<String> programArgs;
-    
+
     public SelfUpdate() {
         this.httpClient = HttpClient.newBuilder()
                 .connectTimeout(TIMEOUT)
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .build();
-        
-        this.currentJarPath = getCurrentJarPath();
-        this.jvmArgs = getCurrentJvmArgs();
-        this.programArgs = getCurrentProgramArgs();
     }
     
     /**
-     * Checks for updates and performs self-update if newer version is available.
-     * @return true if update was performed, false if already up to date
-     * @throws IOException if update process fails
+     * Checks for updates based on RuneLite version compatibility.
+     * @return true if update is available, false if already up to date
+     * @throws IOException if update check fails
      */
     public boolean checkAndUpdate() throws IOException {
         try {
-            final String latestVersion = getLatestVersionFromGitHub();
-            final String currentVersion = Versioning.getVitaLiteVersion();
-            
-            if (currentVersion.equals(latestVersion)) {
-                System.out.println("VitaLite is already up to date (v" + currentVersion + ")");
+            final String liveRLVersion = Versioning.getLiveRuneliteVersion();
+            final String currentVitaLiteVersion = Versioning.getVitaLiteVersion();
+
+            System.out.println("Live RuneLite version: " + liveRLVersion);
+            System.out.println("Current VitaLite version: " + currentVitaLiteVersion);
+
+            // Check if VitaLite version matches RuneLite version
+            if (currentVitaLiteVersion.equals(liveRLVersion)) {
+                System.out.println("VitaLite is already up to date for RuneLite v" + liveRLVersion);
                 return false;
             }
 
-            final boolean userConfirmed = showUpdateDialog(currentVersion, latestVersion);
-            if (!userConfirmed) {
-                System.out.println("Update cancelled by user");
-                System.exit(0);
+            // Check if there's a VitaLite release for the live RL version
+            final boolean releaseExists = checkIfReleaseExistsForRLVersion(liveRLVersion);
+
+            if (!releaseExists) {
+                // No VitaLite release available for current RL version
+                showWaitForUpdateDialog(liveRLVersion);
                 return false;
             }
-            
-            System.out.println("Update confirmed: v" + currentVersion + " -> v" + latestVersion);
-            performUpdate(latestVersion);
+
+            // Release exists - show update available dialog
+            showUpdateAvailableDialog(currentVitaLiteVersion, liveRLVersion);
             return true;
-            
+
         } catch (final Exception e) {
-            throw new IOException("Self-update failed: " + e.getMessage(), e);
+            // Show "out of date" message for any errors (likely can't reach GitHub)
+            showOutOfDateDialog();
+            throw new IOException("Update check failed: " + e.getMessage(), e);
         }
     }
     
     /**
-     * Gets the latest release version from GitHub API.
-     * @return latest version tag
+     * Checks if a VitaLite release exists for the specified RuneLite version.
+     * @param rlVersion the RuneLite version to check for
+     * @return true if a release exists, false otherwise
      * @throws IOException if API request fails
      */
-    private String getLatestVersionFromGitHub() throws IOException {
+    private boolean checkIfReleaseExistsForRLVersion(final String rlVersion) throws IOException {
         try {
+            final String releaseUrl = GITHUB_RELEASES_BASE_URL + "/" + rlVersion;
             final HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(GITHUB_API_URL))
+                    .uri(URI.create(releaseUrl))
                     .header("User-Agent", USER_AGENT)
                     .header("Accept", "application/vnd.github.v3+json")
                     .timeout(TIMEOUT)
                     .GET()
                     .build();
-            
-            final HttpResponse<String> response = httpClient.send(request, 
-                    HttpResponse.BodyHandlers.ofString());
-            
-            if (response.statusCode() != 200) {
-                throw new IOException("GitHub API request failed: HTTP " + response.statusCode());
-            }
-            
-            final JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
-            final String tagName = json.get("tag_name").getAsString();
 
-            return tagName.startsWith("v") ? tagName.substring(1) : tagName;
-            
+            final HttpResponse<String> response = httpClient.send(request,
+                    HttpResponse.BodyHandlers.ofString());
+
+            // 200 = release exists, 404 = release doesn't exist
+            return response.statusCode() == 200;
+
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IOException("Update check was interrupted", e);
+            throw new IOException("Release check was interrupted", e);
         }
     }
     
     /**
-     * Performs the actual update process by launching an external updater script.
-     * @param newVersion the version to update to
-     * @throws IOException if update process fails
+     * Shows a dialog when update is available with option to open download page.
+     * @param currentVitaLiteVersion current VitaLite version string
+     * @param targetRLVersion target RuneLite version string
      */
-    private void performUpdate(final String newVersion) throws IOException {
-        if (currentJarPath == null || !Files.exists(Paths.get(currentJarPath))) {
-            throw new IOException("Cannot determine current JAR location for update");
-        }
-        
-        final String downloadUrl = buildDownloadUrl(newVersion);
-        final Path updateScript = createUpdateScript(downloadUrl, newVersion);
-        
-        System.out.println("Starting update process...");
-        
+    private void showUpdateAvailableDialog(final String currentVitaLiteVersion, final String targetRLVersion) {
         try {
-            final ProcessBuilder pb = new ProcessBuilder(getUpdateCommand(updateScript));
-            pb.inheritIO();
-            pb.start();
-            System.exit(0);
-            
-        } catch (final Exception e) {
-            try {
-                Files.deleteIfExists(updateScript);
-            } catch (final IOException ignored) {}
-            
-            throw new IOException("Failed to launch update process", e);
-        }
-    }
-    
-    /**
-     * Creates a platform-specific update script.
-     * @param downloadUrl URL to download the new JAR
-     * @param newVersion version being downloaded
-     * @return path to the created update script
-     */
-    private Path createUpdateScript(final String downloadUrl, final String newVersion) throws IOException {
-        final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
-        final String scriptName = isWindows ? "vitalite-update.bat" : "vitalite-update.sh";
-        final Path scriptPath = Paths.get(System.getProperty("java.io.tmpdir"), scriptName);
-        
-        final StringBuilder script = new StringBuilder();
-        
-        if (isWindows) {
-            script.append("@echo off\n");
-            script.append("echo VitaLite Self-Update v").append(newVersion).append("\n");
-            script.append("echo Waiting for VitaLite to close...\n");
-            script.append("timeout /t 3 /nobreak >nul\n");
-            script.append("echo Downloading new version...\n");
-            script.append("powershell -Command \"Invoke-WebRequest -Uri '").append(downloadUrl)
-                  .append("' -OutFile '").append(currentJarPath).append("'\"\n");
-            script.append("echo Restarting VitaLite...\n");
-            script.append(buildRestartCommand()).append("\n");
-            script.append("del \"%~f0\"\n"); // Self-delete script
-        } else {
-            script.append("#!/bin/bash\n");
-            script.append("echo \"VitaLite Self-Update v").append(newVersion).append("\"\n");
-            script.append("echo \"Waiting for VitaLite to close...\"\n");
-            script.append("sleep 3\n");
-            script.append("echo \"Downloading new version...\"\n");
-            script.append("curl -L \"").append(downloadUrl).append("\" -o \"").append(currentJarPath).append("\"\n");
-            script.append("echo \"Restarting VitaLite...\"\n");
-            script.append(buildRestartCommand()).append(" &\n");
-            script.append("rm \"$0\"\n"); // Self-delete script
-        }
-        
-        Files.write(scriptPath, script.toString().getBytes());
-        
-        if (!isWindows) {
-            scriptPath.toFile().setExecutable(true);
-        }
-        
-        return scriptPath;
-    }
-    
-    /**
-     * Builds the download URL for the specified version.
-     * @param version version to download
-     * @return download URL
-     */
-    private String buildDownloadUrl(final String version) {
-        return "https://github.com/Tonic-Box/VitaLite/releases/download/v" + version + "/VitaLite-" + version + "-shaded.jar";
-    }
-    
-    /**
-     * Gets the command to execute the update script.
-     * @param scriptPath path to the update script
-     * @return command array for ProcessBuilder
-     */
-    private List<String> getUpdateCommand(final Path scriptPath) {
-        final List<String> command = new ArrayList<>();
-        final boolean isWindows = System.getProperty("os.name").toLowerCase().contains("windows");
-        
-        if (isWindows) {
-            command.add("cmd");
-            command.add("/c");
-        } else {
-            command.add("/bin/bash");
-        }
-        
-        command.add(scriptPath.toString());
-        return command;
-    }
-    
-    /**
-     * Builds the restart command that preserves current JVM and program arguments.
-     * @return restart command string
-     */
-    private String buildRestartCommand() {
-        final StringBuilder cmd = new StringBuilder();
+            final int result = JOptionPane.showConfirmDialog(
+                null,
+                "<html><body style='width: 350px;'>" +
+                "<h3>VitaLite Update Available</h3>" +
+                "<p><b>Current VitaLite Version:</b> v" + currentVitaLiteVersion + "</p>" +
+                "<p><b>Target RuneLite Version:</b> v" + targetRLVersion + "</p>" +
+                "<br>" +
+                "<p>A VitaLite release is available for your RuneLite version.</p>" +
+                "<p>Would you like to open the download page?</p>" +
+                "</body></html>",
+                "Update Available",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.INFORMATION_MESSAGE
+            );
 
-        final String javaHome = System.getProperty("java.home");
-        final String javaBin = javaHome + System.getProperty("file.separator") + 
-                              "bin" + System.getProperty("file.separator") + "java";
-        
-        cmd.append("\"").append(javaBin).append("\"");
-
-        for (final String jvmArg : jvmArgs) {
-            cmd.append(" ").append(jvmArg);
-        }
-
-        cmd.append(" -jar \"").append(currentJarPath).append("\"");
-
-        for (final String programArg : programArgs) {
-            cmd.append(" ").append(programArg);
-        }
-        
-        return cmd.toString();
-    }
-    
-    /**
-     * Determines the path to the current running JAR file.
-     * @return path to current JAR, or null if not running from JAR
-     */
-    private String getCurrentJarPath() {
-        try {
-            final String jarPath = SelfUpdate.class.getProtectionDomain()
-                    .getCodeSource()
-                    .getLocation()
-                    .toURI()
-                    .getPath();
-
-            if (System.getProperty("os.name").toLowerCase().contains("windows") && 
-                jarPath.startsWith("/")) {
-                return jarPath.substring(1);
+            if (result == JOptionPane.YES_OPTION) {
+                openReleasePageInBrowser(targetRLVersion);
             }
-            
-            return jarPath;
-        } catch (final Exception e) {
-            System.err.println("Warning: Could not determine current JAR path: " + e.getMessage());
-            return null;
-        }
-    }
-    
-    /**
-     * Gets the current JVM arguments from the runtime.
-     * @return list of JVM arguments
-     */
-    private List<String> getCurrentJvmArgs() {
-        final List<String> args = new ArrayList<>();
-        
-        try {
-            final RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
 
-            args.addAll(runtimeMxBean.getInputArguments());
-        } catch (final Exception e) {
-            System.err.println("Warning: Could not retrieve JVM arguments: " + e.getMessage());
-        }
-        
-        return args;
-    }
-    
-    /**
-     * Gets the current program arguments (placeholder - would need to be passed from main).
-     * @return list of program arguments
-     */
-    private List<String> getCurrentProgramArgs() {
-        final List<String> args = new ArrayList<>();
-
-        if (Main.optionsParser.isNoPlugins()) {
-            args.add("-noPlugins");
-        }
-        if (Main.optionsParser.isIncognito()) {
-            args.add("-incognito");
-        }
-        if (Main.optionsParser.isMin()) {
-            args.add("-min");
-        }
-        if (Main.optionsParser.getRsdump() != null) {
-            args.add("--rsdump");
-            args.add(Main.optionsParser.getRsdump());
-        }
-        
-        return args;
-    }
-    
-    /**
-     * Shows an update dialog to the user with update information.
-     * @param currentVersion current version string
-     * @param latestVersion latest available version string  
-     * @return true if user confirms update, false if cancelled
-     */
-    private boolean showUpdateDialog(final String currentVersion, final String latestVersion) {
-        try {
-            final JDialog dialog = new JDialog();
-            dialog.setTitle("VitaLite Update Available");
-            dialog.setModal(true);
-            dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-            dialog.setResizable(false);
-            final JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-            mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-            final JLabel titleLabel = new JLabel("Update Available", SwingConstants.CENTER);
-            titleLabel.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
-            mainPanel.add(titleLabel, BorderLayout.NORTH);
-            final JPanel versionPanel = new JPanel(new BorderLayout(5, 5));
-            final JLabel currentLabel = new JLabel("Current: v" + currentVersion, SwingConstants.CENTER);
-            final JLabel latestLabel = new JLabel("Latest: v" + latestVersion, SwingConstants.CENTER);
-            final JLabel infoLabel = new JLabel("<html><center>VitaLite will download and install the update,<br>then restart automatically.</center></html>", SwingConstants.CENTER);
-            versionPanel.add(currentLabel, BorderLayout.NORTH);
-            versionPanel.add(latestLabel, BorderLayout.CENTER);
-            versionPanel.add(infoLabel, BorderLayout.SOUTH);
-            mainPanel.add(versionPanel, BorderLayout.CENTER);
-            final JPanel buttonPanel = new JPanel(new FlowLayout());
-            final JButton updateButton = new JButton("Update Now");
-            final JButton cancelButton = new JButton("Cancel");
-            final boolean[] result = {false};
-            updateButton.addActionListener(e -> {
-                result[0] = true;
-                dialog.dispose();
-            });
-            cancelButton.addActionListener(e -> {
-                result[0] = false;
-                dialog.dispose();
-            });
-            buttonPanel.add(updateButton);
-            buttonPanel.add(cancelButton);
-            mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-            dialog.add(mainPanel);
-            dialog.pack();
-            dialog.setLocationRelativeTo(null); // Center on screen
-            final Dimension minSize = new Dimension(350, 200);
-            dialog.setMinimumSize(minSize);
-            dialog.setPreferredSize(minSize);
-            dialog.setVisible(true);
-            return result[0];
-            
         } catch (final Exception e) {
             System.err.println("Failed to show update dialog: " + e.getMessage());
-            return showConsoleConfirmation(currentVersion, latestVersion);
+            showConsoleUpdateMessage(currentVitaLiteVersion, targetRLVersion);
+        }
+    }
+
+    /**
+     * Shows a dialog when no VitaLite release exists for the current RuneLite version.
+     * @param rlVersion the RuneLite version
+     */
+    private void showWaitForUpdateDialog(final String rlVersion) {
+        try {
+            JOptionPane.showMessageDialog(
+                null,
+                "<html><body style='width: 300px;'>" +
+                "<h3>Please Wait for Update</h3>" +
+                "<p><b>RuneLite Version:</b> v" + rlVersion + "</p>" +
+                "<br>" +
+                "<p>No VitaLite release is available for your current RuneLite version yet.</p>" +
+                "<p>Please wait for an update to be released.</p>" +
+                "</body></html>",
+                "Wait for Update",
+                JOptionPane.INFORMATION_MESSAGE
+            );
+
+        } catch (final Exception e) {
+            System.err.println("Failed to show wait dialog: " + e.getMessage());
+            System.out.println("=== Please Wait for Update ===");
+            System.out.println("RuneLite version: v" + rlVersion);
+            System.out.println("No VitaLite release available for this RuneLite version yet.");
         }
     }
     
     /**
-     * Fallback console confirmation if GUI dialog fails.
+     * Shows a dialog when client is out of date (unable to check for updates).
+     */
+    private void showOutOfDateDialog() {
+        try {
+            JOptionPane.showMessageDialog(
+                null,
+                "<html><body style='width: 300px;'>" +
+                "<h3>Update Check Failed</h3>" +
+                "<p>Client may be out of date. Please check for updates manually.</p>" +
+                "<br>" +
+                "<p>Visit the VitaLite GitHub releases page for the latest version.</p>" +
+                "</body></html>",
+                "Update Check Failed",
+                JOptionPane.WARNING_MESSAGE
+            );
+
+        } catch (final Exception e) {
+            System.err.println("Failed to show out of date dialog: " + e.getMessage());
+            System.out.println("=== Update Check Failed ===");
+            System.out.println("Client may be out of date. Please check for updates manually.");
+        }
+    }
+    
+    /**
+     * Opens the GitHub release page in the system's default browser.
+     * @param version the version to link to
+     */
+    private void openReleasePageInBrowser(final String version) {
+        try {
+            final String releaseUrl = "https://github.com/Tonic-Box/VitaLite/releases/tag/v" + version;
+
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(URI.create(releaseUrl));
+                System.out.println("Opened release page: " + releaseUrl);
+            } else {
+                System.out.println("Desktop browsing not supported. Release URL: " + releaseUrl);
+            }
+
+        } catch (final Exception e) {
+            System.err.println("Failed to open browser: " + e.getMessage());
+            System.out.println("Please visit: https://github.com/Tonic-Box/VitaLite/releases/tag/v" + version);
+        }
+    }
+    
+    /**
+     * Fallback console message when GUI dialogs fail.
      * @param currentVersion current version
      * @param latestVersion latest version
-     * @return true (auto-confirm in non-interactive mode)
      */
-    private boolean showConsoleConfirmation(final String currentVersion, final String latestVersion) {
+    private void showConsoleUpdateMessage(final String currentVersion, final String latestVersion) {
         System.out.println("=== VitaLite Update Available ===");
         System.out.println("Current: v" + currentVersion);
         System.out.println("Latest:  v" + latestVersion);
-        System.out.println("VitaLite will update and restart automatically in 3 seconds...");
-        
-        try {
-            TimeUnit.SECONDS.sleep(3);
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return false;
-        }
-        
-        return true;
+        System.out.println("Please visit: https://github.com/Tonic-Box/VitaLite/releases/tag/v" + latestVersion);
     }
+    
 }

@@ -136,8 +136,6 @@ public class GameManager extends Overlay {
     {
     }
 
-    private NavigationButton titleBarButton;
-
     private GameManager()
     {
         OverlayManager overlayManager = Static.getInjector().getInstance(OverlayManager.class);
@@ -160,22 +158,6 @@ public class GameManager extends Overlay {
     private volatile List<WorldPoint> pathPoints = null;
     private volatile List<WorldPoint> testPoints = null;
 
-    private void jShell()
-    {
-        if(titleBarButton != null)
-            return;
-
-        final BufferedImage iconImage = ImageUtil.loadImageResource(CodeEvalFrame.class, "jshell.png");
-        titleBarButton = NavigationButton.builder()
-                .tooltip("JavaShell")
-                .icon(iconImage)
-                .onClick(() -> CodeEvalFrame.get().toggle())
-                .build();
-
-        ClientToolbar clientToolbar = Static.getInjector().getInstance(ClientToolbar.class);
-        clientToolbar.addNavigation(titleBarButton);
-    }
-
     @Subscribe
     public void onGameTick(GameTick event)
     {
@@ -187,8 +169,6 @@ public class GameManager extends Overlay {
     {
         if(event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
             tickCount = 0;
-
-        jShell();
     }
 
     @Subscribe

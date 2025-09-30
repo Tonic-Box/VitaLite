@@ -9,7 +9,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Scanner;
+
+import com.tonic.Static;
 import com.tonic.services.GameManager;
+import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -262,5 +266,16 @@ public class CodeEvalFrame extends JFrame {
         }
     }
 
+    public static void install()
+    {
+        final BufferedImage iconImage = ImageUtil.loadImageResource(CodeEvalFrame.class, "jshell.png");
+        final NavigationButton titleBarButton = NavigationButton.builder()
+                .tooltip("JavaShell")
+                .icon(iconImage)
+                .onClick(() -> CodeEvalFrame.get().toggle())
+                .build();
 
+        ClientToolbar clientToolbar = Static.getInjector().getInstance(ClientToolbar.class);
+        clientToolbar.addNavigation(titleBarButton);
+    }
 }
