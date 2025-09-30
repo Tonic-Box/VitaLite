@@ -6,6 +6,17 @@ VitaLite is an enhanced RuneLite client loader that provides additional function
 
 VitaLite is a RuneLite client wrapper that adds extra features and safety options while keeping the familiar RuneLite experience. It provides additional customization, enhanced security features, and extended plugin support.
 
+## General User Release
+Grab latest version from releases and download the zip. Either use the provided scripts for launching, or launch jar manually. If you launch manually just keep in mind it requires jdk11 to run.
+
+### Getting Started
+1. **Download**: Get the latest VitaLite release
+2. **Launch**: Run the appropriate script for your OS or double-click the JAR
+3. **Configure**: Use in-client settings or command line arguments
+
+### Requirements
+- Java 11 (jdk)
+
 ## Key Features
 
 ### 🎮 Enhanced Gaming Experience
@@ -90,12 +101,9 @@ The main executable will be located at `build/libs/VitaLite-*-shaded.jar`.
 2. Run the `com.tonic.VitaLite` main class
 ```
 
-## Getting Started
-
-1. **Download**: Get the latest VitaLite release
-2. **Install**: No installation needed - it's a standalone JAR file
-3. **Launch**: Double-click the JAR or use command line options
-4. **Configure**: Use in-client settings or command line arguments
+## Troubleshooting
+1. Ensure your project jdk and build level are both set to java 11
+2. Ensure your gradle version is 8.10 and set the java 11
 
 ## Plugin Support
 
