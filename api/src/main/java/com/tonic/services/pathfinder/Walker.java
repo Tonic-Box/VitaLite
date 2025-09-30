@@ -222,7 +222,7 @@ public class Walker
                 {
                     prayers = null;
                     healthHandler = 0;
-                    running = false;
+                    System.out.println("Pathfinder took: " + (client.getTickCount() - timer) + " ticks");
                     timer = 0;
                     return;
                 }
@@ -253,7 +253,7 @@ public class Walker
                 {
                     prayers = null;
                     healthHandler = 0;
-                    running = false;
+                    System.out.println("Pathfinder took: " + (client.getTickCount() - timer) + " ticks");
                     timer = 0;
                     return;
                 }
@@ -263,8 +263,8 @@ public class Walker
             prayers = null;
             healthHandler = 0;
             running = false;
-            timer = 0;
             System.out.println("Pathfinder took: " + (client.getTickCount() - timer) + " ticks");
+            timer = 0;
         }
     }
 
