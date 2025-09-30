@@ -52,6 +52,9 @@ public class Walker
     private Teleport teleport;
     private final List<Runnable> multiSteps = new ArrayList<>();
     private int multiStepPointer = 0;
+    @Getter
+    @Setter
+    private boolean useTeleports = true;
 
     private Walker()
     {
@@ -128,6 +131,7 @@ public class Walker
         running = true;
 
         reset();
+        this.useTeleports = useTeleports;
         TransportLoader.refreshTransports();
         final Pathfinder engine = new Pathfinder(targets);
 
@@ -147,6 +151,7 @@ public class Walker
         running = true;
 
         reset();
+        this.useTeleports = useTeleports;
         TransportLoader.refreshTransports();
         final Pathfinder engine = new Pathfinder(target);
 
@@ -166,6 +171,7 @@ public class Walker
         running = true;
 
         reset();
+        this.useTeleports = useTeleports;
         if(teleport != null)
             this.teleport = teleport;
         walkTo(steps);
@@ -181,6 +187,7 @@ public class Walker
         timer = 0;
         multiSteps.clear();
         multiStepPointer = 0;
+        this.useTeleports = useTeleports;
 
         if(healthHandler == 0)
         {
@@ -338,10 +345,7 @@ public class Walker
                 timeout = 0;
                 if(steps.isEmpty())
                     return true;
-                WorldPoint wp = steps.get(steps.size() - 1).getPosition();
-                steps.clear();
-                Pathfinder engine = new Pathfinder(wp);
-                steps.addAll(engine.find());
+                rePath(steps);
                 return !steps.isEmpty();
             }
             recalcs = 0;
@@ -446,10 +450,7 @@ public class Walker
             {
                 return !steps.isEmpty();
             }
-            WorldPoint wp = steps.get(steps.size() - 1).getPosition();
-            steps.clear();
-            Pathfinder engine = new Pathfinder(wp);
-            steps.addAll(engine.find());
+            rePath(steps);
             return true;
         }
 
@@ -500,22 +501,9 @@ public class Walker
         }
         else {
             Logger.info("[Pathfinder] Failed to find Passthrough, atempting to circumvent");
-            if (steps.size() <= 6) {
-                timeout++;
-                return false;
-            }
-            Step next;
-            for (int i = 1; i <= 6; i++) {
-                next = steps.get(i);
-                if (!Location.isReachable(client.getLocalPlayer().getWorldLocation(), next.getPosition())) {
-                    MovementAPI.walkTowards(next.getPosition());
-                    steps.subList(0, i).clear();
-                    return true;
-                }
-            }
+            rePath(steps);
+            return true;
         }
-        timeout++;
-        return false;
     }
 
     private void manageRunEnergyAndHitpoints()
@@ -578,6 +566,18 @@ public class Walker
                     InventoryAPI.interact(pot, 1);
                 }
             }
+        }
+    }
+
+    private void rePath(List<Step> steps)
+    {
+        WorldPoint wp = steps.get(steps.size() - 1).getPosition();
+        steps.clear();
+        Pathfinder engine = new Pathfinder(wp);
+        steps.addAll(engine.find());
+        if(useTeleports)
+        {
+            teleport = engine.getTeleport();
         }
     }
 }

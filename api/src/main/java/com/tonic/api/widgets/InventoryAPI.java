@@ -390,6 +390,12 @@ public class InventoryAPI
     }
 
     public static int getCount(int id) {
+        return getCount(id, true);
+    }
+
+    public static int getCount(int id, boolean canonicalize) {
+        if(canonicalize)
+            return InventoryQuery.fromInventoryId(InventoryID.INV).withCanonicalId(id).count();
         return InventoryQuery.fromInventoryId(InventoryID.INV).withId(id).count();
     }
 }

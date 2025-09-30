@@ -154,7 +154,7 @@ public enum PrayerAPI {
     public boolean hasLevelFor()
     {
         Client client = Static.getClient();
-        return client.getRealSkillLevel(Skill.PRAYER) >= level;
+        return Static.invoke(() -> client.getRealSkillLevel(Skill.PRAYER) >= level);
     }
 
     /**

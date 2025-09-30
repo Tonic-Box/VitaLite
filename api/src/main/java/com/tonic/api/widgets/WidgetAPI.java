@@ -299,7 +299,7 @@ public class WidgetAPI
      */
     public static boolean isVisible(Widget widget)
     {
-        return widget != null && !widget.isHidden() && !widget.isSelfHidden();
+        return Static.invoke(() -> widget != null && !widget.isHidden() && !widget.isSelfHidden());
     }
 
     /**

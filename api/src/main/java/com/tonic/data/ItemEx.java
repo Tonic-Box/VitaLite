@@ -31,7 +31,7 @@ public class ItemEx {
 
     public int getCanonicalId() {
         ItemManager itemManager = Static.getInjector().getInstance(ItemManager.class);
-        return itemManager.canonicalize(item.getId());
+        return Static.invoke(() -> itemManager.canonicalize(item.getId()));
     }
 
     public int getLinkedNoteId() {

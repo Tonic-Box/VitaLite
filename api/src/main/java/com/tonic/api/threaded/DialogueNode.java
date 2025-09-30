@@ -69,6 +69,11 @@ public class DialogueNode
             {
                 node = nodes.get(counter);
 
+                if(node == null)
+                {
+                    return;
+                }
+
                 if(node instanceof String)
                 {
                     if(DialogueAPI.selectOption((String)node))
