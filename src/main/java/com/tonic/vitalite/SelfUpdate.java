@@ -187,7 +187,7 @@ public final class SelfUpdate {
      */
     private static void openReleasePageInBrowser(final String version) {
         try {
-            final String releaseUrl = "https://github.com/Tonic-Box/VitaLite/releases/tag/v" + version;
+            final String releaseUrl = "https://github.com/Tonic-Box/VitaLite/releases/tag/" + version;
 
             if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                 Desktop.getDesktop().browse(URI.create(releaseUrl));
