@@ -103,16 +103,17 @@ public final class SelfUpdate {
      * @param currentVitaLiteVersion current VitaLite version string
      * @param targetRLVersion target RuneLite version string
      */
-    public static void showUpdateAvailableDialog(final String currentVitaLiteVersion, final String targetRLVersion) {
+    public static void showUpdateAvailableDialog(final String currentVitaLiteVersion, final String targetRLVersion, boolean vita) {
         try {
+            String ident = vita ? "VitaLite" : "RuneLite";
             final int result = JOptionPane.showConfirmDialog(
                 null,
                 "<html><body style='width: 350px;'>" +
                 "<h3>VitaLite Update Available</h3>" +
                 "<p><b>Current VitaLite Version:</b> v" + currentVitaLiteVersion + "</p>" +
-                "<p><b>Target RuneLite Version:</b> v" + targetRLVersion + "</p>" +
+                "<p><b>Target " + ident + " Version:</b> v" + targetRLVersion + "</p>" +
                 "<br>" +
-                "<p>A VitaLite release is available for your RuneLite version.</p>" +
+                "<p>A VitaLite release is available.</p>" +
                 "<p>Would you like to open the download page?</p>" +
                 "</body></html>",
                 "Update Available",

@@ -32,7 +32,7 @@ public class VitaLite {
                 if(Versioning.isRunningFromShadedJar())
                 {
                     Main.optionsParser.parse(args);
-                    SelfUpdate.showUpdateAvailableDialog(currentVersion, latestVitaRelease);
+                    SelfUpdate.showUpdateAvailableDialog(currentVersion, latestVitaRelease, true);
                 }
                 System.err.println("Warning: You are running VitaLite version " + currentVersion + " but the latest version is " + latestVitaRelease + ". Please update to the latest version.");
                 return;
