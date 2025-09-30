@@ -84,7 +84,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         {
             mousePressedTime = 32767;
         }
-        client.setClientMouseLastPressedMillis(client.getClientMouseLastPressedMillis());
+        client.setClientMouseLastPressedMillis(ms);
 
         int mpt = (int) mousePressedTime;
         int mouseInfo = mouseButton + (mpt << 1);
