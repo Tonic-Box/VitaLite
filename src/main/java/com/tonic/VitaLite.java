@@ -12,30 +12,27 @@ import static com.tonic.vitalite.Versioning.getVitaLiteVersion;
 public class VitaLite {
     public static void main(String[] args) {
         try {
-            String liveRlVersion = getLiveRuneliteVersion();
             String currentVersion = getVitaLiteVersion();
-            if(!currentVersion.startsWith(liveRlVersion))
+            if(Versioning.isRunningFromShadedJar())
             {
-                System.out.println("VitaLite version " + currentVersion + " is out of date. Latest version is " + liveRlVersion + ".");
-                if(Versioning.isRunningFromShadedJar())
+                String liveRlVersion = getLiveRuneliteVersion();
+                if(!currentVersion.startsWith(liveRlVersion))
                 {
+                    System.out.println("VitaLite version " + currentVersion + " is out of date. Latest version is " + liveRlVersion + ".");
                     Main.optionsParser.parse(args);
                     new SelfUpdate().checkAndUpdate();
+                    System.err.println("Warning: You are running VitaLite version " + currentVersion + " but the latest version is " + liveRlVersion + ". Please update to the latest version.");
+                    return;
                 }
-                System.err.println("Warning: You are running VitaLite version " + currentVersion + " but the latest version is " + liveRlVersion + ". Please update to the latest version.");
-                return;
-            }
-            String latestVitaRelease = Versioning.getLatestVitaLiteReleaseTag();
-            if(!currentVersion.equals(latestVitaRelease))
-            {
-                System.out.println("VitaLite version " + currentVersion + " is out of date. Latest version is " + latestVitaRelease + ".");
-                if(Versioning.isRunningFromShadedJar())
+                String latestVitaRelease = Versioning.getLatestVitaLiteReleaseTag();
+                if(!currentVersion.equals(latestVitaRelease))
                 {
+                    System.out.println("VitaLite version " + currentVersion + " is out of date. Latest version is " + latestVitaRelease + ".");
                     Main.optionsParser.parse(args);
                     SelfUpdate.showUpdateAvailableDialog(currentVersion, latestVitaRelease, true);
+                    System.err.println("Warning: You are running VitaLite version " + currentVersion + " but the latest version is " + latestVitaRelease + ". Please update to the latest version.");
+                    return;
                 }
-                System.err.println("Warning: You are running VitaLite version " + currentVersion + " but the latest version is " + latestVitaRelease + ". Please update to the latest version.");
-                return;
             }
             System.out.println("VitaLite version " + currentVersion + " is up to date.");
             String[] newArgs = new String[args.length + 1];
