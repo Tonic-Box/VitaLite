@@ -307,20 +307,6 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         SwingUtilities.invokeLater(() -> transportsEditor.setVisible(!transportsEditor.isVisible()));
     }
 
-    private void openCodeEvaluator()
-    {
-        try
-        {
-            Class<?> codeEvalFrameClass = Static.getClient().getClass().getClassLoader().loadClass("com.tonic.services.codeeval.CodeEvalFrame");
-            java.lang.reflect.Method getMethod = codeEvalFrameClass.getMethod("get");
-            getMethod.invoke(null);
-        }
-        catch (Exception e)
-        {
-            Logger.error("Failed to open Code Evaluator: " + e.getMessage());
-        }
-    }
-
     private void checkMouseValues()
     {
         Object client = Static.getClient();

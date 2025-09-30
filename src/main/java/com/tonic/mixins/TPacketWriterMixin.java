@@ -8,6 +8,7 @@ import com.tonic.model.ui.VitaLiteOptionsPanel;
 import com.tonic.packets.PacketMapReader;
 import com.tonic.packets.types.MapEntry;
 import lombok.Getter;
+import net.runelite.api.Client;
 import net.runelite.api.widgets.WidgetInfo;
 
 import java.util.HashMap;
@@ -77,18 +78,16 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     public void clickPacket(int mouseButton, int mouseX, int mouseY)
     {
         long ms = System.currentTimeMillis();
-        int mousePressedTime = (int)((ms - client.getMouseHandler().getMouseLastPressedMillis()));
-        if (mousePressedTime < 0)
-        {
-            mousePressedTime = 0;
-        }
+        client.getMouseHandler().setMouseLastPressedMillis(ms);
+        long mousePressedTime = (client.getMouseHandler().getMouseLastPressedMillis() - client.getClientMouseLastPressedMillis());
         if (mousePressedTime > 32767)
         {
             mousePressedTime = 32767;
         }
-        client.getMouseHandler().setMouseLastPressedMillis(ms);
-        client.setClientMouseLastPressedMillis(ms);
-        int mouseInfo = (mousePressedTime << 1) + (mouseButton);
+        client.setClientMouseLastPressedMillis(client.getClientMouseLastPressedMillis());
+
+        int mpt = (int) mousePressedTime;
+        int mouseInfo = mouseButton + (mpt << 1);
         MapEntry entry = PacketMapReader.get("OP_MOUSE_CLICK");
         Map<String,Object> args = new HashMap<>();
         args.put("mouseInfo", mouseInfo);

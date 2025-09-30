@@ -5237,8 +5237,8 @@
         "owner": "MouseHandler",
         "ownerObfuscatedName": "by",
         "descriptor": "J",
-        "getter": 4975405132303531979,
-        "setter": -1903374584937432609,
+        "getter": -4975405132303531979,
+        "setter": 2324077938001760797,
         "isStatic": true
       },
       {
@@ -8288,7 +8288,7 @@
         "ownerObfuscatedName": "client",
         "descriptor": "J",
         "getter": -2032803268009057725,
-        "setter": -3476848633071409191,
+        "setter": 7781142521423772267,
         "isStatic": true
       },
       {
