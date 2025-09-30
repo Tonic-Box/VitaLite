@@ -5,7 +5,6 @@ import com.tonic.Static;
 import com.tonic.model.Guice;
 import com.tonic.services.CallStackFilter;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -29,6 +28,8 @@ public class Install {
         while (classesToLoad.peek() != null) {
             ClassByte cb = classesToLoad.poll();
             try {
+                if(Main.CLASSLOADER.libraryExists(cb.name))
+                  continue;
                 Class<?> cls = Main.CLASSLOADER.lookupClass(cb.name, cb.bytes);
                 if (cls == null)
                     continue;

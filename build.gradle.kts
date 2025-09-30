@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.tonic"
-version = "1.11.18.2"
+version = "1.11.18.3"
 
 repositories {
     mavenCentral()
@@ -176,9 +176,6 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.9")
 
     implementation(project(":base-api"))
-
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation("net.sf.trove4j:trove4j:3.0.3")
     implementation("it.unimi.dsi:fastutil:8.5.11")
