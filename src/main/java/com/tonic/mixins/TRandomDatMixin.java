@@ -56,6 +56,12 @@ public abstract class TRandomDatMixin
                 buffer.writeByte(-1);
             }
         }
+        else
+        {
+            for(byte b : cachedData) {
+                buffer.writeByte(b);
+            }
+        }
         Logger.info("Using cached random.dat data for user " + identifier);
         return false;
     }
