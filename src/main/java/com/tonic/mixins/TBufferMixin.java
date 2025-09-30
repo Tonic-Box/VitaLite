@@ -1,6 +1,7 @@
 package com.tonic.mixins;
 
 import com.tonic.api.TBuffer;
+import com.tonic.injector.annotations.Inject;
 import com.tonic.injector.annotations.Mixin;
 import com.tonic.injector.annotations.Shadow;
 import com.tonic.util.TextUtil;
@@ -16,22 +17,28 @@ public abstract class TBufferMixin implements TBuffer
     @Shadow("offset")
     public int offset;
 
+    @Inject
     @Override
-    @Shadow("writeByte")
-    public abstract void writeByte(int var);
+    public void writeByte(int val)
+    {
+        array[++offset - 1] = (byte)val;
+    }
 
+    @Inject
     @Override
     public void writeByteAdd(int var)
     {
         writeByte(var + 128);
     }
 
+    @Inject
     @Override
     public void writeByteNeg(int var)
     {
         writeByte(-var);
     }
 
+    @Inject
     @Override
     public void writeByteSub(int var)
     {
@@ -40,6 +47,7 @@ public abstract class TBufferMixin implements TBuffer
 
     //shorts
 
+    @Inject
     @Override
     public void writeShort(int var)
     {
@@ -47,6 +55,7 @@ public abstract class TBufferMixin implements TBuffer
         writeByte(var);
     }
 
+    @Inject
     @Override
     public void writeShortLE(int var)
     {
@@ -54,6 +63,7 @@ public abstract class TBufferMixin implements TBuffer
         writeByte(var >> 8);
     }
 
+    @Inject
     @Override
     public void writeShortAdd(int var)
     {
@@ -61,6 +71,7 @@ public abstract class TBufferMixin implements TBuffer
         writeByte(var + 128);
     }
 
+    @Inject
     @Override
     public void writeShortAddLE(int var)
     {
@@ -70,6 +81,7 @@ public abstract class TBufferMixin implements TBuffer
 
     //ints
 
+    @Inject
     @Override
     public void writeIntME(int var)
     {
@@ -79,6 +91,7 @@ public abstract class TBufferMixin implements TBuffer
         writeByte(var >> 8);
     }
 
+    @Inject
     @Override
     public void writeIntLE(int var)
     {
@@ -88,6 +101,7 @@ public abstract class TBufferMixin implements TBuffer
         writeByte(var >> 24);
     }
 
+    @Inject
     @Override
     public void writeInt(int var)
     {
@@ -97,6 +111,7 @@ public abstract class TBufferMixin implements TBuffer
         writeByte(var);
     }
 
+    @Inject
     @Override
     public void writeIntIME(int var)
     {
@@ -106,6 +121,7 @@ public abstract class TBufferMixin implements TBuffer
         writeByte(var >> 16);
     }
 
+    @Inject
     @Override
     public void writeLengthByte(int var)
     {
@@ -114,6 +130,7 @@ public abstract class TBufferMixin implements TBuffer
         }
     }
 
+    @Inject
     @Override
     public void writeStringCp1252NullTerminated(String var)
     {
@@ -126,6 +143,7 @@ public abstract class TBufferMixin implements TBuffer
         }
     }
 
+    @Inject
     @Override
     public void writeStringCp1252NullCircumfixed(String var)
     {
