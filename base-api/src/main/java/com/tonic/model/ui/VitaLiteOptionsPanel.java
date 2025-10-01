@@ -206,6 +206,15 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         contentPanel.add(debugLabel);
         contentPanel.add(Box.createVerticalStrut(12));
 
+        FancyButton checkButton = new FancyButton("Check Platform Info");
+        checkButton.addActionListener(e -> {
+            checkShit();
+            Logger.info("Platform info checked and logged.");
+        });
+        contentPanel.add(checkButton);
+
+        contentPanel.add(Box.createVerticalStrut(12));
+
         FancyButton mouseButton = new FancyButton("Check Mouse Values");
         mouseButton.addActionListener(e -> checkMouseValues());
         contentPanel.add(mouseButton);
@@ -326,6 +335,15 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         short info = (short)(time << 1);
 
         Logger.info("Client last pressed: " + client_latsPressed + ", MouseHandler last pressed: " + mh_lastPressed + ", Diff: " + time + ", Info: " + info);
+    }
+
+    private void checkShit()
+    {
+        Object platInfo = ReflectBuilder.ofClass("le")
+                .staticField("wc")
+                .get();
+
+        ReflectUtil.inspectNonStaticFields(platInfo);
     }
 
     private JPanel createToggleOption(String title, String description, ToggleSlider toggle, Runnable onClick) {
