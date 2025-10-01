@@ -71,6 +71,6 @@ public class TTaskMixin
                 Logger.error(e);
             }
         }
-        return false;
+        return true;
     }
 }
