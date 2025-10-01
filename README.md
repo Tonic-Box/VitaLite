@@ -41,14 +41,16 @@ VitaLite supports several command-line arguments for customization:
 
 ### Core Options
 
-| Option       | Type | Description                                          |
-|--------------|------|------------------------------------------------------|
-| `--rsdump`   | String | Path to dump the gamepack to (optional)              |
+| Option       | Type    | Description                                          |
+|--------------|---------|------------------------------------------------------|
+| `--rsdump`   | String  | Path to dump the gamepack to (optional)              |
 | `-noPlugins` | Boolean | Disables loading of core plugins                     |
 | `-min`       | Boolean | Runs jvm with minimal alotted memory.                |
 | `-noMusic`   | Boolean | Prevent the loading of music tracks                  |
 | `-incognito` | Boolean | Visually display as 'RuneLite' instead of 'VitaLite' |
 | `-help`      | Boolean | Displays help information about command line options |
+| `-proxy`     | String  | Set a proxy server to use (e.g., ip:port or ip:port:username:password) |
+
 
 ### Usage Examples
 

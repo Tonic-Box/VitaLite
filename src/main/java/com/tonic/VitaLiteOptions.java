@@ -43,12 +43,9 @@ public class VitaLiteOptions extends OptionsParser
     )
     private boolean noMusic = false;
 
-    private void process()
-    {
-        if(min)
-        {
-            noPlugins = true;
-            noMusic = true;
-        }
-    }
+    @CLIArgument(
+            name = "proxy",
+            description = "Set a proxy server to use (e.g., ip:port or ip:port:username:password)"
+    )
+    private String proxy = null;
 }

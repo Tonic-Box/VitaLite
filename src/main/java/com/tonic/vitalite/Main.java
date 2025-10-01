@@ -13,6 +13,7 @@ import com.tonic.injector.Injector;
 import com.tonic.injector.RLInjector;
 import com.tonic.model.Libs;
 import com.tonic.services.CatFacts;
+import com.tonic.services.proxy.ProxyManager;
 
 import javax.swing.*;
 import java.io.File;
@@ -36,6 +37,11 @@ public class Main {
         {
             System.err.println("Safe launch not satisfied, VitaLite will not start.");
             System.exit(0);
+        }
+        if(optionsParser.getProxy() != null)
+        {
+            System.out.println("Using Proxy: " + optionsParser.getProxy());
+            ProxyManager.process(optionsParser.getProxy());
         }
         JvmParams.set();
         RLUpdater.run();

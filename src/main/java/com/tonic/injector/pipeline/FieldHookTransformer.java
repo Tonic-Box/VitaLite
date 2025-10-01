@@ -49,9 +49,6 @@ public class FieldHookTransformer {
     {
         for(FieldHookDef hook : fieldHooks)
         {
-            if(!hook.isStatic() && !hook.getHookClass().equals(classNode.name))
-                continue;
-
             for(MethodNode methodNode : classNode.methods)
             {
                 instrument(methodNode, hook);
@@ -67,6 +64,9 @@ public class FieldHookTransformer {
     private static void instrument(MethodNode method, FieldHookDef hook) {
         String desc = hook.getTarget().getDescriptor();
         boolean isStatic = hook.isStatic();
+
+        if((method.name + method.desc).equals(hook.getHookMethod() + hook.getHookDesc()))
+            return;
 
         List<AbstractInsnNode> fieldSets = getInjectionPoints(method, hook, isStatic);
         for (AbstractInsnNode fieldInsn : fieldSets) {
@@ -106,15 +106,19 @@ public class FieldHookTransformer {
                 method.instructions.insertBefore(fieldInsn, wrapper);
                 method.instructions.insert(fieldInsn, continueLabel);
             } else {
-                if (isWideType(desc)) {
-                    wrapper.add(new InsnNode(Opcodes.DUP2_X1));
-                    wrapper.add(new InsnNode(Opcodes.POP2));
-                    wrapper.add(new InsnNode(Opcodes.DUP2));
-                } else {
-                    wrapper.add(new InsnNode(Opcodes.DUP_X1));
-                    wrapper.add(new InsnNode(Opcodes.POP));
-                    wrapper.add(new InsnNode(Opcodes.DUP));
-                }
+                //dupe obj ref {obj, value} -> {obj, value, obj}
+                wrapper.add(new InsnNode(Opcodes.DUP2));
+
+                //wrapper.add(new InsnNode(getDupOpcode(desc)));
+//                if (isWideType(desc)) {
+//                    wrapper.add(new InsnNode(Opcodes.DUP2_X1));
+//                    wrapper.add(new InsnNode(Opcodes.POP2));
+//                    wrapper.add(new InsnNode(Opcodes.DUP2));
+//                } else {
+//                    wrapper.add(new InsnNode(Opcodes.DUP_X1));
+//                    wrapper.add(new InsnNode(Opcodes.POP));
+//                    wrapper.add(new InsnNode(Opcodes.DUP));
+//                }
                 
                 if (hook.getTarget().getGetter() != null) {
                     Number multiplier = hook.getTarget().getGetter();
@@ -128,7 +132,7 @@ public class FieldHookTransformer {
                 }
                 
                 wrapper.add(new MethodInsnNode(
-                        Opcodes.INVOKESTATIC,
+                        Opcodes.INVOKEVIRTUAL,
                         hook.getHookClass(),
                         hook.getHookMethod(),
                         hook.getHookDesc(),

@@ -39,6 +39,7 @@ public class VitaLite {
             newArgs[0] = "-safeLaunch";
             System.arraycopy(args, 0, newArgs, 1, args.length);
             launchInNewJVM("com.tonic.vitalite.Main", buildFullClasspath(), newArgs);
+            System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();
         }
