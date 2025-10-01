@@ -196,7 +196,7 @@ public class InventoryAPI
         int count = 0;
         for(int id : ids)
         {
-            count = dropAll(id);
+            count += dropAll(id);
         }
         return (int) Math.ceil((double) count / 10);
     }
@@ -230,7 +230,7 @@ public class InventoryAPI
             if(item.getId() == id)
             {
                 count++;
-                InventoryAPI.interact(item, 6);
+                InventoryAPI.interact(item, 7);
             }
         }
         return (int) Math.ceil((double) count / 10);

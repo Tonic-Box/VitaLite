@@ -26,6 +26,10 @@ public enum Orientation
 
     public static Orientation of(int value)
     {
+        if(value > 7)
+        {
+            value /= 256;
+        }
         for (Orientation orientation : values())
         {
             if (orientation.value == value)
