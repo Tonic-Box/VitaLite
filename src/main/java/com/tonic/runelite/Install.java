@@ -1,10 +1,12 @@
 package com.tonic.runelite;
 
+import com.google.common.reflect.ClassPath;
+import com.tonic.classloader.PluginClassLoader;
 import com.tonic.vitalite.Main;
 import com.tonic.Static;
 import com.tonic.model.Guice;
 import com.tonic.services.CallStackFilter;
-
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -18,8 +20,33 @@ public class Install {
     /**
      * Don't remove, call is injected see @{InjectSideLoadCallTransformer}
      *
-     * @param plugins list of plugin classes to load
+     * @param original list of plugin classes to load
      */
+    public void injectSideLoadPlugins2(List<Class<?>> original) {
+        List<File> jars = findJars().stream()
+                .map(Path::toFile)
+                .collect(Collectors.toList());
+
+        for (File jar : jars) {
+            try
+            {
+                ClassLoader classLoader = new PluginClassLoader(jar, Main.CLASSLOADER);
+                List<Class<?>> plugins = ClassPath.from(classLoader)
+                        .getAllClasses()
+                        .stream()
+                        .filter(classInfo -> !classInfo.getName().equals("module-info"))
+                        .filter(classInfo -> !classInfo.getSimpleName().equals("module-info"))
+                        .map(ClassPath.ClassInfo::load)
+                        .collect(Collectors.toList());
+                original.addAll(plugins);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void injectSideLoadPlugins(List<Class<?>> plugins) {
         Queue<ClassByte> classesToLoad = findJars().stream()
                 .flatMap(jar -> listFilesInJar(jar).stream())

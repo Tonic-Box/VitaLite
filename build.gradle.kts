@@ -187,6 +187,17 @@ dependencies {
     implementation("org.slf4j:slf4j-api:${runeliteVersions["slf4j"]}")
     implementation("ch.qos.logback:logback-core:${runeliteVersions["logback.core"]}")
     implementation("ch.qos.logback:logback-classic:${runeliteVersions["logback.classic"]}")
+
+//    implementation("com.lmax:disruptor:3.4.4")
+//    implementation("org.jctools:jctools-core:4.0.5")
+//    implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
+//    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+//    implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
+//    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
+//    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2")
+//    implementation("com.sun.mail:javax.mail:1.6.2")
+//    implementation("org.osgi:org.osgi.framework:1.10.0")
+//    implementation("org.conscrypt:conscrypt-openjdk-uber:2.5.2")
 }
 
 tasks.test {

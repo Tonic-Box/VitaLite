@@ -23,6 +23,15 @@ public class PluginManagerMixin {
         add("net.runelite.client.plugins.loginscreen");
     }};
 
+    private static final List<String> disallowed = new ArrayList<>()
+    {{
+        add("net.runelite.client.plugins.account");
+        add("net.runelite.client.plugins.crowdsourcing");
+        add("net.runelite.client.plugins.discord");
+        add("net.runelite.client.plugins.twitch");
+        add("net.runelite.client.plugins.xtea");
+    }};
+
     @MethodOverride("loadSideLoadPlugins")
     public static void loadSideLoadPlugins()
     {
@@ -152,8 +161,12 @@ public class PluginManagerMixin {
 
         method.instructions.insert(insertionPoint, code);
 
-        if(!Main.optionsParser.isNoPlugins() && !Main.optionsParser.isMin())
-            return;
+//        if(!Main.optionsParser.isNoPlugins() && !Main.optionsParser.isMin())
+//        {
+//            return;
+//        }
+
+        boolean isMin = Main.optionsParser.isNoPlugins() || Main.optionsParser.isMin();
 
         InsnList code2 = BytecodeBuilder.create()
                 .newInstance("java/util/ArrayList")
@@ -178,15 +191,29 @@ public class PluginManagerMixin {
                                     .storeLocal(6, ASTORE);
                             LabelNode skipAdd = body.createLabel("skipAdd");
                             body.pushInt(0);
-                            for(String prefix : allowed)
+                            if(isMin)
                             {
-                                body.loadLocal(6, ALOAD)
-                                        .pushString(prefix)
-                                        .invokeVirtual("java/lang/String", "startsWith", "(Ljava/lang/String;)Z")
-                                        .or();
+                                for(String prefix : allowed)
+                                {
+                                    body.loadLocal(6, ALOAD)
+                                            .pushString(prefix)
+                                            .invokeVirtual("java/lang/String", "startsWith", "(Ljava/lang/String;)Z")
+                                            .or();
+                                }
                             }
+                            else
+                            {
+                                for(String prefix : disallowed)
+                                {
+                                    body.loadLocal(6, ALOAD)
+                                            .pushString(prefix)
+                                            .invokeVirtual("java/lang/String", "startsWith", "(Ljava/lang/String;)Z")
+                                            .or();
+                                }
+                            }
+                            ConditionType cond = isMin ? ConditionType.EQUALS : ConditionType.NOT_EQUALS;
                             body.pushInt(0)
-                                    .jumpIf(ConditionType.EQUALS, skipAdd)
+                                    .jumpIf(cond, skipAdd)
                                     .loadLocal(3, ALOAD)
                                     .loadLocal(5, ALOAD)
                                     .invokeInterface("java/util/List", "add", "(Ljava/lang/Object;)Z")
