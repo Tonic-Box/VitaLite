@@ -43624,11 +43624,13 @@
     ]
   },
   {
+    "name": "Task",
     "obfuscatedName": "ku",
     "fields": [
       {
         "name": "",
         "obfuscatedName": "ac",
+        "owner": "Task",
         "ownerObfuscatedName": "ku",
         "descriptor": "I",
         "isStatic": false
@@ -43636,6 +43638,7 @@
       {
         "name": "",
         "obfuscatedName": "aw",
+        "owner": "Task",
         "ownerObfuscatedName": "ku",
         "descriptor": "I",
         "isStatic": true
@@ -43643,13 +43646,15 @@
       {
         "name": "",
         "obfuscatedName": "at",
+        "owner": "Task",
         "ownerObfuscatedName": "ku",
         "descriptor": "I",
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "result",
         "obfuscatedName": "ap",
+        "owner": "Task",
         "ownerObfuscatedName": "ku",
         "descriptor": "Ljava/lang/Object;",
         "isStatic": false
@@ -43657,6 +43662,7 @@
       {
         "name": "",
         "obfuscatedName": "af",
+        "owner": "Task",
         "ownerObfuscatedName": "ku",
         "descriptor": "I",
         "isStatic": true
@@ -43664,6 +43670,7 @@
       {
         "name": "",
         "obfuscatedName": "aq",
+        "owner": "Task",
         "ownerObfuscatedName": "ku",
         "descriptor": "Lku;",
         "isStatic": false
@@ -43671,13 +43678,15 @@
       {
         "name": "",
         "obfuscatedName": "ao",
+        "owner": "Task",
         "ownerObfuscatedName": "ku",
         "descriptor": "I",
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "objectArgument",
         "obfuscatedName": "as",
+        "owner": "Task",
         "ownerObfuscatedName": "ku",
         "descriptor": "Ljava/lang/Object;",
         "isStatic": false
@@ -43686,6 +43695,7 @@
     "methods": [
       {
         "obfuscatedName": "\u003cinit\u003e",
+        "owner": "Task",
         "ownerObfuscatedName": "ku",
         "descriptor": "()V",
         "isStatic": false
