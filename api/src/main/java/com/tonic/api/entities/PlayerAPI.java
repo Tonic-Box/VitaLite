@@ -2,10 +2,15 @@ package com.tonic.api.entities;
 
 import com.tonic.Static;
 import com.tonic.api.TClient;
+import com.tonic.queries.NpcQuery;
+import com.tonic.queries.PlayerQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.Client;
+import net.runelite.api.NPC;
+import net.runelite.api.NPCComposition;
 import net.runelite.api.Player;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Player API
@@ -53,6 +58,35 @@ public class PlayerAPI
             ClickManager.click(PacketInteractionType.PLAYER_INTERACT);
             client.getPacketWriter().playerActionPacket(option, index, false);
         });
+    }
+
+    public static boolean canAttack(NPC npc) {
+        if(npc == null || npc.isDead())
+            return false;
+
+        return Static.invoke(() -> {
+            NPCComposition composition = npc.getComposition();
+            if(composition.getConfigs() != null)
+                composition = composition.transform();
+
+            if(composition.getActions() == null || !ArrayUtils.contains(composition.getActions(), "Attack"))
+                return false;
+
+            if(npc.getHealthRatio() == -1 || npc.getHealthScale() == -1)
+                return true;
+
+            Client client = Static.getClient();
+            return npc.getInteracting().equals(client.getLocalPlayer());
+        });
+    }
+
+    public static Player getInCombatWith()
+    {
+        Client client = Static.getClient();
+        return new PlayerQuery()
+                .keepIf(n -> n.getInteracting() != null && n.getInteracting().equals(client.getLocalPlayer()))
+                .keepIf(n -> !isIdle(n) || n.getHealthRatio() != -1)
+                .nearest();
     }
 
     /**
