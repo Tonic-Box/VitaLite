@@ -155,7 +155,8 @@ public class RLClassLoader extends URLClassLoader {
                 name.startsWith("com.google.code.findbugs.") ||
                 name.startsWith("com.google.findbugs.") ||
                 name.startsWith("org.projectlombok.") ||
-                name.startsWith("it.unimi.dsi.");
+                name.startsWith("it.unimi.dsi.") ||
+                name.startsWith("org.slf4j.");
     }
 
     @Override
