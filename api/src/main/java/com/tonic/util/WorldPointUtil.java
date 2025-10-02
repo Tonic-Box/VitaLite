@@ -288,4 +288,12 @@ public class WorldPointUtil {
         int plane = area.getPlane();
         return new WorldPoint(x + (width / 2), y + (height / 2), plane);
     }
+
+    /**
+     * Create a WorldPoint from a packed Jagex coordinate
+     */
+    public static WorldPoint fromJagexCoord(int c)
+    {
+        return new WorldPoint((c >>> 14) & 0x3FFF, c & 0x3FFF, (c >>> 28) & 0x3);
+    }
 }

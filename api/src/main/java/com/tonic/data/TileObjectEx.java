@@ -40,6 +40,10 @@ public class TileObjectEx
         });
     }
 
+    public boolean hasAction(String action) {
+        return getActionIndex(action) != -1;
+    }
+
     public String[] getActions() {
         if(actions == null)
         {
