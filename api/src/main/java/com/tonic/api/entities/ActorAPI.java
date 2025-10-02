@@ -18,12 +18,18 @@ public class ActorAPI
             {
                 NPC npc = (NPC) actor;
                 NPCComposition composition = npc.getComposition();
+                if (composition == null)
+                    return false;
                 if(composition.getConfigs() != null)
                     composition = composition.transform();
 
                 if(composition.getActions() == null || !ArrayUtils.contains(composition.getActions(), "Attack"))
                     return false;
+
+                if(composition.getName() == null)
+                    return false;
             }
+
             if(CombatAPI.inMultiWay())
                 return true;
 
@@ -31,7 +37,7 @@ public class ActorAPI
                 return true;
 
             Client client = Static.getClient();
-            return actor.getInteracting().equals(client.getLocalPlayer());
+            return actor.getInteracting() == null || actor.getInteracting().equals(client.getLocalPlayer());
         });
     }
 

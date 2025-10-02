@@ -17,6 +17,8 @@ public class NpcQuery extends AbstractActorQuery<NPC, NpcQuery>
     {
         return keepIf(n -> {
             NPCComposition composition = getComposition(n);
+            if (composition == null)
+                return false;
             for (int id : ids)
             {
                 if (composition.getId() == id)
@@ -66,6 +68,8 @@ public class NpcQuery extends AbstractActorQuery<NPC, NpcQuery>
     private NPCComposition getComposition(NPC npc)
     {
         NPCComposition composition = npc.getComposition();
+        if(composition == null)
+            return null;
         if(composition.getConfigs() != null)
         {
             composition = composition.transform();
