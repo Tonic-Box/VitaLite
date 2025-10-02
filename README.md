@@ -2,6 +2,7 @@
 
 VitaLite is an enhanced RuneLite client loader that provides additional functionality, safety features, and customization options while maintaining compatibility with the core RuneLite experience.
 
+
 ## What is VitaLite?
 
 VitaLite is a RuneLite client wrapper that adds extra features and safety options while keeping the familiar RuneLite experience. It provides additional customization, enhanced security features, and extended plugin support.
@@ -126,3 +127,5 @@ VitaLite supports loading additional plugins:
 ## Disclaimer
 
 VitaLite is a third-party loader for RuneLite. Use at your own risk. The developers are not responsible for any consequences resulting from the use of this software.
+
+## [Buy me a coffee](https://ko-fi.com/tonicbox)
