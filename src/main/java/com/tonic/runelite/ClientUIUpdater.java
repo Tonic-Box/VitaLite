@@ -1,6 +1,7 @@
 package com.tonic.runelite;
 
 import com.tonic.Logger;
+import com.tonic.services.proxy.ProxyManager;
 import com.tonic.vitalite.Main;
 import com.tonic.model.NavButton;
 import com.tonic.model.ui.VitaLiteInfoPanel;
@@ -39,7 +40,17 @@ public class ClientUIUpdater
 
         BufferedImage icon = ResourceUtil.getImage(Main.class, "icon.png");
         frame.setIconImage(icon);
-        frame.setTitle("VitaLite");
+        if(ProxyManager.getProxy() != null)
+        {
+            frame.setTitle("VitaLite (Proxy: " +
+                    ProxyManager.getProxy().getProxyInfo().getHost() + ":" +
+                    ProxyManager.getProxy().getProxyInfo().getPort() + ")"
+            );
+        }
+        else
+        {
+            frame.setTitle("VitaLite");
+        }
 
         wrapper = new JPanel(new BorderLayout());
         JTextPane console = Logger.getConsole();
