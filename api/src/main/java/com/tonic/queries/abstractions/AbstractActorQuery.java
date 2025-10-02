@@ -1,5 +1,6 @@
 package com.tonic.queries.abstractions;
 
+import com.tonic.api.entities.ActorAPI;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
 import net.runelite.api.Actor;
@@ -34,6 +35,11 @@ public abstract class AbstractActorQuery<T extends Actor, Q extends AbstractActo
     public Q withNameContains(String name)
     {
         return removeIf(o -> o.getName() == null ||  !TextUtil.sanitize(o.getName()).toLowerCase().contains(name.toLowerCase()));
+    }
+
+    public Q canAttack()
+    {
+        return keepIf(ActorAPI::canAttack);
     }
 
     /**
