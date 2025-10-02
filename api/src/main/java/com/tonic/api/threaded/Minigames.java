@@ -2,8 +2,10 @@ package com.tonic.api.threaded;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.api.game.VarAPI;
+import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.TabsAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.Tab;
@@ -11,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.http.api.worlds.WorldType;
 
@@ -26,10 +29,6 @@ import java.util.function.Supplier;
  */
 public class Minigames
 {
-    private static final Supplier<Widget> MINIGAMES_TAB_BUTTON = () -> WidgetAPI.get(707, 6);
-    private static final Supplier<Widget> MINIGAMES_DESTINATION = () -> WidgetAPI.get(76, 11);
-    private static final Supplier<Widget> MINIGAMES_TELEPORT_BUTTON = () -> WidgetAPI.get(160, 30);
-
     private static final Set<Quest> NMZ_QUESTS = Set.of(
             Quest.THE_ASCENT_OF_ARCEUUS,
             Quest.CONTACT,
@@ -95,7 +94,7 @@ public class Minigames
             return false;
         }
 
-        Widget minigamesTeleportButton = MINIGAMES_TELEPORT_BUTTON.get();
+        Widget minigamesTeleportButton = WidgetAPI.get(InterfaceID.Grouping.TELEPORT_TEXT1);
         List<Integer> teleportGraphics = List.of(800, 802, 803, 804);
 
         open();
@@ -115,7 +114,13 @@ public class Minigames
                 return false;
             }
 
-            WidgetAPI.interact(1, 4980766, destination.index);
+            WorldPoint wp = client.getLocalPlayer().getWorldLocation();
+            WidgetAPI.interact(1, InterfaceID.Grouping.TELEPORT_TEXT1, destination.index);
+            Delays.tick();
+            while(wp.equals(client.getLocalPlayer().getWorldLocation()) || !PlayerAPI.isIdle(client.getLocalPlayer()))
+            {
+                Delays.tick();
+            }
             Delays.tick();
             return true;
         }
@@ -137,15 +142,24 @@ public class Minigames
 
         if (!isOpen())
         {
-            Widget widget = MINIGAMES_TAB_BUTTON.get();
-            if (WidgetAPI.isVisible(widget))
-            {
-                WidgetAPI.interact(widget, "Grouping");
-                Delays.tick();
-            }
+            Widget widget = WidgetAPI.get(InterfaceID.SideChannels.TAB_3);
+            WidgetAPI.interact(widget, 1);
         }
         Delays.tick();
         return isOpen();
+    }
+
+    public static boolean hopToSuggestedWorld()
+    {
+        if(!open())
+        {
+            return false;
+        }
+        WidgetAPI.interact(1, InterfaceID.Grouping.SUGGESTEDWORLD, 7);
+        Delays.tick();
+        DialogueAPI.selectOption("Yes");
+        Delays.tick(2);
+        return true;
     }
 
     /**
@@ -155,7 +169,7 @@ public class Minigames
      */
     public static boolean isOpen()
     {
-        return WidgetAPI.isVisible(MINIGAMES_TELEPORT_BUTTON.get());
+        return WidgetAPI.isVisible(WidgetAPI.get(InterfaceID.Grouping.TELEPORT_TEXT1));
     }
 
     /**
@@ -283,7 +297,7 @@ public class Minigames
          */
         public static Destination getCurrent()
         {
-            Widget selectedTeleport = MINIGAMES_DESTINATION.get();
+            Widget selectedTeleport = WidgetAPI.get(76, 11);
             if (WidgetAPI.isVisible(selectedTeleport))
             {
                 return byName(selectedTeleport.getText());
