@@ -260,6 +260,36 @@ public class WidgetAPI
     }
 
     /**
+     * Get the text of a widget
+     * @return text
+     */
+    public static String getText(int widgetId)
+    {
+        Client client = Static.getClient();
+        return Static.invoke(() -> {
+            Widget widget = client.getWidget(widgetId);
+            if(widget == null || widget.getText() == null)
+                return "";
+
+            return widget.getText();
+        });
+    }
+
+    /**
+     * Get the text of a widget
+     * @return text
+     */
+    public static String getText(Widget widget)
+    {
+        return Static.invoke(() -> {
+            if(widget == null || widget.getText() == null)
+                return "";
+
+            return widget.getText();
+        });
+    }
+
+    /**
      * Get a widget by WidgetInfo
      * @param info widget info
      * @return widget

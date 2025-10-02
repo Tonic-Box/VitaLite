@@ -17,11 +17,13 @@ public class ActorAPI
      * @param actor actor
      * @return true if can be attacked
      */
-    public static boolean canAttack(Actor actor) {
+    public static boolean canAttack(Actor actor)
+    {
         if(actor == null || actor.isDead())
             return false;
 
-        return Static.invoke(() -> {
+        return Static.invoke(() ->
+        {
             if(actor instanceof NPC)
             {
                 NPC npc = (NPC) actor;
