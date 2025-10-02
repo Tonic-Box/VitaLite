@@ -3,6 +3,8 @@ package com.tonic.api.entities;
 import com.tonic.Static;
 import com.tonic.api.game.CombatAPI;
 import com.tonic.api.widgets.WidgetAPI;
+import com.tonic.queries.NpcQuery;
+import com.tonic.queries.PlayerQuery;
 import net.runelite.api.*;
 import net.runelite.api.widgets.Widget;
 import org.apache.commons.lang3.ArrayUtils;
@@ -49,5 +51,23 @@ public class ActorAPI
     public static boolean isIdle(Actor actor)
     {
         return (actor.getIdlePoseAnimation() == actor.getPoseAnimation() && actor.getAnimation() == -1);
+    }
+
+    public static Actor getInCombatWith()
+    {
+        Client client = Static.getClient();
+        Actor actor = new NpcQuery()
+                .keepIf(n -> n.getInteracting() != null && n.getInteracting().equals(client.getLocalPlayer()))
+                .keepIf(n -> !isIdle(n) || n.getHealthRatio() != -1)
+                .nearest();
+
+        if(actor == null)
+        {
+            actor = new PlayerQuery()
+                    .keepIf(n -> n.getInteracting() != null && n.getInteracting().equals(client.getLocalPlayer()))
+                    .keepIf(n -> !isIdle(n) || n.getHealthRatio() != -1)
+                    .nearest();
+        }
+        return actor;
     }
 }

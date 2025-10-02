@@ -72,13 +72,4 @@ public class NpcAPI extends ActorAPI
             client.getPacketWriter().npcActionPacket(option, npcIndex, false);
         });
     }
-
-    public static NPC getInCombatWith()
-    {
-        Client client = Static.getClient();
-        return new NpcQuery()
-                .keepIf(n -> n.getInteracting() != null && n.getInteracting().equals(client.getLocalPlayer()))
-                .keepIf(n -> !isIdle(n) || n.getHealthRatio() != -1)
-                .nearest();
-    }
 }

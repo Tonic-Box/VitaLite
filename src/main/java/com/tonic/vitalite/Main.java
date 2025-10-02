@@ -1,6 +1,7 @@
 package com.tonic.vitalite;
 
 import com.tonic.Logger;
+import com.tonic.Static;
 import com.tonic.VitaLite;
 import com.tonic.VitaLiteOptions;
 import com.tonic.bootstrap.RLUpdater;
@@ -18,12 +19,14 @@ import com.tonic.services.proxy.ProxyManager;
 import javax.swing.*;
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.tonic.vitalite.Versioning.isRunningFromShadedJar;
 
 public class Main {
-    public static final Path RUNELITE_REPOSITORY_DIR = Path.of(System.getProperty("user.home"), ".runelite", "repository2");
+    //public static final Path VITA_DIR = Path.of(RUNELITE_DIR.toString(), "vitalite");
+    public static final Path REPOSITORY_DIR = Path.of(Static.VITA_DIR.toString(), "repository2");
     public static final VitaLiteOptions optionsParser = new VitaLiteOptions();
     private static URL[] URLS = null;
     public static Libs LIBS;
@@ -43,6 +46,7 @@ public class Main {
             System.out.println("Using Proxy: " + optionsParser.getProxy());
             ProxyManager.process(optionsParser.getProxy());
         }
+        Files.createDirectories(REPOSITORY_DIR);
         JvmParams.set();
         RLUpdater.run();
         loadArtifacts();
@@ -60,7 +64,7 @@ public class Main {
     {
         try
         {
-            File[] jarfiles = RUNELITE_REPOSITORY_DIR.toFile().listFiles(f ->
+            File[] jarfiles = REPOSITORY_DIR.toFile().listFiles(f ->
                     f.getName().endsWith(".jar") &&
                             !f.getName().contains("guice") &&
                             !f.getName().contains("javax") &&

@@ -20,7 +20,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
-import static com.tonic.vitalite.Main.RUNELITE_REPOSITORY_DIR;
+import static com.tonic.vitalite.Main.REPOSITORY_DIR;
 
 public class RLUpdater
 {
@@ -51,20 +51,20 @@ public class RLUpdater
         Bootstrap bootstrap = new Gson().fromJson(bootstrapRes.body(), Bootstrap.class);
         Artifact[] artifacts = bootstrap.getArtifacts();
 
-        if (!Files.exists(RUNELITE_REPOSITORY_DIR)) {
-            Files.createDirectories(RUNELITE_REPOSITORY_DIR);
+        if (!Files.exists(REPOSITORY_DIR)) {
+            Files.createDirectories(REPOSITORY_DIR);
         }
 
         for (Artifact art : artifacts)
         {
             if (art.getDiffs() != null) {
                 for (Diff diff : art.getDiffs()) {
-                    Path oldFile = RUNELITE_REPOSITORY_DIR.resolve(diff.getFrom());
+                    Path oldFile = REPOSITORY_DIR.resolve(diff.getFrom());
                     Files.deleteIfExists(oldFile);
                 }
             }
 
-            Path localFile = RUNELITE_REPOSITORY_DIR.resolve(art.getName());
+            Path localFile = REPOSITORY_DIR.resolve(art.getName());
             boolean needsDownload = true;
 
             if (Files.exists(localFile)) {

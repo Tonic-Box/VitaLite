@@ -59,13 +59,4 @@ public class PlayerAPI extends ActorAPI
             client.getPacketWriter().playerActionPacket(option, index, false);
         });
     }
-
-    public static Player getInCombatWith()
-    {
-        Client client = Static.getClient();
-        return new PlayerQuery()
-                .keepIf(n -> n.getInteracting() != null && n.getInteracting().equals(client.getLocalPlayer()))
-                .keepIf(n -> !isIdle(n) || n.getHealthRatio() != -1)
-                .nearest();
-    }
 }
