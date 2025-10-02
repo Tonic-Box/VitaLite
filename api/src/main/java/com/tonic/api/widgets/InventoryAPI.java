@@ -347,6 +347,11 @@ public class InventoryAPI
         return InventoryQuery.fromInventoryId(InventoryID.INV).withName(itemNames).count();
     }
 
+    /**
+     * use an item on a tile object
+     * @param item item
+     * @param tileObject tile object
+     */
     public static void useOn(ItemEx item, TileObjectEx tileObject)
     {
         if(item == null || tileObject == null)
@@ -356,6 +361,11 @@ public class InventoryAPI
         WidgetAPI.onTileObject(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), tileObject.getId(), wp.getX(), wp.getY(), false);
     }
 
+    /**
+     * use an item on a ground item
+     * @param item item
+     * @param tileItem tile item
+     */
     public static void useOn(ItemEx item, TileItemEx tileItem)
     {
         if(item == null || tileItem == null)
@@ -365,6 +375,11 @@ public class InventoryAPI
         WidgetAPI.onGroundItem(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), tileItem.getId(), wp.getX(), wp.getY(), false);
     }
 
+    /**
+     * use an item on a player
+     * @param item item
+     * @param player player
+     */
     public static void useOn(ItemEx item, Player player)
     {
         if(item == null || player == null)
@@ -373,6 +388,11 @@ public class InventoryAPI
         WidgetAPI.onPlayer(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), player.getId(), false);
     }
 
+    /**
+     * use an item on an npc
+     * @param item item
+     * @param npc npc
+     */
     public static void useOn(ItemEx item, NPC npc)
     {
         if(item == null || npc == null)
@@ -381,6 +401,11 @@ public class InventoryAPI
         WidgetAPI.onNpc(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), npc.getIndex(), false);
     }
 
+    /**
+     * use an item on another item in your inventory
+     * @param item item
+     * @param target target item
+     */
     public static void useOn(ItemEx item, ItemEx target)
     {
         if(item == null || target == null)
@@ -389,10 +414,21 @@ public class InventoryAPI
         WidgetAPI.onWidget(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), InterfaceID.Inventory.ITEMS, target.getId(), target.getSlot());
     }
 
+    /**
+     * get the total count of an item in your inventory by id
+     * @param id item id
+     * @return int
+     */
     public static int getCount(int id) {
         return getCount(id, true);
     }
 
+    /**
+     * get the total count of an item in your inventory by id
+     * @param id item id
+     * @param canonicalize whether to canonicalize the id (normalize all ids to un-noted version for the count)
+     * @return int
+     */
     public static int getCount(int id, boolean canonicalize) {
         if(canonicalize)
             return InventoryQuery.fromInventoryId(InventoryID.INV).withCanonicalId(id).count();

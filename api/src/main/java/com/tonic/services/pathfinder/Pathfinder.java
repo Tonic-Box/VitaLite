@@ -26,6 +26,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Pathfinder class to find paths between points in the game world.
+ */
 public class Pathfinder
 {
     static {
@@ -47,23 +50,41 @@ public class Pathfinder
     private boolean inInstance = false;
     private int transportsUsed;
 
+    /**
+     * Initializes the pathfinder with a target WorldPoint.
+     *
+     * @param target The destination WorldPoint to find a path to.
+     */
     public Pathfinder(final WorldPoint target) {
         TransportLoader.refreshTransports();
         this.targetWorldPoint = target;
     }
 
+    /**
+     * Initializes the pathfinder with target WorldAreas.
+     * @param worldAreas The destination WorldAreas to find a path to the closest area.
+     */
     public Pathfinder(WorldArea... worldAreas)
     {
         TransportLoader.refreshTransports();
         worldAreaPoints = WorldPointUtil.toCompressedPoints(worldAreas);
     }
 
+    /**
+     * Initializes the pathfinder with target WorldAreas.
+     * @param worldAreas The destination WorldAreas to find a path to the closest area.
+     */
     public Pathfinder(List<WorldArea> worldAreas)
     {
         TransportLoader.refreshTransports();
         worldAreaPoints = WorldPointUtil.toCompressedPoints(worldAreas.toArray(new WorldArea[0]));
     }
 
+    /**
+     * Finds a path from the player's current location to the target WorldPoint or WorldArea.
+     *
+     * @return A list of Steps representing the path, or an empty list if no path is found.
+     */
     public List<Step> find() {
         if(collisionMap == null)
         {

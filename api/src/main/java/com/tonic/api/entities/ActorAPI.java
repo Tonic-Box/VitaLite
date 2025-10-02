@@ -2,15 +2,21 @@ package com.tonic.api.entities;
 
 import com.tonic.Static;
 import com.tonic.api.game.CombatAPI;
-import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.PlayerQuery;
 import net.runelite.api.*;
-import net.runelite.api.widgets.Widget;
 import org.apache.commons.lang3.ArrayUtils;
 
+/**
+ * Actor API
+ */
 public class ActorAPI
 {
+    /**
+     * check if an actor can be attacked
+     * @param actor actor
+     * @return true if can be attacked
+     */
     public static boolean canAttack(Actor actor) {
         if(actor == null || actor.isDead())
             return false;
@@ -53,19 +59,34 @@ public class ActorAPI
         return (actor.getIdlePoseAnimation() == actor.getPoseAnimation() && actor.getAnimation() == -1);
     }
 
+    /**
+     * find the actor currently in combat with the local player
+     * @return the actor, or null if none found
+     */
     public static Actor getInCombatWith()
     {
         Client client = Static.getClient();
+        return getInCombatWith(client.getLocalPlayer());
+    }
+
+    /**
+     * find the actor currently in combat with the target actor
+     * @param target the target actor
+     * @return the actor, or null if none found
+     */
+    public static Actor getInCombatWith(Actor target)
+    {
+        Client client = Static.getClient();
         Actor actor = new NpcQuery()
-                .keepIf(n -> n.getInteracting() != null && n.getInteracting().equals(client.getLocalPlayer()))
-                .keepIf(n -> !isIdle(n) || n.getHealthRatio() != -1)
+                .keepIf(n -> n.getInteracting() != null && n.getInteracting().equals(target))
+                .keepIf(n -> !isIdle(n) || (n.getHealthRatio() != -1 || target.getHealthRatio() != -1))
                 .nearest();
 
         if(actor == null)
         {
             actor = new PlayerQuery()
                     .keepIf(n -> n.getInteracting() != null && n.getInteracting().equals(client.getLocalPlayer()))
-                    .keepIf(n -> !isIdle(n) || n.getHealthRatio() != -1)
+                    .keepIf(n -> !isIdle(n) || (n.getHealthRatio() != -1 || target.getHealthRatio() != -1))
                     .nearest();
         }
         return actor;

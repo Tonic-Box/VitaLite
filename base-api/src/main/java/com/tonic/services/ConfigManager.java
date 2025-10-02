@@ -90,6 +90,9 @@ public class ConfigManager {
         builder.getConfiguration().setProperty(propertyName, value);
     }
 
+    /**
+     * reset the config to default values
+     */
     @SneakyThrows
     public void reset()
     {
@@ -159,6 +162,12 @@ public class ConfigManager {
         return property;
     }
 
+    /**
+     * get a config property or a default value if it does not exist
+     * @param propertyName name
+     * @param defaultValue default value
+     * @return value
+     */
     public Object getPropertyOrDefault(String propertyName, Object defaultValue) {
         Object property = null;
         try {
@@ -169,6 +178,11 @@ public class ConfigManager {
         return property == null ? defaultValue : property;
     }
 
+    /**
+     * check if a property exists
+     * @param propertyName name
+     * @return true if it exists, false otherwise
+     */
     public boolean hasProperty(String propertyName) {
         try {
             return builder.getConfiguration().containsKey(propertyName);
@@ -203,6 +217,12 @@ public class ConfigManager {
         return property;
     }
 
+    /**
+     * get a property as a string or a default value if it does not exist
+     * @param propertyName name
+     * @param defaultValue default value
+     * @return value
+     */
     public String getStringOrDefault(String propertyName, String defaultValue) {
         String property = null;
         try {
@@ -255,6 +275,12 @@ public class ConfigManager {
         return 0;
     }
 
+    /**
+     * get a property as an int or a default value if it does not exist
+     * @param propertyName name
+     * @param defaultValue default value
+     * @return value
+     */
     public int getIntOrDefault(String propertyName, int defaultValue) {
         try {
             if (!builder.getConfiguration().containsKey(propertyName)) return 0;
@@ -290,6 +316,12 @@ public class ConfigManager {
         return false;
     }
 
+    /**
+     * get a property as a boolean or a default value if it does not exist
+     * @param propertyName name
+     * @param defaultValue default value
+     * @return value
+     */
     public boolean getBooleanOrDefault(String propertyName, boolean defaultValue) {
         try {
             if (!builder.getConfiguration().containsKey(propertyName)) return false;

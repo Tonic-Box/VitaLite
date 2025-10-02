@@ -13,12 +13,29 @@ import java.util.List;
 
 import static net.runelite.api.Constants.*;
 
+/**
+ * Utility methods for working with WorldPoints and WorldAreas
+ */
 public class WorldPointUtil {
+    /**
+     * Gets the coordinate of the tile that contains the passed world point,
+     * accounting for instances.
+     *
+     * @param worldPoint the instance worldpoint
+     * @return the tile coordinate containing the local point
+     */
     public static WorldPoint get(WorldPoint worldPoint)
     {
         return fromInstance(worldPoint);
     }
 
+    /**
+     * Gets the coordinate of the tile that contains the passed world point,
+     * accounting for instances.
+     *
+     * @param worldPoint the local worldpoint
+     * @return the tile coordinate containing the local point
+     */
     public static WorldPoint translate(WorldPoint worldPoint)
     {
         return toInstance(worldPoint).get(0);
@@ -67,6 +84,11 @@ public class WorldPointUtil {
         return rotate(new WorldPoint(x, y, templateChunkPlane), 4 - rotation);
     }
 
+    /**
+     * Get all possible instance world points for the given world point.
+     * @param worldPoint worldpoint
+     * @return the list of possible instance world points
+     */
     public static ArrayList<WorldPoint> toInstance(WorldPoint worldPoint)
     {
         Client client = Static.getClient();
@@ -135,14 +157,31 @@ public class WorldPointUtil {
         return point;
     }
 
+    /**
+     * Compresses a WorldPoint into a single integer.
+     * @param wp the WorldPoint to compress
+     * @return the compressed WorldPoint
+     */
     public static int compress(WorldPoint wp) {
         return wp.getX() | wp.getY() << 14 | wp.getPlane() << 29;
     }
 
+    /**
+     * Compresses x, y, z coordinates into a single integer.
+     * @param x the x coordinate (0 - 16383)
+     * @param y the y coordinate (0 - 32767)
+     * @param z the z coordinate (0 - 7)
+     * @return the compressed coordinates
+     */
     public static int compress(int x, int y, int z) {
         return x | y << 14 | z << 29;
     }
 
+    /**
+     * Decompresses a compressed WorldPoint integer back into a WorldPoint.
+     * @param compressed the compressed WorldPoint
+     * @return the decompressed WorldPoint
+     */
     public static WorldPoint fromCompressed(int compressed)
     {
         int x = compressed & 0x3FFF;
@@ -151,36 +190,75 @@ public class WorldPointUtil {
         return new WorldPoint(x, y, z);
     }
 
+    /**
+     * Extracts the X coordinate from a compressed WorldPoint integer.
+     * @param compressed the compressed WorldPoint
+     * @return the X coordinate
+     */
     public static short getCompressedX(int compressed)
     {
         return (short) (compressed & 0x3FFF);
     }
 
+    /**
+     * Extracts the Y coordinate from a compressed WorldPoint integer.
+     * @param compressed the compressed WorldPoint
+     * @return the Y coordinate
+     */
     public static short getCompressedY(int compressed)
     {
         return (short) ((compressed >>> 14) & 0x7FFF);
     }
 
+    /**
+     * Extracts the plane from a compressed WorldPoint integer.
+     * @param compressed the compressed WorldPoint
+     * @return the plane
+     */
     public static byte getCompressedPlane(int compressed)
     {
         return (byte)((compressed >>> 29) & 7);
     }
 
+    /**
+     * Offsets the compressed WorldPoint by the given amounts in each dimension.
+     * @param compressed the compressed WorldPoint
+     * @param n the amount to offset in the X direction
+     * @return the new compressed WorldPoint
+     */
     public static int dx(int compressed, int n)
     {
         return compressed + n;
     }
 
+    /**
+     * Offsets the compressed WorldPoint by the given amounts in each dimension.
+     * @param compressed the compressed WorldPoint
+     * @param n the amount to offset in the Y direction
+     * @return the new compressed WorldPoint
+     */
     public static int dy(int compressed, int n)
     {
         return compressed + (n << 14);
     }
 
+    /**
+     * Offsets the compressed WorldPoint by the given amounts in each dimension.
+     * @param compressed the compressed WorldPoint
+     * @param nx the amount to offset in the X direction
+     * @param ny the amount to offset in the Y direction
+     * @return the new compressed WorldPoint
+     */
     public static int dxy(int compressed, int nx, int ny)
     {
         return compressed + nx + (ny << 14);
     }
 
+    /**
+     * compresses all the points in the given WorldAreas into a single array of compressed points
+     * @param area the WorldAreas
+     * @return the compressed points
+     */
     public static int[] toCompressedPoints(WorldArea... area)
     {
         List<WorldPoint> points = new ArrayList<>();
@@ -194,5 +272,20 @@ public class WorldPointUtil {
             compressed[i] = compress(points.get(i));
         }
         return compressed;
+    }
+
+    /**
+     * Gets the center point of a WorldArea
+     * @param area the WorldArea
+     * @return the center point
+     */
+    public static WorldPoint getCenter(WorldArea area)
+    {
+        int x = area.getX();
+        int y = area.getY();
+        int width = area.getWidth();
+        int height = area.getHeight();
+        int plane = area.getPlane();
+        return new WorldPoint(x + (width / 2), y + (height / 2), plane);
     }
 }

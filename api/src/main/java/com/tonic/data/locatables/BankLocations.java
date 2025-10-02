@@ -20,6 +20,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+/**
+ * A list of known bank locations in the game.
+ */
 public enum BankLocations {
     LUMBRIDGE_BANK(new WorldArea(3207, 3215, 4, 8, 2)),
     VARROCK_WEST_BANK(new WorldArea(3180, 3433, 6, 15, 0)),

@@ -12,6 +12,9 @@ import net.runelite.api.coords.WorldPoint;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Movement API
+ */
 public class MovementAPI {
     private static final Random random = new Random();
     private static final int STAMINA_VARBIT = 25;

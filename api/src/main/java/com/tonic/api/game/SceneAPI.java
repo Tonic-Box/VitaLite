@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+/**
+ * Scene API
+ */
 public class SceneAPI {
     /**
      * Returns a list of all reachable tiles from the player's current position using a breadth-first search algorithm.
@@ -533,6 +536,11 @@ public class SceneAPI {
         }
     }
 
+    /**
+     * Determines if the destination world point is reachable from the player's current position.
+     * @param to The destination WorldPoint.
+     * @return True if the destination WorldPoint is reachable, false otherwise.
+     */
     public static boolean isReachable(WorldPoint to)
     {
         Client client = Static.getClient();

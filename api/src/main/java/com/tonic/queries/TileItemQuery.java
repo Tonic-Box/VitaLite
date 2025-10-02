@@ -12,102 +12,203 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.geom.Point2D;
 
+/**
+ * A query builder for {@link TileItemEx} objects.
+ */
 public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
 {
+    /**
+     * Creates a new TileItemQuery instance initialized with all tile items in the game.
+     */
     public TileItemQuery() {
         super(GameManager.tileItemList());
     }
 
+    /**
+     * Filters the query to include only items with the specified IDs.
+     * @param id the item IDs to filter by
+     * @return TileItemQuery
+     */
     public TileItemQuery withId(int... id)
     {
         return removeIf(o -> !ArrayUtils.contains(id, o.getId()));
     }
 
+    /**
+     * Filters the query to include only items with the specified canonical IDs.
+     * @param id the canonical item IDs to filter by
+     * @return TileItemQuery
+     */
     public TileItemQuery withCanonicalId(int... id)
     {
         return removeIf(o -> !ArrayUtils.contains(id, o.getCanonicalId()));
     }
 
+    /**
+     * Filters the query to include only items with the specified name.
+     * @param name the item name to filter by
+     * @return TileItemQuery
+     */
     public TileItemQuery withName(String name)
     {
         return keepIf(o -> o.getName() != null && o.getName().equalsIgnoreCase(name));
     }
 
+    /**
+     * Filters the query to include only items with names containing any of the specified substrings, ignoring case.
+     * @param names the substrings to filter by
+     * @return TileItemQuery
+     */
     public TileItemQuery withNames(String... names)
     {
         return keepIf(o -> o.getName() != null && TextUtil.containsIgnoreCase(o.getName(), names));
     }
 
+    /**
+     * Filters to only items with a shop price greater than the specified value.
+     * @param price the minimum shop price
+     * @return TileItemQuery
+     */
     public TileItemQuery greaterThanShopPrice(int price)
     {
         return removeIf(o -> o.getShopPrice() <= price);
     }
 
+    /**
+     * Filters to only items with a shop price less than the specified value.
+     * @param price the maximum shop price
+     * @return TileItemQuery
+     */
     public TileItemQuery lessThanShopPrice(int price)
     {
         return removeIf(o -> o.getShopPrice() >= price);
     }
 
+    /**
+     * Filters to only items with a Grand Exchange price greater than the specified value.
+     * @param price the minimum Grand Exchange price
+     * @return TileItemQuery
+     */
     public TileItemQuery greaterThanGePrice(int price)
     {
         return removeIf(o -> o.getGePrice() <= price);
     }
 
+    /**
+     * Filters to only items with a Grand Exchange price less than the specified value.
+     * @param price the maximum Grand Exchange price
+     * @return TileItemQuery
+     */
     public TileItemQuery lessThanGePrice(int price)
     {
         return removeIf(o -> o.getGePrice() >= price);
     }
 
+    /**
+     * Filters to only items with a high alchemy value greater than the specified value.
+     * @param value the minimum high alchemy value
+     * @return TileItemQuery
+     */
     public TileItemQuery greaterThanHighAlchValue(int value)
     {
         return removeIf(o -> o.getHighAlchValue() <= value);
     }
 
+    /**
+     * Filters to only items with a high alchemy value less than the specified value.
+     * @param value the maximum high alchemy value
+     * @return TileItemQuery
+     */
     public TileItemQuery lessThanHighAlchValue(int value)
     {
         return removeIf(o -> o.getHighAlchValue() >= value);
     }
 
+    /**
+     * Filters to only items with a low alchemy value greater than the specified value.
+     * @param value the minimum low alchemy value
+     * @return TileItemQuery
+     */
     public TileItemQuery greaterThanLowAlchValue(int value)
     {
         return removeIf(o -> o.getLowAlchValue() <= value);
     }
 
+    /**
+     * Filters to only items with a low alchemy value less than the specified value.
+     * @param value the maximum low alchemy value
+     * @return TileItemQuery
+     */
     public TileItemQuery lessThanLowAlchValue(int value)
     {
         return removeIf(o -> o.getLowAlchValue() >= value);
     }
 
+    /**
+     * Filters to only items whose names contain the specified substring, ignoring case.
+     * @param namePart the substring to filter by
+     * @return TileItemQuery
+     */
     public TileItemQuery withNameContains(String namePart)
     {
         return removeIf(o -> !o.getName().toLowerCase().contains(namePart.toLowerCase()));
     }
 
+    /**
+     * Filters to only items whose names match the specified wildcard pattern, ignoring case.
+     * @param namePart the wildcard pattern to filter by
+     * @return TileItemQuery
+     */
     public TileItemQuery withNameMatches(String namePart)
     {
         return removeIf(o -> !WildcardMatcher.matches(namePart.toLowerCase(), Text.removeTags(o.getName().toLowerCase())));
     }
 
+    /**
+     * Filters to only items within the specified distance from the local player.
+     * @param distance the maximum distance
+     * @return TileItemQuery
+     */
     public TileItemQuery within(int distance)
     {
         return keepIf(o -> Location.within(client.getLocalPlayer().getWorldLocation(), o.getWorldLocation(), distance));
     }
 
+    /**
+     * Filters to only items within the specified distance from the given world point.
+     * @param center the center world point
+     * @param distance the maximum distance
+     * @return TileItemQuery
+     */
     public TileItemQuery within(WorldPoint center, int distance)
     {
         return keepIf(o -> Location.within(center, o.getWorldLocation(), distance));
     }
 
+    /**
+     * Filters to only items located at the specified world point.
+     * @param location the world point to filter by
+     * @return TileItemQuery
+     */
     public TileItemQuery atLocation(WorldPoint location)
     {
         return keepIf(o -> o.getWorldLocation().equals(location));
     }
 
+    /**
+     * Sorts the items by distance from the local player, nearest first.
+     * @return TileItemQuery
+     */
     public TileItemQuery sortNearest()
     {
         return sortNearest(client.getLocalPlayer().getWorldLocation());
     }
 
+    /**
+     * Sorts the items by distance from the specified world point, nearest first.
+     * @param center the center world point
+     * @return TileItemQuery
+     */
     public TileItemQuery sortNearest(WorldPoint center)
     {
         Point2D point = new Point2D.Double(center.getX(), center.getY());
@@ -118,11 +219,20 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
         });
     }
 
+    /**
+     * Sorts the items by distance from the local player, furthest first.
+     * @return TileItemQuery
+     */
     public TileItemQuery sortFurthest()
     {
         return sortFurthest(client.getLocalPlayer().getWorldLocation());
     }
 
+    /**
+     * Sorts the items by distance from the specified world point, furthest first.
+     * @param center the center world point
+     * @return TileItemQuery
+     */
     public TileItemQuery sortFurthest(WorldPoint center)
     {
         Point2D point = new Point2D.Double(center.getX(), center.getY());

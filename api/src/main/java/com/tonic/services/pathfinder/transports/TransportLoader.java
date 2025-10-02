@@ -248,7 +248,7 @@ public class TransportLoader
                 transports.add(npcTransport(new WorldPoint(2213, 3794, 0), new WorldPoint(2620, 3692, 0), NpcID.LOKAR_SEARUNNER_9306, "Rellekka"));
 
                 // Corsair's Cove
-                if (Skills.getBoostedLevel(Skill.AGILITY) >= 10 || !filter)
+                if (SkillAPI.getBoostedLevel(Skill.AGILITY) >= 10 || !filter)
                 {
                     transports.add(objectTransport(new WorldPoint(2546, 2871, 0), new WorldPoint(2546, 2873, 0), 31757,
                             "Climb"));

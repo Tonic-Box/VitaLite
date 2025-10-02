@@ -12,10 +12,21 @@ import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 
+/**
+ * Game API methods
+ */
 public class GameAPI
 {
+    /**
+     * Logs out of the game
+     */
     public static void logout()
     {
+        Client client = Static.getClient();
+        if (client.getGameState() != GameState.LOGGED_IN)
+        {
+            return;
+        }
         Widget logoutButton = WidgetAPI.get(InterfaceID.Logout.LOGOUT);
         if (logoutButton != null)
         {
@@ -29,6 +40,10 @@ public class GameAPI
         }
     }
 
+    /**
+     * Gets the current wilderness level, or 0 if not in the wilderness
+     * @return the wilderness level
+     */
     public static int getWildyLevel()
     {
         Widget wildyLevelWidget = WidgetAPI.get(InterfaceID.PvpIcons.WILDERNESSLEVEL);
@@ -67,12 +82,20 @@ public class GameAPI
         return Integer.parseInt(levelText.replace("Level: ", ""));
     }
 
+    /**
+     * Checks if the player is logged in
+     * @return true if logged in
+     */
     public static boolean isLoggedIn()
     {
         Client client = Static.getClient();
         return client.getGameState() == GameState.LOGGED_IN || client.getGameState() == GameState.LOADING;
     }
 
+    /**
+     * Checks if the player is on the login screen
+     * @return true if on the login screen
+     */
     public static boolean isOnLoginScreen()
     {
         Client client = Static.getClient();
@@ -81,34 +104,32 @@ public class GameAPI
                 || client.getGameState() == GameState.LOGGING_IN;
     }
 
-    public static int getRealSkillLevel(Skill skill)
-    {
-        Client client = Static.getClient();
-        return Static.invoke(() -> client.getRealSkillLevel(skill));
-    }
-
-    public static int getBoostedSkillLevel(Skill skill)
-    {
-        Client client = Static.getClient();
-        return Static.invoke(() -> client.getBoostedSkillLevel(skill));
-    }
-
-    public static int getSkillExperience(Skill skill)
-    {
-        Client client = Static.getClient();
-        return Static.invoke(() -> client.getSkillExperience(skill));
-    }
-
+    /**
+     * Gets the number of membership days remaining
+     * @return the number of membership days remaining
+     */
     public static int getMembershipDays()
     {
         return VarAPI.getVarp(VarPlayerID.ACCOUNT_CREDIT);
     }
 
+    /**
+     * Checks if the player is in a cutscene
+     * @return true if in a cutscene
+     */
     public static boolean isInCutscene()
     {
         return VarAPI.getVar(VarbitID.CUTSCENE_STATUS) > 0;
     }
 
+    /**
+     * Invokes a menu action
+     * @param identifier identifier
+     * @param opcode opcode
+     * @param param0 param0
+     * @param param1 param1
+     * @param itemId itemId
+     */
     public static void invokeMenuAction(int identifier, int opcode, int param0, int param1, int itemId)
     {
         TClient client = Static.getClient();

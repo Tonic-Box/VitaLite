@@ -75,11 +75,36 @@ public interface TClient
      */
     boolean isClientThread();
 
+    /**
+     * Gets the mouse handler.
+     *
+     * @return the mouse handler
+     */
     TMouseHandler getMouseHandler();
 
+    /**
+     * Gets the timestamp of the last mouse press in milliseconds.
+     * @return the timestamp in milliseconds
+     */
     long getClientMouseLastPressedMillis();
-    //mouseLastPressedMillis
+
+    /**
+     * Sets the timestamp of the last mouse press in milliseconds.
+     * @param millis the timestamp in milliseconds
+     */
     void setClientMouseLastPressedMillis(long millis);
 
+    /**
+     * Invokes a menu action with the specified parameters.
+     * @param option option
+     * @param target target
+     * @param identifier identifier
+     * @param opcode opcode
+     * @param param0 param0
+     * @param param1 param1
+     * @param itemId itemId
+     * @param x x
+     * @param y y
+     */
     void invokeMenuAction(String option, String target, int identifier, int opcode, int param0, int param1, int itemId, int x, int y);
 }

@@ -11,6 +11,9 @@ import lombok.Getter;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
 
+/**
+ * Enum of important NPCs and their locations
+ */
 @AllArgsConstructor
 @Getter
 public enum NpcLocations {

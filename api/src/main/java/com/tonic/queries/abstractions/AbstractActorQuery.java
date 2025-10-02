@@ -37,6 +37,10 @@ public abstract class AbstractActorQuery<T extends Actor, Q extends AbstractActo
         return removeIf(o -> o.getName() == null ||  !TextUtil.sanitize(o.getName()).toLowerCase().contains(name.toLowerCase()));
     }
 
+    /**
+     * filter to npcs the player can attack
+     * @return ActorQuery
+     */
     public Q canAttack()
     {
         return keepIf(ActorAPI::canAttack);
@@ -54,21 +58,41 @@ public abstract class AbstractActorQuery<T extends Actor, Q extends AbstractActo
         });
     }
 
+    /**
+     * filter by distance from a specific point
+     * @param center center point
+     * @param distance distance
+     * @return ActorQuery
+     */
     public Q within(WorldPoint center, int distance)
     {
         return keepIf(o -> Location.within(center, o.getWorldLocation(), distance));
     }
 
+    /**
+     * filter by exact location
+     * @param location location
+     * @return ActorQuery
+     */
     public Q atLocation(WorldPoint location)
     {
         return keepIf(o -> o.getWorldLocation().equals(location));
     }
 
+    /**
+     * sort by nearest to the player
+     * @return ActorQuery
+     */
     public Q sortNearest()
     {
         return sortNearest(client.getLocalPlayer().getWorldLocation());
     }
 
+    /**
+     * sort by nearest to a specific point
+     * @param center center point
+     * @return ActorQuery
+     */
     public Q sortNearest(WorldPoint center)
     {
         Point2D point = new Point2D.Double(center.getX(), center.getY());
@@ -79,11 +103,20 @@ public abstract class AbstractActorQuery<T extends Actor, Q extends AbstractActo
         });
     }
 
+    /**
+     * sort by furthest from the player
+     * @return ActorQuery
+     */
     public Q sortFurthest()
     {
         return sortFurthest(client.getLocalPlayer().getWorldLocation());
     }
 
+    /**
+     * sort by furthest from a specific point
+     * @param center center point
+     * @return ActorQuery
+     */
     public Q sortFurthest(WorldPoint center)
     {
         Point2D point = new Point2D.Double(center.getX(), center.getY());

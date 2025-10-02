@@ -15,6 +15,14 @@ import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+/**
+ * A utility class providing methods to interact with the floating world map in RuneLite.
+ * <p>
+ * This class includes functions to convert screen coordinates to world points,
+ * check if the world map is open, draw markers and images on the map, and more.
+ * It is designed to facilitate plugin development that requires interaction with
+ * the world map interface.
+ */
 public class WorldMapAPI
 {
     /**
@@ -224,7 +232,17 @@ public class WorldMapAPI
         return mapBounds.contains(screenX, screenY);
     }
 
-    //drawing
+    /**
+     * Draws a path of colored squares on the floating world map at the specified world points.
+     * <p>
+     * This method renders a series of colored squares at the given world coordinates on the
+     * world map interface. It ensures that the squares are only drawn within the visible
+     * map area and takes into account any UI elements that may obscure parts of the map.
+     *
+     * @param graphics the Graphics2D context to draw on
+     * @param worldPoints the list of WorldPoints where squares should be drawn
+     * @param color the color of the squares to draw
+     */
     public static void drawPath(Graphics2D graphics, List<WorldPoint> worldPoints, Color color)
     {
         if (WidgetAPI.get(InterfaceID.Worldmap.MAP_CONTAINER) == null) {
@@ -577,9 +595,6 @@ public class WorldMapAPI
         graphics.setStroke(oldStroke);
     }
 
-    /**
-     * Creates a smooth, fluid marker path using Bezier curves.
-     */
     private static Path2D.Double createFluidMarkerPath(int x, int y, double scale) {
         Path2D.Double path = new Path2D.Double();
 

@@ -225,6 +225,9 @@ public enum PrayerAPI {
         }
     }
 
+    /**
+     * flick quick prayers (turns on if off, then off -> on)
+     */
     public static void flickQuickPrayer()
     {
         if(!isQuickPrayerEnabled())

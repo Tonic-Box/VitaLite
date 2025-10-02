@@ -126,21 +126,41 @@ public class TileObjectAPI
         return -1;
     }
 
+    /**
+     * get a tile object by filter
+     * @param filter filter
+     * @return tile object
+     */
     public static TileObjectEx get(Predicate<TileObjectEx> filter)
     {
         return Static.invoke(() -> new TileObjectQuery<>().keepIf(filter).sortNearest().first());
     }
 
+    /**
+     * get a tile object by name
+     * @param names names
+     * @return tile object
+     */
     public static TileObjectEx get(String... names)
     {
         return Static.invoke(() -> new TileObjectQuery<>().withNames(names).sortNearest().first());
     }
 
+    /**
+     * get a tile object by name contains
+     * @param names names
+     * @return tile object
+     */
     public static TileObjectEx getContains(String... names)
     {
         return Static.invoke(() -> new TileObjectQuery<>().withNamesContains(names).sortNearest().first());
     }
 
+    /**
+     * get a tile object by id
+     * @param ids ids
+     * @return tile object
+     */
     public static TileObjectEx get(int... ids)
     {
         return Static.invoke(() -> new TileObjectQuery<>().withId(ids).sortNearest().first());

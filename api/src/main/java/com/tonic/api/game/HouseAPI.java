@@ -1,9 +1,13 @@
 package com.tonic.api.game;
 
 import com.tonic.data.WorldLocation;
+import com.tonic.util.WorldPointUtil;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 
+/**
+ * POH API
+ */
 public class HouseAPI {
     public static final int HOUSE_LOCATION_VARBIT = 2187;
     public static final WorldLocation[] HOUSE_LOCATIONS = {
@@ -17,6 +21,10 @@ public class HouseAPI {
             WorldLocation.HOSIDIUS_POH_PORTAL
     };
 
+    /**
+     * Get the outside location of the player's house
+     * @return WorldPoint of the outside location, or null if no house or not logged in
+     */
     public static WorldPoint getOutsideLocation()
     {
         if (!GameAPI.isLoggedIn())
@@ -30,16 +38,6 @@ public class HouseAPI {
             return null;
         }
 
-        return getCenter(HOUSE_LOCATIONS[idx - 1].getWorldArea());
-    }
-
-    private static WorldPoint getCenter(WorldArea area)
-    {
-        int x = area.getX();
-        int y = area.getY();
-        int width = area.getWidth();
-        int height = area.getHeight();
-        int plane = area.getPlane();
-        return new WorldPoint(x + (width / 2), y + (height / 2), plane);
+        return WorldPointUtil.getCenter(HOUSE_LOCATIONS[idx - 1].getWorldArea());
     }
 }

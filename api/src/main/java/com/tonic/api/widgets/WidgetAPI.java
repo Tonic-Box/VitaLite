@@ -14,6 +14,11 @@ import net.runelite.api.widgets.WidgetInfo;
  */
 public class WidgetAPI
 {
+    /**
+     * invoke a widget action by action name
+     * @param widget widget
+     * @param action action
+     */
     public static void interact(Widget widget, String action) {
         if (widget == null || widget.getActions() == null)
             return;
@@ -28,6 +33,11 @@ public class WidgetAPI
         }
     }
 
+    /**
+     * invoke a widget action by action index
+     * @param widget widget
+     * @param action action index
+     */
     public static void interact(Widget widget, int action) {
         if (widget == null)
             return;
@@ -91,6 +101,12 @@ public class WidgetAPI
         interact(action, widgetInfo.getId(), childId, itemId);
     }
 
+    /**
+     * invoke a widget action
+     * @param action action type
+     * @param widgetInfo widget info
+     * @param childId child ID
+     */
     public static void interact(int action, WidgetInfoExtended widgetInfo, int childId)
     {
         interact(action, widgetInfo.getId(), childId);
@@ -329,6 +345,11 @@ public class WidgetAPI
         return isVisible(get(groupId, childId));
     }
 
+    /**
+     * Check if a widget is visible
+     * @param interfaceId interfaceId
+     * @return true if visible
+     */
     public static boolean isVisible(int interfaceId)
     {
         return isVisible(get(interfaceId));

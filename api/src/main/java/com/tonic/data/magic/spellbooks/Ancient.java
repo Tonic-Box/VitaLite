@@ -1,6 +1,6 @@
 package com.tonic.data.magic.spellbooks;
 
-import com.tonic.api.game.GameAPI;
+import com.tonic.api.game.SkillAPI;
 import com.tonic.api.threaded.WorldsAPI;
 import com.tonic.api.widgets.MagicAPI;
 import com.tonic.data.magic.Rune;
@@ -265,7 +265,7 @@ public enum Ancient implements Spell
             return MagicAPI.isHomeTeleportOnCooldown();
         }
 
-        if (level > GameAPI.getRealSkillLevel(Skill.MAGIC) || level > GameAPI.getRealSkillLevel(Skill.MAGIC))
+        if (level > SkillAPI.getLevel(Skill.MAGIC) || level > SkillAPI.getLevel(Skill.MAGIC))
         {
             return false;
         }

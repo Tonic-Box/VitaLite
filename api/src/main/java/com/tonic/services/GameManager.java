@@ -36,20 +36,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * GameManager
+ */
 public class GameManager extends Overlay {
     //static api
     public static int getTickCount()
     {
         return INSTANCE.tickCount;
-    }
-
-    public static Actor getInteracting()
-    {
-        Client client = Static.getClient();
-        Actor interacting = client.getLocalPlayer().getInteracting();
-        if(interacting == null)
-            interacting = INSTANCE.lastInteracting;
-        return interacting;
     }
 
     public static Stream<Player> playerStream()
@@ -153,7 +147,6 @@ public class GameManager extends Overlay {
     }
 
     private final List<TileItemEx> tileItemCache = new CopyOnWriteArrayList<>();
-    private Actor lastInteracting = null;
     private int tickCount = 0;
     private volatile List<WorldPoint> pathPoints = null;
     private volatile List<WorldPoint> testPoints = null;
@@ -170,29 +163,6 @@ public class GameManager extends Overlay {
         if(event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
             tickCount = 0;
     }
-
-    @Subscribe
-    public void onInteractingChanged(InteractingChanged event)
-    {
-        Client client = Static.getClient();
-        if(event.getSource() == client.getLocalPlayer() && event.getTarget() != null)
-        {
-            if(filter(event.getSource()))
-                lastInteracting = event.getTarget();
-        }
-        else if(event.getTarget() == client.getLocalPlayer() && event.getSource() != null)
-        {
-            if(filter(event.getSource()))
-                lastInteracting = event.getSource();
-        }
-    }
-
-    private boolean filter(Actor actor)
-    {
-        return actor.getName() != null;
-    }
-
-    //tile items
 
     @Subscribe
     public void onItemSpawned(ItemSpawned event)

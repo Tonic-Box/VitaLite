@@ -4,7 +4,17 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import java.io.InputStreamReader;
 import java.net.URL;
+
+/**
+ * Service to fetch random cat facts from an external API.
+ */
 public class CatFacts {
+
+    /**
+     * Fetches a random cat fact.
+     * @param maxLength Maximum length of the cat fact. Use -1 for no limit.
+     * @return A random cat fact as a String.
+     */
     public static String get(int maxLength)
     {
         try

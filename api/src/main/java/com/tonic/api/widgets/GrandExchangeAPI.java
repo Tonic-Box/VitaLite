@@ -247,11 +247,18 @@ public class GrandExchangeAPI
         return item.getSlot();
     }
 
+    /**
+     * Checks if the Grand Exchange interface is currently open.
+     * @return true if the Grand Exchange interface is open, false otherwise.
+     */
     public static boolean isOpen()
     {
         return WidgetAPI.isVisible(InterfaceID.GeOffers.UNIVERSE);
     }
 
+    /**
+     * Collects all completed offers in the Grand Exchange.
+     */
     public static void collectAll()
     {
         WidgetAPI.interact(1, InterfaceID.GeOffers.COLLECTALL, 0, -1);

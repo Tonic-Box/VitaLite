@@ -11,6 +11,9 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+/**
+ * Static access to important stuff
+ */
 public class Static
 {
     public static final Path RUNELITE_DIR = Path.of(System.getProperty("user.home"), ".runelite");
@@ -29,16 +32,28 @@ public class Static
     {
         return (T) CLIENT_OBJECT;
     }
+
+    /**
+     * get runelite wrapper instance
+     * @return runelite wrapper instance
+     */
     public static RuneLite getRuneLite()
     {
         return RL;
     }
 
+    /**
+     * get guice injector
+     * @return guice injector
+     */
     public static Injector getInjector()
     {
         return RL.getInjector().getInjector();
     }
 
+    /**
+     * INTERNAL USE ONLY
+     */
     public static void set(Object object, String name)
     {
         switch (name)
@@ -72,6 +87,11 @@ public class Static
         }
     }
 
+    /**
+     * invoke on client thread
+     *
+     * @param runnable runnable block
+     */
     public static void invoke(Runnable runnable) {
         TClient T_CLIENT = (TClient) CLIENT_OBJECT;
         if (!T_CLIENT.isClientThread()) {
@@ -81,11 +101,20 @@ public class Static
         }
     }
 
+    /**
+     * post event to event bus
+     * @param event event object
+     */
     public static void post(Object event)
     {
         getRuneLite().getEventBus().post(event);
     }
 
+    /**
+     * Enable or disable headless mode.
+     *
+     * @param headless true to enable headless mode, false to disable it
+     */
     public static void setHeadless(boolean headless) {
         Static.headless = headless;
         HeadlessMode.toggleHeadless(headless);

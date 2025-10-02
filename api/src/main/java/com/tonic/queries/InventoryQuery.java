@@ -17,8 +17,16 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Query class for searching and filtering items in an inventory.
+ */
 public class InventoryQuery extends AbstractQuery<ItemEx, InventoryQuery>
 {
+    /**
+     * Create a query from an ItemContainerEx instance
+     * @param itemContainer The item container to query from
+     * @return A new InventoryQuery instance
+     */
     public static InventoryQuery fromContainer(ItemContainerEx itemContainer)
     {
         List<ItemEx> cache;
@@ -34,17 +42,32 @@ public class InventoryQuery extends AbstractQuery<ItemEx, InventoryQuery>
         return new InventoryQuery(cache);
     }
 
+    /**
+     * Create a query from a standard ItemContainer instance
+     * @param itemContainer The item container to query from
+     * @return A new InventoryQuery instance
+     */
     public static InventoryQuery fromContainer(ItemContainer itemContainer)
     {
         return fromInventoryId(itemContainer.getId());
     }
 
+    /**
+     * Create a query from an InventoryID
+     * @param inventoryId The inventory ID to query from
+     * @return A new InventoryQuery instance
+     */
     @SuppressWarnings("deprecation")
     public static InventoryQuery fromInventoryId(InventoryID inventoryId)
     {
         return fromInventoryId(inventoryId.getId());
     }
 
+    /**
+     * Create a query from an inventory ID
+     * @param inventoryId The inventory ID to query from
+     * @return A new InventoryQuery instance
+     */
     public static InventoryQuery fromInventoryId(int inventoryId)
     {
         List<ItemEx> cache;
@@ -61,6 +84,11 @@ public class InventoryQuery extends AbstractQuery<ItemEx, InventoryQuery>
         return new InventoryQuery(cache);
     }
 
+    /**
+     * Create a query from a ShopID
+     * @param inventoryId The shop ID to query from
+     * @return A new InventoryQuery instance
+     */
     public static InventoryQuery fromShopId(ShopID inventoryId)
     {
         if(inventoryId == null)
@@ -82,85 +110,169 @@ public class InventoryQuery extends AbstractQuery<ItemEx, InventoryQuery>
         return new InventoryQuery(cache);
     }
 
+    /**
+     * Constructor to initialize the query with a list of items.
+     * @param cache The initial list of items to query from.
+     */
     public InventoryQuery(List<ItemEx> cache) {
         super(cache);
     }
 
+    /**
+     * Filter items by their IDs.
+     * @param id id
+     * @return InventoryQuery
+     */
     public InventoryQuery withId(int... id)
     {
         return removeIf(o -> !ArrayUtils.contains(id, o.getId()));
     }
 
+    /**
+     * Filter items by their canonical IDs.
+     * @param id id
+     * @return InventoryQuery
+     */
     public InventoryQuery withCanonicalId(int... id)
     {
         return removeIf(o -> !ArrayUtils.contains(id, o.getCanonicalId()));
     }
 
+    /**
+     * Filter items by their names.
+     * @param name name
+     * @return InventoryQuery
+     */
     public InventoryQuery withName(String... name)
     {
         return removeIf(o -> !ArrayUtils.contains(name, o.getName()));
     }
 
+    /**
+     * Filter items with a shop price greater than the specified value.
+     * @param price price
+     * @return InventoryQuery
+     */
     public InventoryQuery greaterThanShopPrice(int price)
     {
         return removeIf(o -> o.getShopPrice() <= price);
     }
 
+    /**
+     * Filter items with a shop price less than the specified value.
+     * @param price price
+     * @return InventoryQuery
+     */
     public InventoryQuery lessThanShopPrice(int price)
     {
         return removeIf(o -> o.getShopPrice() >= price);
     }
 
+    /**
+     * Filter items with a GE price greater than the specified value.
+     * @param price price
+     * @return InventoryQuery
+     */
     public InventoryQuery greaterThanGePrice(int price)
     {
         return removeIf(o -> o.getGePrice() <= price);
     }
 
+    /**
+     * Filter items with a GE price less than the specified value.
+     * @param price price
+     * @return InventoryQuery
+     */
     public InventoryQuery lessThanGePrice(int price)
     {
         return removeIf(o -> o.getGePrice() >= price);
     }
 
+    /**
+     * Filter items with a high alch value greater than the specified value.
+     * @param value value
+     * @return InventoryQuery
+     */
     public InventoryQuery greaterThanHighAlchValue(int value)
     {
         return removeIf(o -> o.getHighAlchValue() <= value);
     }
 
+    /**
+     * Filter items with a high alch value less than the specified value.
+     * @param value value
+     * @return InventoryQuery
+     */
     public InventoryQuery lessThanHighAlchValue(int value)
     {
         return removeIf(o -> o.getHighAlchValue() >= value);
     }
 
+    /**
+     * Filter items with a low alch value greater than the specified value.
+     * @param value value
+     * @return InventoryQuery
+     */
     public InventoryQuery greaterThanLowAlchValue(int value)
     {
         return removeIf(o -> o.getLowAlchValue() <= value);
     }
 
+    /**
+     * Filter items with a low alch value less than the specified value.
+     * @param value value
+     * @return InventoryQuery
+     */
     public InventoryQuery lessThanLowAlchValue(int value)
     {
         return removeIf(o -> o.getLowAlchValue() >= value);
     }
 
+    /**
+     * Filter items whose names contain the specified substring (case-insensitive).
+     * @param namePart Substring to search for in item names
+     * @return InventoryQuery
+     */
     public InventoryQuery withNameContains(String namePart)
     {
         return removeIf(o -> !o.getName().toLowerCase().contains(namePart.toLowerCase()));
     }
 
+    /**
+     * Filter items whose names match the specified wildcard pattern (case-insensitive).
+     * @param namePart Wildcard pattern to match against item names
+     * @return InventoryQuery
+     */
     public InventoryQuery withNameMatches(String namePart)
     {
         return removeIf(o -> !WildcardMatcher.matches(namePart.toLowerCase(), Text.removeTags(o.getName().toLowerCase())));
     }
 
+    /**
+     * Filter items by action.
+     * @param action action
+     * @return InventoryQuery
+     */
     public InventoryQuery withAction(String action)
     {
         return removeIf(o -> !o.hasAction(action));
     }
 
+    /**
+     * Filter items whose actions contain the specified substring (case-insensitive).
+     * @param actionPart Substring to search for in item actions
+     * @return InventoryQuery
+     */
     public InventoryQuery withActionContains(String actionPart)
     {
         return removeIf(o -> !o.hasActionContains(actionPart));
     }
 
+    /**
+     * Filter items by slots.
+     * @param slots slots
+     * @return InventoryQuery
+     */
     public InventoryQuery fromSlot(int... slots)
     {
         return removeIf(i -> !ArrayUtils.contains(slots, i.getSlot()));
@@ -202,6 +314,10 @@ public class InventoryQuery extends AbstractQuery<ItemEx, InventoryQuery>
         );
     }
 
+    /**
+     * Count the total quantity of items left in the list - terminal operation
+     * @return The total quantity of items
+     */
     public int count()
     {
         List<ItemEx> list = collect();

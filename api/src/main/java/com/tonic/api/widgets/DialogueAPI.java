@@ -342,6 +342,10 @@ public class DialogueAPI
         return false;
     }
 
+    /**
+     * Helper method to continue a quest by selecting the highlighted option.
+     * @return true if an option was selected, false otherwise.
+     */
     public static boolean continueQuestHelper() {
         Widget widget = WidgetAPI.get(WidgetInfoExtended.DIALOG_OPTION_OPTION1);
         if(widget == null)
@@ -360,6 +364,10 @@ public class DialogueAPI
         return false;
     }
 
+    /**
+     * Continues the Varrock Museum quiz by selecting the correct answer based on the question.
+     * @return true if an answer was selected, false otherwise.
+     */
     public static boolean continueMuseumQuiz() {
         Widget questionWidget = WidgetAPI.get(WidgetInfo.VARROCK_MUSEUM_QUESTION);
         if(questionWidget == null)

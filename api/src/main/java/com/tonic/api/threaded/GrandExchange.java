@@ -6,12 +6,17 @@ import com.tonic.data.GrandExchangeSlot;
 
 import static com.tonic.api.widgets.GrandExchangeAPI.*;
 
+/**
+ * Threaded Grand Exchange API
+ */
 public class GrandExchange
 {
     /**
-     * start a fully automated buy offer
+     * fully automated buy offer with retries
      * @param id item id
      * @param quantity amount
+     * @param noted withdraw as noted
+     * @param tries number of retries (increasing the offer by 5% each retry)
      */
     public static void buy(int id, int quantity, boolean noted, int tries)
     {
@@ -37,6 +42,12 @@ public class GrandExchange
         Delays.tick();
     }
 
+    /**
+     * fully automated buy offer
+     * @param id item id
+     * @param quantity amount
+     * @param price price per item
+     */
     public static void buy(int id, int quantity, int price)
     {
         GrandExchangeSlot slot = startBuyOffer(id, quantity, price);
@@ -54,6 +65,13 @@ public class GrandExchange
         Delays.tick();
     }
 
+    /**
+     * fully automated buy offer
+     * @param id item id
+     * @param quantity amount
+     * @param price price per item
+     * @param noted withdraw as noted
+     */
     public static void buy(int id, int quantity, int price, boolean noted)
     {
         GrandExchangeSlot slot = startBuyOffer(id, quantity, price);
@@ -73,6 +91,12 @@ public class GrandExchange
         Delays.tick();
     }
 
+    /**
+     * fully automated buy offer with retries
+     * @param id item id
+     * @param quantity amount
+     * @param noted withdraw as noted
+     */
     public static void buy(int id, int quantity, boolean noted)
     {
         int slotNumber = freeSlot();
@@ -96,6 +120,14 @@ public class GrandExchange
         Delays.tick();
     }
 
+    /**
+     * attempt to insta-buy with a percentage increase
+     * @param id item id
+     * @param quantity amount
+     * @param slot slot to use
+     * @param percents percentage increase (# of 5% increases to do)
+     * @return true if the offer was completed
+     */
     private static boolean buyNow(int id, int quantity, GrandExchangeSlot slot, int percents)
     {
         startBuyOfferPercentage(id, quantity, percents, slot.getSlot());

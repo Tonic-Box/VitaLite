@@ -22,11 +22,6 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
         this.client = Static.getClient();
     }
 
-    protected AbstractQuery(Supplier<List<T>> dataSource) {
-        this.dataSource = dataSource;
-        this.client = Static.getClient();
-    }
-
     @SuppressWarnings("unchecked")
     protected final Q self() {
         return (Q) this;

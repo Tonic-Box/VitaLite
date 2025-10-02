@@ -34,6 +34,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A worldWalker
+ */
 public class Walker
 {
     private final static Walker instance = new Walker();
@@ -67,23 +70,43 @@ public class Walker
         instance.cancel();
     }
 
+    /**
+     * Check if the walker is currently walking
+     * @return true if walking, false if not
+     */
     public static boolean isWalking()
     {
         return instance.running;
     }
 
+    /**
+     * Walk to a target point, eating at the specified hitpoints
+     * @param target target point
+     * @param eatAtHp hitpoints to eat at
+     */
     public static void walkTo(WorldPoint target, int eatAtHp)
     {
         instance.setHealthHandler(eatAtHp);
         walkTo(target, true);
     }
 
+    /**
+     * Walk to a target point, using the specified prayers
+     * @param target target point
+     * @param prayers prayers to use
+     */
     public static void walkTo(WorldPoint target, PrayerAPI... prayers)
     {
         instance.setPrayers(prayers);
         walkTo(target, true);
     }
 
+    /**
+     * Walk to a target point, eating at the specified hitpoints and using the specified prayers
+     * @param target target point
+     * @param eatAtHp hitpoints to eat at
+     * @param prayers prayers to use
+     */
     public static void walkTo(WorldPoint target, int eatAtHp, PrayerAPI... prayers)
     {
         instance.setHealthHandler(eatAtHp);
@@ -91,18 +114,31 @@ public class Walker
         walkTo(target, true);
     }
 
+    /**
+     * Walk to a target point
+     * @param target target point
+     */
     public static void walkTo(WorldPoint target)
     {
         walkTo(target, true);
     }
 
+    /**
+     * Walk to a target point, optionally using teleports
+     * @param target target point
+     * @param useTeleports true to use teleports, false to not
+     */
     public static void walkTo(WorldPoint target, boolean useTeleports)
     {
         instance.walk(target, useTeleports);
     }
 
-    //!
-
+    /**
+     * Walk to one of the specified areas (closest), eating at the specified hitpoints
+     * @param areas target areas
+     * @param eatAtHp hitpoints to eat at
+     * @param useTeleports true to use teleports, false to not
+     */
     public static void walkTo(List<WorldArea> areas, int eatAtHp, boolean useTeleports, PrayerAPI... prayers)
     {
         instance.setHealthHandler(eatAtHp);
@@ -110,13 +146,21 @@ public class Walker
         instance.walk(areas, useTeleports);
     }
 
+    /**
+     * Walk to one of the specified areas (closest)
+     * @param areas target areas
+     * @param useTeleports true to use teleports, false to not
+     */
     public static void walkTo(List<WorldArea> areas, boolean useTeleports)
     {
         instance.walk(areas, useTeleports);
     }
 
-    //!/
-
+    /**
+     * Walk the specified steps, using the specified teleport
+     * @param steps steps
+     * @param teleport teleport
+     */
     public static void walkTo(List<Step> steps, Teleport teleport)
     {
         instance.walk(steps, teleport);

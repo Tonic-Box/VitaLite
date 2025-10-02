@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+/**
+ * Threaded Minigames API
+ */
 public class Minigames
 {
     private static final Supplier<Widget> MINIGAMES_TAB_BUTTON = () -> WidgetAPI.get(707, 6);
@@ -68,11 +71,22 @@ public class Minigames
             Quest.WITCHS_HOUSE
     );
 
+    /**
+     * Checks if the player can currently use minigame teleport.
+     *
+     * @return true if the player can use minigame teleport, false otherwise
+     */
     public static boolean canTeleport()
     {
         return getLastMinigameTeleportUsage().plus(20, ChronoUnit.MINUTES).isBefore(Instant.now());
     }
 
+    /**
+     * Attempts to teleport to the specified minigame destination.
+     *
+     * @param destination The destination to teleport to
+     * @return true if the teleport was initiated, false otherwise
+     */
     public static boolean teleport(Destination destination)
     {
         if (!canTeleport())
@@ -109,6 +123,10 @@ public class Minigames
         return false;
     }
 
+    /**
+     * Opens the minigames tab and the minigames teleport interface.
+     * @return true if the minigames teleport interface is open, false otherwise
+     */
     public static boolean open()
     {
         if (!isTabOpen())
@@ -130,16 +148,31 @@ public class Minigames
         return isOpen();
     }
 
+    /**
+     * Checks if the minigames teleport interface is currently open.
+     *
+     * @return true if the minigames teleport interface is open, false otherwise
+     */
     public static boolean isOpen()
     {
         return WidgetAPI.isVisible(MINIGAMES_TELEPORT_BUTTON.get());
     }
 
+    /**
+     * Checks if the minigames tab is currently open.
+     *
+     * @return true if the minigames tab is open, false otherwise
+     */
     public static boolean isTabOpen()
     {
         return TabsAPI.isOpen(Tab.CLAN_TAB);
     }
 
+    /**
+     * Gets the time of the last minigame teleport usage.
+     *
+     * @return An {@link Instant} representing the time of the last minigame teleport usage
+     */
     public static Instant getLastMinigameTeleportUsage()
     {
         return Instant.ofEpochSecond(VarAPI.getVarp(VarPlayer.LAST_MINIGAME_TELEPORT) * 60L);
@@ -181,6 +214,11 @@ public class Minigames
         private final WorldPoint location;
         private final boolean members;
 
+        /**
+         * Checks if the player can use this minigame teleport destination.
+         *
+         * @return true if the player can use this minigame teleport destination, false otherwise
+         */
         public boolean canUse()
         {
             if (!hasDestination())
@@ -228,11 +266,21 @@ public class Minigames
             return false;
         }
 
+        /**
+         * Checks if this destination has a valid location.
+         *
+         * @return true if this destination has a valid location, false otherwise
+         */
         public boolean hasDestination()
         {
             return location != null;
         }
 
+        /**
+         * Gets the currently selected minigame teleport destination.
+         *
+         * @return The currently selected minigame teleport destination, or {@link Destination#NONE} if none is selected
+         */
         public static Destination getCurrent()
         {
             Widget selectedTeleport = MINIGAMES_DESTINATION.get();
@@ -244,6 +292,12 @@ public class Minigames
             return NONE;
         }
 
+        /**
+         * Finds a minigame teleport destination by its name.
+         *
+         * @param name The name of the destination
+         * @return The matching destination, or {@link Destination#NONE} if no match is found
+         */
         public static Destination byName(String name)
         {
             return Arrays.stream(values())
@@ -252,6 +306,12 @@ public class Minigames
                     .orElse(NONE);
         }
 
+        /**
+         * Finds a minigame teleport destination by its index.
+         *
+         * @param index The index of the destination
+         * @return The matching destination, or {@link Destination#NONE} if no match is found
+         */
         public static Destination of(int index)
         {
             return Arrays.stream(values())

@@ -9,8 +9,16 @@ import net.runelite.api.gameval.VarClientID;
 
 import java.util.Arrays;
 
+/**
+ * API for interacting with game tabs.
+ */
 public class TabsAPI
 {
+    /**
+     * Opens the specified tab.
+     *
+     * @param tab The tab to open.
+     */
     public static void open(Tab tab)
     {
         Client client = Static.getClient();
@@ -22,6 +30,12 @@ public class TabsAPI
         ClientScriptAPI.switchTabs(tab);
     }
 
+    /**
+     * Checks if the specified tab is currently open.
+     *
+     * @param tab The tab to check.
+     * @return True if the tab is open, false otherwise.
+     */
     public static boolean isOpen(Tab tab)
     {
         Client client = Static.getClient();

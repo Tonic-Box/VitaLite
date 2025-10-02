@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Manages mouse click strategies and click packet generation.
+ */
 public class ClickManager
 {
     @Setter
@@ -23,12 +26,20 @@ public class ClickManager
     private static volatile Shape shape = null;
     private static final List<ClickPacket> clickPackets = new ArrayList<>();
 
-
+    /**
+     * Sets the target point for static clicking.
+     * @param x the x-coordinate
+     * @param y the y-coordinate
+     */
     public static void setPoint(int x, int y)
     {
         point.set(new Point(x, y));
     }
 
+    /**
+     * Queues a shape for controlled clicking.
+     * @param shape the shape to click within
+     */
     public static void queueClickBox(Shape shape)
     {
         if(shape == null)
@@ -39,16 +50,26 @@ public class ClickManager
         ClickManager.shape = shape;
     }
 
+    /**
+     * Clears the currently set click box.
+     */
     public static void clearClickBox()
     {
         shape = null;
     }
 
+    /**
+     * Sends a click packet using the current strategy.
+     */
     public static void click()
     {
         click(PacketInteractionType.UNBOUND_INTERACT);
     }
 
+    /**
+     * Sends a click packet using the current strategy and specified interaction type.
+     * @param packetInteractionType the type of interaction for the click packet
+     */
     public static void click(PacketInteractionType packetInteractionType)
     {
         Static.invoke(() -> {

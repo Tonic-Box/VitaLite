@@ -13,6 +13,9 @@ import net.runelite.api.gameval.InterfaceID;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Various location related utility methods.
+ */
 public class Location {
     public static int getDistance(Tile source, WorldPoint worldPoint)
     {

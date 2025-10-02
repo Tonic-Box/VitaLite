@@ -9,7 +9,17 @@ import net.runelite.client.ui.overlay.OverlayUtil;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * MiniMap API
+ */
 public class MiniMapAPI {
+    /**
+     * Draws a path on the minimap.
+     *
+     * @param graphics The graphics context to draw on.
+     * @param path     The list of WorldPoints representing the path.
+     * @param color    The color to use for drawing the path.
+     */
     public static void drawPath(Graphics2D graphics, List<WorldPoint> path, Color color)
     {
         if(graphics == null || path == null || path.isEmpty())
@@ -23,6 +33,13 @@ public class MiniMapAPI {
         }
     }
 
+    /**
+     * Renders a single node on the minimap.
+     *
+     * @param graphics The graphics context to draw on.
+     * @param point    The WorldPoint to render.
+     * @param color    The color to use for rendering the node.
+     */
     public static void RenderNode(Graphics2D graphics, WorldPoint point, Color color)
     {
         final Client client = Static.getClient();

@@ -164,6 +164,11 @@ public class EquipmentAPI
         unEquip(EquipmentSlot.RING);
     }
 
+    /**
+     * get the count of a specific equipped item by id
+     * @param id item id
+     * @return int
+     */
     public static int getCount(int id) {
         return Static.invoke(() -> InventoryQuery.fromInventoryId(InventoryID.WORN).withId(id).count());
     }

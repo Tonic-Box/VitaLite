@@ -1,8 +1,6 @@
 package com.tonic.api.threaded;
 
 import com.tonic.Static;
-import com.tonic.api.TClient;
-import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.queries.WorldQuery;
@@ -107,6 +105,10 @@ public class WorldsAPI
         Delays.tick();
     }
 
+    /**
+     * Check if the current world is a members world
+     * @return True if the current world is a members world, false otherwise
+     */
     public static boolean inMembersWorld() {
         return getCurrentWorld().getTypes().contains(WorldType.MEMBERS);
     }

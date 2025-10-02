@@ -7,6 +7,10 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.coords.WorldArea;
 
+/**
+ * Enum of various notable areas in the game.
+ * Each area is represented by a WorldArea object defining its boundaries.
+ */
 @AllArgsConstructor
 @Getter
 public enum AreaLocations {

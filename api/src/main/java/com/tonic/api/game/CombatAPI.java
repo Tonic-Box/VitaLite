@@ -129,17 +129,29 @@ public class CombatAPI
         }
     }
 
+    /**
+     * Gets the player's current attack style
+     * @return the player's current attack style
+     */
     public static AttackStyle getAttackStyle()
     {
         return AttackStyle.fromIndex(VarAPI.getVarp(43));
     }
 
+    /**
+     * Gets the player's current health
+     * @return the player's current health
+     */
     public static int getHealth()
     {
         Client client = Static.getClient();
         return Static.invoke(() -> client.getBoostedSkillLevel(Skill.HITPOINTS));
     }
 
+    /**
+     * Checks if the player is currently in multiway combat
+     * @return true if the player is in multiway combat, false otherwise
+     */
     public static boolean inMultiWay()
     {
         return LayoutView.MULTI_WAY.isVisible();

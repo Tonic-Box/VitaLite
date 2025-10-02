@@ -7,7 +7,6 @@ import com.tonic.data.ItemContainerEx;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.data.ItemEx;
 import net.runelite.api.Client;
-import net.runelite.api.ItemContainer;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.VarbitID;
@@ -286,9 +285,15 @@ public class BankAPI
         );
         if(item == null)
             return;
-        WidgetAPI.interact(9, InterfaceID.Bankside.ITEMS, item.getId(), item.getId());
+        WidgetAPI.interact(9, InterfaceID.Bankside.ITEMS, item.getSlot(), item.getId());
     }
 
+    /**
+     * Attempts to guess the slot an item will be withdrawn into (for use in programatically
+     * 1-ticking interactions with withdrawn items) and "uses" the item. Not guarenteed to be
+     * 100% accurate.
+     * @param itemId The item id
+     */
     public static void useGuessNextSlot(int itemId) {
         int slot = Static.invoke(() -> {
             ItemContainerEx inventory = new ItemContainerEx(InventoryID.INV);
@@ -299,6 +304,6 @@ public class BankAPI
             Logger.warn("[useGuessNextSlot] Inventory full already");
             return;
         }
-        WidgetAPI.interact(9, WidgetInfo.BANK_INVENTORY_ITEMS_CONTAINER.getId(), slot, itemId);
+        WidgetAPI.interact(9, InterfaceID.Bankside.ITEMS, slot, itemId);
     }
 }

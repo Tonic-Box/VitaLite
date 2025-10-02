@@ -11,6 +11,9 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A custom overlay similar to InfoBox but with more flexibility (Throwback to my private non-RL client)
+ */
 public class VitaOverlay extends Overlay {
 
     @Getter @Setter
