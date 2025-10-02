@@ -8,6 +8,8 @@ import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarPlayerID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 
 public class GameAPI
@@ -71,6 +73,14 @@ public class GameAPI
         return client.getGameState() == GameState.LOGGED_IN || client.getGameState() == GameState.LOADING;
     }
 
+    public static boolean isOnLoginScreen()
+    {
+        Client client = Static.getClient();
+        return client.getGameState() == GameState.LOGIN_SCREEN
+                || client.getGameState() == GameState.LOGIN_SCREEN_AUTHENTICATOR
+                || client.getGameState() == GameState.LOGGING_IN;
+    }
+
     public static int getRealSkillLevel(Skill skill)
     {
         Client client = Static.getClient();
@@ -87,6 +97,16 @@ public class GameAPI
     {
         Client client = Static.getClient();
         return Static.invoke(() -> client.getSkillExperience(skill));
+    }
+
+    public static int getMembershipDays()
+    {
+        return VarAPI.getVarp(VarPlayerID.ACCOUNT_CREDIT);
+    }
+
+    public static boolean isInCutscene()
+    {
+        return VarAPI.getVar(VarbitID.CUTSCENE_STATUS) > 0;
     }
 
     public static void invokeMenuAction(int identifier, int opcode, int param0, int param1, int itemId)

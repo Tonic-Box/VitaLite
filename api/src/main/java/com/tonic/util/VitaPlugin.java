@@ -48,6 +48,7 @@ public class VitaPlugin extends Plugin
             catch (Throwable e)
             {
                 Logger.error(e, "[" + getName() + "] Error in loop(): %e");
+                e.printStackTrace();
             }
             finally
             {

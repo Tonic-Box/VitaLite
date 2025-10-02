@@ -15,7 +15,7 @@ import org.apache.commons.lang3.ArrayUtils;
 /**
  * Player API
  */
-public class PlayerAPI
+public class PlayerAPI extends ActorAPI
 {
     /**
      * interact with a player by option number
@@ -60,26 +60,6 @@ public class PlayerAPI
         });
     }
 
-    public static boolean canAttack(NPC npc) {
-        if(npc == null || npc.isDead())
-            return false;
-
-        return Static.invoke(() -> {
-            NPCComposition composition = npc.getComposition();
-            if(composition.getConfigs() != null)
-                composition = composition.transform();
-
-            if(composition.getActions() == null || !ArrayUtils.contains(composition.getActions(), "Attack"))
-                return false;
-
-            if(npc.getHealthRatio() == -1 || npc.getHealthScale() == -1)
-                return true;
-
-            Client client = Static.getClient();
-            return npc.getInteracting().equals(client.getLocalPlayer());
-        });
-    }
-
     public static Player getInCombatWith()
     {
         Client client = Static.getClient();
@@ -87,15 +67,5 @@ public class PlayerAPI
                 .keepIf(n -> n.getInteracting() != null && n.getInteracting().equals(client.getLocalPlayer()))
                 .keepIf(n -> !isIdle(n) || n.getHealthRatio() != -1)
                 .nearest();
-    }
-
-    /**
-     * check if a player is idle
-     * @param player player
-     * @return true if idle
-     */
-    public static boolean isIdle(Player player)
-    {
-        return (player.getIdlePoseAnimation() == player.getPoseAnimation() && player.getAnimation() == -1);
     }
 }

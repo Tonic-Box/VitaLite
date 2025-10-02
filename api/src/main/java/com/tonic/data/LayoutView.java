@@ -19,6 +19,8 @@ public enum LayoutView
     WORLD_MAP(InterfaceID.Toplevel.MINIMAP, InterfaceID.ToplevelOsrsStretch.MINIMAP, InterfaceID.ToplevelPreEoc.MINIMAP),
     SIDE_MENU(InterfaceID.Toplevel.SIDE, InterfaceID.ToplevelOsrsStretch.SIDE_MENU, InterfaceID.ToplevelPreEoc.SIDE_CONTAINER),
     CHAT_BOX(InterfaceID.Toplevel.CHAT_CONTAINER, InterfaceID.ToplevelOsrsStretch.CHAT_CONTAINER, InterfaceID.ToplevelPreEoc.CHAT_CONTAINER),
+    MULTI_WAY(InterfaceID.Toplevel.MULTIWAY_ICON, InterfaceID.ToplevelOsrsStretch.MULTIWAY_ICON, InterfaceID.ToplevelPreEoc.MULTIWAY_ICON),
+    GRAVESTONE(InterfaceID.Toplevel.GRAVESTONE, InterfaceID.ToplevelOsrsStretch.GRAVESTONE, InterfaceID.ToplevelPreEoc.GRAVESTONE),
     ;
     private final int CLASSIC_FIXED;
     private final int CLASSIC_STRETCH;
@@ -30,6 +32,15 @@ public enum LayoutView
             Client client = Static.getClient();
             int widgetId = client.isResized() ? (client.getVarbitValue(VarbitID.RESIZABLE_STONE_ARRANGEMENT) == 1 ? MODERN_STRETCH : CLASSIC_STRETCH) : CLASSIC_FIXED;
             return WidgetAPI.get(widgetId);
+        });
+    }
+
+    public boolean isVisible()
+    {
+        return Static.invoke(() -> {
+            Client client = Static.getClient();
+            int widgetId = client.isResized() ? (client.getVarbitValue(VarbitID.RESIZABLE_STONE_ARRANGEMENT) == 1 ? MODERN_STRETCH : CLASSIC_STRETCH) : CLASSIC_FIXED;
+            return WidgetAPI.isVisible(widgetId);
         });
     }
 }

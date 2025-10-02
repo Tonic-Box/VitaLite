@@ -3,6 +3,7 @@ package com.tonic.api.game;
 import com.tonic.Static;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.AttackStyle;
+import com.tonic.data.LayoutView;
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
 import net.runelite.api.gameval.InterfaceID;
@@ -137,5 +138,10 @@ public class CombatAPI
     {
         Client client = Static.getClient();
         return Static.invoke(() -> client.getBoostedSkillLevel(Skill.HITPOINTS));
+    }
+
+    public static boolean inMultiWay()
+    {
+        return LayoutView.MULTI_WAY.isVisible();
     }
 }
