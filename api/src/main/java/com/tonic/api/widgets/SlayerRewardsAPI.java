@@ -8,12 +8,15 @@ import lombok.Getter;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 
-@Getter
 public class SlayerRewardsAPI
 {
+    @Getter
     private static final UnlockTab unlockTab = new UnlockTab();
+    @Getter
     private static final ExtendTab extendTab = new ExtendTab();
+    @Getter
     private static final BuyTab buyTab = new BuyTab();
+    @Getter
     private static final TasksTab tasksTab = new TasksTab();
 
     public static boolean isOpen()
