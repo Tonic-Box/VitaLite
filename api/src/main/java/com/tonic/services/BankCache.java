@@ -115,7 +115,6 @@ public class BankCache
                 {
                     String serialized = serialize(emptyMap);
                     configManager.setProperty(playerName, serialized);
-                    Logger.norm("[Updated] cached bank for " + playerName);
                 }
             }
         }
@@ -130,8 +129,7 @@ public class BankCache
         String serialized = configManager.getStringOrDefault(client.getLocalPlayer().getName(), "");
         Int2IntMap map = deserialize(serialized);
         bankCache.put(client.getLocalPlayer().getName(), map);
-
-        Logger.norm("[Loaded] cached bank for " + client.getLocalPlayer().getName());
+        Logger.info("[Loaded] cached bank for " + client.getLocalPlayer().getName());
     }
 
     static void init()
