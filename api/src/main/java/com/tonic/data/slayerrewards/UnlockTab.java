@@ -18,7 +18,7 @@ public class UnlockTab extends AbstractTabImpl
         REPTILE_FREEZER(2, 10),
         SHROOM_SPRAYER(3, 110),
         MALEVOLENT_MMASQUERADE(5, 400),
-        RING_BLING(6150),
+        RING_BLING(6150, 150),
         BROADER_FLETCHING(7, 300),
         SEEING_RED(34, 50),
         WATCH_THE_BRIDE(17, 80),
