@@ -6,6 +6,7 @@ import com.tonic.api.widgets.BankAPI;
 import com.tonic.data.ItemEx;
 import com.tonic.queries.InventoryQuery;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMaps;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
@@ -34,8 +35,8 @@ public class BankCache
     {
         Client client = Static.getClient();
         if(client.getLocalPlayer() == null || client.getLocalPlayer().getName() == null)
-            return new Int2IntOpenHashMap();
-        return bankCache.getOrDefault(client.getLocalPlayer().getName(), new Int2IntOpenHashMap());
+            return EMPTY;
+        return bankCache.getOrDefault(client.getLocalPlayer().getName(), EMPTY);
     }
 
     /**
@@ -55,11 +56,10 @@ public class BankCache
      * @param itemIds Array of item IDs to search for.
      * @return The first matching item ID, or -1 if none are found.
      */
-    public static int cachedBankGetFirst(int... itemIds)
-    {
-        for(int id : itemIds)
-        {
-            if(cachedBankContains(id))
+    public static int cachedBankGetFirst(int... itemIds) {
+        Int2IntMap bank = getCachedBank();
+        for(int id : itemIds) {
+            if(bank.containsKey(id)) // Direct containsKey is faster
                 return id;
         }
         return -1;
@@ -77,6 +77,8 @@ public class BankCache
     }
 
     private static final ConcurrentHashMap<String,Int2IntMap> bankCache = new ConcurrentHashMap<>();
+    private static final
+    Int2IntMap EMPTY = Int2IntMaps.unmodifiable(new Int2IntOpenHashMap());
     private final ConfigManager configManager = new ConfigManager("CachedBanks");
 
     @Subscribe
@@ -84,10 +86,13 @@ public class BankCache
     {
         Client client = Static.getClient();
 
-        if(client.getLocalPlayer() == null || client.getLocalPlayer().getName() == null)
+        if(client.getLocalPlayer() == null)
+            return;
+        String playerName = client.getLocalPlayer().getName();
+        if(playerName == null)
             return;
 
-        if(!bankCache.containsKey(client.getLocalPlayer().getName()) && Static.isSaveBankCaching())
+        if(!bankCache.containsKey(playerName) && Static.isSaveBankCaching())
         {
             fetch();
         }
@@ -102,30 +107,18 @@ public class BankCache
                 emptyMap.put(item.getCanonicalId(), item.getQuantity() + currentQty);
             }
 
-            Int2IntMap itemMap = bankCache.getOrDefault(client.getLocalPlayer().getName(), new Int2IntOpenHashMap());
-            if(!match(itemMap, emptyMap))
+            Int2IntMap itemMap = bankCache.getOrDefault(playerName, EMPTY);
+            if(!itemMap.equals(emptyMap))
             {
-                bankCache.put(client.getLocalPlayer().getName(), emptyMap);
+                bankCache.put(playerName, emptyMap);
                 if(Static.isSaveBankCaching())
                 {
                     String serialized = serialize(emptyMap);
-                    configManager.setProperty(client.getLocalPlayer().getName(), serialized);
-                    Logger.norm("[Updated] cached bank for " + client.getLocalPlayer().getName());
+                    configManager.setProperty(playerName, serialized);
+                    Logger.norm("[Updated] cached bank for " + playerName);
                 }
             }
         }
-    }
-
-    private boolean match(Int2IntMap a, Int2IntMap b)
-    {
-        if(a.size() != b.size())
-            return false;
-        for(Int2IntMap.Entry entry : a.int2IntEntrySet())
-        {
-            if(b.get(entry.getIntKey()) != entry.getIntValue())
-                return false;
-        }
-        return true;
     }
 
     private void fetch()
@@ -153,9 +146,7 @@ public class BankCache
     }
 
     public static String serialize(Int2IntMap map) {
-        if (map.isEmpty()) {
-            return "";
-        }
+        if (map.isEmpty()) return "";
 
         ByteBuffer buffer = ByteBuffer.allocate(4 + map.size() * 8);
         buffer.putInt(map.size());
@@ -170,19 +161,24 @@ public class BankCache
 
     public static Int2IntMap deserialize(String str) {
         if (str == null || str.isEmpty()) {
-            return new Int2IntOpenHashMap();
+            return EMPTY;
         }
 
-        byte[] bytes = Base64.getDecoder().decode(str);
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-
-        int size = buffer.getInt();
-        Int2IntOpenHashMap map = new Int2IntOpenHashMap(size);
-
-        for (int i = 0; i < size; i++) {
-            map.put(buffer.getInt(), buffer.getInt());
+        try
+        {
+            byte[] bytes = Base64.getDecoder().decode(str);
+            ByteBuffer buffer = ByteBuffer.wrap(bytes);
+            int size = buffer.getInt();
+            Int2IntOpenHashMap map = new Int2IntOpenHashMap(size);
+            for (int i = 0; i < size; i++) {
+                map.put(buffer.getInt(), buffer.getInt());
+            }
+            return map;
         }
-
-        return map;
+        catch (Throwable e)
+        {
+            Logger.error("Failed to deserialize bank cache: " + e.getMessage());
+            return EMPTY;
+        }
     }
 }
