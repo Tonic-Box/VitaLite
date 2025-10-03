@@ -3,10 +3,14 @@ package com.tonic.services;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.tonic.Static;
 import com.tonic.api.threaded.Delays;
+import com.tonic.api.widgets.BankAPI;
 import com.tonic.api.widgets.MiniMapAPI;
 import com.tonic.api.widgets.WorldMapAPI;
+import com.tonic.data.ItemContainerEx;
+import com.tonic.data.ItemEx;
 import com.tonic.data.TileItemEx;
 import com.tonic.data.TileObjectEx;
+import com.tonic.queries.InventoryQuery;
 import com.tonic.services.codeeval.CodeEvalFrame;
 import com.tonic.services.pathfinder.Pathfinder;
 import com.tonic.services.pathfinder.Walker;
@@ -19,6 +23,7 @@ import net.runelite.api.Point;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.ClientToolbar;
@@ -142,7 +147,7 @@ public class GameManager extends Overlay {
                 .getEventBus()
                 .register(this);
         TransportLoader.init();
-
+        BankCache.init();
         System.out.println("GameCache initialized!");
     }
 
@@ -152,7 +157,7 @@ public class GameManager extends Overlay {
     private volatile List<WorldPoint> testPoints = null;
 
     @Subscribe
-    public void onGameTick(GameTick event)
+    protected void onGameTick(GameTick event)
     {
         tickCount++;
     }

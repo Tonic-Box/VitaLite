@@ -194,12 +194,12 @@ public class BankAPI
 
     /**
      * Checks if the bank contains an item with the specified id.
-     * @param itemId The id of the item to check for.
+     * @param itemIds The item ids to check for.
      * @return True if the item is in the bank, false otherwise.
      */
-    public static boolean contains(int itemId)
+    public static boolean contains(int... itemIds)
     {
-        return InventoryQuery.fromInventoryId(InventoryID.BANK).withId(itemId).first() != null;
+        return InventoryQuery.fromInventoryId(InventoryID.BANK).withId(itemIds).first() != null;
     }
 
     /**

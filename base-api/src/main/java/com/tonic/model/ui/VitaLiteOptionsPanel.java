@@ -39,6 +39,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ToggleSlider logPacketsToggle;
     private final ToggleSlider logMenuActionsToggle;
     private final ToggleSlider hideLoggerToggle;
+    private final ToggleSlider bankCacheToggle;
     private JFrame transportsEditor;
     private JFrame jShell;
     private final ConfigManager config = new ConfigManager("VitaLiteOptions");
@@ -51,7 +52,8 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 "clickPointX", -1,
                 "clickPointY", -1,
                 "cachedRandomDat", true,
-                "cachedDeviceID", true
+                "cachedDeviceID", true,
+                "cachedBank", true
         );
         config.ensure(defaults);
 
@@ -99,6 +101,20 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
         contentPanel.add(titlePanel);
         contentPanel.add(Box.createVerticalStrut(10));
+
+        bankCacheToggle = new ToggleSlider();
+        contentPanel.add(createToggleOption(
+                "Persist Bank Cache",
+                "Save the bank caching for reuse between sessions",
+                bankCacheToggle,
+                () -> {
+                    Static.setSaveBankCaching(bankCacheToggle.isSelected());
+                    config.setProperty("cachedBank", bankCacheToggle.isSelected());
+                }
+        ));
+        bankCacheToggle.setSelected(config.getBoolean("cachedBank"));
+        Static.setSaveBankCaching(config.getBoolean("cachedBank"));
+        contentPanel.add(Box.createVerticalStrut(12));
 
         headlessToggle = new ToggleSlider();
         contentPanel.add(createToggleOption(

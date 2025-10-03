@@ -5,6 +5,7 @@ import com.tonic.api.TClient;
 import com.tonic.headless.HeadlessMode;
 import com.tonic.model.RuneLite;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -20,6 +21,9 @@ public class Static
     public static final Path VITA_DIR = Path.of(RUNELITE_DIR.toString(), "vitalite");
     @Getter
     private static boolean headless = false;
+    @Getter
+    @Setter
+    private static boolean saveBankCaching = false;
     private static Object CLIENT_OBJECT;
     private static RuneLite RL;
 
