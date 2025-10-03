@@ -4,6 +4,7 @@ import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.PacketInteractionType;
+import com.tonic.services.pathfinder.Walker;
 import net.runelite.api.Client;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;

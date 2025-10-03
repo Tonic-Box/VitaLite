@@ -11,7 +11,7 @@ import com.tonic.data.locatables.NpcLocations;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.util.WorldPointUtil;
-import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.ItemID;
 import net.runelite.api.coords.WorldPoint;
@@ -23,7 +23,7 @@ import java.util.function.Supplier;
  */
 public class Cannon
 {
-    @Getter
+    @Setter
     private static boolean placed;
 
     /**

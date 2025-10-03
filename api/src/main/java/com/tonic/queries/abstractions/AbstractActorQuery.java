@@ -4,11 +4,9 @@ import com.tonic.api.entities.ActorAPI;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
 import net.runelite.api.Actor;
+import net.runelite.api.Tile;
 import net.runelite.api.coords.WorldPoint;
-
 import java.awt.geom.Point2D;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public abstract class AbstractActorQuery<T extends Actor, Q extends AbstractActorQuery<T, Q>> extends AbstractQuery<T, Q>
@@ -128,12 +126,78 @@ public abstract class AbstractActorQuery<T extends Actor, Q extends AbstractActo
     }
 
     /**
+     * sort by shortest path from the player
+     * @return ActorQuery
+     */
+    public Q sortShortestPath()
+    {
+        return sortShortestPath(client.getLocalPlayer().getWorldLocation());
+    }
+
+    /**
+     * sort by shortest path from a specific point
+     * @param center center point
+     * @return ActorQuery
+     */
+    public Q sortShortestPath(WorldPoint center)
+    {
+        return sort((o1, o2) -> {
+            List<Tile> path1 = Location.pathTo(center, o1.getWorldLocation());
+            List<Tile> path2 = Location.pathTo(center, o2.getWorldLocation());
+            int len1 = path2 == null ? Integer.MAX_VALUE : path2.size();
+            int len2 = path1 == null ? Integer.MAX_VALUE : path1.size();
+            return Integer.compare(len1, len2);
+        });
+    }
+
+    /**
+     * sort by furthest path from the player
+     * @return ActorQuery
+     */
+    public Q sortFurthestPath()
+    {
+        return sortFurthestPath(client.getLocalPlayer().getWorldLocation());
+    }
+
+    /**
+     * sort by furthest path from a specific point
+     * @param center center point
+     * @return ActorQuery
+     */
+    public Q sortFurthestPath(WorldPoint center)
+    {
+        return sort((o1, o2) -> {
+            List<Tile> path1 = Location.pathTo(center, o1.getWorldLocation());
+            List<Tile> path2 = Location.pathTo(center, o2.getWorldLocation());
+            int len1 = path2 == null ? Integer.MAX_VALUE : path2.size();
+            int len2 = path1 == null ? Integer.MAX_VALUE : path1.size();
+            return Integer.compare(len2, len1);
+        });
+    }
+
+    /**
      * Get the nearest Actor from the filtered list
      * Terminal operation - executes the query
      */
     public T nearest() {
         // Apply filters and sort by distance, then get first
         return this.sortNearest().first();
+    }
+
+    /**
+     * Get the Actor with the shortest path from the filtered list
+     * Terminal operation - executes the query
+     */
+    public T shortestPath() {
+        return this.sortShortestPath().first();
+    }
+
+    /**
+     * Get the Actor with the furthest path from the filtered list
+     * Terminal operation - executes the query
+     */
+    public T furthestPath() {
+        return this.sortFurthestPath().first();
     }
 
     /**

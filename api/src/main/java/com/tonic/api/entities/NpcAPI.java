@@ -2,14 +2,11 @@ package com.tonic.api.entities;
 
 import com.tonic.Static;
 import com.tonic.api.TClient;
-import com.tonic.queries.NpcQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.PacketInteractionType;
-import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.NPCComposition;
-import net.runelite.api.Player;
-import org.apache.commons.lang3.ArrayUtils;
+import net.runelite.client.game.NPCManager;
 
 /**
  * NPC API
@@ -70,6 +67,39 @@ public class NpcAPI extends ActorAPI
         {
             ClickManager.click(PacketInteractionType.NPC_INTERACT);
             client.getPacketWriter().npcActionPacket(option, npcIndex, false);
+        });
+    }
+
+    public static int getHealth(NPC npc) {
+        return Static.invoke(() -> {
+            NPCManager npcManager = Static.getInjector().getInstance(NPCManager.class);
+            Integer maxHealthValue = npcManager.getHealth(npc.getId());
+            if(maxHealthValue == null)
+                return 0;
+
+            int healthRatio = npc.getHealthRatio();
+            if(healthRatio <= 0)
+                return 0;
+
+            int healthScale = npc.getHealthScale();
+            if(healthScale <= 0)
+                return 0;
+
+            if(healthScale == 1) {
+                return maxHealthValue;
+            }
+
+            int minHealth = 1;
+            if(healthRatio > 1) {
+                minHealth = (maxHealthValue * (healthRatio - 1) + healthScale - 2) / (healthScale - 1);
+            }
+
+            int maxHealth = (maxHealthValue * healthRatio - 1) / (healthScale - 1);
+            if(maxHealth > maxHealthValue) {
+                maxHealth = maxHealthValue;
+            }
+
+            return (minHealth + maxHealth + 1) / 2;
         });
     }
 }

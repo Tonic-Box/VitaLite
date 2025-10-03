@@ -187,6 +187,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api:${runeliteVersions["slf4j"]}")
     implementation("ch.qos.logback:logback-core:${runeliteVersions["logback.core"]}")
     implementation("ch.qos.logback:logback-classic:${runeliteVersions["logback.classic"]}")
+    implementation("org.apache.commons:commons-collections4:4.1")
 
 //    implementation("com.lmax:disruptor:3.4.4")
 //    implementation("org.jctools:jctools-core:4.0.5")

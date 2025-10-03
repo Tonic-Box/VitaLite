@@ -2,6 +2,7 @@ package com.tonic.services.pathfinder;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.services.pathfinder.collections.BFSCache;
 import com.tonic.services.pathfinder.collections.HybridIntQueue;
 import com.tonic.services.pathfinder.collision.CollisionMap;
@@ -21,6 +22,7 @@ import net.runelite.api.Client;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.ItemID;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;

@@ -338,6 +338,16 @@ public class InventoryAPI
     }
 
     /**
+     * count the total number of items in your inventory by ids
+     * @param itemIds item ids
+     * @return int
+     */
+    public static int canonicalCount(int... itemIds)
+    {
+        return InventoryQuery.fromInventoryId(InventoryID.INV).withCanonicalId(itemIds).count();
+    }
+
+    /**
      * count the total number of items in your inventory by names
      * @param itemNames item names
      * @return int

@@ -296,4 +296,24 @@ public class WorldPointUtil {
     {
         return new WorldPoint((c >>> 14) & 0x3FFF, c & 0x3FFF, (c >>> 28) & 0x3);
     }
+
+    /**
+     * Checks if a WorldPoint is within a square area defined by another WorldPoint and size.
+     * @param other the WorldPoint to check
+     * @param size the size of the square area (size x size)
+     * @return true if the point is within the area, false otherwise
+     */
+    public static boolean pointWithinArea(WorldPoint wp, WorldPoint other, int size) {
+        int x = wp.getX();
+        int y = wp.getY();
+        int maxX = x + size - 1;
+        int maxY = y + size - 1;
+
+        return other.getX() >= x && other.getX() <= maxX && other.getY() >= y && other.getY() <= maxY;
+    }
+
+    public static boolean overlaps(WorldArea a, WorldArea b)
+    {
+        return a.toWorldPointList().stream().anyMatch(b.toWorldPointList()::contains);
+    }
 }
