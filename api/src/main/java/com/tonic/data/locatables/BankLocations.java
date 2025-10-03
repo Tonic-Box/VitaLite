@@ -1,12 +1,17 @@
 package com.tonic.data.locatables;
 
 import com.tonic.Static;
+import com.tonic.api.entities.TileObjectAPI;
+import com.tonic.api.game.MovementAPI;
 import com.tonic.api.game.QuestAPI;
+import com.tonic.api.threaded.Delays;
+import com.tonic.api.widgets.BankAPI;
+import com.tonic.data.TileObjectEx;
 import com.tonic.services.pathfinder.Walker;
-import com.tonic.services.pathfinder.model.Step;
 import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
 import net.runelite.api.Client;
+import net.runelite.api.Player;
 import net.runelite.api.Quest;
 import net.runelite.api.QuestState;
 import net.runelite.api.coords.WorldArea;
@@ -14,9 +19,9 @@ import net.runelite.api.coords.WorldPoint;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -136,5 +141,158 @@ public enum BankLocations {
     {
         List<WorldArea> areas = Arrays.stream(BankLocations.values()).filter(BankLocations::test).map(BankLocations::getArea).collect(Collectors.toList());
         Walker.walkTo(areas, true);
+    }
+
+    public static void walkToAndUseNearestBank()
+    {
+        if(BankAPI.isOpen())
+        {
+            return;
+        }
+
+        Client client = Static.getClient();
+        WorldPoint start = Static.invoke(() ->
+        {
+            Player localPlayer = client.getLocalPlayer();
+            return localPlayer != null ? localPlayer.getWorldLocation() : null;
+        });
+
+        if(start == null)
+        {
+            return;
+        }
+
+        BankLocations nearest = getNearest(start);
+        if(nearest == null)
+        {
+            return;
+        }
+
+        WorldPoint target = getNearestPointInArea(nearest.getArea(), start);
+
+        if(start.distanceTo2D(target) > 5)
+        {
+            Walker.walkTo(Collections.singletonList(nearest.getArea()), true);
+
+            boolean reached = Delays.waitUntil(() ->
+            {
+                if(BankAPI.isOpen())
+                {
+                    return true;
+                }
+
+                return Static.invoke(() ->
+                {
+                    Player localPlayer = client.getLocalPlayer();
+                    if(localPlayer == null)
+                    {
+                        return false;
+                    }
+                    return localPlayer.getWorldLocation().distanceTo2D(target) <= 5;
+                });
+            }, 80);
+
+            if(BankAPI.isOpen())
+            {
+                return;
+            }
+
+            if(!reached)
+            {
+                return;
+            }
+        }
+
+        if(MovementAPI.isMoving())
+        {
+            if(!Delays.waitUntil(() -> !MovementAPI.isMoving(), 20))
+            {
+                return;
+            }
+        }
+
+        TileObjectEx bankObject = findNearestBankObject();
+        if(bankObject == null)
+        {
+            return;
+        }
+
+        String interaction = determineBankAction(bankObject);
+        if(interaction == null)
+        {
+            return;
+        }
+
+        TileObjectAPI.interact(bankObject, interaction);
+
+        Delays.waitUntil(BankAPI::isOpen, 40);
+    }
+
+    private static TileObjectEx findNearestBankObject()
+    {
+        TileObjectEx bankObject = null;
+        for(int attempt = 0; attempt < 5 && bankObject == null; attempt++)
+        {
+            bankObject = TileObjectAPI.get(BankLocations::isSupportedBankObject);
+            if(bankObject == null)
+            {
+                Delays.wait(200);
+            }
+        }
+        return bankObject;
+    }
+
+    private static boolean isSupportedBankObject(TileObjectEx object)
+    {
+        if(object == null || object.getName() == null)
+        {
+            return false;
+        }
+
+        String name = object.getName();
+        if("Bank chest".equalsIgnoreCase(name))
+        {
+            return object.hasAction("Use");
+        }
+
+        if("Bank booth".equalsIgnoreCase(name) || "Grand Exchange booth".equalsIgnoreCase(name))
+        {
+            return object.hasAction("Bank");
+        }
+
+        return false;
+    }
+
+    private static String determineBankAction(TileObjectEx object)
+    {
+        if(object == null || object.getName() == null)
+        {
+            return null;
+        }
+
+        String name = object.getName();
+        if("Bank chest".equalsIgnoreCase(name))
+        {
+            return "Use";
+        }
+
+        if("Bank booth".equalsIgnoreCase(name) || "Grand Exchange booth".equalsIgnoreCase(name))
+        {
+            return "Bank";
+        }
+
+        return null;
+    }
+
+    private static WorldPoint getNearestPointInArea(WorldArea area, WorldPoint reference)
+    {
+        if(area == null || reference == null)
+        {
+            return reference;
+        }
+
+        int x = Math.max(area.getX(), Math.min(reference.getX(), area.getX() + area.getWidth() - 1));
+        int y = Math.max(area.getY(), Math.min(reference.getY(), area.getY() + area.getHeight() - 1));
+        return new WorldPoint(x, y, area.getPlane());
     }
 }
