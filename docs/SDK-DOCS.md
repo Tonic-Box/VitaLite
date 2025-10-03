@@ -10,7 +10,7 @@ VitaLite SDK is a comprehensive framework for developing RuneLite plugins, provi
 The `base-api` module provides foundational utilities and core functionality for plugin development.
 
 **Key Components:**
-- **Static Access**: [`Static.java`](base-api/src/main/java/com/tonic/Static.java) - Central static access point for client, RuneLite instance, and thread invocation
+- **Static Access**: [`Static.java`](../base-api/src/main/java/com/tonic/Static.java) - Central static access point for client, RuneLite instance, and thread invocation
 - **Logging**: [`Logger.java`](base-api/src/main/java/com/tonic/Logger.java) - Enhanced logging utilities
 - **Click Management**: [`ClickManager.java`](base-api/src/main/java/com/tonic/services/ClickManager.java) - Advanced click handling with multiple strategies
 - **Packet Handling**: Packet classes in [`packets/`](base-api/src/main/java/com/tonic/packets/) directory
@@ -269,3 +269,4 @@ public void runTask() {
 - **Missing Dependencies**: Ensure all Gradle dependencies are resolved
 - **Threading Errors**: Use `Static.invoke()` for client thread access
 - **API Sync Issues**: Run `:base-api:syncRuneliteApi` task to update RuneLite API files
+
