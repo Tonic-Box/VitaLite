@@ -269,7 +269,3 @@ public void runTask() {
 - **Missing Dependencies**: Ensure all Gradle dependencies are resolved
 - **Threading Errors**: Use `Static.invoke()` for client thread access
 - **API Sync Issues**: Run `:base-api:syncRuneliteApi` task to update RuneLite API files
-
-## Support
-
-For issues and contributions, refer to the project documentation and example plugins in the `src/main/java/com/tonic/woodcutter/` directory.
