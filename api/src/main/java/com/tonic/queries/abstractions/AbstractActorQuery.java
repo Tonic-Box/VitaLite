@@ -144,8 +144,8 @@ public abstract class AbstractActorQuery<T extends Actor, Q extends AbstractActo
         return sort((o1, o2) -> {
             List<Tile> path1 = Location.pathTo(center, o1.getWorldLocation());
             List<Tile> path2 = Location.pathTo(center, o2.getWorldLocation());
-            int len1 = path2 == null ? Integer.MAX_VALUE : path2.size();
-            int len2 = path1 == null ? Integer.MAX_VALUE : path1.size();
+            int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
+            int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
             return Integer.compare(len1, len2);
         });
     }
@@ -169,8 +169,8 @@ public abstract class AbstractActorQuery<T extends Actor, Q extends AbstractActo
         return sort((o1, o2) -> {
             List<Tile> path1 = Location.pathTo(center, o1.getWorldLocation());
             List<Tile> path2 = Location.pathTo(center, o2.getWorldLocation());
-            int len1 = path2 == null ? Integer.MAX_VALUE : path2.size();
-            int len2 = path1 == null ? Integer.MAX_VALUE : path1.size();
+            int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
+            int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
             return Integer.compare(len2, len1);
         });
     }
