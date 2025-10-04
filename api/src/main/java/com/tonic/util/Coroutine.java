@@ -12,8 +12,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * The coroutine is created from a given Runnable
  */
 public class Coroutine implements Runnable {
-    private static boolean canceled = false;
-    private static Coroutine live = null;
+    private static volatile boolean canceled = false;
+    private static volatile Coroutine live = null;
     private final Runnable runnable;
     @Setter
     @Getter

@@ -69,8 +69,21 @@ tasks.register<Copy>("copySubmoduleJar") {
     outputs.upToDateWhen { false }
 }
 
+tasks.register<Copy>("copySubmoduleJar2") {
+    dependsOn(":plugins:jar")
+    from(project(":plugins").tasks.named<Jar>("jar").flatMap { it.archiveFile })
+    into("src/main/resources/com/tonic")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    rename {
+        "plugins.jarData"
+    }
+
+    outputs.upToDateWhen { false }
+}
+
 tasks.processResources {
     dependsOn("copySubmoduleJar")
+    dependsOn("copySubmoduleJar2")
 }
 
 tasks {
@@ -188,6 +201,8 @@ dependencies {
     implementation("ch.qos.logback:logback-core:${runeliteVersions["logback.core"]}")
     implementation("ch.qos.logback:logback-classic:${runeliteVersions["logback.classic"]}")
     implementation("org.apache.commons:commons-collections4:4.1")
+
+    implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
 
 //    implementation("com.lmax:disruptor:3.4.4")
 //    implementation("org.jctools:jctools-core:4.0.5")

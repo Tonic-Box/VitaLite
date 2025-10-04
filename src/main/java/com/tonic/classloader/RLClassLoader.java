@@ -21,19 +21,19 @@ public class RLClassLoader extends URLClassLoader {
 
     public RLClassLoader(URL[] urls) {
         super(urls, Main.class.getClassLoader());
-        loadEmbeddedJarAsURL();
+        loadEmbeddedJarAsURL("api.jarData");
     }
 
-    private void loadEmbeddedJarAsURL() {
+    private void loadEmbeddedJarAsURL(String resource) {
         try {
-            File tempJar = File.createTempFile("api", ".jar");
+            File tempJar = File.createTempFile(resource, ".jar");
             tempJar.deleteOnExit();
 
-            try (InputStream jarStream = VitaLite.class.getResourceAsStream("api.jarData");
+            try (InputStream jarStream = VitaLite.class.getResourceAsStream(resource);
                  FileOutputStream fos = new FileOutputStream(tempJar)) {
 
                 if (jarStream == null) {
-                    System.err.println("Could not find embedded api.jar in resources");
+                    System.err.println("Could not find embedded " + resource + " in resources");
                     return;
                 }
 

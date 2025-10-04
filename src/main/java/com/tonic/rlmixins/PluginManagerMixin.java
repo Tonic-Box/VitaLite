@@ -161,11 +161,6 @@ public class PluginManagerMixin {
 
         method.instructions.insert(insertionPoint, code);
 
-//        if(!Main.optionsParser.isNoPlugins() && !Main.optionsParser.isMin())
-//        {
-//            return;
-//        }
-
         boolean isMin = Main.optionsParser.isNoPlugins() || Main.optionsParser.isMin();
 
         InsnList code2 = BytecodeBuilder.create()
