@@ -18,7 +18,7 @@ public class TileItemEx
     private final TileItem item;
     private final WorldPoint worldLocation;
     private final LocalPoint localPoint;
-    private String[] actions = null;
+    private final String[] actions = null;
 
     public int getId() {
         return item.getId();
@@ -45,19 +45,7 @@ public class TileItemEx
 
     public String[] getActions()
     {
-        if(actions != null)
-            return actions;
-        if(item == null)
-            return new String[0];
-
         return new String[0];
-        //todo: export way to get ground actions
-//        actions = Static.invoke(() -> {
-//            Client client = Static.getClient();
-//            ItemComposition itemComp = client.getItemDefinition(item.getId());
-//            return itemComp.get();
-//        });
-//        return actions;
     }
 
     public int getShopPrice() {
@@ -67,25 +55,26 @@ public class TileItemEx
 
     public long getGePrice()
     {
-        ItemManager itemManager = Static.getInjector().getInstance(ItemManager.class);
-        int id = itemManager.canonicalize(item.getId());
-        if (id == ItemID.COINS)
-        {
-            return getQuantity();
-        }
-        else if (id == ItemID.PLATINUM)
-        {
-            return getQuantity() * 1000L;
-        }
+        return Static.invoke(() -> {
+            ItemManager itemManager = Static.getInjector().getInstance(ItemManager.class);
+            int id = itemManager.canonicalize(item.getId());
+            if (id == ItemID.COINS)
+            {
+                return (long) getQuantity();
+            }
+            else if (id == ItemID.PLATINUM)
+            {
+                return getQuantity() * 1000L;
+            }
 
-        ItemComposition itemDef = itemManager.getItemComposition(id);
-        // Only check prices for things with store prices
-        if (itemDef.getPrice() <= 0)
-        {
-            return 0;
-        }
+            ItemComposition itemDef = itemManager.getItemComposition(id);
+            if (itemDef.getPrice() <= 0)
+            {
+                return 0L;
+            }
 
-        return itemManager.getItemPrice(id);
+            return (long) itemManager.getItemPrice(id);
+        });
     }
 
     public int getHighAlchValue()
