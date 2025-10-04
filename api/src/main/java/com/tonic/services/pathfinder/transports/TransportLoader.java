@@ -28,6 +28,7 @@ import com.tonic.util.WorldPointUtil;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 import org.apache.commons.lang3.ArrayUtils;
@@ -1066,7 +1067,7 @@ public class TransportLoader
                         .withIds(NpcID.SHANTAY)
                         .within(source, 10)
                         .first();
-                NpcAPI.interact(npc, "buy");
+                NpcAPI.interact(npc, "Buy-pass");
             } else {
                 TileObjectEx object = new TileObjectQuery<>()
                         .withId(ObjectID.SHANTAY_PASS)
@@ -1081,9 +1082,9 @@ public class TransportLoader
             TileObjectAPI.interact(object, 0);
         });
         consumers.add(() -> {
-            Client client = Static.getClient();
-            if (Static.invoke(() -> client.getWidget(565, 17) != null && client.getWidget(565, 17).getText().contains("Proceed regardless"))) {
-                WidgetAPI.interact(0, 37027857, -1, -1);
+            if(WidgetAPI.isVisible(InterfaceID.CwsWarning10.WARN1) && WidgetAPI.getText(InterfaceID.CwsWarning10.WARN1).equalsIgnoreCase("Proceed regardless"))
+            {
+                WidgetAPI.interact(1, InterfaceID.CwsWarning10.WARN1, -1, -1);
             }
         });
         return new LongTransport(source, destination, 2, 2, consumers, new Requirements(), 2);

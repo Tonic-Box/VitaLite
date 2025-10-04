@@ -178,6 +178,7 @@ public class TextUtil
 
     public static boolean containsIgnoreCase(String target, String... names) {
         for (String name : names) {
+            if( name == null ) continue;
             if (target.toLowerCase().contains(name.toLowerCase())) {
                 return true;
             }
