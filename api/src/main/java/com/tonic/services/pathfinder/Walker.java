@@ -12,6 +12,7 @@ import com.tonic.api.widgets.PrayerAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.ItemConstants;
 import com.tonic.data.ItemEx;
+import com.tonic.data.StrongholdSecurityQuestion;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.queries.TileObjectQuery;
@@ -536,6 +537,11 @@ public class Walker
                 .keepIf(o -> (o.getWorldLocation().equals(local.getWorldLocation()) || o.getWorldLocation().equals(step.getPosition())))
                 .sortNearest()
                 .first();
+
+        if(StrongholdSecurityQuestion.process(object))
+        {
+            return true;
+        }
 
         if(object != null)
         {

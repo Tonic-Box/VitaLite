@@ -23,7 +23,17 @@ public class TileObjectEx
     private String[] actions;
 
     public int getId() {
-        return tileObject.getId();
+        Client client = Static.getClient();
+        return Static.invoke(() -> {
+            ObjectComposition composition = client.getObjectDefinition(tileObject.getId());
+            if(composition.getImpostorIds() != null)
+            {
+                composition = composition.getImpostor();
+            }
+            if(composition == null)
+                return tileObject.getId();
+            return composition.getId();
+        });
     }
 
     public String getName() {
