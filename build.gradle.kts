@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.tonic"
-version = "1.11.19.2"
+version = "1.11.19.3"
 
 repositories {
     mavenCentral()
