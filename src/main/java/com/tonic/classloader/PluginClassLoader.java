@@ -1,6 +1,7 @@
 package com.tonic.classloader;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -23,7 +24,7 @@ public class PluginClassLoader extends URLClassLoader
         {
             return super.loadClass(name);
         }
-        catch (ClassNotFoundException ex)
+        catch (Throwable ex)
         {
             return parent.loadClass(name);
         }

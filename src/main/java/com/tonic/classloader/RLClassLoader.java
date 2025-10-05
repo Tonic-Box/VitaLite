@@ -144,22 +144,6 @@ public class RLClassLoader extends URLClassLoader {
         return defineClass(name, bytes, 0, bytes.length, protDomain);
     }
 
-    public boolean libraryExists(String name)
-    {
-        return name.startsWith("com.google.gson.") ||
-                name.startsWith("net.sf.trove4j.") ||
-                name.startsWith("org.json.") ||
-                name.startsWith("com.google.code.gson.") ||
-                name.startsWith("org.ow2.asm.") ||
-                name.startsWith("org.jetbrains.") ||
-                name.startsWith("com.google.code.findbugs.") ||
-                name.startsWith("com.google.findbugs.") ||
-                name.startsWith("org.projectlombok.") ||
-                name.startsWith("it.unimi.dsi.") ||
-                name.startsWith("org.slf4j.") ||
-                name.startsWith("com.sun.jna.");
-    }
-
     @Override
     public InputStream getResourceAsStream(String name) {
         if (resources.containsKey(name)) {

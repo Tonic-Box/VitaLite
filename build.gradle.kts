@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.tonic"
-version = "1.11.19.4"
+version = "1.11.19.5"
 
 repositories {
     mavenCentral()
@@ -203,6 +203,7 @@ dependencies {
     implementation("org.apache.commons:commons-collections4:4.1")
 
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
+    implementation("com.apple:AppleJavaExtensions:1.4")
 
 //    implementation("com.lmax:disruptor:3.4.4")
 //    implementation("org.jctools:jctools-core:4.0.5")
