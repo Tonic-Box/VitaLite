@@ -159,7 +159,7 @@ public enum NpcLocations {
 
     //exam centre/digsite
     EXAMINER("Examiner", new WorldPoint(3360, 3343, 0)),
-    ARCHAEOLOGICAL_EXPERT("Archaeological expert", new WorldPoint(3352, 3336, 0)),
+    ARCHAEOLOGICAL_EXPERT("Terry Balando", new WorldPoint(3352, 3336, 0)),
     PANNING_GUIDE("Panning guide", new WorldPoint(3377, 3378, 0)),
     STUDENT_NW("Student", new WorldPoint(3346, 3420, 0)),
     STUDENT_NE("Student", new WorldPoint(3371, 3418, 0)),
