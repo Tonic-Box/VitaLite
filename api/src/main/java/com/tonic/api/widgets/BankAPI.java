@@ -272,7 +272,7 @@ public class BankAPI
         );
         if(item == null)
             return;
-        WidgetAPI.interact(9, InterfaceID.Bankside.ITEMS, item.getId(), itemId);
+        WidgetAPI.interact(9, InterfaceID.Bankside.ITEMS, item.getSlot(), itemId);
     }
 
     /**
