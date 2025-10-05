@@ -12,6 +12,11 @@ import static com.tonic.vitalite.Versioning.getVitaLiteVersion;
 public class VitaLite {
     public static void main(String[] args) {
         try {
+            if(isSafeLaunch(args))
+            {
+                Main.main(args);
+                return;
+            }
             String currentVersion = getVitaLiteVersion();
             if(Versioning.isRunningFromShadedJar())
             {
@@ -56,5 +61,17 @@ public class VitaLite {
             return myLocation + File.pathSeparator + currentClasspath;
         }
         return currentClasspath;
+    }
+
+    private static boolean isSafeLaunch(String[] args)
+    {
+        for(String arg : args)
+        {
+            if(arg.equals("-safeLaunch"))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

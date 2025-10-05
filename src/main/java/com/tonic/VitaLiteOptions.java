@@ -27,7 +27,7 @@ public class VitaLiteOptions extends OptionsParser
 
     @CLIArgument(
             name = "safeLaunch",
-            description = "Flag to ensure proper Launching from Launcher class."
+            description = ""
     )
     private boolean safeLaunch = false;
 
@@ -48,4 +48,10 @@ public class VitaLiteOptions extends OptionsParser
             description = "Set a proxy server to use (e.g., ip:port or ip:port:username:password)"
     )
     private String proxy = null;
+
+    @CLIArgument(
+            name = "launcherCom",
+            description = ""
+    )
+    private String port;
 }

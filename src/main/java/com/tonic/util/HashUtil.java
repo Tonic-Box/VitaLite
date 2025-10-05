@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.util.Arrays;
 
 public class HashUtil {
     public static String computeSha256(Path path) {

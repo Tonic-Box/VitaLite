@@ -15,6 +15,7 @@ import com.tonic.injector.RLInjector;
 import com.tonic.model.Libs;
 import com.tonic.services.CatFacts;
 import com.tonic.services.proxy.ProxyManager;
+import com.tonic.util.LauncherCom;
 
 import javax.swing.*;
 import java.io.File;
@@ -55,6 +56,10 @@ public class Main {
         Injector.patch();
         RLInjector.patch();
         MappingProvider.getMappings().clear();
+        if(optionsParser.getPort() != null)
+        {
+            LauncherCom.sendReadySignal(Integer.parseInt(optionsParser.getPort()), "Done");
+        }
         CLASSLOADER.launch(args);
         Install.install();
         Logger.norm("VitaLite started. - Did you know... " + CatFacts.get(-1));

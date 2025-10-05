@@ -81,7 +81,7 @@ public class OptionsParser {
         {
             boolean isBooleanField = field.getType().equals(boolean.class) || field.getType().equals(Boolean.class);
             CLIArgument annotation = field.getAnnotation(CLIArgument.class);
-            if (annotation != null)
+            if (annotation != null && !annotation.description().isBlank())
             {
                 System.out.println("  " + (isBooleanField ? "-" : "--") + annotation.name() + ": " + annotation.description());
             }
