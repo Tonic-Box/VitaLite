@@ -43,6 +43,17 @@ public class NpcQuery extends AbstractActorQuery<NPC, NpcQuery>
     }
 
     /**
+     * Filters NPCs by their index.
+     *
+     * @param index The index to filter by.
+     * @return NpcQuery
+     */
+    public NpcQuery withIndex(int index)
+    {
+        return keepIf(n -> n.getIndex() == index);
+    }
+
+    /**
      * Filters NPCs by a specific actions.
      *
      * @param action The action to filter by.
