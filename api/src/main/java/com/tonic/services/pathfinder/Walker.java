@@ -16,6 +16,7 @@ import com.tonic.data.StrongholdSecurityQuestion;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.queries.TileObjectQuery;
+import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.model.Step;
 import com.tonic.services.pathfinder.teleports.Teleport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
@@ -263,6 +264,7 @@ public class Walker
             WorldPoint end = path.get(path.size() - 1).getPosition();
             while(traverse(path))
             {
+                GameManager.setPathPoints(Step.toWorldPoints(path));
                 if(!running)
                 {
                     prayers = null;
@@ -305,6 +307,7 @@ public class Walker
             }
         }
         finally {
+            GameManager.setPathPoints(null);
             prayers = null;
             healthHandler = 0;
             running = false;
@@ -315,6 +318,7 @@ public class Walker
 
     private void cancel()
     {
+        GameManager.setPathPoints(null);
         running = false;
     }
 

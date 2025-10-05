@@ -141,6 +141,9 @@ public class GameManager extends Overlay {
     private final List<TileItemEx> tileItemCache = new CopyOnWriteArrayList<>();
     private int tickCount = 0;
     private volatile List<WorldPoint> pathPoints = null;
+    public static void setPathPoints(List<WorldPoint> path) {
+        INSTANCE.pathPoints = path;
+    }
     private volatile List<WorldPoint> testPoints = null;
 
     @Subscribe
