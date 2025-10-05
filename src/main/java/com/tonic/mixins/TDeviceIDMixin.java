@@ -33,7 +33,7 @@ public abstract class TDeviceIDMixin
     @Inject
     private static String process(int os)
     {
-        if (!DeviceID.useCachedUUID())
+        if (!Static.getVitaConfig().shouldCacheDeviceId())
         {
             return DeviceID.vanillaGetDeviceID(os);
         }

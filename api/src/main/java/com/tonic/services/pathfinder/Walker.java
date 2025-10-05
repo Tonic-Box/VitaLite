@@ -16,13 +16,13 @@ import com.tonic.data.StrongholdSecurityQuestion;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.queries.TileObjectQuery;
+import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.model.Step;
 import com.tonic.services.pathfinder.teleports.Teleport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.Coroutine;
 import com.tonic.util.Location;
 import com.tonic.util.WorldPointUtil;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.*;
@@ -216,7 +216,7 @@ public class Walker
         running = true;
 
         reset();
-        this.useTeleports = useTeleports;
+        this.useTeleports = true;
         if(teleport != null)
             this.teleport = teleport;
         walkTo(steps);
@@ -232,7 +232,7 @@ public class Walker
         timer = 0;
         multiSteps.clear();
         multiStepPointer = 0;
-        this.useTeleports = useTeleports;
+        this.useTeleports = true;
 
         if(healthHandler == 0)
         {
@@ -247,6 +247,11 @@ public class Walker
      */
     private void walkTo(List<Step> path)
     {
+        if(path == null || path.isEmpty())
+        {
+            return;
+        }
+        GameManager.setPathPoints(Step.toWorldPoints(path));
         try
         {
             timer = client.getTickCount();
@@ -256,10 +261,6 @@ public class Walker
                 PrayerAPI.setQuickPrayer(prayers);
             }
             handlePrayer();
-            if(path == null || path.isEmpty())
-            {
-                return;
-            }
             WorldPoint end = path.get(path.size() - 1).getPosition();
             while(traverse(path))
             {
@@ -269,6 +270,7 @@ public class Walker
                     healthHandler = 0;
                     System.out.println("Pathfinder took: " + (client.getTickCount() - timer) + " ticks");
                     timer = 0;
+                    GameManager.clearPathPoints();
                     return;
                 }
                 Delays.tick();
@@ -287,6 +289,7 @@ public class Walker
                         Pathfinder engine = new Pathfinder(end);
                         List<Step> path2 =  engine.find();
                         walkTo(path2);
+                        GameManager.clearPathPoints();
                         return;
                     }
                     MovementAPI.walkToWorldPoint(end);
@@ -300,6 +303,7 @@ public class Walker
                     healthHandler = 0;
                     System.out.println("Pathfinder took: " + (client.getTickCount() - timer) + " ticks");
                     timer = 0;
+                    GameManager.clearPathPoints();
                     return;
                 }
             }
@@ -310,6 +314,7 @@ public class Walker
             running = false;
             System.out.println("Pathfinder took: " + (client.getTickCount() - timer) + " ticks");
             timer = 0;
+            GameManager.clearPathPoints();
         }
     }
 

@@ -19,7 +19,7 @@ public abstract class TRandomDatMixin
     @Insert(method = "writeRandomDat", at = @At(value = AtTarget.RETURN, shift = Shift.HEAD), all = true)
     public static void onWriteNewRandomDatData(byte[] var0, int var1, byte[] newRandomDatData, int var3, int var4)
     {
-        if (!RandomDat.useCachedRandomDat())
+        if (!Static.getVitaConfig().shouldCacheRandomDat())
         {
             return;
         }
@@ -37,7 +37,7 @@ public abstract class TRandomDatMixin
     @Disable("randomDatData2")
     public static boolean randomDatData2(TBuffer buffer)
     {
-        if (!RandomDat.useCachedRandomDat())
+        if (!Static.getVitaConfig().shouldCacheRandomDat())
         {
             return true;
         }

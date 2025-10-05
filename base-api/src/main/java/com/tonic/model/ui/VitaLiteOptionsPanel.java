@@ -41,21 +41,9 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ToggleSlider hideLoggerToggle;
     private final ToggleSlider bankCacheToggle;
     private JFrame transportsEditor;
-    private JFrame jShell;
-    private final ConfigManager config = new ConfigManager("VitaLiteOptions");
 
     private VitaLiteOptionsPanel() {
         super(false); // Don't use default wrapping, we'll handle scrolling ourselves
-
-        Map<String,Object> defaults = Map.of(
-                "clickStrategy", ClickStrategy.STATIC.name(),
-                "clickPointX", -1,
-                "clickPointY", -1,
-                "cachedRandomDat", true,
-                "cachedDeviceID", true,
-                "cachedBank", true
-        );
-        config.ensure(defaults);
 
         // Set up the main panel layout
         setLayout(new BorderLayout());
@@ -102,20 +90,6 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         contentPanel.add(titlePanel);
         contentPanel.add(Box.createVerticalStrut(10));
 
-        bankCacheToggle = new ToggleSlider();
-        contentPanel.add(createToggleOption(
-                "Persist Bank Cache",
-                "Save the bank caching for reuse between sessions",
-                bankCacheToggle,
-                () -> {
-                    Static.setSaveBankCaching(bankCacheToggle.isSelected());
-                    config.setProperty("cachedBank", bankCacheToggle.isSelected());
-                }
-        ));
-        bankCacheToggle.setSelected(config.getBoolean("cachedBank"));
-        Static.setSaveBankCaching(config.getBoolean("cachedBank"));
-        contentPanel.add(Box.createVerticalStrut(12));
-
         headlessToggle = new ToggleSlider();
         contentPanel.add(createToggleOption(
                 "Headless Mode",
@@ -153,55 +127,63 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         contentPanel.add(Box.createVerticalStrut(12));
 
         ToggleSlider cachedRandomDat = new ToggleSlider();
+        cachedRandomDat.setSelected(Static.getVitaConfig().shouldCacheRandomDat());
         contentPanel.add(createToggleOption(
                 "Cached RandomDat",
                 "Spoof and cache per-account Random dat data",
                 cachedRandomDat,
-                () -> {
-                    RandomDat.setUseCachedRandomDat(cachedRandomDat.isSelected());
-                    config.setProperty("cachedRandomDat", cachedRandomDat.isSelected());
-                }
+                () -> Static.getVitaConfig().setShouldCacheRandomDat(cachedRandomDat.isSelected())
         ));
-        cachedRandomDat.setSelected(config.getBoolean("cachedRandomDat"));
-        RandomDat.setUseCachedRandomDat(cachedRandomDat.isSelected());
         contentPanel.add(Box.createVerticalStrut(12));
 
         ToggleSlider cachedDeviceID = new ToggleSlider();
+        cachedDeviceID.setSelected(Static.getVitaConfig().shouldCacheDeviceId());
         contentPanel.add(createToggleOption(
                 "Cached DeviceID",
                 "Spoof and cache per-account DeviceID",
                 cachedDeviceID,
-                () -> {
-                    DeviceID.setUseCachedUUID(cachedDeviceID.isSelected());
-                    config.setProperty("cachedDeviceID", cachedDeviceID.isSelected());
-                }
+                () -> Static.getVitaConfig().setShouldCacheDeviceId(cachedDeviceID.isSelected())
         ));
-        cachedDeviceID.setSelected(config.getBoolean("cachedDeviceID"));
-        DeviceID.setUseCachedUUID(cachedDeviceID.isSelected());
         contentPanel.add(Box.createVerticalStrut(12));
+
+        bankCacheToggle = new ToggleSlider();
+        bankCacheToggle.setSelected(Static.getVitaConfig().shouldCacheBank());
+        contentPanel.add(createToggleOption(
+                "Persist Bank Cache",
+                "Save the bank caching for reuse between sessions",
+                bankCacheToggle,
+                () -> Static.getVitaConfig().setShouldCacheBank(bankCacheToggle.isSelected())
+        ));
+        contentPanel.add(Box.createVerticalStrut(12));
+
+        ToggleSlider drawPath = new ToggleSlider();
+        drawPath.setSelected(Static.getVitaConfig().shouldDrawWalkerPath());
+        contentPanel.add(createToggleOption(
+                "Draw walker path",
+                "Draw the walker path on the floating and mini maps",
+                drawPath,
+                () -> Static.getVitaConfig().setShouldDrawWalkerPath(drawPath.isSelected())
+        ));
 
         FancyDualSpinner pointSpinner = new FancyDualSpinner(
                 "Static Click Point",
-                Integer.MIN_VALUE, Integer.MAX_VALUE, config.getInt("clickPointX"),
-                Integer.MIN_VALUE, Integer.MAX_VALUE, config.getInt("clickPointY")
+                Integer.MIN_VALUE, Integer.MAX_VALUE, Static.getVitaConfig().getClickPointX(),
+                Integer.MIN_VALUE, Integer.MAX_VALUE, Static.getVitaConfig().getClickPointY()
         );
         ClickManager.setPoint(pointSpinner.getLeftValue().intValue(), pointSpinner.getRightValue().intValue());
         pointSpinner.addChangeListener(e -> {
-            config.setProperty("clickPointX", pointSpinner.getLeftValue().intValue());
-            config.setProperty("clickPointY", pointSpinner.getRightValue().intValue());
+            Static.getVitaConfig().setClickPointX(pointSpinner.getLeftValue().intValue());
+            Static.getVitaConfig().setClickPointY(pointSpinner.getRightValue().intValue());
             ClickManager.setPoint(pointSpinner.getLeftValue().intValue(), pointSpinner.getRightValue().intValue());
         });
-        pointSpinner.setVisible(ClickManager.getStrategy() == ClickStrategy.STATIC);
 
         FancyDropdown<ClickStrategy> clickStrategyDropdown = new FancyDropdown<>("Click Strategy", ClickStrategy.class);
-        String name = config.getString("clickStrategy");
-        clickStrategyDropdown.setSelectedItem(ClickStrategy.valueOf(name));
-        ClickManager.setStrategy(clickStrategyDropdown.getSelectedItem());
-        pointSpinner.setVisible(ClickManager.getStrategy() == ClickStrategy.STATIC);
+        ClickStrategy strat = Static.getVitaConfig().getClickStrategy();
+        clickStrategyDropdown.setSelectedItem(strat);
+        pointSpinner.setVisible(strat == ClickStrategy.STATIC);
         clickStrategyDropdown.addSelectionListener(event -> {
-            config.setProperty("clickStrategy", clickStrategyDropdown.getSelectedItem().name());
-            ClickManager.setStrategy(clickStrategyDropdown.getSelectedItem());
-            pointSpinner.setVisible(ClickManager.getStrategy() == ClickStrategy.STATIC);
+            Static.getVitaConfig().setClickStrategy(clickStrategyDropdown.getSelectedItem());
+            pointSpinner.setVisible(clickStrategyDropdown.getSelectedItem() == ClickStrategy.STATIC);
         });
         contentPanel.add(clickStrategyDropdown);
         contentPanel.add(Box.createVerticalStrut(12));

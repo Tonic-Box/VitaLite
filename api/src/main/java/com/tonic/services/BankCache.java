@@ -92,7 +92,7 @@ public class BankCache
         if(playerName == null)
             return;
 
-        if(!bankCache.containsKey(playerName) && Static.isSaveBankCaching())
+        if(!bankCache.containsKey(playerName) && Static.getVitaConfig().shouldCacheBank())
         {
             fetch();
         }
@@ -111,7 +111,7 @@ public class BankCache
             if(!itemMap.equals(emptyMap))
             {
                 bankCache.put(playerName, emptyMap);
-                if(Static.isSaveBankCaching())
+                if(Static.getVitaConfig().shouldCacheBank())
                 {
                     String serialized = serialize(emptyMap);
                     configManager.setProperty(playerName, serialized);

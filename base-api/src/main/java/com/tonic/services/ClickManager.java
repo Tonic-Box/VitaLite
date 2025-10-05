@@ -18,9 +18,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ClickManager
 {
-    @Setter
-    @Getter
-    private static volatile ClickStrategy strategy = ClickStrategy.STATIC;
     @Getter
     private static final AtomicReference<Point> point = new AtomicReference<>(new Point(-1, -1));
     private static volatile Shape shape = null;
@@ -76,6 +73,7 @@ public class ClickManager
             TClient client = Static.getClient();
             int px = point.get().x;
             int py = point.get().y;
+            ClickStrategy strategy = Static.getVitaConfig().getClickStrategy();
             switch (strategy)
             {
                 case STATIC:

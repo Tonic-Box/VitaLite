@@ -77,7 +77,7 @@ public class GameManager extends Overlay {
                         if (tile != null) {
                             if (tile.getGameObjects() != null) {
                                 for (GameObject gameObject : tile.getGameObjects()) {
-                                    if (gameObject != null) {
+                                    if (gameObject != null && gameObject.getSceneMinLocation().equals(tile.getSceneLocation())) {
                                         temp.add(new TileObjectEx(gameObject));
                                     }
                                 }
@@ -143,6 +143,16 @@ public class GameManager extends Overlay {
     private volatile List<WorldPoint> pathPoints = null;
     private volatile List<WorldPoint> testPoints = null;
 
+    public static void setPathPoints(List<WorldPoint> points)
+    {
+        INSTANCE.pathPoints = points;
+    }
+
+    public static void clearPathPoints()
+    {
+        INSTANCE.pathPoints = null;
+    }
+
     @Subscribe
     protected void onGameTick(GameTick event)
     {
@@ -179,8 +189,6 @@ public class GameManager extends Overlay {
 
     @Subscribe
     public void onMenuEntryAdded(MenuEntryAdded event) {
-
-
         final Client client = Static.getClient();
         final Widget map = client.getWidget(InterfaceID.Worldmap.MAP_CONTAINER);
         if(map == null)
@@ -212,14 +220,7 @@ public class GameManager extends Overlay {
                     .setParam1(event.getActionParam1())
                     .setIdentifier(event.getIdentifier())
                     .setType(MenuAction.RUNELITE)
-                    .onClick(e -> ThreadPool.submit(() -> {
-                        Pathfinder engine = new Pathfinder(wp);
-                        List<Step> path = engine.find();
-                        pathPoints = Step.toWorldPoints(path);
-                        Walker.walkTo(path, engine.getTeleport());
-                        Delays.waitUntilIdle();
-                        pathPoints = null;
-                    }));
+                    .onClick(e -> ThreadPool.submit(() -> Walker.walkTo(wp)));
         }
         else
         {
@@ -273,6 +274,9 @@ public class GameManager extends Overlay {
             WorldPoint last = testPoints.get(testPoints.size() - 1);
             WorldMapAPI.drawRedMapMarker(graphics, last);
         }
+
+        if(!Static.getVitaConfig().shouldDrawWalkerPath())
+            return null;
 
         if(pathPoints != null && !pathPoints.isEmpty())
         {

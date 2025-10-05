@@ -4,18 +4,7 @@ import com.tonic.services.ConfigManager;
 import java.util.Base64;
 
 public class RandomDat {
-    private static boolean cachedRandomDat = true;
     private static final ConfigManager cachedDataProperties = new ConfigManager("CachedRandomDat");
-
-    public static boolean useCachedRandomDat()
-    {
-        return cachedRandomDat;
-    }
-
-    public static void setUseCachedRandomDat(boolean use)
-    {
-        cachedRandomDat = use;
-    }
 
     public static synchronized byte[] getCachedRandomDatData(String username)
     {

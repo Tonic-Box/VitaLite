@@ -4,6 +4,7 @@ import com.google.inject.Injector;
 import com.tonic.api.TClient;
 import com.tonic.headless.HeadlessMode;
 import com.tonic.model.RuneLite;
+import com.tonic.util.ClientConfig;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,8 +23,7 @@ public class Static
     @Getter
     private static boolean headless = false;
     @Getter
-    @Setter
-    private static boolean saveBankCaching = false;
+    private static final ClientConfig vitaConfig = new ClientConfig();
     private static Object CLIENT_OBJECT;
     private static RuneLite RL;
 

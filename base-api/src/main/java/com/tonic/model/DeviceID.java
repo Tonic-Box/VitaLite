@@ -6,18 +6,7 @@ import java.io.*;
 
 public class DeviceID
 {
-    private static boolean cachedUUID = true;
     private static final ConfigManager cachedUUIDProperties = new ConfigManager("CachedUUID");
-
-    public static boolean useCachedUUID()
-    {
-        return cachedUUID;
-    }
-
-    public static void setUseCachedUUID(boolean useCached)
-    {
-        cachedUUID = useCached;
-    }
 
     public static String getCachedUUID(String identifier)
     {
