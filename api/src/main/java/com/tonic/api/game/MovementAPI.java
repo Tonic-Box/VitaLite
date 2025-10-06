@@ -250,4 +250,14 @@ public class MovementAPI {
         List<WorldPoint> pathTo = SceneAPI.pathTo(current, target);
         return pathTo != null && pathTo.contains(target);
     }
+
+    /**
+     * Checks if there is a path from the local player's world point to the target world point
+     * @param target The target world point
+     * @return True if there is a path, false otherwise
+     */
+    public static boolean canPathTo(WorldPoint target) {
+        WorldPoint current = Static.getClient().getLocalPlayer().getWorldLocation();
+        return canPathTo(current, target);
+    }
 }
