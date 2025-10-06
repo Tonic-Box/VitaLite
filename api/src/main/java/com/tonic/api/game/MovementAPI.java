@@ -257,7 +257,8 @@ public class MovementAPI {
      * @return True if there is a path, false otherwise
      */
     public static boolean canPathTo(WorldPoint target) {
-        WorldPoint current = Static.getClient().getLocalPlayer().getWorldLocation();
+        Client client = Static.getClient();
+        WorldPoint current = client.getLocalPlayer().getWorldLocation();
         return canPathTo(current, target);
     }
 }
