@@ -1,6 +1,5 @@
 package com.tonic.plugins.profiles.panel;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.tonic.Static;
 import com.tonic.model.DeviceID;
@@ -12,9 +11,6 @@ import com.tonic.plugins.profiles.jagex.model.JagLoginToken;
 import com.tonic.plugins.profiles.util.GsonUtil;
 import com.tonic.plugins.profiles.util.OS;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.client.RuneLite;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.client.ui.PluginPanel;
 import org.apache.commons.lang3.StringUtils;
 
@@ -88,7 +84,7 @@ public class ProfilesRootPanel extends PluginPanel {
         this.add(addProxyPanel, gbc);
 
         gbc.gridy++;
-        AddJagexAccountPanel addJagexAccountPanel = crateJagexAccountPanel();
+        AddJagexAccountPanel addJagexAccountPanel = createJagexAccountPanel();
         this.add(addJagexAccountPanel, gbc);
 
         gbc.gridy++;
@@ -261,7 +257,7 @@ public class ProfilesRootPanel extends PluginPanel {
         service.shutdownServer();
     }
 
-    private AddJagexAccountPanel crateJagexAccountPanel() {
+    private AddJagexAccountPanel createJagexAccountPanel() {
         AddJagexAccountPanel addJagexAccountPanel = new AddJagexAccountPanel();
         addJagexAccountPanel.addJagexAccountActionListener((event) -> {
 
@@ -276,7 +272,84 @@ public class ProfilesRootPanel extends PluginPanel {
                 }
             }).start();
         });
+
+        addJagexAccountPanel.addImportJagexAccountActionListener((event) -> {
+            importJagexAccountDialog();
+        });
         return addJagexAccountPanel;
+    }
+
+    private void importJagexAccountDialog() {
+        JTextField identifierField = new JTextField(32);
+        JTextField accountIdField = new JTextField(32);
+        JTextField sessionIdField = new JTextField(32);
+        JTextField displayNameField = new JTextField(32);
+        JTextField bankPinField = new JTextField(4);
+
+        JPanel panel = new JPanel(new GridLayout(0, 1));
+        panel.add(new JLabel("Identifier (Nickname):"));
+        panel.add(identifierField);
+        panel.add(new JLabel("Account ID (Character ID):"));
+        panel.add(accountIdField);
+        panel.add(new JLabel("Session ID:"));
+        panel.add(sessionIdField);
+        panel.add(new JLabel("Display Name (Character Name):"));
+        panel.add(displayNameField);
+        panel.add(new JLabel("Bank PIN (Optional):"));
+        panel.add(bankPinField);
+
+        int result = JOptionPane.showConfirmDialog(
+                null,
+                panel,
+                "Import Jagex Account",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (result == JOptionPane.OK_OPTION) {
+            String identifier = identifierField.getText().trim();
+            String accountId = accountIdField.getText().trim();
+            String sessionId = sessionIdField.getText().trim();
+            String displayName = displayNameField.getText().trim();
+            String bankPin = bankPinField.getText().trim();
+
+            if (identifier.isEmpty() || accountId.isEmpty() || sessionId.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Identifier, Account ID, and Session ID are required.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            loadProfilesFromFile(profiles);
+
+            boolean alreadyExists = profiles.stream()
+                    .anyMatch(p -> p != null && p.getIdentifier().equals(identifier));
+
+            if (alreadyExists) {
+                JOptionPane.showMessageDialog(null, "A profile with that identifier already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!bankPin.isEmpty() && !bankPin.matches("\\d{4}")) {
+                JOptionPane.showMessageDialog(null, "Bank PIN must be 4 digits.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Profile profile = new Profile(
+                    identifier,
+                    true,
+                    "",
+                    "",
+                    displayName,
+                    sessionId,
+                    accountId,
+                    bankPin
+            );
+
+            profiles.add(profile);
+            saveProfilesToFile(profiles);
+            loadProfilesList(profiles);
+
+            JOptionPane.showMessageDialog(null, "Jagex account added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     private AddLegacyAccountPanel createAddAccountPanel() {
