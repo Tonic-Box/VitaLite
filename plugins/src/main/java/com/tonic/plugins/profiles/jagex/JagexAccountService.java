@@ -8,6 +8,8 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -63,13 +65,20 @@ public class JagexAccountService {
             throws IOException, URISyntaxException {
         int currentState = state++;
         String url = String.format(
-                "%s?response_type=id_token+code&client_id=%s&nonce=00000000&state=%08d&prompt=login&scope=openid+offline",
+                "%s?response_type=id_token+code&client_id=%s&nonce=" + generateNonce(48) + "&state=%08d&prompt=login&scope=openid+offline",
                 AUTH_ENDPOINT, CLIENT_ID, currentState
         );
 
         CompletableFuture<JagexHttpServer.OAuth2Response> future = httpServer.waitForResponse(currentState);
         Desktop.getDesktop().browse(new URI(url));
         return future;
+    }
+
+    public static String generateNonce(int length) {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] randomBytes = new byte[length];
+        secureRandom.nextBytes(randomBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
     }
 
     public void startServer() throws IOException {

@@ -2,7 +2,8 @@ package com.tonic.runelite;
 
 import com.google.common.reflect.ClassPath;
 import com.tonic.VitaLite;
-import com.tonic.classloader.PluginClassLoader;
+import com.tonic.services.hotswapper.PluginClassLoader;
+import com.tonic.services.hotswapper.PluginContext;
 import com.tonic.vitalite.Main;
 import com.tonic.Static;
 import com.tonic.model.Guice;
@@ -31,34 +32,70 @@ public class Install {
         for (File jar : jars) {
             try
             {
-                ClassLoader classLoader = new PluginClassLoader(jar, Main.CLASSLOADER);
+                PluginClassLoader classLoader = new PluginClassLoader(jar, Main.CLASSLOADER);
                 List<Class<?>> plugins = ClassPath.from(classLoader)
                         .getAllClasses()
                         .stream()
                         .map(ClassPath.ClassInfo::load)
                         .collect(Collectors.toList());
                 original.addAll(plugins);
+
+                List<Class<?>> loadedFromJar = plugins.stream()
+                        .filter(c -> {
+                            Class<?> parent = c.getSuperclass();
+                            if (parent == null)
+                                return false;
+
+                            String parentName = parent.getName();
+                            return parentName.endsWith(".Plugin") || parentName.endsWith(".VitaPlugin");
+                        })
+                        .collect(Collectors.toList());
+
+                PluginContext.getLoadedPlugins().put(jar.getAbsolutePath(), new PluginContext(
+                        classLoader, new ArrayList<>(), loadedFromJar, jar.lastModified()
+                ));
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
         }
+
+        try
+        {
+            File builtIns = loadBuildIns().toFile();
+            ClassLoader classLoader = new PluginClassLoader(builtIns, Main.CLASSLOADER);
+            List<Class<?>> plugins = ClassPath.from(classLoader)
+                    .getAllClasses()
+                    .stream()
+                    .map(ClassPath.ClassInfo::load)
+                    .collect(Collectors.toList());
+            original.addAll(plugins);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public static void install() {
         Guice injector = Static.getRuneLite().getInjector();
         Static.set(injector.getBinding("net.runelite.api.Client"), "RL_CLIENT");
+        Static.set(Main.CLASSLOADER, "CLASSLOADER");
     }
 
-    private List<Path> findJars() {
-        Path external = Static.RUNELITE_DIR.resolve("externalplugins");
-        Path sideloaded = Static.RUNELITE_DIR.resolve("sideloaded-plugins");
+    private Path loadBuildIns() {
         File tempJar = getBuiltIns();
         if (tempJar == null) {
             System.err.println("Failed to load built-in plugins.");
             System.exit(1);
         }
+        return tempJar.toPath();
+    }
+
+    private List<Path> findJars() {
+        Path external = Static.RUNELITE_DIR.resolve("externalplugins");
+        Path sideloaded = Static.RUNELITE_DIR.resolve("sideloaded-plugins");
         try {
             Files.createDirectories(external);
             Files.createDirectories(sideloaded);
@@ -76,7 +113,6 @@ public class Install {
                 .filter(Files::isRegularFile)
                 .filter(p -> p.toString().endsWith(".jar"))
                 .collect(Collectors.toList());
-        classes.add(tempJar.toPath());
         return classes;
     }
 

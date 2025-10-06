@@ -164,6 +164,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 drawPath,
                 () -> Static.getVitaConfig().setShouldDrawWalkerPath(drawPath.isSelected())
         ));
+        contentPanel.add(Box.createVerticalStrut(12));
 
         FancyDualSpinner pointSpinner = new FancyDualSpinner(
                 "Static Click Point",

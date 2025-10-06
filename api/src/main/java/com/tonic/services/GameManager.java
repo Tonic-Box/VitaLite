@@ -6,6 +6,7 @@ import com.tonic.api.widgets.MiniMapAPI;
 import com.tonic.api.widgets.WorldMapAPI;
 import com.tonic.data.TileItemEx;
 import com.tonic.data.TileObjectEx;
+import com.tonic.services.hotswapper.PluginReloader;
 import com.tonic.services.pathfinder.Pathfinder;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.Step;
@@ -135,6 +136,18 @@ public class GameManager extends Overlay {
                 .register(this);
         TransportLoader.init();
         BankCache.init();
+
+        ThreadPool.submit(() -> {
+            Client client = Static.getClient();
+            while(client == null || client.getGameState() != GameState.LOGIN_SCREEN)
+            {
+                Delays.wait(1000);
+                client = Static.getClient();
+            }
+            PluginReloader.init();
+            PluginReloader.forceRebuildPluginList();
+        });
+
         System.out.println("GameCache initialized!");
     }
 

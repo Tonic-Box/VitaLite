@@ -24,6 +24,8 @@ public class Static
     private static boolean headless = false;
     @Getter
     private static final ClientConfig vitaConfig = new ClientConfig();
+    @Getter
+    private static ClassLoader classLoader;
     private static Object CLIENT_OBJECT;
     private static RuneLite RL;
 
@@ -67,6 +69,9 @@ public class Static
                 break;
             case "RL":
                 RL = (RuneLite) Objects.requireNonNull(object, "RL cannot be null");
+                break;
+            case "CLASSLOADER":
+                classLoader = (ClassLoader) Objects.requireNonNull(object, "CLASSLOADER cannot be null");
                 break;
             default:
                 throw new IllegalArgumentException("Unknown class name: " + name);

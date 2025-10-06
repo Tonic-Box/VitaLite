@@ -123,6 +123,11 @@ public class BytecodeBuilder {
         return this;
     }
 
+    public BytecodeBuilder pushLocal(int index) {
+        insnList.add(new VarInsnNode(ALOAD, index));
+        return this;
+    }
+
     /**
      * Pushes a local variable onto the stack.
      * @param index the local variable index
