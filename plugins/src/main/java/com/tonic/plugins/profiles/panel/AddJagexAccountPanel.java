@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 
 public class AddJagexAccountPanel extends JPanel {
     private final JButton addJagexAccountButton;
+    private final JButton importJagexAccount;
 
     public AddJagexAccountPanel() {
         setLayout(new BorderLayout());
@@ -34,8 +35,10 @@ public class AddJagexAccountPanel extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
 
         JLabel addJagexAccountLabel = new JLabel("<html>To add a Jagex Account, clicking the button will give you a prompt to login to your " +
-                "Jagex account via the <b>Official</b> Jagex website, and import the characters you want to add to profiles.  You will name the Profile and customize it's Bank Pin after selecting them to import.</html>");
+                "Jagex account via the <b>Official</b> Jagex website, and import the characters you want to add to profiles.  You will name the Profile and customize it's Bank Pin after selecting them to import." +
+                "<br>You can import jagex accounts manually if you have your account and session IDs with Import Jagex Account</html>");
         addJagexAccountButton = new JButton("Add Jagex Account");
+        importJagexAccount = new JButton("Import Jagex Account");
 
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(2, 0, 2, 0);
@@ -57,4 +60,7 @@ public class AddJagexAccountPanel extends JPanel {
         this.addJagexAccountButton.addActionListener(actionListener);
     }
 
+    public void addImportJagexAccountActionListener(ActionListener actionListener) {
+        this.importJagexAccount.addActionListener(actionListener);
+    }
 }
