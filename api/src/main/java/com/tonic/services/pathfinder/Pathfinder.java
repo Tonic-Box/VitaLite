@@ -190,8 +190,10 @@ public class Pathfinder
         final int targetIndex = WorldPointUtil.compress(targetWorldPoint);
 
         //validate target
-        if(!collisionMap.walkable(targetIndex))
+        if(!collisionMap.walkable(targetIndex)) {
+            Logger.info("Could not generate path to a blocked tile");
             return new ArrayList<>();
+        }
 
         int current;
         while(!queue.isEmpty())
