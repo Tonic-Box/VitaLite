@@ -1,6 +1,8 @@
 package com.tonic.services.hotswapper;
 
 import lombok.Getter;
+import net.runelite.client.plugins.Plugin;
+
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -27,13 +29,11 @@ public class PluginContext {
     }
 
     private final PluginClassLoader classLoader;
-    private final List<Object> plugins;
-    private final List<Class<?>> pluginClasses;
+    private final List<Plugin> plugins;
     private final long lastModified;
 
-    public PluginContext(PluginClassLoader classloader, List<Object> plugins, List<Class<?>> classes, long modified) {
+    public PluginContext(PluginClassLoader classloader, List<Plugin> plugins, long modified) {
         this.classLoader = classloader;
-        this.pluginClasses = classes;
         this.plugins = plugins;
         this.lastModified = modified;
     }

@@ -1,6 +1,5 @@
 package com.tonic.services.hotswapper;
 
-import com.google.common.reflect.ClassPath;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.util.ReflectBuilder;
@@ -8,13 +7,16 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginManager;
-
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PluginReloader {
     @Getter
@@ -32,22 +34,33 @@ public class PluginReloader {
 
         pluginManager = Static.getInjector().getInstance(PluginManager.class);
 
-        for(PluginContext context : PluginContext.getLoadedPlugins().values())
-        {
-            if(context.getPluginClasses().isEmpty())
-                continue;
+        List<File> jars = findJars().stream()
+                .map(Path::toFile)
+                .collect(Collectors.toList());
 
-            final List<Object> plugins = new ArrayList<>();
-            for(Class<?> clazz : context.getPluginClasses())
+        for (File jar : jars) {
+            try
             {
-                Plugin plugin = findLoadedPlugin(clazz);
-                if(plugin != null)
+                PluginClassLoader classLoader = new PluginClassLoader(jar, Static.getClassLoader());
+                List<Class<?>> pluginClasses = classLoader.getPluginClasses();
+
+                List<Plugin> plugins = new ArrayList<>();
+                for(Class<?> clazz : pluginClasses)
                 {
-                    plugins.add(plugin);
+                    Plugin plugin = findLoadedPlugin(clazz);
+                    if(plugin != null)
+                    {
+                        plugins.add(plugin);
+                    }
                 }
+
+                PluginContext.getLoadedPlugins().put(jar.getAbsolutePath(), new PluginContext(
+                        classLoader, plugins, jar.lastModified()
+                ));
             }
-            context.getPlugins().addAll(plugins);
-            context.getPluginClasses().clear();
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -55,8 +68,10 @@ public class PluginReloader {
     {
         for(Plugin plugin : pluginManager.getPlugins())
         {
-            if(plugin.getClass().equals(clazz))
+            if(plugin.getClass().getName().equals(clazz.getName()))
+            {
                 return plugin;
+            }
         }
         return null;
     }
@@ -65,8 +80,7 @@ public class PluginReloader {
         try {
             PluginContext oldContext = PluginContext.getLoadedPlugins().get(jarFile.getAbsolutePath());
             if (oldContext != null) {
-                for (Object obj : oldContext.getPlugins()) {
-                    Plugin plugin = (Plugin) obj;
+                for (Plugin plugin : oldContext.getPlugins()) {
                     if (pluginManager.isPluginActive(plugin)) {
                         if(!pluginManager.stopPlugin(plugin)) {
                             Logger.error("Failed to stop plugin: " + plugin.getClass().getName());
@@ -81,18 +95,12 @@ public class PluginReloader {
 
             PluginClassLoader newClassLoader = new PluginClassLoader(jarFile, Static.getClassLoader());
 
-            List<Class<?>> newClasses = ClassPath.from(newClassLoader)
-                    .getAllClasses()
-                    .stream()
-                    .filter(info -> !info.getName().equals("module-info"))
-                    .map(ClassPath.ClassInfo::load)
-                    .collect(Collectors.toList());
+            List<Class<?>> newClasses = newClassLoader.getClasses();
 
             List<Plugin> newPlugins = pluginManager.loadPlugins(newClasses, null);
-            List<Object> instances = new ArrayList<>(newPlugins);
 
             PluginContext.getLoadedPlugins().put(jarFile.getAbsolutePath(), new PluginContext(
-                    newClassLoader, instances, new ArrayList<>(), jarFile.lastModified()
+                    newClassLoader, newPlugins, jarFile.lastModified()
             ));
 
             if (oldContext != null) {
@@ -185,5 +193,27 @@ public class PluginReloader {
         pluginListItem.revalidate();
         pluginListItem.repaint();
         return cycleButton;
+    }
+
+    private static List<Path> findJars() {
+        Path external = Static.RUNELITE_DIR.resolve("externalplugins");
+        Path sideloaded = Static.RUNELITE_DIR.resolve("sideloaded-plugins");
+        try {
+            Files.createDirectories(external);
+            Files.createDirectories(sideloaded);
+        } catch (IOException ignored) {
+        }
+
+        return Stream.of(external, sideloaded)
+                .flatMap(dir -> {
+                    try {
+                        return Files.walk(dir);
+                    } catch (IOException e) {
+                        return Stream.empty();
+                    }
+                })
+                .filter(Files::isRegularFile)
+                .filter(p -> p.toString().endsWith(".jar"))
+                .collect(Collectors.toList());
     }
 }

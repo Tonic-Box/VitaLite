@@ -2,7 +2,6 @@ package com.tonic.vitalite;
 
 import com.tonic.Logger;
 import com.tonic.Static;
-import com.tonic.VitaLite;
 import com.tonic.VitaLiteOptions;
 import com.tonic.bootstrap.RLUpdater;
 import com.tonic.classloader.RLClassLoader;
@@ -100,5 +99,6 @@ public class Main {
         if(!isRunningFromShadedJar())
             UIManager.put("ClassLoader", CLASSLOADER);
         Thread.currentThread().setContextClassLoader(CLASSLOADER);
+        Static.set(CLASSLOADER, "CLASSLOADER");
     }
 }

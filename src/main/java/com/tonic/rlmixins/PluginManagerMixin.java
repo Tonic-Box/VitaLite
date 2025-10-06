@@ -2,6 +2,7 @@ package com.tonic.rlmixins;
 
 import com.tonic.injector.annotations.*;
 import com.tonic.injector.util.BytecodeBuilder;
+import com.tonic.injector.util.LogCallRemover;
 import com.tonic.model.ConditionType;
 import com.tonic.vitalite.Main;
 import org.objectweb.asm.Opcodes;
@@ -32,10 +33,23 @@ public class PluginManagerMixin {
         add("net.runelite.client.plugins.xtea");
     }};
 
-    @MethodOverride("loadSideLoadPlugins")
-    public static void loadSideLoadPlugins()
+    @Insert(
+            method = "loadSideLoadPlugins",
+            at = @At(
+                    value = AtTarget.GETFIELD,
+                    owner = "net/runelite/client/plugins/PluginManager",
+                    target = "developerMode"
+            ),
+            raw = true
+    )
+    public static void loadSideLoadPlugins(MethodNode method, AbstractInsnNode insertionPoint)
     {
-        return;
+        InsnList list = BytecodeBuilder.create()
+                .pop()
+                .pushInt(1)
+                .build();
+        method.instructions.insert(insertionPoint, list);
+        LogCallRemover.removeLogInfoCall(method);
     }
 
     @Insert(
@@ -154,7 +168,7 @@ public class PluginManagerMixin {
                 .castToType("com/tonic/runelite/Install")
                 .loadLocal(2, Opcodes.ALOAD)
                 .invokeVirtual("com/tonic/runelite/Install",
-                        "injectSideLoadPlugins",
+                        "injectBuiltInPlugins",
                         "(Ljava/util/List;)V")
                 .build();
 
