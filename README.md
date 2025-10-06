@@ -76,7 +76,6 @@ java -jar VitaLite-shaded.jar -help
 
 ```
 ~/.runelite/
-├── externalplugins/       # External plugin JARs
 └── sideloaded-plugins/    # External plugin JARs
 ```
 
@@ -112,8 +111,7 @@ The main executable will be located at `build/libs/VitaLite-*-shaded.jar`.
 
 VitaLite supports loading additional plugins:
 
-- Place plugin JAR files in `~/.runelite/externalplugins/`
-- Or use the `~/.runelite/sideloaded-plugins/` directory
+- Place plugin JAR files in `~/.runelite/sideloaded-plugins/` directory
 - Plugins will be automatically loaded on startup
 
 ## Contributing
