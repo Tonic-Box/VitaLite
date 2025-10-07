@@ -60,6 +60,9 @@ Everything in the built-in API is designed with thread safety in mind
 │   └── WorldMapAPI           # World map api
 │
 ├── 🗺️ Advanced Services
+│   ├─── 🧭 ipc/
+│   │   ├── ChannelBuilder      # Builder class for Channel instance
+│   │   └── Channel             # Stateless inter-client comunications service
 │   └─── 🧭 pathfinder/
 │       ├── Pathfinder          # OSRS Pathfinding
 │       └── Walker              # World walker

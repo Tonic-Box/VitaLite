@@ -92,22 +92,23 @@ public class RLInjector
                     name,
                     bytes
             );
-//
-//            List<String> toDump = List.of(
-//                    "net.runelite.client.RuneLite",
-//                    "net.runelite.client.RuneLiteModule",
-//                    "net.runelite.client.plugins.PluginManager",
-//                    "net.runelite.client.ui.ClientUI",
-//                    "net.runelite.client.ui.SplashScreen"
-//            );
-//            if(toDump.contains(name))
-//            {
-//                ClassFileUtil.writeClass(
-//                        name,
-//                        bytes,
-//                        Path.of("C:/test/dumper/")
-//                );
-//            }
+
+            List<String> toDump = List.of(
+                    "net.runelite.client.RuneLite",
+                    "net.runelite.client.RuneLiteModule",
+                    "net.runelite.client.plugins.PluginManager",
+                    "net.runelite.client.ui.ClientUI",
+                    "net.runelite.client.ui.SplashScreen",
+                    "net.runelite.client.plugins.config.TopLevelConfigPanel"
+            );
+            if(toDump.contains(name))
+            {
+                ClassFileUtil.writeClass(
+                        name,
+                        bytes,
+                        Path.of("C:/test/dumper/")
+                );
+            }
         }
         runelite.clear();
     }

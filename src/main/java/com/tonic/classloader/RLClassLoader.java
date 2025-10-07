@@ -1,6 +1,7 @@
 package com.tonic.classloader;
 
 import com.tonic.VitaLite;
+import com.tonic.runelite.Install;
 import com.tonic.vitalite.Main;
 import com.tonic.model.Libs;
 

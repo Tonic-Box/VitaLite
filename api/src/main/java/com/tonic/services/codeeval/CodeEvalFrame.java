@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 import com.tonic.Static;
 import com.tonic.services.GameManager;
+import com.tonic.util.ThreadPool;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
@@ -25,6 +26,7 @@ public class CodeEvalFrame extends JFrame {
     private SimpleCodeEvaluator evaluator;
     private final RSyntaxTextArea codeArea;
     private final JTextArea outputArea;
+    private final JButton runButton;
 
     public static CodeEvalFrame get() {
         if (INSTANCE == null) {
@@ -167,7 +169,7 @@ public class CodeEvalFrame extends JFrame {
 
         // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout());
-        JButton runButton = new JButton("Run Code (Ctrl+Enter)");
+        runButton = new JButton("Run Code (Ctrl+Enter)");
         runButton.addActionListener(e -> runCode());
 
         JButton clearButton = new JButton("Clear Output");
@@ -236,34 +238,36 @@ public class CodeEvalFrame extends JFrame {
     }
 
     private void runCode() {
-        outputArea.append(">>> Running code...\n");
+        runButton.setEnabled(false);
+        ThreadPool.submit(() -> {
+            outputArea.append(">>> Running code...\n");
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintStream originalOut = System.out;
+            PrintStream originalErr = System.err;
 
-        // Capture System.out
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        PrintStream originalErr = System.err;
+            try {
+                System.setOut(new PrintStream(baos));
+                System.setErr(new PrintStream(baos));
 
-        try {
-            System.setOut(new PrintStream(baos));
-            System.setErr(new PrintStream(baos));
+                Object result = evaluator.evaluate(codeArea.getText());
 
-            Object result = evaluator.evaluate(codeArea.getText());
+                if (result != null) {
+                    System.out.println("Result: " + result);
+                }
 
-            if (result != null) {
-                System.out.println("Result: " + result);
+            } finally {
+                System.setOut(originalOut);
+                System.setErr(originalErr);
+
+                String output = baos.toString();
+                if (!output.trim().isEmpty()) {
+                    outputArea.append(output);
+                }
+                outputArea.append(">>> Done.\n\n");
+                outputArea.setCaretPosition(outputArea.getDocument().getLength());
+                runButton.setEnabled(true);
             }
-
-        } finally {
-            System.setOut(originalOut);
-            System.setErr(originalErr);
-
-            String output = baos.toString();
-            if (!output.trim().isEmpty()) {
-                outputArea.append(output);
-            }
-            outputArea.append(">>> Done.\n\n");
-            outputArea.setCaretPosition(outputArea.getDocument().getLength());
-        }
+        });
     }
 
     public static void install()

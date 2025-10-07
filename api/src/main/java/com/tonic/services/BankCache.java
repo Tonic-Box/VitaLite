@@ -4,7 +4,10 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.widgets.BankAPI;
 import com.tonic.data.ItemEx;
+import com.tonic.data.locatables.BankLocations;
 import com.tonic.queries.InventoryQuery;
+import com.tonic.services.ipc.Channel;
+import com.tonic.services.ipc.ChannelBuilder;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMaps;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -24,6 +27,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BankCache
 {
     private static BankCache INSTANCE;
+
+    private static void test()
+    {
+        Channel channel = new ChannelBuilder("client1")
+                .port(1337)
+                .build();
+
+        channel.addHandler(m -> {
+
+        });
+    }
 
     /**
      * Retrieves the cached bank items for the current player.
