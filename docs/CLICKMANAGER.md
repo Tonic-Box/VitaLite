@@ -14,5 +14,18 @@ ClickManager::queueClickBox(Rectangle rectangle)
 
 this wills et the area for which the click manager will select a random point from when set to `CONTROLLED` strategy. It will stay persistent until its either cleared or set to a new Rectangle.
 
+There is also a Util class for setting this up easier:
+## ClickManagerUtil
+```
+//Queue click on a TileObject
+ClickManagerUtil.queueClickBox(TileObjectEx object)
+
+//Queue click on an actor
+ClickManagerUtil.queueClickBox(Actor actor)
+
+//Queue click on an item
+ClickManagerUtil.queueClickBox(ItemEx item)
+```
+
 ## Notes
 If the click box is not set, but the user has the strategy set to `CONTROLLED`, it will fallback to `STATIC` strategy.
