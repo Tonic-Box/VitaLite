@@ -73,13 +73,13 @@ public enum BankLocations {
     BURTHORPE_BANK(new WorldArea(3037, 4961, 13, 17, 1)),
     ZANERIS_BANK(new WorldArea(2379, 4453, 6, 7, 0), () -> {
         Client client = Static.getClient();
-        QuestState state = QuestAPI.getState(Quest.CHILDREN_OF_THE_SUN);
+        QuestState state = QuestAPI.getState(Quest.LOST_CITY);
         return state != null && state.equals(QuestState.FINISHED);
     }),
 
     CIVITAS_ILLA_FORTIS(new WorldArea(1777, 3093, 9, 11, 0), () -> {
         Client client = Static.getClient();
-        QuestState state = QuestAPI.getState(Quest.LOST_CITY);
+        QuestState state = QuestAPI.getState(Quest.CHILDREN_OF_THE_SUN);
         return state != null && state.equals(QuestState.FINISHED);
     }),
 
