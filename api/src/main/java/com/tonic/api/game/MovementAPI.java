@@ -68,7 +68,7 @@ public class MovementAPI {
         if(dest == null)
             return false;
 
-        return wp.distanceTo(dest) >= 1;
+        return !wp.equals(dest);
     }
 
     /**

@@ -34,6 +34,8 @@ import net.runelite.api.widgets.WidgetInfo;
 import org.apache.commons.lang3.ArrayUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A worldWalker
@@ -59,6 +61,7 @@ public class Walker
     @Getter
     @Setter
     private boolean useTeleports = true;
+    private boolean justInteracted = false;
 
     private Walker()
     {
@@ -337,6 +340,7 @@ public class Walker
             Logger.error("[Pathfinder] Steps are null");
             return false;
         }
+
         if (isCancelledOrTimedOut(steps)) {
             return false;
         }
@@ -349,6 +353,15 @@ public class Walker
         if(handleTeleport())
         {
             return !steps.isEmpty();
+        }
+
+        if(justInteracted)
+        {
+            if(!PlayerAPI.isIdle(client.getLocalPlayer()) && !MovementAPI.isMoving())
+            {
+                return !steps.isEmpty();
+            }
+            justInteracted = false;
         }
 
         if(handleMultiSteps())
@@ -426,6 +439,7 @@ public class Walker
             if (multiStepPointer >= multiSteps.size()) {
                 multiSteps.clear();
                 multiStepPointer = 0;
+                justInteracted = true;
             } else {
                 multiSteps.get(multiStepPointer).run();
                 multiStepPointer++;
@@ -510,7 +524,9 @@ public class Walker
         }
 
         int s = 0;
-        while(s <= 12 && s < steps.size() && !steps.get(s).hasTransport())
+        //rand 5 - 12
+        int rand = ThreadLocalRandom.current().nextInt(5, 16);
+        while(s <= rand && s < steps.size() && !steps.get(s).hasTransport())
         {
             if(!Location.isReachable(local.getWorldLocation(), steps.get(s).getPosition()))
             {
@@ -630,9 +646,5 @@ public class Walker
         steps.clear();
         Pathfinder engine = new Pathfinder(wp);
         steps.addAll(engine.find());
-        if(useTeleports)
-        {
-            teleport = engine.getTeleport();
-        }
     }
 }
