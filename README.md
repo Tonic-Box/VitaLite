@@ -13,14 +13,16 @@ VitaLite is a launcher for RuneLite that offers additional features and customiz
   Add your plugins to the `~\.runelite\sideloaded-plugins` folder for them to load
 
 ## General User Release
-Grab the Launcher From [https://github.com/Tonic-Box/VitaLauncher/releases](https://github.com/Tonic-Box/VitaLauncher/releases).
 
-### General Use Features
+[VitaLite Launcher](https://github.com/Tonic-Box/VitaLauncher/releases)
+
 [Client QoL User Features](./docs/FEATURES.md)
 
 ## Developers
 [SDK Docs](./docs/SDK-DOCS.md)
+
 [Plugin Dev Guide](./docs/EXTERNALPLUGIN.md)
+
 [Click Manager Docs](./docs/CLICKMANAGER.md)
 
 ### Building from source
