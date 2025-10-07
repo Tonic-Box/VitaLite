@@ -11,6 +11,7 @@ import net.runelite.client.util.WildcardMatcher;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.geom.Point2D;
+import java.util.List;
 
 /**
  * A query builder for {@link TileItemEx} objects.
@@ -241,5 +242,104 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
             Point2D p1 = new Point2D.Double(o2.getWorldLocation().getX(), o2.getWorldLocation().getY());
             return Double.compare(point.distance(p1), point.distance(p0));
         });
+    }
+
+    /**
+     * sort by shortest path from the player
+     * @return TileItemQuery
+     */
+    public TileItemQuery sortShortestPath()
+    {
+        return sortShortestPath(client.getLocalPlayer().getWorldLocation());
+    }
+
+    /**
+     * sort by shortest path from a specific point
+     * @param center center point
+     * @return TileItemQuery
+     */
+    public TileItemQuery sortShortestPath(WorldPoint center)
+    {
+        return sort((o1, o2) -> {
+            List<WorldPoint> path1 = Location.fullPathTo(center, o1.getWorldLocation());
+            List<WorldPoint> path2 = Location.fullPathTo(center, o2.getWorldLocation());
+            int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
+            int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
+            return Integer.compare(len1, len2);
+        });
+    }
+
+    /**
+     * sort by furthest path from the player
+     * @return TileItemQuery
+     */
+    public TileItemQuery sortLongestPath()
+    {
+        return sortLongestPath(client.getLocalPlayer().getWorldLocation());
+    }
+
+    /**
+     * sort by furthest path from a specific point
+     * @param center center point
+     * @return TileItemQuery
+     */
+    public TileItemQuery sortLongestPath(WorldPoint center)
+    {
+        return sort((o1, o2) -> {
+            List<WorldPoint> path1 = Location.fullPathTo(center, o1.getWorldLocation());
+            List<WorldPoint> path2 = Location.fullPathTo(center, o2.getWorldLocation());
+            int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
+            int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
+            return Integer.compare(len2, len1);
+        });
+    }
+
+    /**
+     * Get the nearest item from the filtered list
+     * Terminal operation - executes the query
+     */
+    public TileItemEx nearest() {
+        // Apply filters and sort by distance, then get first
+        return this.sortNearest().first();
+    }
+
+    /**
+     * Get the nearest item to a specific point
+     * Terminal operation - executes the query
+     */
+    public TileItemEx nearest(WorldPoint center) {
+        return this.sortNearest(center).first();
+    }
+
+    /**
+     * Get the farthest item from the filtered list
+     * Terminal operation - executes the query
+     */
+    public TileItemEx farthest() {
+        return this.sortFurthest().first();
+    }
+
+    /**
+     * Get the farthest item from a specific point
+     * Terminal operation - executes the query
+     */
+    public TileItemEx farthest(WorldPoint center) {
+        return this.sortFurthest(center).first();
+    }
+
+    /**
+     * Get the item with the shortest path from the filtered list
+     * Terminal operation - executes the query
+     */
+    public TileItemEx shortestPath() {
+        return this.sortShortestPath().first();
+    }
+
+    /**
+     * Get the item with the furthest path from the filtered list
+     * Terminal operation - executes the query
+     */
+    public TileItemEx longestPath() {
+        return this.sortLongestPath().first();
     }
 }

@@ -236,7 +236,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
     }
 
     /**
-     * Get the nearest Actor from the filtered list
+     * Get the nearest object from the filtered list
      * Terminal operation - executes the query
      */
     public TileObjectEx nearest() {
@@ -245,7 +245,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
     }
 
     /**
-     * Get the nearest Actor to a specific point
+     * Get the nearest object to a specific point
      * Terminal operation - executes the query
      */
     public TileObjectEx nearest(WorldPoint center) {
@@ -253,7 +253,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
     }
 
     /**
-     * Get the farthest Actor from the filtered list
+     * Get the farthest object from the filtered list
      * Terminal operation - executes the query
      */
     public TileObjectEx farthest() {
@@ -261,7 +261,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
     }
 
     /**
-     * Get the farthest Actor from a specific point
+     * Get the farthest object from a specific point
      * Terminal operation - executes the query
      */
     public TileObjectEx farthest(WorldPoint center) {
@@ -269,7 +269,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
     }
 
     /**
-     * Get the Actor with the shortest path from the filtered list
+     * Get the object with the shortest path from the filtered list
      * Terminal operation - executes the query
      */
     public TileObjectEx shortestPath() {
@@ -277,7 +277,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
     }
 
     /**
-     * Get the Actor with the longest path from the filtered list
+     * Get the object with the longest path from the filtered list
      * Terminal operation - executes the query
      */
     public TileObjectEx longestPath() {
