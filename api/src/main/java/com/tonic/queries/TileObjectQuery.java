@@ -11,6 +11,7 @@ import net.runelite.client.util.WildcardMatcher;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.geom.Point2D;
+import java.util.List;
 
 /**
  * A query to find {@link TileObjectEx}'s in the game world.
@@ -176,11 +177,110 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
     }
 
     /**
+     * sort by shortest path from the player
+     * @return TileObjectQuery
+     */
+    public TileObjectQuery<T> sortShortestPath()
+    {
+        return sortShortestPath(client.getLocalPlayer().getWorldLocation());
+    }
+
+    /**
+     * sort by shortest path from a specific point
+     * @param center center point
+     * @return TileObjectQuery
+     */
+    public TileObjectQuery<T> sortShortestPath(WorldPoint center)
+    {
+        return sort((o1, o2) -> {
+            List<WorldPoint> path1 = Location.fullPathTo(center, o1.getWorldLocation());
+            List<WorldPoint> path2 = Location.fullPathTo(center, o2.getWorldLocation());
+            int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
+            int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
+            return Integer.compare(len1, len2);
+        });
+    }
+
+    /**
+     * sort by longest path from the player
+     * @return TileObjectQuery
+     */
+    public TileObjectQuery<T> sortLongestPath()
+    {
+        return sortLongestPath(client.getLocalPlayer().getWorldLocation());
+    }
+
+    /**
+     * sort by longest path from a specific point
+     * @param center center point
+     * @return TileObjectQuery
+     */
+    public TileObjectQuery<T> sortLongestPath(WorldPoint center)
+    {
+        return sort((o1, o2) -> {
+            List<WorldPoint> path1 = Location.fullPathTo(center, o1.getWorldLocation());
+            List<WorldPoint> path2 = Location.fullPathTo(center, o2.getWorldLocation());
+            int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
+            int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
+            return Integer.compare(len2, len1);
+        });
+    }
+
+    /**
      * Filters the query to only include objects with actions that contain the specified string.
      * @param partial The string to filter by.
      * @return TileObjectQuery
      */
     public TileObjectQuery<T> withPartialAction(String partial) {
         return keepIf(o -> o.getActions() != null && TextUtil.containsIgnoreCase(partial, o.getActions()));
+    }
+
+    /**
+     * Get the nearest Actor from the filtered list
+     * Terminal operation - executes the query
+     */
+    public TileObjectEx nearest() {
+        // Apply filters and sort by distance, then get first
+        return this.sortNearest().first();
+    }
+
+    /**
+     * Get the nearest Actor to a specific point
+     * Terminal operation - executes the query
+     */
+    public TileObjectEx nearest(WorldPoint center) {
+        return this.sortNearest(center).first();
+    }
+
+    /**
+     * Get the farthest Actor from the filtered list
+     * Terminal operation - executes the query
+     */
+    public TileObjectEx farthest() {
+        return this.sortFurthest().first();
+    }
+
+    /**
+     * Get the farthest Actor from a specific point
+     * Terminal operation - executes the query
+     */
+    public TileObjectEx farthest(WorldPoint center) {
+        return this.sortFurthest(center).first();
+    }
+
+    /**
+     * Get the Actor with the shortest path from the filtered list
+     * Terminal operation - executes the query
+     */
+    public TileObjectEx shortestPath() {
+        return this.sortShortestPath().first();
+    }
+
+    /**
+     * Get the Actor with the longest path from the filtered list
+     * Terminal operation - executes the query
+     */
+    public TileObjectEx longestPath() {
+        return this.sortLongestPath().first();
     }
 }

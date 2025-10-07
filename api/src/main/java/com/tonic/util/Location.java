@@ -2,7 +2,9 @@ package com.tonic.util;
 
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
+import com.tonic.services.pathfinder.LocalPathfinder;
 import com.tonic.services.pathfinder.collision.CollisionMap;
+import com.tonic.services.pathfinder.model.Step;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
@@ -151,6 +153,11 @@ public class Location {
         } catch (Exception ignored) {
             return false;
         }
+    }
+
+    public static List<WorldPoint> fullPathTo(WorldPoint start, WorldPoint end) {
+        List<Step> steps = LocalPathfinder.get().findPath(start, end);
+        return Step.toWorldPoints(steps);
     }
 
     public static List<Tile> pathTo(WorldPoint start, WorldPoint end) {
