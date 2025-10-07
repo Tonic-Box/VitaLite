@@ -7,6 +7,7 @@ import com.tonic.data.VarrockMuseumAnswer;
 import com.tonic.data.WidgetInfoExtended;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.PacketInteractionType;
+import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
@@ -134,6 +135,14 @@ public class DialogueAPI
                     return true;
                 }
             }
+            if(WidgetAPI.get(InterfaceID.Chatbox.MES_TEXT2) != null) {
+                Widget w = WidgetAPI.get(InterfaceID.Chatbox.MES_TEXT2);
+                if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
+                {
+                    ((Client) client).runScript(101, 1);
+                    return true;
+                }
+            }
             return false;
         });
     }
@@ -180,7 +189,11 @@ public class DialogueAPI
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                     return true;
             }
-
+            if(WidgetAPI.get(InterfaceID.Chatbox.MES_TEXT2) != null) {
+                Widget w = WidgetAPI.get(InterfaceID.Chatbox.MES_TEXT2);
+                if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
+                    return true;
+            }
             return WidgetAPI.get(WidgetInfoExtended.DIALOG_OPTION_OPTION1) != null || WidgetAPI.get(WidgetInfo.DIALOG_OPTION_OPTIONS) != null;
         });
     }
