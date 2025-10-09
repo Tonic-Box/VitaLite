@@ -5,6 +5,7 @@ import com.tonic.api.TClient;
 import com.tonic.headless.HeadlessMode;
 import com.tonic.model.RuneLite;
 import com.tonic.util.ClientConfig;
+import com.tonic.util.config.ConfigFactory;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,7 +24,7 @@ public class Static
     @Getter
     private static boolean headless = false;
     @Getter
-    private static final ClientConfig vitaConfig = new ClientConfig();
+    private static final ClientConfig vitaConfig = ConfigFactory.create(ClientConfig.class);
     @Getter
     private static ClassLoader classLoader;
     private static Object CLIENT_OBJECT;

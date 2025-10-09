@@ -2,86 +2,38 @@ package com.tonic.util;
 
 import com.tonic.services.ClickStrategy;
 import com.tonic.services.ConfigManager;
+import com.tonic.util.config.ConfigGroup;
+import com.tonic.util.config.ConfigKey;
+import com.tonic.util.config.VitaConfig;
 
-public class ClientConfig
-{
-    private final ConfigManager config = new ConfigManager("VitaLiteOptions");
+@ConfigGroup("VitaLiteOptions")
+public interface ClientConfig extends VitaConfig {
 
-    public ClickStrategy getClickStrategy()
-    {
-        String strategyName = config.getStringOrDefault("clickStrategy", "STATIC");
-        try
-        {
-            return ClickStrategy.valueOf(strategyName);
-        }
-        catch (IllegalArgumentException e)
-        {
-            return ClickStrategy.STATIC;
-        }
-    }
+    @ConfigKey(value = "clickStrategy", defaultValue = "STATIC")
+    ClickStrategy getClickStrategy();
+    void setClickStrategy(ClickStrategy strategy);
 
-    public void setClickStrategy(ClickStrategy strategy)
-    {
-        config.setProperty("clickStrategy", strategy.name());
-    }
+    @ConfigKey(value = "clickPointX", defaultValue = "-1")
+    int getClickPointX();
+    void setClickPointX(int x);
 
-    public int getClickPointX()
-    {
-        return config.getIntOrDefault("clickPointX", -1);
-    }
+    @ConfigKey(value = "clickPointY", defaultValue = "-1")
+    int getClickPointY();
+    void setClickPointY(int y);
 
-    public void setClickPointX(int x)
-    {
-        config.setProperty("clickPointX", x);
-    }
+    @ConfigKey(value = "cachedRandomDat", defaultValue = "true")
+    boolean shouldCacheRandomDat();
+    void setShouldCacheRandomDat(boolean shouldCache);
 
-    public int getClickPointY()
-    {
-        return config.getIntOrDefault("clickPointY", -1);
-    }
+    @ConfigKey(value = "cachedDeviceID", defaultValue = "true")
+    boolean shouldCacheDeviceId();
+    void setShouldCacheDeviceId(boolean shouldCache);
 
-    public void setClickPointY(int y)
-    {
-        config.setProperty("clickPointY", y);
-    }
+    @ConfigKey(value = "cachedBank", defaultValue = "true")
+    boolean shouldCacheBank();
+    void setShouldCacheBank(boolean shouldCache);
 
-    public boolean shouldCacheRandomDat()
-    {
-        return config.getBooleanOrDefault("cachedRandomDat", true);
-    }
-
-    public void setShouldCacheRandomDat(boolean shouldCache)
-    {
-        config.setProperty("cachedRandomDat", shouldCache);
-    }
-
-    public boolean shouldCacheDeviceId()
-    {
-        return config.getBooleanOrDefault("cachedDeviceID", true);
-    }
-
-    public void setShouldCacheDeviceId(boolean shouldCache)
-    {
-        config.setProperty("cachedDeviceID", shouldCache);
-    }
-
-    public boolean shouldCacheBank()
-    {
-        return config.getBooleanOrDefault("cachedBank", true);
-    }
-
-    public void setShouldCacheBank(boolean shouldCache)
-    {
-        config.setProperty("cachedBank", shouldCache);
-    }
-
-    public boolean shouldDrawWalkerPath()
-    {
-        return config.getBooleanOrDefault("drawWalkerPath", true);
-    }
-
-    public void setShouldDrawWalkerPath(boolean shouldDraw)
-    {
-        config.setProperty("drawWalkerPath", shouldDraw);
-    }
+    @ConfigKey(value = "drawWalkerPath", defaultValue = "true")
+    boolean shouldDrawWalkerPath();
+    void setShouldDrawWalkerPath(boolean shouldDraw);
 }
