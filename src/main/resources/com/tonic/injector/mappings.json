@@ -11707,7 +11707,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "mouseFlag",
         "obfuscatedName": "llimc",
         "owner": "Client",
         "ownerObfuscatedName": "client",

@@ -54,4 +54,10 @@ public class VitaLiteOptions extends OptionsParser
             description = ""
     )
     private String port;
+
+    @CLIArgument(
+            name = "disableMouseHook",
+            description = "Disable RuneLites mousehook DLL from being loaded or called"
+    )
+    private boolean disableMouseHook = false;
 }

@@ -7,6 +7,9 @@ import com.tonic.util.dto.JField;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class OSGlobalMixin
 {
     public static void patch(ClassNode classNode)
@@ -14,6 +17,35 @@ public class OSGlobalMixin
         for(MethodNode method : classNode.methods)
         {
             randomDat(classNode, method);
+            mouseFlag(method);
+        }
+    }
+
+    public static void mouseFlag(MethodNode method)
+    {
+        JClass client = MappingProvider.getClass("Client");
+        JField mouseFlag = MappingProvider.getField(client, "mouseFlag");
+
+        List<FieldInsnNode> toReplace = new ArrayList<>();
+
+        for(AbstractInsnNode insn : method.instructions)
+        {
+            if(insn.getOpcode() != Opcodes.GETSTATIC)
+                continue;
+
+            FieldInsnNode fin = (FieldInsnNode) insn;
+            if(!fin.owner.equals(mouseFlag.getOwnerObfuscatedName()) || !fin.name.equals(mouseFlag.getObfuscatedName()))
+                continue;
+
+            toReplace.add(fin);
+        }
+
+        if(toReplace.isEmpty())
+            return;
+
+        for (FieldInsnNode insn : toReplace) {
+            InsnNode iconst0 = new InsnNode(Opcodes.ICONST_0);
+            method.instructions.set(insn, iconst0);
         }
     }
 
