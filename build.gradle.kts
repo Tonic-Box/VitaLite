@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.tonic"
-version = "1.11.19.11"
+version = "1.11.20"
 
 repositories {
     mavenCentral()
@@ -204,6 +204,9 @@ dependencies {
 
     implementation("org.jboss.aerogear:aerogear-otp-java:1.0.0")
     implementation("com.apple:AppleJavaExtensions:1.4")
+
+    implementation(group = "com.fifesoft", name = "rsyntaxtextarea", version = "3.1.2")
+    implementation(group = "com.fifesoft", name = "autocomplete", version = "3.1.1")
 
 //    implementation("com.lmax:disruptor:3.4.4")
 //    implementation("org.jctools:jctools-core:4.0.5")

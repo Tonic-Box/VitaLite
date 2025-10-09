@@ -25,6 +25,8 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
     compileOnly("org.jboss.aerogear:aerogear-otp-java:1.0.0")
+    implementation(group = "com.fifesoft", name = "rsyntaxtextarea", version = "3.1.2")
+    implementation(group = "com.fifesoft", name = "autocomplete", version = "3.1.1")
 }
 
 tasks.test {

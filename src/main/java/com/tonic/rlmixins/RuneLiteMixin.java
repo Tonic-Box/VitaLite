@@ -36,26 +36,4 @@ public class RuneLiteMixin {
 
         method.instructions.insert(insertionPoint, toInject);
     }
-
-    @Insert(
-            method = "start",
-            at = @At(value = AtTarget.RETURN),
-            raw = true
-    )
-    public static void start(ClassNode classNode, MethodNode method, AbstractInsnNode insertionPoint)
-    {
-        if(Main.optionsParser.isIncognito())
-            return;
-        InsnList code = BytecodeBuilder.create()
-                .invokeStatic(
-                        "com/tonic/services/codeeval/CodeEvalFrame",
-                        "install",
-                        "()V"
-                ).build();
-
-        method.instructions.insertBefore(
-                insertionPoint,
-                code
-        );
-    }
 }

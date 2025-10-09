@@ -141,7 +141,7 @@ public class Channel
 	/**
 	 * Broadcast a message to all peers on the channel.
 	 */
-	public void broadcast(String type, Map<String, Object> payload) throws Exception
+	public void broadcast(String type, Map<String, Object> payload)
 	{
 		Message message = new Message.Builder(clientId, clientName)
 			.type(type)
@@ -153,19 +153,26 @@ public class Channel
 	/**
 	 * Broadcast a pre-built message to all peers.
 	 */
-	public void broadcast(Message message) throws Exception
+	public void broadcast(Message message)
 	{
-		if (!running.get())
+		try
 		{
-			throw new IllegalStateException("Channel not started");
+			if (!running.get())
+			{
+				throw new IllegalStateException("Channel not started");
+			}
+
+			byte[] data = serialize(message);
+			DatagramPacket packet = new DatagramPacket(data, data.length, group, port);
+			socket.send(packet);
+
+			// Track our own message to avoid duplicate processing
+			recentMessages.put(message.getMessageId(), System.currentTimeMillis());
 		}
-
-		byte[] data = serialize(message);
-		DatagramPacket packet = new DatagramPacket(data, data.length, group, port);
-		socket.send(packet);
-
-		// Track our own message to avoid duplicate processing
-		recentMessages.put(message.getMessageId(), System.currentTimeMillis());
+		catch (Exception ex)
+		{
+			Logger.error(ex);
+		}
 	}
 
 	/**

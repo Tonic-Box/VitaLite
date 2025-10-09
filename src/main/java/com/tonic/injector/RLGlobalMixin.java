@@ -1,12 +1,16 @@
 package com.tonic.injector;
 
+import com.tonic.injector.util.BytecodeBuilder;
 import com.tonic.injector.util.LdcRewriter;
+import com.tonic.injector.util.MappingProvider;
 import com.tonic.injector.util.expreditor.impls.*;
+import com.tonic.util.dto.JClass;
+import com.tonic.util.dto.JField;
 import com.tonic.vitalite.Main;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.*;
 
-public class GlobalMixin
+public class RLGlobalMixin
 {
     private static final RuntimeMaxMemoryReplacer memoryReplacer = new RuntimeMaxMemoryReplacer(778502144L);
     private static final SystemPropertyReplacer propertyReplacer = new SystemPropertyReplacer();

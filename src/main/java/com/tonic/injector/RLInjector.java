@@ -86,7 +86,7 @@ public class RLInjector
             {
                 continue;
             }
-            GlobalMixin.patch(entry.getValue());
+            RLGlobalMixin.patch(entry.getValue());
             byte[] bytes = ClassNodeUtil.toBytes(entry.getValue());
             Main.LIBS.getRunelite().classes.put(
                     name,

@@ -1,6 +1,7 @@
 package com.tonic.util;
 
 import com.tonic.Static;
+import com.tonic.api.TClient;
 import net.runelite.api.ChatMessageType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
@@ -23,4 +24,27 @@ public class MessageUtil {
         sendChatMessage(null, message);
     }
 
+    public static void sendPublicChatMessage(String message)
+    {
+        Static.invoke(() -> {
+            TClient client = Static.getClient();
+            client.getPacketWriter().chatPacket(0, message);
+        });
+    }
+
+    public static void sendFriendsChatMessage(String message)
+    {
+        Static.invoke(() -> {
+            TClient client = Static.getClient();
+            client.getPacketWriter().chatPacket(2, message);
+        });
+    }
+
+    public static void sendClanChatMessage(String message)
+    {
+        Static.invoke(() -> {
+            TClient client = Static.getClient();
+            client.getPacketWriter().chatPacket(3, message);
+        });
+    }
 }

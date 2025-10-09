@@ -102,4 +102,28 @@ public class NpcAPI extends ActorAPI
             return (minHealth + maxHealth + 1) / 2;
         });
     }
+
+    public static String getName(NPC npc)
+    {
+        return Static.invoke(() -> {
+            NPCComposition composition = getComposition(npc);
+            if (composition == null || composition.getName() == null)
+                return npc.getName();
+            return composition.getName();
+        });
+    }
+
+    public static NPCComposition getComposition(NPC npc)
+    {
+        return Static.invoke(() -> {
+            NPCComposition composition = npc.getComposition();
+            if(composition == null)
+                return null;
+            if(composition.getConfigs() != null)
+            {
+                composition = composition.transform();
+            }
+            return composition;
+        });
+    }
 }

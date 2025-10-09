@@ -1,14 +1,17 @@
-package com.tonic.services.codeeval;
+package com.tonic.plugins.codeeval;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
 import java.util.Scanner;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import com.tonic.Static;
 import com.tonic.services.GameManager;
@@ -27,6 +30,7 @@ public class CodeEvalFrame extends JFrame {
     private final RSyntaxTextArea codeArea;
     private final JTextArea outputArea;
     private final JButton runButton;
+    private Future<?> future;
 
     public static CodeEvalFrame get() {
         if (INSTANCE == null) {
@@ -46,7 +50,6 @@ public class CodeEvalFrame extends JFrame {
     }
 
     public void open() {
-        // Initialize/refresh the evaluator with current classloader context
         refreshContext();
         setVisible(true);
         toFront();
@@ -55,16 +58,13 @@ public class CodeEvalFrame extends JFrame {
 
     public void close() {
         setVisible(false);
-        // Clear any sensitive output
         clearOutput();
     }
 
     private void refreshContext() {
-        // Get the RLClassLoader from a class that we know is loaded by it
-        // GameManager is loaded by RLClassLoader and has access to RuneLite classes
         ClassLoader rlClassLoader = com.tonic.services.GameManager.class.getClassLoader();
         outputArea.append(">>> Using RLClassLoader: " + rlClassLoader.getClass().getName() + "\n");
-        outputArea.append(">>> RLClassLoader toString: " + rlClassLoader.toString() + "\n");
+        outputArea.append(">>> RLClassLoader toString: " + rlClassLoader + "\n");
         if (evaluator == null || !evaluator.getParentClassLoader().equals(rlClassLoader)) {
             outputArea.append(">>> Refreshing classloader context...\n");
             evaluator = new SimpleCodeEvaluator(rlClassLoader);
@@ -78,8 +78,6 @@ public class CodeEvalFrame extends JFrame {
 
     public CodeEvalFrame() {
         super("VitaLite Code Evaluator");
-
-        // Initialize evaluator with RLClassLoader - will be refreshed on each open() call
         this.evaluator = new SimpleCodeEvaluator(GameManager.class.getClassLoader());
 
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -87,19 +85,13 @@ public class CodeEvalFrame extends JFrame {
 
         final BufferedImage iconImage = ImageUtil.loadImageResource(CodeEvalFrame.class, "jshell.png");
         setIconImage(iconImage);
-
-        // Add window listener to handle cleanup when window is closed
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                 close();
             }
         });
-
-        // Create split pane
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-
-        // Code input area
         JPanel codePanel = new JPanel(new BorderLayout());
         codePanel.setBorder(BorderFactory.createTitledBorder("Code (Ctrl+Enter to run)"));
 
@@ -110,21 +102,18 @@ public class CodeEvalFrame extends JFrame {
         codeArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         codeArea.setTabSize(4);
 
-        // Apply dark theme
         try {
-            Theme theme = Theme.load(getClass().getResourceAsStream("/org/fife/ui/rsyntaxtextarea/themes/dark.xml"));
+            Theme theme = Theme.load(getClass().getResourceAsStream("dark.xml"));
             theme.apply(codeArea);
         } catch (Exception e) {
-            // Fallback to manual dark theme
             codeArea.setBackground(new Color(40, 40, 40));
             codeArea.setForeground(Color.WHITE);
             codeArea.setCurrentLineHighlightColor(new Color(50, 50, 50));
         }
 
-        // Setup basic autocompletion
-        setupAutoCompletion();
+        codeArea.setWhitespaceVisible(false);
+        codeArea.setEOLMarkersVisible(false);
 
-        // Load default code example from resources
         try {
             InputStream exampleStream = getClass().getResourceAsStream("default_example.java");
             if (exampleStream != null) {
@@ -140,7 +129,6 @@ public class CodeEvalFrame extends JFrame {
             codeArea.setText("// Enter your Java code here\nout.println(\"Hello World!\");");
         }
 
-        // Ctrl+Enter to run
         codeArea.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -154,7 +142,6 @@ public class CodeEvalFrame extends JFrame {
         JScrollPane codeScrollPane = new JScrollPane(codeArea);
         codePanel.add(codeScrollPane, BorderLayout.CENTER);
 
-        // Output area
         JPanel outputPanel = new JPanel(new BorderLayout());
         outputPanel.setBorder(BorderFactory.createTitledBorder("Output"));
 
@@ -167,10 +154,23 @@ public class CodeEvalFrame extends JFrame {
         JScrollPane outputScrollPane = new JScrollPane(outputArea);
         outputPanel.add(outputScrollPane, BorderLayout.CENTER);
 
-        // Button panel
         JPanel buttonPanel = new JPanel(new FlowLayout());
         runButton = new JButton("Run Code (Ctrl+Enter)");
-        runButton.addActionListener(e -> runCode());
+        runButton.addActionListener(e -> {
+            if(runButton.getText().equals("Run Code (Ctrl+Enter)"))
+            {
+                runButton.setText("Stop");
+                repaint();
+                runCode();
+            }
+            else
+            {
+                forceStopFuture(future);
+                runButton.setText("Run Code (Ctrl+Enter)");
+                outputArea.append(">>> Canceled.\n");
+                outputArea.setCaretPosition(outputArea.getDocument().getLength());
+            }
+        });
 
         JButton clearButton = new JButton("Clear Output");
         clearButton.addActionListener(e -> outputArea.setText(""));
@@ -184,70 +184,57 @@ public class CodeEvalFrame extends JFrame {
 
         codePanel.add(buttonPanel, BorderLayout.SOUTH);
 
-        // Assemble UI
         splitPane.setTopComponent(codePanel);
         splitPane.setBottomComponent(outputPanel);
         splitPane.setDividerLocation(500);
 
         add(splitPane, BorderLayout.CENTER);
 
-        // Set always on top by default
         setAlwaysOnTop(true);
 
         pack();
         setLocationRelativeTo(null);
     }
 
-    private void setupAutoCompletion() {
-        // Create a simple completion provider with basic completions
-        DefaultCompletionProvider provider = new DefaultCompletionProvider();
-
-        // Add basic Java completions
-        provider.addCompletion(new BasicCompletion(provider, "System.out.println"));
-        provider.addCompletion(new BasicCompletion(provider, "out.println"));
-
-        // Add VitaLite-specific completions
-        provider.addCompletion(new BasicCompletion(provider, "client()", "Get RuneLite Client instance"));
-        provider.addCompletion(new BasicCompletion(provider, "inject(\"className\")", "Inject class via Guice"));
-        provider.addCompletion(new BasicCompletion(provider, "loadClass(\"className\")", "Load class dynamically"));
-
-        // Add GameManager static methods
-        provider.addCompletion(new BasicCompletion(provider, "GameManager.playerList()", "Get list of players"));
-        provider.addCompletion(new BasicCompletion(provider, "GameManager.npcList()", "Get list of NPCs"));
-        provider.addCompletion(new BasicCompletion(provider, "GameManager.objectList()", "Get list of objects"));
-        provider.addCompletion(new BasicCompletion(provider, "GameManager.tileItemList()", "Get list of ground items"));
-
-        // Add Static utilities
-        provider.addCompletion(new BasicCompletion(provider, "Static.getClient()", "Get RuneLite client"));
-        provider.addCompletion(new BasicCompletion(provider, "Static.getInjector()", "Get Guice injector"));
-
-        // Create and install the auto completion
-        AutoCompletion ac = new AutoCompletion(provider);
-        ac.setAutoCompleteEnabled(true);
-        ac.setAutoActivationEnabled(true);
-        ac.setAutoActivationDelay(300);
-        ac.setShowDescWindow(true);
-        ac.install(codeArea);
-
-        // Set trigger key
-        try {
-            ac.setTriggerKey(KeyStroke.getKeyStroke("ctrl SPACE"));
-        } catch (Exception e) {
-            // Fallback trigger
-        }
-    }
-
     private void runCode() {
-        runButton.setEnabled(false);
-        ThreadPool.submit(() -> {
+        future = ThreadPool.submit(() -> {
             outputArea.append(">>> Running code...\n");
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
             PrintStream originalOut = System.out;
             PrintStream originalErr = System.err;
+            PrintStream customOut = new PrintStream(new OutputStream() {
+                private StringBuilder buffer = new StringBuilder();
+
+                @Override
+                public void write(int b) {
+                    if (b == '\n') {
+                        String line = buffer.toString();
+                        SwingUtilities.invokeLater(() -> {
+                            outputArea.append(line + "\n");
+                            outputArea.setCaretPosition(outputArea.getDocument().getLength());
+                        });
+                        buffer = new StringBuilder();
+                    } else {
+                        buffer.append((char) b);
+                    }
+                }
+
+                @Override
+                public void flush() {
+                    if (buffer.length() > 0) {
+                        String text = buffer.toString();
+                        SwingUtilities.invokeLater(() -> {
+                            outputArea.append(text);
+                            outputArea.setCaretPosition(outputArea.getDocument().getLength());
+                        });
+                        buffer = new StringBuilder();
+                    }
+                }
+            });
 
             try {
-                System.setOut(new PrintStream(baos));
-                System.setErr(new PrintStream(baos));
+                System.setOut(customOut);
+                System.setErr(customOut);
 
                 Object result = evaluator.evaluate(codeArea.getText());
 
@@ -256,30 +243,36 @@ public class CodeEvalFrame extends JFrame {
                 }
 
             } finally {
+                customOut.flush();
                 System.setOut(originalOut);
                 System.setErr(originalErr);
 
-                String output = baos.toString();
-                if (!output.trim().isEmpty()) {
-                    outputArea.append(output);
-                }
-                outputArea.append(">>> Done.\n\n");
-                outputArea.setCaretPosition(outputArea.getDocument().getLength());
-                runButton.setEnabled(true);
+                SwingUtilities.invokeLater(() -> {
+                    outputArea.append(">>> Done.\n\n");
+                    outputArea.setCaretPosition(outputArea.getDocument().getLength());
+                    runButton.setText("Run Code (Ctrl+Enter)");
+                });
             }
         });
     }
 
-    public static void install()
-    {
-        final BufferedImage iconImage = ImageUtil.loadImageResource(CodeEvalFrame.class, "jshell.png");
-        final NavigationButton titleBarButton = NavigationButton.builder()
-                .tooltip("JavaShell")
-                .icon(iconImage)
-                .onClick(() -> CodeEvalFrame.get().toggle())
-                .build();
+    public static void forceStopFuture(Future<?> future) {
+        try {
+            if (future instanceof FutureTask) {
+                Field runnerField = FutureTask.class.getDeclaredField("runner");
+                runnerField.setAccessible(true);
+                Thread runner = (Thread) runnerField.get(future);
 
-        ClientToolbar clientToolbar = Static.getInjector().getInstance(ClientToolbar.class);
-        clientToolbar.addNavigation(titleBarButton);
+                if (runner != null) {
+                    runner.setUncaughtExceptionHandler((t, e) -> {
+                        if (!(e instanceof ThreadDeath)) {
+                            e.printStackTrace();
+                        }
+                    });
+                    runner.stop();
+                }
+            }
+        } catch (ThreadDeath | Exception ignored) {
+        }
     }
 }

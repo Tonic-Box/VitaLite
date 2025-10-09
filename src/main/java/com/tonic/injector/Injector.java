@@ -42,7 +42,7 @@ public class Injector {
 
             ClassNode classNode = entry.getValue();
             FieldHookTransformer.instrument(classNode);
-            GlobalMixin.patch(classNode);
+            OSGlobalMixin.patch(classNode);
 
             Main.LIBS.getGamepack().classes.put(name, ClassNodeUtil.toBytes(classNode));
 

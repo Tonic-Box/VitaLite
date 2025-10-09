@@ -27,6 +27,11 @@ public class RLUpdater
     private static Map<String, String> properties;
     private static HttpClient httpClient;
 
+    public static void main(String[] args) throws Exception
+    {
+        run();
+    }
+
     public static void run() throws IOException, InterruptedException, NoSuchAlgorithmException
     {
         properties = Properties.fetch();

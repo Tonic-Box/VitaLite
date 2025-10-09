@@ -1,4 +1,6 @@
-package com.tonic.services.codeeval;
+package com.tonic.plugins.codeeval;
+
+import com.tonic.api.game.MovementAPI;
 
 import javax.tools.*;
 import java.io.*;
@@ -41,7 +43,6 @@ public class SimpleCodeEvaluator {
 
         } catch (Exception e) {
             System.err.println("Error evaluating code: " + e.getMessage());
-            e.printStackTrace();
             return null;
         } finally {
             // Restore original classloader context

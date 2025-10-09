@@ -77,8 +77,7 @@ public class %CLASS_NAME% {
         }
     }
 
-    public Object run() {
+    public void run() {
         %USER_CODE%
-        return null;
     }
 }

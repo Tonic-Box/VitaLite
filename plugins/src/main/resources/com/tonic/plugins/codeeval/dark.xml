@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE RSyntaxTheme SYSTEM "theme.dtd">
+
+<RSyntaxTheme version="1.0">
+
+    <!-- VS Code Dark+ Theme -->
+
+    <!-- General editor colors -->
+    <background color="1E1E1E"/>
+    <caret color="AEAFAD"/>
+    <selection fg="default" bg="264F78"/>
+    <currentLineHighlight color="2A2A2A" fade="false"/>
+    <marginLine fg="2A2A2A"/>
+    <markAllHighlight color="464646"/>
+    <markOccurrencesHighlight color="464646" border="false"/>
+    <matchedBracket fg="default" bg="3A3A3A" highlightBoth="true" animate="false"/>
+    <hyperlinks fg="569CD6"/>
+    <secondaryLanguages>
+        <language index="1" bg="333333"/>
+        <language index="2" bg="2B2B2B"/>
+        <language index="3" bg="3C3C3C"/>
+    </secondaryLanguages>
+
+    <!-- Gutter/line numbers -->
+    <gutterBackground color="1E1E1E"/>
+    <gutterBorder color="2A2A2A"/>
+    <lineNumbers fg="858585"/>
+    <foldIndicator fg="858585" iconBg="1E1E1E"/>
+    <iconRowHeader activeLineRange="3A3A3A"/>
+
+    <!-- Syntax tokens -->
+    <tokenStyles>
+        <!-- Comments -->
+        <style token="COMMENT_DOCUMENTATION" fg="6A9955" italic="true"/>
+        <style token="COMMENT_EOL" fg="6A9955" italic="true"/>
+        <style token="COMMENT_MULTILINE" fg="6A9955" italic="true"/>
+        <style token="COMMENT_KEYWORD" fg="7CA668" bold="true" italic="true"/>
+        <style token="COMMENT_MARKUP" fg="7CA668" italic="true"/>
+
+        <!-- Keywords -->
+        <style token="RESERVED_WORD" fg="569CD6" bold="false"/>
+        <style token="RESERVED_WORD_2" fg="C586C0" bold="false"/>
+
+        <!-- Data types -->
+        <style token="DATA_TYPE" fg="4EC9B0" bold="false"/>
+        <style token="VARIABLE" fg="9CDCFE" bold="false"/>
+
+        <!-- Literals -->
+        <style token="LITERAL_BOOLEAN" fg="569CD6" bold="false"/>
+        <style token="LITERAL_NUMBER_DECIMAL_INT" fg="B5CEA8" bold="false"/>
+        <style token="LITERAL_NUMBER_FLOAT" fg="B5CEA8" bold="false"/>
+        <style token="LITERAL_NUMBER_HEXADECIMAL" fg="B5CEA8" bold="false"/>
+        <style token="LITERAL_STRING_DOUBLE_QUOTE" fg="CE9178" bold="false"/>
+        <style token="LITERAL_CHAR" fg="CE9178" bold="false"/>
+        <style token="LITERAL_BACKQUOTE" fg="CE9178" bold="false"/>
+
+        <!-- Functions -->
+        <style token="FUNCTION" fg="DCDCAA" bold="false"/>
+        <style token="METHOD" fg="DCDCAA" bold="false"/>
+
+        <!-- Operators and separators -->
+        <style token="OPERATOR" fg="D4D4D4" bold="false"/>
+        <style token="SEPARATOR" fg="D4D4D4" bold="false"/>
+
+        <!-- Identifiers -->
+        <style token="IDENTIFIER" fg="D4D4D4" bold="false"/>
+        <style token="WHITESPACE" fg="D4D4D4"/>
+
+        <!-- Preprocessor -->
+        <style token="PREPROCESSOR" fg="C586C0" bold="false"/>
+
+        <!-- Annotations -->
+        <style token="ANNOTATION" fg="DCDCAA" bold="false"/>
+
+        <!-- Errors -->
+        <style token="ERROR_IDENTIFIER" fg="F44747" bold="false" underline="true"/>
+        <style token="ERROR_NUMBER_FORMAT" fg="F44747" bold="false" underline="true"/>
+        <style token="ERROR_STRING_DOUBLE" fg="F44747" bold="false" underline="true"/>
+        <style token="ERROR_CHAR" fg="F44747" bold="false" underline="true"/>
+
+        <!-- Markup languages -->
+        <style token="MARKUP_TAG_DELIMITER" fg="808080" bold="false"/>
+        <style token="MARKUP_TAG_NAME" fg="569CD6" bold="false"/>
+        <style token="MARKUP_TAG_ATTRIBUTE" fg="9CDCFE" bold="false"/>
+        <style token="MARKUP_TAG_ATTRIBUTE_VALUE" fg="CE9178" bold="false"/>
+        <style token="MARKUP_PROCESSING_INSTRUCTION" fg="C586C0" bold="false"/>
+        <style token="MARKUP_CDATA" fg="CE9178" bold="false"/>
+        <style token="MARKUP_CDATA_DELIMITER" fg="808080" bold="false"/>
+        <style token="MARKUP_DTD" fg="C586C0" bold="false"/>
+        <style token="MARKUP_ENTITY_REFERENCE" fg="9CDCFE" bold="false"/>
+
+        <style token="WHITESPACE" fg="2A2A2A"/>
+        <!-- Regex -->
+        <style token="REGEX" fg="D16969" bold="false"/>
+
+        <!-- Other -->
+        <style token="NULL" fg="569CD6" bold="false"/>
+    </tokenStyles>
+</RSyntaxTheme>

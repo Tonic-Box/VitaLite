@@ -2,7 +2,6 @@
 
 // Get the RuneLite client instance with proper typing
 Client client = Static.getClient();
-
 Player localPlayer = client.getLocalPlayer();
 if (localPlayer != null) {
     out.println("Local player name: " + localPlayer.getName());
