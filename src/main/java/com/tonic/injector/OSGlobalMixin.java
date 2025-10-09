@@ -1,5 +1,7 @@
-package com.tonic.injector.util;
+package com.tonic.injector;
 
+import com.tonic.injector.util.BytecodeBuilder;
+import com.tonic.injector.util.MappingProvider;
 import com.tonic.util.dto.JClass;
 import com.tonic.util.dto.JField;
 import org.objectweb.asm.Opcodes;
@@ -70,14 +72,14 @@ public class OSGlobalMixin
         if(target == null)
             return;
 
-        InsnList code2 = BytecodeBuilder.create()
-                .getStaticField("java/lang/System", "out", "Ljava/io/PrintStream;")
-                .pushString("Something went wrong with RandomDat @ " + clazz.name + "." + method.name + method.desc)
-                .invokeVirtual("java/io/PrintStream", "println", "(Ljava/lang/String;)V")
-                .pushInt(1)
-                .invokeStatic("System", "exit", "(I)V")
-                .build();
-
-        method.instructions.insertBefore(target, code2);
+//        InsnList code2 = BytecodeBuilder.create()
+//                .getStaticField("java/lang/System", "out", "Ljava/io/PrintStream;")
+//                .pushString("Something went wrong with RandomDat @ " + clazz.name + "." + method.name + method.desc)
+//                .invokeVirtual("java/io/PrintStream", "println", "(Ljava/lang/String;)V")
+//                .pushInt(1)
+//                .invokeStatic("java/lang/System", "exit", "(I)V")
+//                .build();
+//
+//        method.instructions.insertBefore(target, code2);
     }
 }

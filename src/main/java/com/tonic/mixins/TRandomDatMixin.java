@@ -29,8 +29,8 @@ public abstract class TRandomDatMixin
     @Shadow("randomDat")
     public static byte[] randomDat;
 
-    @Insert(method = "writeRandomDat", at = @At(value = AtTarget.RETURN, shift = Shift.HEAD), all = true)
-    public static void onWriteNewRandomDatData(byte[] var0, int var1, byte[] newRandomDatData, int var3, int var4)
+    @Insert(method = "randomDatData2", at = @At(value = AtTarget.RETURN, shift = Shift.HEAD), all = true)
+    public static void onWriteNewRandomDatData(byte[] newRandomDatData, int var1) //writeRandomDat
     {
         if (!Static.getVitaConfig().shouldCacheRandomDat())
         {
@@ -62,45 +62,26 @@ public abstract class TRandomDatMixin
                     .get();
 
             String identifier = username != null && !username.isEmpty() ? username : characterId;
-            randomDat = RandomDat.getCachedRandomDatData(identifier);
-            Logger.info("Using cached random.dat data for user " + identifier);
+            byte[] data = RandomDat.getCachedRandomDatData(identifier);
+            if(data != null)
+            {
+                randomDat = data;
+                Logger.info("Using cached random.dat data for user " + identifier);
+            }
+            else
+            {
+                randomDat = new byte[24];
+                for(int i = 0; i < 24; i++)
+                {
+                    randomDat[i] = -1;
+                }
+            }
         }
         catch (Exception ex)
         {
             System.out.println("Issue from caller: " + caller);
+            ex.printStackTrace();
             System.exit(0);
         }
-    }
-
-    @Disable("randomDatData2")
-    public static boolean randomDatData2(TBuffer buffer)
-    {
-        if (!Static.getVitaConfig().shouldCacheRandomDat())
-        {
-            return true;
-        }
-
-        String username = ReflectBuilder.of(Static.getClient())
-                .method("getUsername", null, null)
-                .get();
-
-        String identifier = username != null && !username.isEmpty() ? username : characterId;
-
-        byte[] cachedData = RandomDat.getCachedRandomDatData(identifier);
-        if (cachedData == null)
-        {
-            for (byte i = 0; i < 24; i++)
-            {
-                buffer.writeByte(-1);
-            }
-        }
-        else
-        {
-            for(byte b : cachedData) {
-                buffer.writeByte(b);
-            }
-        }
-        Logger.info("Using cached random.dat data for user " + identifier);
-        return false;
     }
 }
