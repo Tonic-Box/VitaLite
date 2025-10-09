@@ -32,7 +32,7 @@ public class ToggleSlider extends JPanel {
 
         addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mousePressed(MouseEvent e) {
                 setSelected(!selected);
                 fireActionPerformed();
             }
