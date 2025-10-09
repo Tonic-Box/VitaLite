@@ -54,32 +54,5 @@ public class OSGlobalMixin
                 .build();
 
         method.instructions.insertBefore(target, code);
-
-        target = null;
-        for(AbstractInsnNode insn : method.instructions)
-        {
-            if (!(insn instanceof IntInsnNode))
-                continue;
-
-            IntInsnNode intInsn = (IntInsnNode) insn;
-            if (intInsn.getOpcode() == Opcodes.BIPUSH && intInsn.operand == 24) {
-                if(insn.getNext().getOpcode() != Opcodes.NEWARRAY)
-                    continue;
-                target = insn;
-            }
-        }
-
-        if(target == null)
-            return;
-
-//        InsnList code2 = BytecodeBuilder.create()
-//                .getStaticField("java/lang/System", "out", "Ljava/io/PrintStream;")
-//                .pushString("Something went wrong with RandomDat @ " + clazz.name + "." + method.name + method.desc)
-//                .invokeVirtual("java/io/PrintStream", "println", "(Ljava/lang/String;)V")
-//                .pushInt(1)
-//                .invokeStatic("java/lang/System", "exit", "(I)V")
-//                .build();
-//
-//        method.instructions.insertBefore(target, code2);
     }
 }
