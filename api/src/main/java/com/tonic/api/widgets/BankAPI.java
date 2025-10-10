@@ -6,9 +6,11 @@ import com.tonic.api.game.VarAPI;
 import com.tonic.data.ItemContainerEx;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.data.ItemEx;
+import com.tonic.services.GameManager;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.WidgetInfo;
 
@@ -17,6 +19,29 @@ import net.runelite.api.widgets.WidgetInfo;
  */
 public class BankAPI
 {
+
+    private static class XSnapshot
+    {
+        private static int amount = -1;
+        private static int tick = -1;
+    }
+
+    private static class WithdrawModeSnapshot
+    {
+        private static boolean noted = false;
+        private static int tick = -1;
+    }
+
+    public static int getX()
+    {
+        if (GameManager.getTickCount() == XSnapshot.tick)
+        {
+            return XSnapshot.amount;
+        }
+
+        return VarAPI.getVar(VarbitID.BANK_REQUESTEDQUANTITY);
+    }
+
     /**
      * Sets the withdraw amount to the specified amount.
      * @param amount The amount to set the withdraw amount to.
@@ -29,12 +54,24 @@ public class BankAPI
             WidgetAPI.interact(1, InterfaceID.Bankmain.QUANTITYX, -1, -1);
         }
 
-        int xQuantity = VarAPI.getVar(VarbitID.BANK_REQUESTEDQUANTITY);
+        int xQuantity = getX();
         if(xQuantity != amount && amount != 1 && amount != 5 && amount != 10 && amount != -1)
         {
             WidgetAPI.interact(2, InterfaceID.Bankmain.QUANTITYX, -1, -1);
             DialogueAPI.resumeNumericDialogue(amount);
+            XSnapshot.amount = amount;
+            XSnapshot.tick = GameManager.getTickCount();
         }
+    }
+
+    public static boolean isWithdrawNote()
+    {
+        if (GameManager.getTickCount() == WithdrawModeSnapshot.tick)
+        {
+            return WithdrawModeSnapshot.noted;
+        }
+
+        return VarAPI.getVarp(VarPlayerID.BANKCERT) == 1;
     }
 
     /**
@@ -42,12 +79,15 @@ public class BankAPI
      * @param noted True for noted, false for unnoted.
      */
     public static void setWithdrawMode(boolean noted) {
-        if(noted) {
-            WidgetAPI.interact(1, InterfaceID.Bankmain.NOTE, -1, -1);
+        if (noted == isWithdrawNote())
+        {
+            return;
         }
-        else {
-            WidgetAPI.interact(1, InterfaceID.Bankmain.ITEM, -1, -1);
-        }
+
+        WithdrawModeSnapshot.noted = noted;
+        WithdrawModeSnapshot.tick = GameManager.getTickCount();
+
+        WidgetAPI.interact(1, noted ? InterfaceID.Bankmain.NOTE : InterfaceID.Bankmain.ITEM, -1, -1);
     }
 
     /**
