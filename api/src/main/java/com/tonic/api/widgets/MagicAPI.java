@@ -6,6 +6,8 @@ import com.tonic.data.magic.Spell;
 import com.tonic.data.magic.SpellBook;
 import net.runelite.api.Skill;
 import net.runelite.api.gameval.VarPlayerID;
+import net.runelite.api.gameval.VarbitID;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
@@ -16,6 +18,7 @@ import java.time.temporal.ChronoUnit;
 public class MagicAPI
 {
     private static final int AUTOCAST_VARP = 108;
+    private static final int AUTOCAST_USABLE_VARP = 843;
 
     /**
      * Checks if autocasting is currently enabled.
@@ -25,6 +28,16 @@ public class MagicAPI
     public static boolean isAutoCasting()
     {
         return VarAPI.getVarp(AUTOCAST_VARP) != 0;
+    }
+
+    public static boolean isAutoCastUsable()
+    {
+        return VarAPI.getVarp(AUTOCAST_USABLE_VARP) == 18;
+    }
+
+    public static boolean isDefensiveCasting()
+    {
+        return !isAutoCasting() && VarAPI.getVar(VarbitID.AUTOCAST_DEFMODE) == 1;
     }
 
     /**
