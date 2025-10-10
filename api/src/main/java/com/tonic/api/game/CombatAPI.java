@@ -97,6 +97,9 @@ public class CombatAPI
         return VarAPI.getVar(VarbitID.SUPER_ANTIFIRE_POTION) > 0;
     }
 
+    /**
+     * @return The number of remaining teleblock ticks
+     */
     public static int getRemainingTeleblockTicks()
     {
         return VarAPI.getVar(VarbitID.TELEBLOCK_CYCLES);
