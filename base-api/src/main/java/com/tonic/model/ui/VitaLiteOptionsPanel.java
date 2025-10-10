@@ -338,8 +338,8 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
     private void checkShit()
     {
-        Object platInfo = ReflectBuilder.ofClass("le")
-                .staticField("wc")
+        Object platInfo = ReflectBuilder.ofClass("ft")
+                .staticField("vc")
                 .get();
 
         ReflectUtil.inspectNonStaticFields(platInfo);
