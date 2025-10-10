@@ -62,13 +62,7 @@ public class VitaExternalsPanel extends PluginPanel {
         cardContainer.setLayout(new GridBagLayout());
         cardContainer.setBackground(BACKGROUND);
 
-        JScrollPane scrollPane = new JScrollPane(cardContainer);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.getViewport().setBackground(BACKGROUND);
-
-        add(scrollPane, BorderLayout.CENTER);
+        add(cardContainer, BorderLayout.CENTER);
 
         statusLabel = new JLabel("Ready");
         statusLabel.setForeground(TEXT_SECONDARY);
