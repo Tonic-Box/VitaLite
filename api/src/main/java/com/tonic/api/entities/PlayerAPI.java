@@ -54,4 +54,13 @@ public class PlayerAPI extends ActorAPI
             client.getPacketWriter().playerActionPacket(option, index, false);
         });
     }
+
+    /**
+     * @return The current player
+     */
+    public static Player getLocal()
+    {
+        Client client = Static.getClient();
+        return client.getLocalPlayer();
+    }
 }
