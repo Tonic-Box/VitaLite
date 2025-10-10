@@ -113,36 +113,8 @@ public class ProxyClassBuilder
 
             int varIndex = 1;
             for (Type argType : argTypes) {
-                int opcode;
-                int size;
-
-                switch (argType.getSort()) {
-                    case Type.BOOLEAN:
-                    case Type.BYTE:
-                    case Type.CHAR:
-                    case Type.SHORT:
-                    case Type.INT:
-                        opcode = ILOAD;
-                        size = 1;
-                        break;
-                    case Type.LONG:
-                        opcode = LLOAD;
-                        size = 2;
-                        break;
-                    case Type.FLOAT:
-                        opcode = FLOAD;
-                        size = 1;
-                        break;
-                    case Type.DOUBLE:
-                        opcode = DLOAD;
-                        size = 2;
-                        break;
-                    default:
-                        opcode = ALOAD;
-                        size = 1;
-                        break;
-                }
-
+                int opcode = argType.getOpcode(ILOAD);
+                int size = argType.getSize();
                 mv.visitVarInsn(opcode, varIndex);
                 varIndex += size;
             }
