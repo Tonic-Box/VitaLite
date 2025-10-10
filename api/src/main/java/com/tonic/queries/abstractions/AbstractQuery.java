@@ -4,8 +4,10 @@ import com.tonic.Static;
 import net.runelite.api.Client;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -136,7 +138,7 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
      * Generic aggregation method for custom terminal operations
      * Executes filters and allows custom stream processing
      */
-    public <R> R aggregate(java.util.function.Function<Stream<T>, R> aggregator) {
+    public <R> R aggregate(Function<Stream<T>, R> aggregator) {
         return Static.invoke(() -> {
             Stream<T> stream = dataSource.get().stream();
 
@@ -151,7 +153,7 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
     /**
      * Execute filters and process with custom collector
      */
-    public <R> R collect(java.util.stream.Collector<T, ?, R> collector) {
+    public <R> R collect(Collector<T, ?, R> collector) {
         return Static.invoke(() -> {
             Stream<T> stream = dataSource.get().stream();
 
