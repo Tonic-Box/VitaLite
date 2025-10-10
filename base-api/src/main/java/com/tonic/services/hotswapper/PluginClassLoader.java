@@ -33,14 +33,7 @@ public class PluginClassLoader extends URLClassLoader {
 
     public List<Class<?>> getPluginClasses() throws IOException {
         return getClasses().stream()
-            .filter(c -> {
-                Class<?> parent = c.getSuperclass();
-                if (parent == null)
-                    return false;
-
-                String parentName = parent.getName();
-                return parentName.endsWith(".Plugin") || parentName.endsWith(".VitaPlugin");
-            })
+            .filter(this::inheritsPluginClass)
             .collect(Collectors.toList());
     }
 
@@ -51,6 +44,18 @@ public class PluginClassLoader extends URLClassLoader {
                 .filter(info -> !info.getName().equals("module-info"))
                 .map(ClassPath.ClassInfo::load)
                 .collect(Collectors.toList());
+    }
+
+    public boolean inheritsPluginClass(Class<?> clazz) {
+        if (clazz.getSuperclass() == null) {
+            return false;
+        }
+
+        if (clazz.getSuperclass().getName().endsWith(".Plugin")) {
+            return true;
+        }
+
+        return inheritsPluginClass(clazz);
     }
 
     @Override
