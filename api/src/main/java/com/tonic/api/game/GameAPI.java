@@ -123,6 +123,14 @@ public class GameAPI
     }
 
     /**
+     * @return true if the game screen is currently fading
+     */
+    public static boolean isScreenFading()
+    {
+        return WidgetAPI.isVisible(InterfaceID.FadeOverlay.FADER);
+    }
+
+    /**
      * Invokes a menu action
      * @param identifier identifier
      * @param opcode opcode

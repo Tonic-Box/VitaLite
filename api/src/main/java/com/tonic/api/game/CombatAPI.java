@@ -17,6 +17,7 @@ import net.runelite.api.widgets.Widget;
 public class CombatAPI
 {
     private static final int VENOM_THRESHOLD = 1000000;
+    private static final int ANTIVENOM_THRESHOLD = -38;
 
     /**
      * Checks if the player is currently retaliating
@@ -62,6 +63,41 @@ public class CombatAPI
     }
 
     /**
+     * @return true if an antipoison effect is active
+     */
+    public static boolean isAntipoisoned()
+    {
+        return VarAPI.getVarp(VarPlayerID.POISON) < 0;
+    }
+
+    /**
+     * @return true if an antivenom effect is active
+     */
+    public static boolean isAntivenomed()
+    {
+        return VarAPI.getVarp(VarPlayerID.POISON) < ANTIVENOM_THRESHOLD;
+    }
+
+    /**
+     * @return The damage that the next poison hitsplat will incur
+     */
+    public static int getNextPoisonDamage()
+    {
+        int value = VarAPI.getVarp(VarPlayerID.POISON);
+        if (isVenomed())
+        {
+            return (value - 999997) * 2;
+        }
+
+        if (isPoisoned())
+        {
+            return (int) Math.ceil(value / 5.0f);
+        }
+
+        return 0;
+    }
+
+    /**
      * Checks if the player's special attack is enabled
      * @return true if the special attack is enabled, false otherwise
      */
@@ -85,7 +121,7 @@ public class CombatAPI
      */
     public static boolean isAntifired()
     {
-        return VarAPI.getVar(VarbitID.ANTIFIRE_POTION) > 0;
+        return VarAPI.getVar(VarbitID.ANTIFIRE_POTION) > 0 || isSuperAntifired();
     }
 
     /**
@@ -95,6 +131,14 @@ public class CombatAPI
     public static boolean isSuperAntifired()
     {
         return VarAPI.getVar(VarbitID.SUPER_ANTIFIRE_POTION) > 0;
+    }
+
+    /**
+     * @return The number of remaining teleblock ticks
+     */
+    public static int getRemainingTeleblockTicks()
+    {
+        return VarAPI.getVar(VarbitID.TELEBLOCK_CYCLES);
     }
 
     /**
@@ -154,6 +198,6 @@ public class CombatAPI
      */
     public static boolean inMultiWay()
     {
-        return LayoutView.MULTI_WAY.isVisible();
+        return VarAPI.getVar(VarbitID.MULTIWAY_INDICATOR) == 1;
     }
 }

@@ -13,13 +13,27 @@ import java.util.function.Predicate;
  * Scene API
  */
 public class SceneAPI {
+
     /**
      * Returns a list of all reachable tiles from the player's current position using a breadth-first search algorithm.
      * This method considers the collision data to determine which tiles can be reached.
      *
      * @return A list of WorldPoint objects representing all reachable tiles.
      */
-    public static List<WorldPoint> reachableTiles() {
+    public static List<WorldPoint> reachableTiles()
+    {
+        Client client = Static.getClient();
+        return reachableTiles(client.getLocalPlayer().getWorldLocation());
+    }
+
+    /**
+     * Returns a list of all reachable tiles from the origins position using a breadth-first search algorithm.
+     * This method considers the collision data to determine which tiles can be reached.
+     *
+     * @param origin The point to query from
+     * @return A list of WorldPoint objects representing all reachable tiles from the origin.
+     */
+    public static List<WorldPoint> reachableTiles(WorldPoint origin) {
         Client client = Static.getClient();
         boolean[][] visited = new boolean[104][104];
         CollisionData[] collisionData = client.getTopLevelWorldView().getCollisionMaps();
@@ -28,8 +42,7 @@ public class SceneAPI {
         }
         WorldView worldView = client.getTopLevelWorldView();
         int[][] flags = collisionData[worldView.getPlane()].getFlags();
-        WorldPoint playerLoc = client.getLocalPlayer().getWorldLocation();
-        int firstPoint = (playerLoc.getX()-worldView.getBaseX() << 16) | playerLoc.getY()-worldView.getBaseY();
+        int firstPoint = (origin.getX()-worldView.getBaseX() << 16) | origin.getY()-worldView.getBaseY();
         ArrayDeque<Integer> queue = new ArrayDeque<>();
         queue.add(firstPoint);
         while (!queue.isEmpty()) {

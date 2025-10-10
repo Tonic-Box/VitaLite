@@ -57,31 +57,14 @@ public enum BankLocations {
     HOSIDIUS_BANK(new WorldArea(1748, 3594, 5, 8, 0)),
     PORT_PISCARILIUS_BANK(new WorldArea(1794, 3784, 18, 7, 0)),
     //	HALLOWED_SEPULCHRE_BANK(new WorldArea(2393, 5975, 15, 15, 0)), has quest requirements
-    CANIFIS_BANK(new WorldArea(3508, 3474, 6, 10, 0), () ->
-    {
-        QuestState state = QuestAPI.getState(Quest.PRIEST_IN_PERIL);
-        return state != null && state.equals(QuestState.FINISHED);
-    }),
+    CANIFIS_BANK(new WorldArea(3508, 3474, 6, 10, 0), () -> QuestAPI.getState(Quest.PRIEST_IN_PERIL) == QuestState.FINISHED),
     //	MOTHERLODE_MINE_BANK(new WorldArea(3754, 5664, 4, 3, 0)), has pickaxe requirement
-    BURGH_DE_ROTT_BANK(new WorldArea(3492, 3208, 10, 6, 0), () ->
-    {
-        QuestState state = QuestAPI.getState(Quest.PRIEST_IN_PERIL);
-        return state != null && state.equals(QuestState.FINISHED);
-    }),
+    BURGH_DE_ROTT_BANK(new WorldArea(3492, 3208, 10, 6, 0), () -> QuestAPI.getState(Quest.PRIEST_IN_PERIL) == QuestState.FINISHED),
     VER_SINHAZA_BANK(new WorldArea(3646, 3204, 10, 13, 0)),
     FEROX_ENCLAVE_BANK(new WorldArea(3127, 3627, 10, 6, 0)),
     BURTHORPE_BANK(new WorldArea(3037, 4961, 13, 17, 1)),
-    ZANERIS_BANK(new WorldArea(2379, 4453, 6, 7, 0), () -> {
-        Client client = Static.getClient();
-        QuestState state = QuestAPI.getState(Quest.LOST_CITY);
-        return state != null && state.equals(QuestState.FINISHED);
-    }),
-
-    CIVITAS_ILLA_FORTIS(new WorldArea(1777, 3093, 9, 11, 0), () -> {
-        Client client = Static.getClient();
-        QuestState state = QuestAPI.getState(Quest.CHILDREN_OF_THE_SUN);
-        return state != null && state.equals(QuestState.FINISHED);
-    }),
+    ZANERIS_BANK(new WorldArea(2379, 4453, 6, 7, 0), () -> QuestAPI.getState(Quest.LOST_CITY) == QuestState.FINISHED),
+    CIVITAS_ILLA_FORTIS(new WorldArea(1777, 3093, 9, 11, 0), () -> QuestAPI.getState(Quest.CHILDREN_OF_THE_SUN) == QuestState.FINISHED),
 
     ;
 
