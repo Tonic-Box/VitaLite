@@ -1,1 +1,1417 @@
-[{"name":"OP_GROUND_ITEM_ACTION_3","packet":{"id":90,"length":7},"writes":["writeByteAdd","writeShortAdd","writeShortAdd","writeShort"],"reads":["readByteAdd","readShortAdd","readShortAdd","readShort"],"args":["ctrl","worldY","identifier","worldX"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_FOCUS_CHANGED","packet":{"id":54,"length":1},"writes":["writeByte"],"reads":["readByte"],"args":["focus"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_WALK","packet":{"id":98,"length":-1},"writes":["writeByte","writeShortAdd","writeByte","writeShortAddLE"],"reads":["readByte","readShortAdd","readByte","readShortAddLE"],"args":["5","worldY","ctrl","worldX"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_RESUME_STRINGDIALOG","packet":{"id":88,"length":-1},"writes":["writeByte","writeStringCp1252NullTerminated"],"reads":["readByte","readStringCp1252NullTerminated"],"args":["length","var7"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_PLAYER_ACTION_0","packet":{"id":34,"length":3},"writes":["writeByte","writeShort"],"reads":["readByte","readShort"],"args":["ctrl","identifier"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_GROUND_ITEM_ACTION_4","packet":{"id":32,"length":7},"writes":["writeShortAdd","writeShortAddLE","writeByte","writeShortAdd"],"reads":["readShortAdd","readShortAddLE","readByte","readShortAdd"],"args":["worldX","identifier","ctrl","worldY"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_NPC_ACTION_1","packet":{"id":5,"length":3},"writes":["writeByte","writeShortAddLE"],"reads":["readByte","readShortAddLE"],"args":["ctrl","identifier"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_PLAYER_ACTION_6","packet":{"id":18,"length":3},"writes":["writeByteAdd","writeShort"],"reads":["readByteAdd","readShort"],"args":["ctrl","identifier"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_GROUND_ITEM_ACTION_0","packet":{"id":87,"length":7},"writes":["writeByteAdd","writeShortAdd","writeShortLE","writeShort"],"reads":["readByteAdd","readShortAdd","readShortLE","readShort"],"args":["ctrl","worldY","worldX","identifier"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_PLAYER_ACTION_4","packet":{"id":78,"length":3},"writes":["writeByte","writeShort"],"reads":["readByte","readShort"],"args":["ctrl","identifier"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_PLAYER_ACTION_5","packet":{"id":93,"length":3},"writes":["writeShortAdd","writeByteAdd"],"reads":["readShortAdd","readByteAdd"],"args":["identifier","ctrl"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_MOUSE_CLICK","packet":{"id":40,"length":7},"writes":["writeByteAdd","writeShortAdd","writeShortLE","writeShortLE"],"reads":["readByteAdd","readShortAdd","readShortLE","readShortLE"],"args":["0","x","mouseInfo","y"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_NPC_ACTION_0","packet":{"id":16,"length":3},"writes":["writeShort","writeByteAdd"],"reads":["readShort","readByteAdd"],"args":["identifier","ctrl"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_GAME_OBJECT_ACTION_1","packet":{"id":68,"length":7},"writes":["writeShortLE","writeShort","writeByteAdd","writeShort"],"reads":["readShortLE","readShort","readByteAdd","readShort"],"args":["identifier","worldY","ctrl","worldX"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_WIDGET_ACTION_SUBOP","packet":{"id":9,"length":9},"writes":["writeInt","writeShort","writeShort","writeByte","writeByte"],"reads":["readInt","readShort","readShort","readByte","readByte"],"args":["widgetId","childId","itemId","type","subOp"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_GROUND_ITEM_ACTION_1","packet":{"id":51,"length":7},"writes":["writeShortLE","writeByte","writeShort","writeShortLE"],"reads":["readShortLE","readByte","readShort","readShortLE"],"args":["worldY","ctrl","identifier","worldX"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_WIDGET_TARGET_ON_NPC","packet":{"id":77,"length":11},"writes":["writeIntIME","writeShortLE","writeByteAdd","writeShort","writeShort"],"reads":["readIntIME","readShortLE","readByteAdd","readShort","readShort"],"args":["selectedWidgetId","slot","ctrl","identifier","itemId"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_PLAYER_ACTION_1","packet":{"id":47,"length":3},"writes":["writeShort","writeByteAdd"],"reads":["readShort","readByteAdd"],"args":["identifier","ctrl"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_WIDGET_TARGET_ON_GAME_OBJECT","packet":{"id":58,"length":15},"writes":["writeShortAdd","writeShortAddLE","writeShort","writeShortAdd","writeIntME","writeByte","writeShortAddLE"],"reads":["readShortAdd","readShortAddLE","readShort","readShortAdd","readIntME","readByte","readShortAddLE"],"args":["identifier","worldX","slot","worldY","selectedWidgetId","ctrl","itemId"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_GAME_OBJECT_ACTION_3","packet":{"id":17,"length":7},"writes":["writeShortAddLE","writeByteAdd","writeShortLE","writeShortLE"],"reads":["readShortAddLE","readByteAdd","readShortLE","readShortLE"],"args":["identifier","ctrl","worldX","worldY"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_GAME_OBJECT_ACTION_2","packet":{"id":76,"length":7},"writes":["writeShortAdd","writeByte","writeShortAdd","writeShortAddLE"],"reads":["readShortAdd","readByte","readShortAdd","readShortAddLE"],"args":["worldX","ctrl","identifier","worldY"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_RESUME_OBJDIALOG","packet":{"id":6,"length":2},"writes":["writeShort"],"reads":["readShort"],"args":["id"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_GROUND_ITEM_ACTION_2","packet":{"id":22,"length":7},"writes":["writeByte","writeShortAdd","writeShortLE","writeShort"],"reads":["readByte","readShortAdd","readShortLE","readShort"],"args":["ctrl","worldY","identifier","worldX"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_WIDGET_ACTION","packet":{"id":91,"length":9},"writes":["writeInt","writeShort","writeShort","writeByte"],"reads":["readInt","readShort","readShort","readByte"],"args":["widgetId","childId","itemId","type"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_WIDGET_TARGET_ON_WIDGET","packet":{"id":19,"length":16},"writes":["writeShort","writeShort","writeInt","writeIntLE","writeShortAdd","writeShortAddLE"],"reads":["readShort","readShort","readInt","readIntLE","readShortAdd","readShortAddLE"],"args":["param0","slot","selectedWidgetId","targetWidgetID","itemId","identifier2"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_WIDGET_TARGET_ON_GROUND_ITEM","packet":{"id":11,"length":15},"writes":["writeShortLE","writeShortLE","writeIntLE","writeShort","writeShortAddLE","writeByteAdd","writeShortLE"],"reads":["readShortLE","readShortLE","readIntLE","readShort","readShortAddLE","readByteAdd","readShortLE"],"args":["slot","identifier","selectedWidgetId","worldY","itemId","ctrl","worldX"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_RESUME_COUNTDIALOG","packet":{"id":43,"length":6},"writes":["writeInt"],"reads":["readInt"],"args":["count"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_GAME_OBJECT_ACTION_0","packet":{"id":64,"length":7},"writes":["writeShortAddLE","writeShortAddLE","writeByteAdd","writeShort"],"reads":["readShortAddLE","readShortAddLE","readByteAdd","readShort"],"args":["worldX","identifier","ctrl","worldY"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_GAME_OBJECT_ACTION_4","packet":{"id":67,"length":7},"writes":["writeShortLE","writeShortAdd","writeShortLE","writeByteAdd"],"reads":["readShortLE","readShortAdd","readShortLE","readByteAdd"],"args":["identifier","worldY","worldX","ctrl"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_WIDGET_TARGET_ON_PLAYER","packet":{"id":44,"length":11},"writes":["writeByteAdd","writeShortLE","writeShortAdd","writeInt","writeShort"],"reads":["readByteAdd","readShortLE","readShortAdd","readInt","readShort"],"args":["ctrl","itemId","identifier","selectedWidgetId","slot"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_NPC_ACTION_4","packet":{"id":46,"length":3},"writes":["writeByte","writeShortLE"],"reads":["readByte","readShortLE"],"args":["ctrl","identifier"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_PLAYER_ACTION_3","packet":{"id":61,"length":3},"writes":["writeByte","writeShortAdd"],"reads":["readByte","readShortAdd"],"args":["ctrl","identifier"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_NPC_ACTION_2","packet":{"id":94,"length":3},"writes":["writeByte","writeShortLE"],"reads":["readByte","readShortLE"],"args":["ctrl","identifier"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_PLAYER_ACTION_2","packet":{"id":79,"length":3},"writes":["writeShortLE","writeByte"],"reads":["readShortLE","readByte"],"args":["identifier","ctrl"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_PLAYER_ACTION_7","packet":{"id":71,"length":3},"writes":["writeShortAdd","writeByteAdd"],"reads":["readShortAdd","readByteAdd"],"args":["identifier","ctrl"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_EXAMINE_NPC","packet":{"id":50,"length":3},"writes":["writeShortAdd"],"reads":["readShortAdd"],"args":["identifier"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_RESUME_PAUSEBUTTON","packet":{"id":35,"length":6},"writes":["writeShortLE","writeIntIME"],"reads":["readShortLE","readIntIME"],"args":["optionIndex","widgetID"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_EXAMINE_OBJECT","packet":{"id":15,"length":3},"writes":["writeShortLE"],"reads":["readShortLE"],"args":["identifier"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_NPC_ACTION_3","packet":{"id":25,"length":3},"writes":["writeByte","writeShortAdd"],"reads":["readByte","readShortAdd"],"args":["ctrl","identifier"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]},{"name":"OP_EXAMINE_ITEM_GROUND","packet":{"id":38,"length":3},"writes":["writeShortAdd","writeShortLE","writeShort"],"reads":["readShortAdd","readShortLE","readShort"],"args":["worldX","worldY","identifier"],"sorted":["selectedWidgetId","itemId","slot","id","identifier","worldX","worldY","ctrl","targetWidgetID","identifier2","param0"]}]
+[
+  {
+    "name": "OP_GROUND_ITEM_ACTION_3",
+    "packet": {
+      "id": 90,
+      "length": 7
+    },
+    "writes": [
+      "writeByteAdd",
+      "writeShortAdd",
+      "writeShortAdd",
+      "writeShort"
+    ],
+    "reads": [
+      "readByteAdd",
+      "readShortAdd",
+      "readShortAdd",
+      "readShort"
+    ],
+    "args": [
+      "ctrl",
+      "worldY",
+      "identifier",
+      "worldX"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_FOCUS_CHANGED",
+    "packet": {
+      "id": 54,
+      "length": 1
+    },
+    "writes": [
+      "writeByte"
+    ],
+    "reads": [
+      "readByte"
+    ],
+    "args": [
+      "focus"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_WALK",
+    "packet": {
+      "id": 98,
+      "length": -1
+    },
+    "writes": [
+      "writeByte",
+      "writeShortAdd",
+      "writeByte",
+      "writeShortAddLE"
+    ],
+    "reads": [
+      "readByte",
+      "readShortAdd",
+      "readByte",
+      "readShortAddLE"
+    ],
+    "args": [
+      "5",
+      "worldY",
+      "ctrl",
+      "worldX"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_RESUME_STRINGDIALOG",
+    "packet": {
+      "id": 88,
+      "length": -1
+    },
+    "writes": [
+      "writeByte",
+      "writeStringCp1252NullTerminated"
+    ],
+    "reads": [
+      "readByte",
+      "readStringCp1252NullTerminated"
+    ],
+    "args": [
+      "length",
+      "var7"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_PLAYER_ACTION_0",
+    "packet": {
+      "id": 34,
+      "length": 3
+    },
+    "writes": [
+      "writeByte",
+      "writeShort"
+    ],
+    "reads": [
+      "readByte",
+      "readShort"
+    ],
+    "args": [
+      "ctrl",
+      "identifier"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_GROUND_ITEM_ACTION_4",
+    "packet": {
+      "id": 32,
+      "length": 7
+    },
+    "writes": [
+      "writeShortAdd",
+      "writeShortAddLE",
+      "writeByte",
+      "writeShortAdd"
+    ],
+    "reads": [
+      "readShortAdd",
+      "readShortAddLE",
+      "readByte",
+      "readShortAdd"
+    ],
+    "args": [
+      "worldX",
+      "identifier",
+      "ctrl",
+      "worldY"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_NPC_ACTION_1",
+    "packet": {
+      "id": 5,
+      "length": 3
+    },
+    "writes": [
+      "writeByte",
+      "writeShortAddLE"
+    ],
+    "reads": [
+      "readByte",
+      "readShortAddLE"
+    ],
+    "args": [
+      "ctrl",
+      "identifier"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_PLAYER_ACTION_6",
+    "packet": {
+      "id": 18,
+      "length": 3
+    },
+    "writes": [
+      "writeByteAdd",
+      "writeShort"
+    ],
+    "reads": [
+      "readByteAdd",
+      "readShort"
+    ],
+    "args": [
+      "ctrl",
+      "identifier"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_GROUND_ITEM_ACTION_0",
+    "packet": {
+      "id": 87,
+      "length": 7
+    },
+    "writes": [
+      "writeByteAdd",
+      "writeShortAdd",
+      "writeShortLE",
+      "writeShort"
+    ],
+    "reads": [
+      "readByteAdd",
+      "readShortAdd",
+      "readShortLE",
+      "readShort"
+    ],
+    "args": [
+      "ctrl",
+      "worldY",
+      "worldX",
+      "identifier"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_PLAYER_ACTION_4",
+    "packet": {
+      "id": 78,
+      "length": 3
+    },
+    "writes": [
+      "writeByte",
+      "writeShort"
+    ],
+    "reads": [
+      "readByte",
+      "readShort"
+    ],
+    "args": [
+      "ctrl",
+      "identifier"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_PLAYER_ACTION_5",
+    "packet": {
+      "id": 93,
+      "length": 3
+    },
+    "writes": [
+      "writeShortAdd",
+      "writeByteAdd"
+    ],
+    "reads": [
+      "readShortAdd",
+      "readByteAdd"
+    ],
+    "args": [
+      "identifier",
+      "ctrl"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_MOUSE_CLICK",
+    "packet": {
+      "id": 40,
+      "length": 7
+    },
+    "writes": [
+      "writeByteAdd",
+      "writeShortAdd",
+      "writeShortLE",
+      "writeShortLE"
+    ],
+    "reads": [
+      "readByteAdd",
+      "readShortAdd",
+      "readShortLE",
+      "readShortLE"
+    ],
+    "args": [
+      "0",
+      "x",
+      "mouseInfo",
+      "y"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_NPC_ACTION_0",
+    "packet": {
+      "id": 16,
+      "length": 3
+    },
+    "writes": [
+      "writeShort",
+      "writeByteAdd"
+    ],
+    "reads": [
+      "readShort",
+      "readByteAdd"
+    ],
+    "args": [
+      "identifier",
+      "ctrl"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_GAME_OBJECT_ACTION_1",
+    "packet": {
+      "id": 68,
+      "length": 7
+    },
+    "writes": [
+      "writeShortLE",
+      "writeShort",
+      "writeByteAdd",
+      "writeShort"
+    ],
+    "reads": [
+      "readShortLE",
+      "readShort",
+      "readByteAdd",
+      "readShort"
+    ],
+    "args": [
+      "identifier",
+      "worldY",
+      "ctrl",
+      "worldX"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_WIDGET_ACTION_SUBOP",
+    "packet": {
+      "id": 9,
+      "length": 9
+    },
+    "writes": [
+      "writeInt",
+      "writeShort",
+      "writeShort",
+      "writeByte",
+      "writeByte"
+    ],
+    "reads": [
+      "readInt",
+      "readShort",
+      "readShort",
+      "readByte",
+      "readByte"
+    ],
+    "args": [
+      "widgetId",
+      "childId",
+      "itemId",
+      "type",
+      "subOp"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_GROUND_ITEM_ACTION_1",
+    "packet": {
+      "id": 51,
+      "length": 7
+    },
+    "writes": [
+      "writeShortLE",
+      "writeByte",
+      "writeShort",
+      "writeShortLE"
+    ],
+    "reads": [
+      "readShortLE",
+      "readByte",
+      "readShort",
+      "readShortLE"
+    ],
+    "args": [
+      "worldY",
+      "ctrl",
+      "identifier",
+      "worldX"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_WIDGET_TARGET_ON_NPC",
+    "packet": {
+      "id": 77,
+      "length": 11
+    },
+    "writes": [
+      "writeIntIME",
+      "writeShortLE",
+      "writeByteAdd",
+      "writeShort",
+      "writeShort"
+    ],
+    "reads": [
+      "readIntIME",
+      "readShortLE",
+      "readByteAdd",
+      "readShort",
+      "readShort"
+    ],
+    "args": [
+      "selectedWidgetId",
+      "slot",
+      "ctrl",
+      "identifier",
+      "itemId"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_PLAYER_ACTION_1",
+    "packet": {
+      "id": 47,
+      "length": 3
+    },
+    "writes": [
+      "writeShort",
+      "writeByteAdd"
+    ],
+    "reads": [
+      "readShort",
+      "readByteAdd"
+    ],
+    "args": [
+      "identifier",
+      "ctrl"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_WIDGET_TARGET_ON_GAME_OBJECT",
+    "packet": {
+      "id": 58,
+      "length": 15
+    },
+    "writes": [
+      "writeShortAdd",
+      "writeShortAddLE",
+      "writeShort",
+      "writeShortAdd",
+      "writeByteNeg",
+      "writeIntLE",
+      "writeShortAddLE"
+    ],
+    "reads": [
+      "readShortAdd",
+      "readShortAddLE",
+      "readShort",
+      "readShortAdd",
+      "readByteNeg",
+      "readIntLE",
+      "readShortAddLE"
+    ],
+    "args": [
+      "identifier",
+      "worldX",
+      "slot",
+      "worldY",
+      "ctrl",
+      "selectedWidgetId",
+      "itemId"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_GAME_OBJECT_ACTION_3",
+    "packet": {
+      "id": 17,
+      "length": 7
+    },
+    "writes": [
+      "writeShortAddLE",
+      "writeByteAdd",
+      "writeShortLE",
+      "writeShortLE"
+    ],
+    "reads": [
+      "readShortAddLE",
+      "readByteAdd",
+      "readShortLE",
+      "readShortLE"
+    ],
+    "args": [
+      "identifier",
+      "ctrl",
+      "worldX",
+      "worldY"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_GAME_OBJECT_ACTION_2",
+    "packet": {
+      "id": 76,
+      "length": 7
+    },
+    "writes": [
+      "writeShortAdd",
+      "writeByte",
+      "writeShortAdd",
+      "writeShortAddLE"
+    ],
+    "reads": [
+      "readShortAdd",
+      "readByte",
+      "readShortAdd",
+      "readShortAddLE"
+    ],
+    "args": [
+      "worldX",
+      "ctrl",
+      "identifier",
+      "worldY"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_RESUME_OBJDIALOG",
+    "packet": {
+      "id": 6,
+      "length": 2
+    },
+    "writes": [
+      "writeShort"
+    ],
+    "reads": [
+      "readShort"
+    ],
+    "args": [
+      "id"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_GROUND_ITEM_ACTION_2",
+    "packet": {
+      "id": 22,
+      "length": 7
+    },
+    "writes": [
+      "writeByte",
+      "writeShortAdd",
+      "writeShortLE",
+      "writeShort"
+    ],
+    "reads": [
+      "readByte",
+      "readShortAdd",
+      "readShortLE",
+      "readShort"
+    ],
+    "args": [
+      "ctrl",
+      "worldY",
+      "identifier",
+      "worldX"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_WIDGET_ACTION",
+    "packet": {
+      "id": 91,
+      "length": 9
+    },
+    "writes": [
+      "writeInt",
+      "writeShort",
+      "writeShort",
+      "writeByte"
+    ],
+    "reads": [
+      "readInt",
+      "readShort",
+      "readShort",
+      "readByte"
+    ],
+    "args": [
+      "widgetId",
+      "childId",
+      "itemId",
+      "type"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_WIDGET_TARGET_ON_WIDGET",
+    "packet": {
+      "id": 19,
+      "length": 16
+    },
+    "writes": [
+      "writeShortLE",
+      "writeShort",
+      "writeInt",
+      "writeIntLE",
+      "writeShortAdd",
+      "writeShortAddLE"
+    ],
+    "reads": [
+      "readShortLE",
+      "readShort",
+      "readInt",
+      "readIntLE",
+      "readShortAdd",
+      "readShortAddLE"
+    ],
+    "args": [
+      "param0",
+      "slot",
+      "selectedWidgetId",
+      "targetWidgetID",
+      "itemId",
+      "identifier2"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_WIDGET_TARGET_ON_GROUND_ITEM",
+    "packet": {
+      "id": 11,
+      "length": 15
+    },
+    "writes": [
+      "writeShortLE",
+      "writeShortLE",
+      "writeIntLE",
+      "writeShort",
+      "writeShortAddLE",
+      "writeByteAdd",
+      "writeShortLE"
+    ],
+    "reads": [
+      "readShortLE",
+      "readShortLE",
+      "readIntLE",
+      "readShort",
+      "readShortAddLE",
+      "readByteAdd",
+      "readShortLE"
+    ],
+    "args": [
+      "slot",
+      "identifier",
+      "selectedWidgetId",
+      "worldY",
+      "itemId",
+      "ctrl",
+      "worldX"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_RESUME_COUNTDIALOG",
+    "packet": {
+      "id": 43,
+      "length": 6
+    },
+    "writes": [
+      "writeInt"
+    ],
+    "reads": [
+      "readInt"
+    ],
+    "args": [
+      "count"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_GAME_OBJECT_ACTION_0",
+    "packet": {
+      "id": 64,
+      "length": 7
+    },
+    "writes": [
+      "writeShortAddLE",
+      "writeShortAddLE",
+      "writeByteAdd",
+      "writeShort"
+    ],
+    "reads": [
+      "readShortAddLE",
+      "readShortAddLE",
+      "readByteAdd",
+      "readShort"
+    ],
+    "args": [
+      "worldX",
+      "identifier",
+      "ctrl",
+      "worldY"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_GAME_OBJECT_ACTION_4",
+    "packet": {
+      "id": 67,
+      "length": 7
+    },
+    "writes": [
+      "writeShortLE",
+      "writeShortAdd",
+      "writeShortLE",
+      "writeByteAdd"
+    ],
+    "reads": [
+      "readShortLE",
+      "readShortAdd",
+      "readShortLE",
+      "readByteAdd"
+    ],
+    "args": [
+      "identifier",
+      "worldY",
+      "worldX",
+      "ctrl"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_WIDGET_TARGET_ON_PLAYER",
+    "packet": {
+      "id": 44,
+      "length": 11
+    },
+    "writes": [
+      "writeByteAdd",
+      "writeShortLE",
+      "writeShortAdd",
+      "writeInt",
+      "writeShort"
+    ],
+    "reads": [
+      "readByteAdd",
+      "readShortLE",
+      "readShortAdd",
+      "readInt",
+      "readShort"
+    ],
+    "args": [
+      "ctrl",
+      "itemId",
+      "identifier",
+      "selectedWidgetId",
+      "slot"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_NPC_ACTION_4",
+    "packet": {
+      "id": 46,
+      "length": 3
+    },
+    "writes": [
+      "writeByte",
+      "writeShortLE"
+    ],
+    "reads": [
+      "readByte",
+      "readShortLE"
+    ],
+    "args": [
+      "ctrl",
+      "identifier"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_PLAYER_ACTION_3",
+    "packet": {
+      "id": 61,
+      "length": 3
+    },
+    "writes": [
+      "writeByte",
+      "writeShortAdd"
+    ],
+    "reads": [
+      "readByte",
+      "readShortAdd"
+    ],
+    "args": [
+      "ctrl",
+      "identifier"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_NPC_ACTION_2",
+    "packet": {
+      "id": 94,
+      "length": 3
+    },
+    "writes": [
+      "writeByte",
+      "writeShortLE"
+    ],
+    "reads": [
+      "readByte",
+      "readShortLE"
+    ],
+    "args": [
+      "ctrl",
+      "identifier"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_PLAYER_ACTION_2",
+    "packet": {
+      "id": 79,
+      "length": 3
+    },
+    "writes": [
+      "writeShortLE",
+      "writeByte"
+    ],
+    "reads": [
+      "readShortLE",
+      "readByte"
+    ],
+    "args": [
+      "identifier",
+      "ctrl"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_PLAYER_ACTION_7",
+    "packet": {
+      "id": 71,
+      "length": 3
+    },
+    "writes": [
+      "writeShortAdd",
+      "writeByteAdd"
+    ],
+    "reads": [
+      "readShortAdd",
+      "readByteAdd"
+    ],
+    "args": [
+      "identifier",
+      "ctrl"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_EXAMINE_NPC",
+    "packet": {
+      "id": 50,
+      "length": 3
+    },
+    "writes": [
+      "writeShortAdd"
+    ],
+    "reads": [
+      "readShortAdd"
+    ],
+    "args": [
+      "identifier"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_RESUME_PAUSEBUTTON",
+    "packet": {
+      "id": 35,
+      "length": 6
+    },
+    "writes": [
+      "writeShortLE",
+      "writeIntIME"
+    ],
+    "reads": [
+      "readShortLE",
+      "readIntIME"
+    ],
+    "args": [
+      "optionIndex",
+      "widgetID"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_EXAMINE_OBJECT",
+    "packet": {
+      "id": 15,
+      "length": 3
+    },
+    "writes": [
+      "writeShortLE"
+    ],
+    "reads": [
+      "readShortLE"
+    ],
+    "args": [
+      "identifier"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_NPC_ACTION_3",
+    "packet": {
+      "id": 25,
+      "length": 3
+    },
+    "writes": [
+      "writeByte",
+      "writeShortAdd"
+    ],
+    "reads": [
+      "readByte",
+      "readShortAdd"
+    ],
+    "args": [
+      "ctrl",
+      "identifier"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  },
+  {
+    "name": "OP_EXAMINE_ITEM_GROUND",
+    "packet": {
+      "id": 38,
+      "length": 3
+    },
+    "writes": [
+      "writeShortAdd",
+      "writeShortLE",
+      "writeShort"
+    ],
+    "reads": [
+      "readShortAdd",
+      "readShortLE",
+      "readShort"
+    ],
+    "args": [
+      "worldX",
+      "worldY",
+      "identifier"
+    ],
+    "sorted": [
+      "selectedWidgetId",
+      "itemId",
+      "slot",
+      "id",
+      "identifier",
+      "worldX",
+      "worldY",
+      "ctrl",
+      "targetWidgetID",
+      "identifier2",
+      "param0"
+    ]
+  }
+]
