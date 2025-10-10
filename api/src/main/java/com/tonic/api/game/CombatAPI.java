@@ -19,6 +19,11 @@ public class CombatAPI
     private static final int VENOM_THRESHOLD = 1000000;
     private static final int ANTIVENOM_THRESHOLD = -38;
 
+    public static boolean isMultiway()
+    {
+        return VarAPI.getVar(VarbitID.MULTIWAY_INDICATOR) == 1;
+    }
+
     /**
      * Checks if the player is currently retaliating
      * @return true if the player is retaliating, false otherwise
