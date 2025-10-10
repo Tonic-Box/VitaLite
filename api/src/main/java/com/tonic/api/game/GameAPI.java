@@ -127,7 +127,7 @@ public class GameAPI
      */
     public static boolean isScreenFading()
     {
-        return WidgetAPI.isVisible(InterfaceID.FADE_OVERLAY);
+        return WidgetAPI.isVisible(InterfaceID.FadeOverlay.FADER);
     }
 
     /**
