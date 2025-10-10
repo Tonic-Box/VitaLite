@@ -14,7 +14,8 @@ public class ShopAPI
 {
 
     /**
-     * Purchases the amount of the desired item
+     * Purchases the amount of the desired item.
+     * Stops when the amount purchased is reached, the item is out of stock or you've hit the 10 action per tick cap
      *
      * @param itemId The ID of the item to purchase. See {@link net.runelite.api.gameval.ItemID}
      * @param purchaseAmount The amount of the item to purchase
@@ -25,9 +26,10 @@ public class ShopAPI
     }
 
     /**
-     * Purchases the amount of the desired item
+     * Purchases the amount of the desired item.
+     * Stops when the amount purchased is reached, the item is out of stock or you've hit the 10 action per tick cap
      *
-     * @param itemName The name of the item to purchase. See
+     * @param itemName The name of the item to purchase.
      * @param purchaseAmount The amount of the item to purchase
      */
     static void buyX(String itemName, int purchaseAmount)
