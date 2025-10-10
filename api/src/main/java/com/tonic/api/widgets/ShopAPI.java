@@ -5,11 +5,85 @@ import com.tonic.data.ItemEx;
 import com.tonic.data.ShopID;
 import net.runelite.api.gameval.InterfaceID;
 
+import java.util.function.Supplier;
+
 /**
  * ShopAPI - methods for interacting with shops
  */
 public class ShopAPI
 {
+
+    /**
+     * Purchases the amount of the desired item
+     *
+     * @param itemId The ID of the item to purchase. See {@link net.runelite.api.gameval.ItemID}
+     * @param purchaseAmount The amount of the item to purchase
+     */
+    public static void buyX(int itemId, int purchaseAmount)
+    {
+        buyX(() -> getShopItem(itemId), purchaseAmount);
+    }
+
+    /**
+     * Purchases the amount of the desired item
+     *
+     * @param itemName The name of the item to purchase. See
+     * @param purchaseAmount The amount of the item to purchase
+     */
+    static void buyX(String itemName, int purchaseAmount)
+    {
+        buyX(() -> getShopItem(itemName), purchaseAmount);
+    }
+
+    private static void buyX(Supplier<ItemEx> supplier, int purchaseAmount)
+    {
+        ItemEx item = supplier.get();
+        if (item == null)
+        {
+            return;
+        }
+
+        if (purchaseAmount == 0)
+        {
+            return;
+        }
+
+        int availableAmount = item.getQuantity();
+        int actions = 0;
+        while (purchaseAmount > 0 && actions <= 10)
+        {
+            if (availableAmount < purchaseAmount)
+            {
+                break;
+            }
+
+            actions++;
+            if (purchaseAmount >= 50)
+            {
+                buy_50(item);
+                purchaseAmount -= 50;
+                availableAmount -= 50;
+            }
+            else if (purchaseAmount >= 10)
+            {
+                buy_10(item);
+                purchaseAmount -= 10;
+                availableAmount -= 10;
+            }
+            else if (purchaseAmount >= 5)
+            {
+                buy_5(item);
+                purchaseAmount -= 5;
+                availableAmount -= 5;
+            }
+            else
+            {
+                buy_1(item);
+                purchaseAmount -= 1;
+                availableAmount -= 1;
+            }
+        }
+    }
 
     /**
      * buy 1 of an item from the shop by its id
