@@ -85,7 +85,7 @@ public class CombatAPI
      */
     public static boolean isAntifired()
     {
-        return VarAPI.getVar(VarbitID.ANTIFIRE_POTION) > 0;
+        return VarAPI.getVar(VarbitID.ANTIFIRE_POTION) > 0 || isSuperAntifired();
     }
 
     /**
