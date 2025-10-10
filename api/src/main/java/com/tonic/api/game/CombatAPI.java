@@ -97,6 +97,11 @@ public class CombatAPI
         return VarAPI.getVar(VarbitID.SUPER_ANTIFIRE_POTION) > 0;
     }
 
+    public static int getRemainingTeleblockTicks()
+    {
+        return VarAPI.getVar(VarbitID.TELEBLOCK_CYCLES);
+    }
+
     /**
      * Toggles the player's special attack
      */
