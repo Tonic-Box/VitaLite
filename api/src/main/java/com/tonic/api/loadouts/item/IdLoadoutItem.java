@@ -7,6 +7,7 @@ import com.tonic.data.ItemEx;
 import com.tonic.queries.InventoryQuery;
 import net.runelite.api.gameval.InventoryID;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class IdLoadoutItem extends LoadoutItem {
@@ -32,27 +33,54 @@ public class IdLoadoutItem extends LoadoutItem {
   @Override
   public List<ItemEx> getCarried()
   {
+    int[] preferredOrder = getIds();
     return InventoryQuery.fromInventoryId(InventoryID.INV)
         .withId(ids)
         .removeIf(item -> item.isNoted() != isNoted())
-        .collect();
+        .sort(Comparator.comparingInt(item -> {
+          int itemId = item.getId();
+          for (int i = 0; i < preferredOrder.length; i++) {
+            if (preferredOrder[i] == itemId) {
+              return i;
+            }
+          }
+          return Integer.MAX_VALUE;
+        })).collect();
   }
 
   @Override
   public List<ItemEx> getWorn()
   {
+    int[] preferredOrder = getIds();
     return InventoryQuery.fromInventoryId(InventoryID.WORN)
         .withId(ids)
-        .collect();
+        .sort(Comparator.comparingInt(item -> {
+          int itemId = item.getId();
+          for (int i = 0; i < preferredOrder.length; i++) {
+            if (preferredOrder[i] == itemId) {
+              return i;
+            }
+          }
+          return Integer.MAX_VALUE;
+        })).collect();
   }
 
   @Override
   public List<ItemEx> getBanked()
   {
+    int[] preferredOrder = getIds();
     return InventoryQuery.fromInventoryId(InventoryID.BANK)
         .withId(ids)
         .removeIf(ItemEx::isPlaceholder)
-        .collect();
+        .sort(Comparator.comparingInt(item -> {
+          int itemId = item.getId();
+          for (int i = 0; i < preferredOrder.length; i++) {
+            if (preferredOrder[i] == itemId) {
+              return i;
+            }
+          }
+          return Integer.MAX_VALUE;
+        })).collect();
   }
 
   public static class Builder
