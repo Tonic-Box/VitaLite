@@ -34,7 +34,6 @@ public class NamedLoadoutItem extends LoadoutItem {
   {
     String[] preferredOrder = getNames();
     return InventoryQuery.fromInventoryId(InventoryID.INV)
-        .removeIf(ItemEx::isPlaceholder)
         .removeIf(item -> item.isNoted() != isNoted())
         .sort(Comparator.comparingInt(item -> {
           String itemName = item.getName();
@@ -43,7 +42,6 @@ public class NamedLoadoutItem extends LoadoutItem {
               return i;
             }
           }
-
           return Integer.MAX_VALUE;
         })).collect();
   }
@@ -60,7 +58,23 @@ public class NamedLoadoutItem extends LoadoutItem {
               return i;
             }
           }
+          return Integer.MAX_VALUE;
+        })).collect();
+  }
 
+  @Override
+  public List<ItemEx> getBanked()
+  {
+    String[] preferredOrder = getNames();
+    return InventoryQuery.fromInventoryId(InventoryID.BANK)
+        .removeIf(ItemEx::isPlaceholder)
+        .sort(Comparator.comparingInt(item -> {
+          String itemName = item.getName();
+          for (int i = 0; i < preferredOrder.length; i++) {
+            if (preferredOrder[i].equalsIgnoreCase(itemName)) {
+              return i;
+            }
+          }
           return Integer.MAX_VALUE;
         })).collect();
   }

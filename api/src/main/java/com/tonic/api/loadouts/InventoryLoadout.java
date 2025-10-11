@@ -1,13 +1,14 @@
 package com.tonic.api.loadouts;
 
+import com.tonic.api.loadouts.item.ItemDepletionListener;
 import com.tonic.api.loadouts.item.LoadoutItem;
+import com.tonic.api.widgets.InventoryAPI;
+import com.tonic.data.ItemEx;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
- * A high-level loadout API designed for use in conjunction with banking
+ * A high-level loadout API designed for use in conjunction with banking and resupplying.
  */
 public class InventoryLoadout implements Iterable<LoadoutItem>
 {
@@ -16,6 +17,8 @@ public class InventoryLoadout implements Iterable<LoadoutItem>
 
   private final String name;
   private final Map<String, LoadoutItem> items;
+
+  private ItemDepletionListener itemDepletionListener;
 
   public InventoryLoadout(String name)
   {
@@ -26,6 +29,20 @@ public class InventoryLoadout implements Iterable<LoadoutItem>
   public String getName()
   {
     return name;
+  }
+
+  /**
+   * @return A listener to trigger when an item is attempted to be withdrawn but is not available in the desired quantity.
+   * This can be utilised to trigger states in your plugin such as restocking.
+   */
+  public ItemDepletionListener getItemDepletionListener()
+  {
+    return itemDepletionListener;
+  }
+
+  public void setItemDepletionListener(ItemDepletionListener itemDepletionListener)
+  {
+    this.itemDepletionListener = itemDepletionListener;
   }
 
   public void add(LoadoutItem item)
@@ -87,6 +104,64 @@ public class InventoryLoadout implements Iterable<LoadoutItem>
   public LoadoutItem remove(String key)
   {
     return items.remove(key);
+  }
+
+  /**
+   * @return A List containing the remainder of items that we still need
+   */
+  public List<LoadoutItem> getRequiredItems() {
+    List<LoadoutItem> missing = new ArrayList<>();
+    for (LoadoutItem entry : this)
+    {
+      if (!entry.isCarried())
+      {
+        missing.add(entry);
+      }
+    }
+
+    return missing;
+  }
+
+  /**
+   * @return A List of foreign items that are currently in the inventory.
+   * A foreign item includes anything that isn't in this loadout
+   */
+  public List<ItemEx> getCarriedInvalidItems() {
+    List<ItemEx> invalid = new LinkedList<>(InventoryAPI.getItems());
+    List<ItemEx> valid = new ArrayList<>();
+    for (LoadoutItem item : this)
+    {
+      valid.addAll(item.getCarried());
+    }
+
+    invalid.removeIf(valid::contains);
+    return invalid;
+  }
+
+  /**
+   * @return A List of items that are not foreign to this loadout, but are present in excess quantities
+   */
+  public List<LoadoutItem> getCarriedExcessItems() {
+    List<LoadoutItem> excess = new ArrayList<>();
+    for (LoadoutItem item : this)
+    {
+      List<ItemEx> present = item.getCarried();
+      if (present.isEmpty())
+      {
+        continue;
+      }
+
+      ItemEx carried = present.get(0);
+      int count = item.isStackable() ? carried.getQuantity() : present.size();
+      if (count <= carried.getQuantity())
+      {
+        continue;
+      }
+
+      excess.add(item);
+    }
+
+    return excess;
   }
 
   @Override

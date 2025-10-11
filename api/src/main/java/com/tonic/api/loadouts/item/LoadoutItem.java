@@ -57,6 +57,9 @@ public abstract class LoadoutItem {
     return noted;
   }
 
+  /**
+   * @return If the item is optional or not. Items marked as optional will not be passed to the {@link ItemDepletionListener}
+   */
   public boolean isOptional()
   {
     return optional;
@@ -73,9 +76,14 @@ public abstract class LoadoutItem {
   public abstract List<ItemEx> getCarried();
 
   /**
-   * @return A List of items worn in the equipment pertaining to this LoadoutItem.
+   * @return A List of items worn in the equipment pertaining to this LoadoutItem
    */
   public abstract List<ItemEx> getWorn();
+
+  /**
+   * @return A List of items in the bank pertaining to this LoadoutItem
+   */
+  public abstract List<ItemEx> getBanked();
 
   /**
    * @return {@code true} if the LoadoutItem is carried.

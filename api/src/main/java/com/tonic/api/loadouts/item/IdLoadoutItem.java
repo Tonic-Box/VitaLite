@@ -6,7 +6,6 @@ import com.tonic.data.ItemEx;
 import com.tonic.queries.InventoryQuery;
 import net.runelite.api.gameval.InventoryID;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class IdLoadoutItem extends LoadoutItem {
@@ -34,9 +33,7 @@ public class IdLoadoutItem extends LoadoutItem {
   {
     return InventoryQuery.fromInventoryId(InventoryID.INV)
         .withId(ids)
-        .removeIf(ItemEx::isPlaceholder)
         .removeIf(item -> item.isNoted() != isNoted())
-        .sort(Comparator.comparingInt(ItemEx::getQuantity))
         .collect();
   }
 
@@ -45,7 +42,15 @@ public class IdLoadoutItem extends LoadoutItem {
   {
     return InventoryQuery.fromInventoryId(InventoryID.WORN)
         .withId(ids)
-        .sort(Comparator.comparingInt(ItemEx::getQuantity))
+        .collect();
+  }
+
+  @Override
+  public List<ItemEx> getBanked()
+  {
+    return InventoryQuery.fromInventoryId(InventoryID.BANK)
+        .withId(ids)
+        .removeIf(ItemEx::isPlaceholder)
         .collect();
   }
 
