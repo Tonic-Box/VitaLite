@@ -14,6 +14,7 @@ import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.ThreadPool;
 import net.runelite.api.*;
 import net.runelite.api.Point;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.InterfaceID;
@@ -284,6 +285,7 @@ public class GameManager extends Overlay {
         {
             WorldMapAPI.drawPath(graphics, testPoints, Color.MAGENTA);
             MiniMapAPI.drawPath(graphics, testPoints, Color.MAGENTA);
+            drawWorldTiles(graphics, testPoints, Color.MAGENTA);
             WorldPoint last = testPoints.get(testPoints.size() - 1);
             WorldMapAPI.drawRedMapMarker(graphics, last);
         }
@@ -295,10 +297,41 @@ public class GameManager extends Overlay {
         {
             WorldMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
             MiniMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
+            drawWorldTiles(graphics, pathPoints, Color.CYAN);
             WorldPoint last = pathPoints.get(pathPoints.size() - 1);
             WorldMapAPI.drawGreenMapMarker(graphics, last);
         }
 
         return null;
+    }
+
+    private void drawWorldTiles(Graphics2D graphics, List<WorldPoint> points, Color color)
+    {
+        if(points == null || points.isEmpty())
+            return;
+
+        final Client client = Static.getClient();
+        final WorldView worldView = client.getTopLevelWorldView();
+        final WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
+        final int MAX_DRAW_DISTANCE = 32;
+
+        Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 50);
+        Stroke stroke = new BasicStroke(2.0f);
+
+        for(WorldPoint point : points)
+        {
+            if(point.distanceTo(playerLocation) >= MAX_DRAW_DISTANCE)
+                continue;
+
+            LocalPoint localPoint = LocalPoint.fromWorld(worldView, point);
+            if(localPoint == null)
+                continue;
+
+            Polygon polygon = Perspective.getCanvasTilePoly(client, localPoint);
+            if(polygon == null)
+                continue;
+
+            OverlayUtil.renderPolygon(graphics, polygon, color, fillColor, stroke);
+        }
     }
 }
