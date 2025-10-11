@@ -361,14 +361,14 @@ public class DialogueAPI
      */
     public static boolean continueQuestHelper() {
         Widget widget = WidgetAPI.get(WidgetInfoExtended.DIALOG_OPTION_OPTION1);
-        if(widget == null)
+        if (widget == null)
             return false;
         Widget[] dialogOption1kids = widget.getChildren();
-        if(dialogOption1kids == null)
+        if (dialogOption1kids == null)
             return false;
         int i = 0;
-        for(Widget w : dialogOption1kids) {
-            if(w.getTextColor() == -0xff4d4e) {
+        for (Widget w : dialogOption1kids) {
+            if (w.getTextColor() != 0 && w.getText().matches("\\[\\d].*")) {
                 selectOption(i);
                 return true;
             }
