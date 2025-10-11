@@ -1,5 +1,7 @@
 package com.tonic.api.loadouts;
 
+import com.tonic.api.loadouts.item.LoadoutItem;
+
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;

@@ -29,6 +29,11 @@ public class ItemEx {
         return Static.invoke(() -> client.getItemDefinition(item.getId()).getNote()) == 799;
     }
 
+    public boolean isPlaceholder() {
+        Client client = Static.getClient();
+        return Static.invoke(() -> client.getItemDefinition(item.getId()).getPlaceholderTemplateId() >= 0);
+    }
+
     public int getCanonicalId() {
         ItemManager itemManager = Static.getInjector().getInstance(ItemManager.class);
         return Static.invoke(() -> itemManager.canonicalize(item.getId()));
