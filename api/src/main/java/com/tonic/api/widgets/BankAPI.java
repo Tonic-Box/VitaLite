@@ -83,20 +83,25 @@ public class BankAPI
         }
 
         int actions = 0;
-        int irrelevant = depositForeignLoadoutItems(loadout, maxActionsPerTick);
-        if (irrelevant == Integer.MAX_VALUE)
+
+        //deposit items not in the loadout
+        int foreignDepositActions = depositForeignLoadoutItems(loadout, maxActionsPerTick);
+        if (foreignDepositActions == Integer.MAX_VALUE)
         {
             //we used the deposit inventory button
             actions++;
         }
         else
         {
-            actions += irrelevant;
+            actions += foreignDepositActions;
         }
 
+        //deposit items that we have too many of
         actions += depositExcessLoadoutItems(loadout);
 
-        for (LoadoutItem item : loadout) {
+        //handle the withdraw magic
+        for (LoadoutItem item : loadout)
+        {
             if (actions >= maxActionsPerTick)
             {
                 return true;
@@ -115,11 +120,16 @@ public class BankAPI
             List<ItemEx> carried = item.getCarried();
 
             int count;
-            if (carried.isEmpty()) {
+            if (carried.isEmpty())
+            {
                 count = 0;
-            } else if (item.isStackable()) {
+            }
+            else if (item.isStackable())
+            {
                 count = carried.get(0).getQuantity();
-            } else {
+            }
+            else
+            {
                 count = carried.size();
             }
 
