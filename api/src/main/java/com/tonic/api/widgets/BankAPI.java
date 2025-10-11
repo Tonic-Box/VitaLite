@@ -12,7 +12,6 @@ import com.tonic.services.GameManager;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
-import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 
 import java.util.List;
@@ -174,20 +173,20 @@ public class BankAPI
     }
 
     private static int depositForeignLoadoutItems(InventoryLoadout loadout, int maxActionsPerTick) {
-        List<ItemEx> irrelevant = loadout.getCarriedInvalidItems();
-        if (irrelevant.isEmpty())
+        List<ItemEx> foreign = loadout.getCarriedForeignItems();
+        if (foreign.isEmpty())
         {
             return 0;
         }
 
         List<ItemEx> items = InventoryAPI.getItems();
-        if (items.size() == irrelevant.size())
+        if (items.size() == foreign.size())
         {
             depositAll();
             return Integer.MAX_VALUE;
         }
 
-        Set<Integer> unique = irrelevant.stream()
+        Set<Integer> unique = foreign.stream()
             .map(ItemEx::getId)
             .collect(Collectors.toSet());
         if (unique.size() >= maxActionsPerTick)
@@ -200,8 +199,9 @@ public class BankAPI
         int actions = 0;
         for (int id : unique)
         {
+            System.out.println(id + " is foreign, depositing!");
             //is there not a depositAll(id)?
-            deposit(id, InventoryAPI.getCount(id));
+            deposit(id, -1);
             actions++;
         }
 
@@ -226,6 +226,7 @@ public class BankAPI
                 continue;
             }
 
+            System.out.println("We have " + count + " of " + item.getIdentifier() + " but we need " + item.getAmount() + ", depositing " + extra);
             deposit(carried.get(0).getId(), extra);
             actions++;
         }
@@ -240,7 +241,7 @@ public class BankAPI
             return WithdrawModeSnapshot.noted;
         }
 
-        return VarAPI.getVarp(VarPlayerID.BANKCERT) == 1;
+        return VarAPI.getVar(VarbitID.BANK_WITHDRAWNOTES) == 1;
     }
 
     /**

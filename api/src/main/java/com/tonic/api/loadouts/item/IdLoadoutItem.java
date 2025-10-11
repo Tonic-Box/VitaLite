@@ -1,6 +1,7 @@
 package com.tonic.api.loadouts.item;
 
 import com.tonic.api.loadouts.LoadoutException;
+import com.tonic.api.loadouts.item.restock.RestockConfig;
 import com.tonic.data.EquipmentSlot;
 import com.tonic.data.ItemEx;
 import com.tonic.queries.InventoryQuery;
@@ -12,9 +13,9 @@ public class IdLoadoutItem extends LoadoutItem {
 
   private final int[] ids;
 
-  private IdLoadoutItem(String identifier, int minimumAmount, int amount, boolean stackable, boolean noted, boolean optional, EquipmentSlot equipmentSlot, int[] ids)
+  private IdLoadoutItem(String identifier, int minimumAmount, int amount, boolean stackable, boolean noted, boolean optional, EquipmentSlot equipmentSlot, RestockConfig restockConfig, int[] ids)
   {
-    super(identifier, minimumAmount, amount, stackable, noted, optional, equipmentSlot);
+    super(identifier, minimumAmount, amount, stackable, noted, optional, equipmentSlot, restockConfig);
     this.ids = ids;
   }
 
@@ -64,6 +65,7 @@ public class IdLoadoutItem extends LoadoutItem {
     private boolean noted;
     private boolean optional;
     private EquipmentSlot equipmentSlot;
+    private RestockConfig restockConfig;
     private int[] ids;
 
     public Builder identifier(String identifier)
@@ -114,6 +116,12 @@ public class IdLoadoutItem extends LoadoutItem {
       return this;
     }
 
+    public Builder restock(RestockConfig restockConfig)
+    {
+      this.restockConfig = restockConfig;
+      return this;
+    }
+
     public IdLoadoutItem build()
     {
       if (ids == null || ids.length == 0)
@@ -121,7 +129,7 @@ public class IdLoadoutItem extends LoadoutItem {
         throw new LoadoutException("IDs not specified for IdLoadoutItem");
       }
 
-      return new IdLoadoutItem(identifier, amount, minimumAmount, stackable, noted, optional, equipmentSlot, ids);
+      return new IdLoadoutItem(identifier, amount, minimumAmount, stackable, noted, optional, equipmentSlot, restockConfig, ids);
     }
   }
 }

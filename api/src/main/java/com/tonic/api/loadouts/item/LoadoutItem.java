@@ -1,5 +1,6 @@
 package com.tonic.api.loadouts.item;
 
+import com.tonic.api.loadouts.item.restock.RestockConfig;
 import com.tonic.data.EquipmentSlot;
 import com.tonic.data.ItemEx;
 
@@ -14,8 +15,9 @@ public abstract class LoadoutItem {
   private final boolean noted;
   private final boolean optional;
   private final EquipmentSlot equipmentSlot;
+  private final RestockConfig restockConfig;
 
-  public LoadoutItem(String identifier, int minimumAmount, int amount, boolean stackable, boolean noted, boolean optional, EquipmentSlot equipmentSlot)
+  public LoadoutItem(String identifier, int minimumAmount, int amount, boolean stackable, boolean noted, boolean optional, EquipmentSlot equipmentSlot, RestockConfig restockConfig)
   {
     this.identifier = identifier;
     this.minimumAmount = minimumAmount;
@@ -24,6 +26,7 @@ public abstract class LoadoutItem {
     this.noted = noted;
     this.optional = optional;
     this.equipmentSlot = equipmentSlot;
+    this.restockConfig = restockConfig;
   }
 
   public String getIdentifier()
@@ -68,6 +71,11 @@ public abstract class LoadoutItem {
   public EquipmentSlot getEquipmentSlot()
   {
     return equipmentSlot;
+  }
+
+  public RestockConfig getRestockConfig()
+  {
+    return restockConfig;
   }
 
   /**

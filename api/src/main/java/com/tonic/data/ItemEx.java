@@ -151,4 +151,23 @@ public class ItemEx {
     {
         return (int) Math.floor(getHighAlchValue() * 0.6);
     }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if (this == other)
+        {
+            return true;
+        }
+
+        if (other == null || getClass() != other.getClass())
+        {
+            return false;
+        }
+
+        ItemEx that = (ItemEx) other;
+        return this.getSlot() == that.getSlot()
+            && this.getId() == that.getId()
+            && this.getQuantity() == that.getQuantity();
+    }
 }

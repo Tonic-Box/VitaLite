@@ -106,6 +106,19 @@ public class InventoryLoadout implements Iterable<LoadoutItem>
     return items.remove(key);
   }
 
+  public boolean isFulfilled()
+  {
+    for (LoadoutItem item : getRequiredItems())
+    {
+      if (!item.isOptional())
+      {
+        return false;
+      }
+    }
+
+    return getCarriedExcessItems().isEmpty();
+  }
+
   /**
    * @return A List containing the remainder of items that we still need
    */
@@ -126,7 +139,7 @@ public class InventoryLoadout implements Iterable<LoadoutItem>
    * @return A List of foreign items that are currently in the inventory.
    * A foreign item includes anything that isn't in this loadout
    */
-  public List<ItemEx> getCarriedInvalidItems() {
+  public List<ItemEx> getCarriedForeignItems() {
     List<ItemEx> invalid = new LinkedList<>(InventoryAPI.getItems());
     List<ItemEx> valid = new ArrayList<>();
     for (LoadoutItem item : this)
@@ -153,7 +166,7 @@ public class InventoryLoadout implements Iterable<LoadoutItem>
 
       ItemEx carried = present.get(0);
       int count = item.isStackable() ? carried.getQuantity() : present.size();
-      if (count <= carried.getQuantity())
+      if (count <= item.getAmount())
       {
         continue;
       }

@@ -1,6 +1,7 @@
 package com.tonic.api.loadouts.item;
 
 import com.tonic.api.loadouts.LoadoutException;
+import com.tonic.api.loadouts.item.restock.RestockConfig;
 import com.tonic.data.EquipmentSlot;
 import com.tonic.data.ItemEx;
 import com.tonic.queries.InventoryQuery;
@@ -13,9 +14,9 @@ public class NamedLoadoutItem extends LoadoutItem {
 
   private final String[] names;
 
-  private NamedLoadoutItem(String identifier, int minimumAmount, int amount, boolean stackable, boolean noted, boolean optional, EquipmentSlot equipmentSlot, String[] names)
+  private NamedLoadoutItem(String identifier, int minimumAmount, int amount, boolean stackable, boolean noted, boolean optional, EquipmentSlot equipmentSlot, RestockConfig restockConfig, String[] names)
   {
-    super(identifier, minimumAmount, amount, stackable, noted, optional, equipmentSlot);
+    super(identifier, minimumAmount, amount, stackable, noted, optional, equipmentSlot, restockConfig);
     this.names = names;
   }
 
@@ -34,6 +35,7 @@ public class NamedLoadoutItem extends LoadoutItem {
   {
     String[] preferredOrder = getNames();
     return InventoryQuery.fromInventoryId(InventoryID.INV)
+        .withName(getNames())
         .removeIf(item -> item.isNoted() != isNoted())
         .sort(Comparator.comparingInt(item -> {
           String itemName = item.getName();
@@ -51,6 +53,7 @@ public class NamedLoadoutItem extends LoadoutItem {
   {
     String[] preferredOrder = getNames();
     return InventoryQuery.fromInventoryId(InventoryID.WORN)
+        .withName(getNames())
         .sort(Comparator.comparingInt(item -> {
           String itemName = item.getName();
           for (int i = 0; i < preferredOrder.length; i++) {
@@ -94,6 +97,7 @@ public class NamedLoadoutItem extends LoadoutItem {
     private boolean noted;
     private boolean optional;
     private EquipmentSlot equipmentSlot;
+    private RestockConfig restockConfig;
     private String[] names;
 
     public Builder identifier(String identifier)
@@ -151,6 +155,12 @@ public class NamedLoadoutItem extends LoadoutItem {
       return this;
     }
 
+    public Builder restock(RestockConfig restockConfig)
+    {
+      this.restockConfig = restockConfig;
+      return this;
+    }
+
     public NamedLoadoutItem build()
     {
       if (names == null || names.length == 0)
@@ -158,7 +168,7 @@ public class NamedLoadoutItem extends LoadoutItem {
         throw new LoadoutException("Names not specified for NamedLoadoutItem");
       }
 
-      return new NamedLoadoutItem(identifier, amount, minimumAmount, stackable, noted, optional, equipmentSlot, names);
+      return new NamedLoadoutItem(identifier, amount, minimumAmount, stackable, noted, optional, equipmentSlot, restockConfig, names);
     }
   }
 }
