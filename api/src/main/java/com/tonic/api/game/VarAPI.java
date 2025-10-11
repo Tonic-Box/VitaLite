@@ -30,6 +30,18 @@ public class VarAPI
         return Static.invoke(() -> client.getVarpValue(varp));
     }
 
+    public static int getVarcInteger(int varc)
+    {
+        Client client = Static.getClient();
+        return Static.invoke(() -> client.getVarcIntValue(varc));
+    }
+
+    public static String getVarcString(int varc)
+    {
+        Client client = Static.getClient();
+        return Static.invoke(() -> client.getVarcStrValue(varc));
+    }
+
     /**
      * Sets the value of a varbit
      * @param varbit the varbit id
