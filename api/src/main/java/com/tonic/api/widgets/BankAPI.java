@@ -3,6 +3,8 @@ package com.tonic.api.widgets;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.VarAPI;
+import com.tonic.api.loadouts.InventoryLoadout;
+import com.tonic.api.loadouts.item.LoadoutItem;
 import com.tonic.data.ItemContainerEx;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.data.ItemEx;
@@ -10,9 +12,11 @@ import com.tonic.services.GameManager;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
-import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
-import net.runelite.api.widgets.WidgetInfo;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Bank API
@@ -64,6 +68,172 @@ public class BankAPI
         }
     }
 
+    public static boolean withdraw(InventoryLoadout loadout)
+    {
+        return withdraw(loadout, 10);
+    }
+
+    public static boolean withdraw(InventoryLoadout loadout, int maxActionsPerTick)
+    {
+        if (!isOpen())
+        {
+            //TODO open the bank?
+            return false;
+        }
+
+        int actions = 0;
+
+        //deposit items not in the loadout
+        int foreignDepositActions = depositForeignLoadoutItems(loadout, maxActionsPerTick);
+        if (foreignDepositActions == Integer.MAX_VALUE)
+        {
+            //we used the deposit inventory button
+            actions++;
+        }
+        else
+        {
+            actions += foreignDepositActions;
+        }
+
+        //deposit items that we have too many of
+        actions += depositExcessLoadoutItems(loadout);
+
+        //handle the withdraw magic
+        for (LoadoutItem item : loadout)
+        {
+            if (actions >= maxActionsPerTick)
+            {
+                return true;
+            }
+
+            List<ItemEx> banked = item.getBanked();
+            if (banked.isEmpty())
+            {
+                if (!item.isOptional() && loadout.getItemDepletionListener() != null)
+                {
+                    loadout.getItemDepletionListener().onDeplete(item);
+                }
+                continue;
+            }
+
+            List<ItemEx> carried = item.getCarried();
+
+            int count;
+            if (carried.isEmpty())
+            {
+                count = 0;
+            }
+            else if (item.isStackable())
+            {
+                count = carried.get(0).getQuantity();
+            }
+            else
+            {
+                count = carried.size();
+            }
+
+            int remaining = item.getAmount() - count;
+            if (remaining < 0)
+            {
+                //We have too many, and depositExcessAmounts needs to deal with it
+                return false;
+            }
+
+            if (remaining == 0)
+            {
+                continue;
+            }
+
+            if (remaining > BankAPI.count(banked.get(0).getId()) && !item.isOptional())
+            {
+                if (loadout.getItemDepletionListener() != null)
+                {
+                    loadout.getItemDepletionListener().onDeplete(item);
+                }
+                continue;
+            }
+
+            //BankAPI#withdraw handles withdraw mode but we need to keep track of actions, so do it ourselves
+            if (item.isNoted() && !isWithdrawNote())
+            {
+                setWithdrawMode(true);
+                actions++;
+            }
+            else if (!item.isNoted() && isWithdrawNote())
+            {
+                setWithdrawMode(false);
+                actions++;
+            }
+
+            withdraw(banked.get(0).getId(), remaining, item.isNoted());
+            actions++;
+        }
+
+        return true;
+    }
+
+    private static int depositForeignLoadoutItems(InventoryLoadout loadout, int maxActionsPerTick) {
+        List<ItemEx> foreign = loadout.getCarriedForeignItems();
+        if (foreign.isEmpty())
+        {
+            return 0;
+        }
+
+        List<ItemEx> items = InventoryAPI.getItems();
+        if (items.size() == foreign.size())
+        {
+            depositAll();
+            return Integer.MAX_VALUE;
+        }
+
+        Set<Integer> unique = foreign.stream()
+            .map(ItemEx::getId)
+            .collect(Collectors.toSet());
+        if (unique.size() >= maxActionsPerTick)
+        {
+            //easier to use depositAll
+            depositAll();
+            return Integer.MAX_VALUE;
+        }
+
+        int actions = 0;
+        for (int id : unique)
+        {
+            System.out.println(id + " is foreign, depositing!");
+            //is there not a depositAll(id)?
+            deposit(id, -1);
+            actions++;
+        }
+
+        return actions;
+    }
+
+    private static int depositExcessLoadoutItems(InventoryLoadout loadout) {
+        List<LoadoutItem> excess = loadout.getCarriedExcessItems();
+        int actions = 0;
+        for (LoadoutItem item : excess)
+        {
+            List<ItemEx> carried = item.getCarried();
+            if (carried.isEmpty())
+            {
+                continue;
+            }
+
+            int count = item.isStackable() ? carried.get(0).getQuantity() : carried.size();
+            int extra = count - item.getAmount();
+            if (extra <= 0)
+            {
+                continue;
+            }
+
+            System.out.println("We have " + count + " of " + item.getIdentifier() + " but we need " + item.getAmount() + ", depositing " + extra);
+            deposit(carried.get(0).getId(), extra);
+            actions++;
+        }
+
+        return actions;
+    }
+
     public static boolean isWithdrawNote()
     {
         if (GameManager.getTickCount() == WithdrawModeSnapshot.tick)
@@ -71,7 +241,7 @@ public class BankAPI
             return WithdrawModeSnapshot.noted;
         }
 
-        return VarAPI.getVarp(VarPlayerID.BANKCERT) == 1;
+        return VarAPI.getVar(VarbitID.BANK_WITHDRAWNOTES) == 1;
     }
 
     /**
