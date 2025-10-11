@@ -39,6 +39,6 @@ public class IntPair {
     }
 
     public String toString() {
-        return "Pair{key=" + this.key + ", value=" + this.value + "}";
+        return "IntPair{key=" + this.key + ", value=" + this.value + "}";
     }
 }
