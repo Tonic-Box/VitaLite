@@ -26,6 +26,7 @@ VitaLite is a launcher for RuneLite that offers additional features and customiz
 [Click Manager Docs](./docs/CLICKMANAGER.md)
 
 ### Building from source
+**Requirements:** Jdk 11
 - Run the `SyncRuneliteApi` gradle task to download the latest RuneLite API _(Only need to run Once each rev update and first time you build)_
 1. Run the `buildAndPublishAll` gradle task to build the artifacts and setup the main module correctly
 2. Run the `com.tonic.VitaLite` main class to launch the client

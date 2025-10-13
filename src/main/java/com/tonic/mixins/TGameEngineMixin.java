@@ -14,9 +14,9 @@ public class TGameEngineMixin implements TGameEngine
         return !Static.isHeadless();
     }
 
-    @Disable("post")
-    public static boolean post()
-    {
-        return !Static.isHeadless();
-    }
+//    @Disable("post")
+//    public static boolean post()
+//    {
+//        return !Static.isHeadless();
+//    }
 }
