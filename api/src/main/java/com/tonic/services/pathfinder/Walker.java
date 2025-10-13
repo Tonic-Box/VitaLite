@@ -34,7 +34,9 @@ import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.WidgetInfo;
 import org.apache.commons.lang3.ArrayUtils;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -42,6 +44,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Walker
 {
+    private static final Map<WorldPoint, WorldPoint> tileRedirects = new HashMap<>();
     private static final int[] STAMINA = {ItemID._1DOSESTAMINA,ItemID._2DOSESTAMINA,ItemID._3DOSESTAMINA,ItemID._4DOSESTAMINA};
     private static final Walker instance = new Walker();
 
@@ -78,6 +81,83 @@ public class Walker
 
         private static int toggleRunThreshold = toggleRunRange.randomEnclosed();
         private static int consumeStaminaThreshold = consumeStaminaRange.randomEnclosed();
+    }
+
+    /**
+     * Add a tile redirect - when trying to walk to the 'from' tile, walk to the 'to' tile instead
+     * @param from The blocked/problematic tile
+     * @param to The alternative tile to walk to instead
+     */
+    public static void addTileRedirect(WorldPoint from, WorldPoint to)
+    {
+        tileRedirects.put(from, to);
+        Logger.info("[Walker] Added tile redirect: " + from + " -> " + to);
+    }
+
+    /**
+     * Remove a specific tile redirect
+     * @param from The tile to remove the redirect for
+     */
+    public static void removeTileRedirect(WorldPoint from)
+    {
+        WorldPoint removed = tileRedirects.remove(from);
+        if (removed != null)
+        {
+            Logger.info("[Walker] Removed tile redirect: " + from + " -> " + removed);
+        }
+    }
+
+    /**
+     * Clear all tile redirects
+     */
+    public static void clearTileRedirects()
+    {
+        int count = tileRedirects.size();
+        tileRedirects.clear();
+        Logger.info("[Walker] Cleared " + count + " tile redirects");
+    }
+
+    /**
+     * Check if a tile has a redirect configured
+     * @param tile The tile to check
+     * @return true if a redirect exists, false otherwise
+     */
+    public static boolean hasTileRedirect(WorldPoint tile)
+    {
+        return tileRedirects.containsKey(tile);
+    }
+
+    /**
+     * Get the redirect for a tile, or the original tile if no redirect exists
+     * @param tile The tile to get the redirect for
+     * @return The redirect tile if one exists, otherwise the original tile
+     */
+    public static WorldPoint getTileRedirect(WorldPoint tile)
+    {
+        WorldPoint redirect = tileRedirects.get(tile);
+        return redirect != null ? redirect : tile;
+    }
+
+    /**
+     * Apply tile redirects to a target WorldPoint before walking
+     * @param target The target WorldPoint
+     * @return The redirected WorldPoint if a redirect exists, otherwise the original
+     */
+    private WorldPoint applyRedirect(WorldPoint target)
+    {
+        if (target == null)
+        {
+            return null;
+        }
+
+        WorldPoint redirect = tileRedirects.get(target);
+        if (redirect != null)
+        {
+            Logger.info("[Walker] Applying tile redirect: " + target + " -> " + redirect);
+            return redirect;
+        }
+
+        return target;
     }
 
     public static void cancelWalk()
@@ -208,6 +288,8 @@ public class Walker
             return;
         }
         running = true;
+
+        target = applyRedirect(target);
 
         reset();
         this.useTeleports = useTeleports;
