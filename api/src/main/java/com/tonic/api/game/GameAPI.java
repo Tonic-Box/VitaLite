@@ -8,6 +8,7 @@ import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarClientID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
@@ -102,6 +103,17 @@ public class GameAPI
         return client.getGameState() == GameState.LOGIN_SCREEN
                 || client.getGameState() == GameState.LOGIN_SCREEN_AUTHENTICATOR
                 || client.getGameState() == GameState.LOGGING_IN;
+    }
+
+    /**
+     * Note: The character summary subtab must be opened for this to update otherwise it returns a cached value.
+     *       For accounts that have never opened it, the value will be {@code -1}.
+     *       If the tab is already open, it won't update. You have to open another subtab and then reopen it.
+     * @return The accounts playtime in minutes
+     */
+    public static int getPlaytimeInMinutes()
+    {
+        return VarAPI.getVarcInteger(VarClientID.ACCOUNT_SUMMARY_PLAYTIME);
     }
 
     /**
