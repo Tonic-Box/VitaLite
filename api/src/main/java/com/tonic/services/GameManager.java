@@ -1,9 +1,11 @@
 package com.tonic.services;
 
+import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.MiniMapAPI;
 import com.tonic.api.widgets.WorldMapAPI;
+import com.tonic.data.LoginResponse;
 import com.tonic.data.TileItemEx;
 import com.tonic.data.TileObjectEx;
 import com.tonic.services.hotswapper.PluginReloader;
@@ -332,6 +334,14 @@ public class GameManager extends Overlay {
                 continue;
 
             OverlayUtil.renderPolygon(graphics, polygon, color, fillColor, stroke);
+        }
+    }
+    @Subscribe
+    public void onLoginResponse(LoginResponse event)
+    {
+        if(event.isBanned())
+        {
+            Logger.error("LoginResponse: Account is banned!" );
         }
     }
 }

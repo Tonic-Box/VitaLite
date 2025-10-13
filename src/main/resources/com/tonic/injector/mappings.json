@@ -13979,6 +13979,7 @@
         "isStatic": true
       },
       {
+        "name": "",
         "obfuscatedName": "ip",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -26465,9 +26466,11 @@
         "isStatic": true
       },
       {
+        "name": "getLoginError",
         "obfuscatedName": "hn",
         "ownerObfuscatedName": "gd",
         "descriptor": "(II)V",
+        "garbageValue": 1931802302,
         "isStatic": true
       }
     ]
@@ -29575,9 +29578,11 @@
         "isStatic": true
       },
       {
+        "name": "setLoginResponse",
         "obfuscatedName": "ax",
         "ownerObfuscatedName": "hi",
         "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;B)V",
+        "garbageValue": 0,
         "isStatic": true
       },
       {
