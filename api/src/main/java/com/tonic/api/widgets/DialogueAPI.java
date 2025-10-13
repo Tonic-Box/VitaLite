@@ -11,6 +11,8 @@ import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.client.config.ConfigManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +22,9 @@ import java.util.List;
  */
 public class DialogueAPI
 {
-    /**
+    private static final net.runelite.client.config.ConfigManager configManager = Static.getInjector().getInstance(ConfigManager.class);
+
+	/**
      * Retrieves the header of the current dialogue, which may indicate the speaker or context.
      *
      * @return The dialogue header as a String. Possible values include NPC names, "Player", "Select an Option", or "UNKNOWN".
@@ -361,14 +365,18 @@ public class DialogueAPI
      */
     public static boolean continueQuestHelper() {
         Widget widget = WidgetAPI.get(WidgetInfoExtended.DIALOG_OPTION_OPTION1);
-        if(widget == null)
+        if (widget == null)
             return false;
         Widget[] dialogOption1kids = widget.getChildren();
-        if(dialogOption1kids == null)
+        if (dialogOption1kids == null)
             return false;
         int i = 0;
-        for(Widget w : dialogOption1kids) {
-            if(w.getTextColor() == -0xff4d4e) {
+		String configValue = configManager.getConfiguration("questhelper", "textHighlightColor");
+        if (configValue == null || configValue.isEmpty())
+            return false;
+        int colorCode = Integer.parseInt(configValue);
+        for (Widget w : dialogOption1kids) {
+            if (w.getTextColor() == colorCode) {
                 selectOption(i);
                 return true;
             }
