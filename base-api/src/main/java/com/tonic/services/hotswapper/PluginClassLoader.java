@@ -55,7 +55,7 @@ public class PluginClassLoader extends URLClassLoader {
             return true;
         }
 
-        return inheritsPluginClass(clazz);
+        return inheritsPluginClass(clazz.getSuperclass());
     }
 
     @Override
