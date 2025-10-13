@@ -6,7 +6,11 @@ import net.runelite.api.Client;
 import net.runelite.api.Skill;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * PrayerAPI provides methods to interact with and manage prayers in the game.
@@ -132,6 +136,15 @@ public enum PrayerAPI {
      */
     AUGURY(VarbitID.PRAYER_AUGURY, 40.0, InterfaceID.Prayerbook.PRAYER28, 77, 27);
 
+    private static final PrayerAPI[] OVERHEAD_PRAYERS = {
+        PrayerAPI.PROTECT_FROM_MAGIC,
+        PrayerAPI.PROTECT_FROM_MELEE,
+        PrayerAPI.PROTECT_FROM_MISSILES,
+        PrayerAPI.RETRIBUTION,
+        PrayerAPI.REDEMPTION,
+        PrayerAPI.SMITE
+    };
+
     private final int varbit;
     private final double drainRate;
     private final int interfaceId;
@@ -223,6 +236,64 @@ public enum PrayerAPI {
         {
             toggleQuickPrayer();
         }
+    }
+
+    /**
+     * @return The current active overhead prayer
+     */
+    public static PrayerAPI getActiveOverhead() {
+        for (PrayerAPI prayer : PrayerAPI.values())
+        {
+            if (!prayer.isActive())
+            {
+                continue;
+            }
+
+            if (!ArrayUtils.contains(OVERHEAD_PRAYERS, prayer))
+            {
+                continue;
+            }
+
+            return prayer;
+        }
+
+        return null;
+    }
+
+    /**
+     * Flicks the given prayers
+     * @param prayers The prayers to flick
+     */
+    public static void flick(Collection<PrayerAPI> prayers)
+    {
+        PrayerAPI previous = getActiveOverhead();
+        if (previous != null && !prayers.contains(previous) && previous.isActive())
+        {
+            //without this, you sometimes lose prayer points when switching protection prayers
+            previous.toggle();
+        }
+
+        toggle(false, prayers);
+        toggle(true, prayers);
+    }
+
+    private static void toggle(boolean skipValidate, Collection<PrayerAPI> prayers) {
+        for (PrayerAPI prayer : prayers)
+        {
+            if (prayer.isActive() || skipValidate) //isActive states don't update until the next tick when flicking
+            {
+                prayer.toggle();
+            }
+        }
+    }
+
+    /**
+     * Flicks the given prayers
+     * @param prayers The prayers to flick
+     */
+    public static void flick(PrayerAPI... prayers)
+    {
+        flick(Set.of(prayers));
     }
 
     /**
