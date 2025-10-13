@@ -20,8 +20,6 @@ public class PluginListItemMixin
     )
     public static void constructorHook(MethodNode method, AbstractInsnNode insertionPoint)
     {
-        if(Main.optionsParser.isIncognito())
-            return;
         InsnList code = BytecodeBuilder.create()
                 .pushThis()
                 .pushLocal(2)

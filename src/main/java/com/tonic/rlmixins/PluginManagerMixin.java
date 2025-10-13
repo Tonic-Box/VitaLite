@@ -86,16 +86,16 @@ public class PluginManagerMixin {
     )
     public static void loadPlugins(MethodNode method, AbstractInsnNode insertionPoint)
     {
-        if(Main.optionsParser.isIncognito())
-            return;
+        if(!Main.optionsParser.isIncognito())
+        {
+            InsnList code = BytecodeBuilder.create()
+                    .pushInt(1)
+                    .build();
 
-        InsnList code = BytecodeBuilder.create()
-                .pushInt(1)
-                .build();
-
-        method.instructions.insert(insertionPoint, code);
-        method.instructions.remove(insertionPoint.getPrevious());
-        method.instructions.remove(insertionPoint);
+            method.instructions.insert(insertionPoint, code);
+            method.instructions.remove(insertionPoint.getPrevious());
+            method.instructions.remove(insertionPoint);
+        }
 
         // Replace "getSuperclass() == Plugin.class" with "Plugin.class.isAssignableFrom(getSuperclass())"
         InsnList instructions = method.instructions;
