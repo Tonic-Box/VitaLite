@@ -33645,11 +33645,13 @@
     ]
   },
   {
+    "name": "ItemComposition",
     "obfuscatedName": "ig",
     "fields": [
       {
         "name": "",
         "obfuscatedName": "au",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "Lme;",
         "isStatic": true
@@ -33657,6 +33659,7 @@
       {
         "name": "",
         "obfuscatedName": "at",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": true
@@ -33664,6 +33667,7 @@
       {
         "name": "",
         "obfuscatedName": "pv",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "Lxl;",
         "isStatic": true
@@ -33671,6 +33675,7 @@
       {
         "name": "",
         "obfuscatedName": "zf",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33678,6 +33683,7 @@
       {
         "name": "",
         "obfuscatedName": "bm",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33685,6 +33691,7 @@
       {
         "name": "",
         "obfuscatedName": "af",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": true
@@ -33692,6 +33699,7 @@
       {
         "name": "",
         "obfuscatedName": "ae",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": true
@@ -33699,6 +33707,7 @@
       {
         "name": "",
         "obfuscatedName": "cl",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33706,6 +33715,7 @@
       {
         "name": "",
         "obfuscatedName": "av",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "Lpe;",
         "isStatic": true
@@ -33713,6 +33723,7 @@
       {
         "name": "",
         "obfuscatedName": "am",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "[S",
         "isStatic": false
@@ -33720,6 +33731,7 @@
       {
         "name": "",
         "obfuscatedName": "cu",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33727,6 +33739,7 @@
       {
         "name": "",
         "obfuscatedName": "aa",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": true
@@ -33734,6 +33747,7 @@
       {
         "name": "",
         "obfuscatedName": "aj",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": true
@@ -33741,6 +33755,7 @@
       {
         "name": "",
         "obfuscatedName": "ax",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33748,6 +33763,7 @@
       {
         "name": "",
         "obfuscatedName": "aw",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "Ljava/lang/String;",
         "isStatic": false
@@ -33755,6 +33771,7 @@
       {
         "name": "",
         "obfuscatedName": "cs",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33762,6 +33779,7 @@
       {
         "name": "",
         "obfuscatedName": "ai",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "Ljava/lang/String;",
         "isStatic": false
@@ -33769,6 +33787,7 @@
       {
         "name": "",
         "obfuscatedName": "ci",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33776,6 +33795,7 @@
       {
         "name": "",
         "obfuscatedName": "al",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "[S",
         "isStatic": false
@@ -33783,6 +33803,7 @@
       {
         "name": "",
         "obfuscatedName": "ay",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "[S",
         "isStatic": false
@@ -33790,6 +33811,7 @@
       {
         "name": "",
         "obfuscatedName": "be",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "[S",
         "isStatic": false
@@ -33797,6 +33819,7 @@
       {
         "name": "",
         "obfuscatedName": "ba",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33804,6 +33827,7 @@
       {
         "name": "",
         "obfuscatedName": "bj",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33811,6 +33835,7 @@
       {
         "name": "",
         "obfuscatedName": "bb",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33818,6 +33843,7 @@
       {
         "name": "",
         "obfuscatedName": "bn",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33825,6 +33851,7 @@
       {
         "name": "",
         "obfuscatedName": "bs",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33832,6 +33859,7 @@
       {
         "name": "",
         "obfuscatedName": "ak",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "Lme;",
         "isStatic": true
@@ -33839,6 +33867,7 @@
       {
         "name": "",
         "obfuscatedName": "cw",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33846,6 +33875,7 @@
       {
         "name": "",
         "obfuscatedName": "bu",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33853,6 +33883,7 @@
       {
         "name": "",
         "obfuscatedName": "ao",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "Lri;",
         "isStatic": true
@@ -33860,6 +33891,7 @@
       {
         "name": "",
         "obfuscatedName": "bq",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33867,6 +33899,7 @@
       {
         "name": "",
         "obfuscatedName": "bh",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "[[Ljava/lang/String;",
         "isStatic": false
@@ -33874,13 +33907,15 @@
       {
         "name": "",
         "obfuscatedName": "bo",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "groundActions",
         "obfuscatedName": "bp",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "[Ljava/lang/String;",
         "isStatic": false
@@ -33888,6 +33923,7 @@
       {
         "name": "",
         "obfuscatedName": "bz",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "[Ljava/lang/String;",
         "isStatic": false
@@ -33895,6 +33931,7 @@
       {
         "name": "",
         "obfuscatedName": "cx",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33902,6 +33939,7 @@
       {
         "name": "",
         "obfuscatedName": "bc",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "[I",
         "isStatic": false
@@ -33909,6 +33947,7 @@
       {
         "name": "",
         "obfuscatedName": "bv",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "[I",
         "isStatic": false
@@ -33916,6 +33955,7 @@
       {
         "name": "",
         "obfuscatedName": "bi",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33923,6 +33963,7 @@
       {
         "name": "",
         "obfuscatedName": "bw",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33930,6 +33971,7 @@
       {
         "name": "",
         "obfuscatedName": "br",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33937,6 +33979,7 @@
       {
         "name": "",
         "obfuscatedName": "bf",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33944,6 +33987,7 @@
       {
         "name": "",
         "obfuscatedName": "bl",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33951,6 +33995,7 @@
       {
         "name": "",
         "obfuscatedName": "bd",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33958,6 +34003,7 @@
       {
         "name": "",
         "obfuscatedName": "bt",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33965,6 +34011,7 @@
       {
         "name": "",
         "obfuscatedName": "bk",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33972,6 +34019,7 @@
       {
         "name": "",
         "obfuscatedName": "ca",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -33979,6 +34027,7 @@
       {
         "name": "",
         "obfuscatedName": "cy",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "Lqw;",
         "isStatic": false
@@ -33986,6 +34035,7 @@
       {
         "name": "",
         "obfuscatedName": "cj",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "Z",
         "isStatic": false
@@ -33993,6 +34043,7 @@
       {
         "name": "",
         "obfuscatedName": "ce",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34000,6 +34051,7 @@
       {
         "name": "",
         "obfuscatedName": "by",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34007,6 +34059,7 @@
       {
         "name": "",
         "obfuscatedName": "bx",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "Z",
         "isStatic": false
@@ -34014,6 +34067,7 @@
       {
         "name": "",
         "obfuscatedName": "ah",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": true
@@ -34021,6 +34075,7 @@
       {
         "name": "",
         "obfuscatedName": "cp",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34028,6 +34083,7 @@
       {
         "name": "",
         "obfuscatedName": "ab",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": true
@@ -34035,6 +34091,7 @@
       {
         "name": "",
         "obfuscatedName": "cn",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34042,6 +34099,7 @@
       {
         "name": "",
         "obfuscatedName": "an",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34049,6 +34107,7 @@
       {
         "name": "",
         "obfuscatedName": "ck",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34056,6 +34115,7 @@
       {
         "name": "",
         "obfuscatedName": "cb",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34063,6 +34123,7 @@
       {
         "name": "",
         "obfuscatedName": "cq",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34070,6 +34131,7 @@
       {
         "name": "",
         "obfuscatedName": "cf",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34077,6 +34139,7 @@
       {
         "name": "",
         "obfuscatedName": "ch",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34084,6 +34147,7 @@
       {
         "name": "",
         "obfuscatedName": "az",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "Lme;",
         "isStatic": true
@@ -34091,6 +34155,7 @@
       {
         "name": "",
         "obfuscatedName": "bg",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34098,6 +34163,7 @@
       {
         "name": "",
         "obfuscatedName": "cz",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34105,6 +34171,7 @@
       {
         "name": "",
         "obfuscatedName": "cd",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "Ljava/lang/String;",
         "isStatic": false
@@ -34112,6 +34179,7 @@
       {
         "name": "",
         "obfuscatedName": "cv",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34119,6 +34187,7 @@
       {
         "name": "",
         "obfuscatedName": "aq",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": true
@@ -34126,6 +34195,7 @@
       {
         "name": "",
         "obfuscatedName": "as",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": true
@@ -34133,6 +34203,7 @@
       {
         "name": "",
         "obfuscatedName": "ct",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "I",
         "isStatic": false
@@ -34141,204 +34212,238 @@
     "methods": [
       {
         "obfuscatedName": "au",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(ILgv;I)Z",
         "isStatic": false
       },
       {
         "obfuscatedName": "yn",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lig;ILgv;I)Lib;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ah",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(I)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "af",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lwj;B)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "aq",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lig;Lig;B)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "aa",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lig;Lig;I)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "ik",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lig;Lig;)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "se",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lig;I)I",
         "isStatic": true
       },
       {
         "obfuscatedName": "zq",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lig;ILjava/lang/String;I)Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "as",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(IB)Lig;",
         "isStatic": false
       },
       {
         "obfuscatedName": "ar",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(ILgv;I)Z",
         "isStatic": false
       },
       {
         "obfuscatedName": "ak",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(ILgv;I)Lib;",
         "isStatic": false
       },
       {
         "obfuscatedName": "dg",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lig;Lig;)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "getId",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "()I",
         "isStatic": false
       },
       {
         "obfuscatedName": "uu",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "()V",
         "isStatic": false
       },
       {
         "obfuscatedName": "wg",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lig;Lig;Lig;I)V",
         "isStatic": true
       },
       {
         "obfuscatedName": "ax",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(IIB)I",
         "isStatic": false
       },
       {
         "obfuscatedName": "getName",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "()Ljava/lang/String;",
         "isStatic": false
       },
       {
         "obfuscatedName": "\u003cinit\u003e",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "()V",
         "isStatic": false
       },
       {
         "obfuscatedName": "zo",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lig;Lig;)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "ap",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(II)Lib;",
         "isStatic": false
       },
       {
         "obfuscatedName": "pk",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lig;B)Z",
         "isStatic": true
       },
       {
         "obfuscatedName": "getMembersName",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "()Ljava/lang/String;",
         "isStatic": false
       },
       {
         "obfuscatedName": "pk",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lig;II)Ljd;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ao",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lib;Lgv;I)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "ae",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lwj;II)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "\u003cclinit\u003e",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "()V",
         "isStatic": true
       },
       {
         "obfuscatedName": "am",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(I)Z",
         "isStatic": false
       },
       {
         "obfuscatedName": "ad",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(II)Ljd;",
         "isStatic": false
       },
       {
         "obfuscatedName": "ai",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(B)Z",
         "isStatic": false
       },
       {
         "obfuscatedName": "an",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(ILjava/lang/String;I)Ljava/lang/String;",
         "isStatic": false
       },
       {
         "obfuscatedName": "az",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(ILgv;I)Lib;",
         "isStatic": false
       },
       {
         "obfuscatedName": "ac",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(Lig;Lig;I)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "aw",
+        "owner": "ItemComposition",
         "ownerObfuscatedName": "ig",
         "descriptor": "(I)I",
         "isStatic": false

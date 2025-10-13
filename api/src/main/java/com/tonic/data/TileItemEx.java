@@ -1,6 +1,8 @@
 package com.tonic.data;
 
 import com.tonic.Static;
+import com.tonic.api.TItemComposition;
+import com.tonic.services.GameManager;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.Client;
@@ -18,7 +20,7 @@ public class TileItemEx
     private final TileItem item;
     private final WorldPoint worldLocation;
     private final LocalPoint localPoint;
-    private final String[] actions = null;
+    private String[] actions = null;
 
     public int getId() {
         return item.getId();
@@ -45,7 +47,17 @@ public class TileItemEx
 
     public String[] getActions()
     {
-        return new String[0];
+        if(actions != null)
+            return actions;
+        if(item == null)
+            return new String[0];
+        actions = Static.invoke(() -> {
+            Client client = Static.getClient();
+            TItemComposition itemComp = (TItemComposition) client.getItemDefinition(item.getId());
+            return itemComp.getGroundActions();
+        });
+
+        return actions;
     }
 
     public int getShopPrice() {
