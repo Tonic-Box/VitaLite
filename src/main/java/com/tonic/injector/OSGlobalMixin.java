@@ -25,11 +25,15 @@ public class OSGlobalMixin
     public static void patch(ClassNode classNode)
     {
         pathsGetReplacer.instrument(classNode);
-        modifyResourceLoading.instrument(classNode);
-        replaceMethodByString.instrument(classNode);
         memoryReplacer.instrument(classNode);
         propertyReplacer.instrument(classNode);
         integerReplacer.instrument(classNode);
+
+        if(Main.optionsParser.isNoMusic() || Main.optionsParser.isMin())
+        {
+            replaceMethodByString.instrument(classNode);
+            modifyResourceLoading.instrument(classNode);
+        }
 
         for(MethodNode method : classNode.methods)
         {
