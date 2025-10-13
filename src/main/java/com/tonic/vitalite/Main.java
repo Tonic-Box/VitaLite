@@ -36,6 +36,7 @@ public class Main {
     public static void main(String[] args) throws Exception
     {
         args = optionsParser.parse(args);
+        optionsParser._checkAudio();
         if(!optionsParser.isSafeLaunch())
         {
             System.err.println("Safe launch not satisfied, VitaLite will not start.");

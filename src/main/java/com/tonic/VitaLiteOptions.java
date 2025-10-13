@@ -1,8 +1,10 @@
 package com.tonic;
 
+import com.tonic.util.AudioDeviceChecker;
 import com.tonic.util.optionsparser.OptionsParser;
 import com.tonic.util.optionsparser.annotations.CLIArgument;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class VitaLiteOptions extends OptionsParser
@@ -60,4 +62,12 @@ public class VitaLiteOptions extends OptionsParser
             description = "Disable RuneLites mousehook DLL from being loaded or called"
     )
     private boolean disableMouseHook = false;
+
+    public void _checkAudio()
+    {
+        if(!AudioDeviceChecker.hasAudioDevice())
+        {
+            noMusic = true;
+        }
+    }
 }
