@@ -521,7 +521,7 @@ public class TransportLoader
                             .withName("Fairy ring")
                             .first();
                     TileObjectAPI.interact(current, "Configure");
-                    Delays.waitUntil(() -> WidgetAPI.get(398, 0) != null);
+                    Delays.waitUntil(() -> WidgetAPI.get(InterfaceID.Fairyrings.CONFIRM) != null);
                     while(!destination.travel())
                     {
                         Delays.tick();

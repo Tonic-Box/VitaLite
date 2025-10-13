@@ -94,21 +94,21 @@ public enum FairyRing
         if (currentCode.charAt(0) != this.code.charAt(0))
         {
             Widget widget = WidgetAPI.get(WidgetInfo.FAIRY_RING.getGroupId(), TURN_INDICES[0][0]);
-            WidgetAPI.interact(widget, 0);
+            WidgetAPI.interact(widget, 1);
             return;
         }
 
         if (currentCode.charAt(1) != this.code.charAt(1))
         {
             Widget widget = WidgetAPI.get(WidgetInfo.FAIRY_RING.getGroupId(), TURN_INDICES[1][0]);
-            WidgetAPI.interact(widget, 0);
+            WidgetAPI.interact(widget, 1);
             return;
         }
 
         if (currentCode.charAt(2) != this.code.charAt(2))
         {
             Widget widget = WidgetAPI.get(WidgetInfo.FAIRY_RING.getGroupId(), TURN_INDICES[2][0]);
-            WidgetAPI.interact(widget, 0);
+            WidgetAPI.interact(widget, 1);
         }
     }
 
@@ -116,7 +116,7 @@ public enum FairyRing
     {
         if (validateCode())
         {
-            WidgetAPI.interact(0, 26083354, -1, -1);
+            WidgetAPI.interact(1, 26083354, -1, -1);
             return true;
         }
         else
