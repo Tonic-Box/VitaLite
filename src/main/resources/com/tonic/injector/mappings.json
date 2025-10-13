@@ -9748,7 +9748,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "logger",
         "obfuscatedName": "ip",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -12960,7 +12960,7 @@
     ],
     "methods": [
       {
-        "name": "callStackPacker1",
+        "name": "",
         "obfuscatedName": "bz",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -42904,7 +42904,7 @@
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "graphicsGuard",
         "obfuscatedName": "yp",
         "ownerObfuscatedName": "jx",
         "descriptor": "Z",
@@ -62121,9 +62121,11 @@
         "isStatic": true
       },
       {
+        "name": "processError",
         "obfuscatedName": "ab",
         "ownerObfuscatedName": "pq",
         "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;B)V",
+        "garbageValue": 0,
         "isStatic": true
       }
     ]
@@ -69279,6 +69281,12 @@
         "ownerObfuscatedName": "rl3",
         "descriptor": "()V",
         "isStatic": false
+      },
+      {
+        "obfuscatedName": "yb",
+        "ownerObfuscatedName": "rl3",
+        "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+        "isStatic": true
       },
       {
         "obfuscatedName": "\u003cinit\u003e",
@@ -83439,6 +83447,18 @@
         "ownerObfuscatedName": "xv",
         "descriptor": "(Ljava/lang/Throwable;Ljava/lang/String;)V",
         "isStatic": false
+      },
+      {
+        "obfuscatedName": "aj",
+        "ownerObfuscatedName": "xv",
+        "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+        "isStatic": true
+      },
+      {
+        "obfuscatedName": "ag",
+        "ownerObfuscatedName": "xv",
+        "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
+        "isStatic": true
       }
     ]
   },
