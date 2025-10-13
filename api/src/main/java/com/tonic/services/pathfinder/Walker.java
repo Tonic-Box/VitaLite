@@ -21,6 +21,7 @@ import com.tonic.services.pathfinder.model.Step;
 import com.tonic.services.pathfinder.teleports.Teleport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.Coroutine;
+import com.tonic.util.IntPair;
 import com.tonic.util.Location;
 import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
@@ -34,7 +35,6 @@ import net.runelite.api.widgets.WidgetInfo;
 import org.apache.commons.lang3.ArrayUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -42,10 +42,12 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Walker
 {
-    private final static Walker instance = new Walker();
+    private static final int[] STAMINA = {ItemID._1DOSESTAMINA,ItemID._2DOSESTAMINA,ItemID._3DOSESTAMINA,ItemID._4DOSESTAMINA};
+    private static final Walker instance = new Walker();
+
     private final Client client;
+
     private boolean running = false;
-    private final int[] stamina = {ItemID._1DOSESTAMINA,ItemID._2DOSESTAMINA,ItemID._3DOSESTAMINA,ItemID._4DOSESTAMINA};
     private int cooldown = 0;
     private int timeout = 0;
     private int recalcs = 0;
@@ -67,6 +69,15 @@ public class Walker
     {
         this.client = Static.getClient();
         prayerDangerZone = client.getRealSkillLevel(Skill.PRAYER) / 2;
+    }
+
+    public static class Setting
+    {
+        private static IntPair toggleRunRange = new IntPair(25, 35);
+        private static IntPair consumeStaminaRange = new IntPair(50, 60);
+
+        private static int toggleRunThreshold = toggleRunRange.randomEnclosed();
+        private static int consumeStaminaThreshold = consumeStaminaRange.randomEnclosed();
     }
 
     public static void cancelWalk()
@@ -585,28 +596,31 @@ public class Walker
         }
         int energy = client.getEnergy() / 100;
 
-        if(!MovementAPI.isRunEnabled() && energy > 30)
+        if(!MovementAPI.isRunEnabled() && energy > Setting.toggleRunThreshold)
         {
             WidgetAPI.interact(1, WidgetInfo.MINIMAP_TOGGLE_RUN_ORB, -1, -1);
+            Setting.toggleRunThreshold = Setting.toggleRunRange.randomEnclosed();
         }
 
-        if(energy < 60 && !MovementAPI.staminaInEffect())
+        if(energy < Setting.consumeStaminaThreshold && !MovementAPI.staminaInEffect())
         {
-            ItemEx stam = InventoryAPI.getItem(i -> ArrayUtils.contains(stamina, i.getId()));
+            ItemEx stam = InventoryAPI.getItem(i -> ArrayUtils.contains(STAMINA, i.getId()));
 
             if(stam != null)
             {
                 InventoryAPI.interact(stam, 2);
+                Setting.consumeStaminaThreshold = Setting.consumeStaminaRange.randomEnclosed();
             }
         }
 
-        if(energy <= 30)
+        if(energy <= Setting.toggleRunThreshold)
         {
-            ItemEx stam = InventoryAPI.getItem(i -> ArrayUtils.contains(stamina, i.getId()));
+            ItemEx stam = InventoryAPI.getItem(i -> ArrayUtils.contains(STAMINA, i.getId()));
 
             if(stam != null)
             {
                 InventoryAPI.interact(stam, 2);
+                Setting.toggleRunThreshold = Setting.toggleRunRange.randomEnclosed();
             }
         }
 
