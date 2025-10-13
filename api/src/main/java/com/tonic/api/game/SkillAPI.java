@@ -19,6 +19,11 @@ public class SkillAPI
     private static final int MAX_SKILL_LEVEL = 99;
     private static final int[] XP_TABLE;
 
+    /**
+     * Mapping of skills to their reward widget packed IDs.
+     */
+    private static final Map<Skill, Integer> skillRewardMap;
+
     static {
         XP_TABLE = new int[127];
         XP_TABLE[0] = 0;
@@ -32,6 +37,32 @@ public class SkillAPI
 
             XP_TABLE[level] = (int) Math.floor(delta / 4);
         }
+
+        skillRewardMap = ImmutableMap.<Skill, Integer>builder()
+                .put(Skill.ATTACK, InterfaceID.Xpreward.ATTACK)
+                .put(Skill.STRENGTH, InterfaceID.Xpreward.STRENGTH)
+                .put(Skill.RANGED, InterfaceID.Xpreward.RANGED)
+                .put(Skill.MAGIC, InterfaceID.Xpreward.MAGIC)
+                .put(Skill.DEFENCE, InterfaceID.Xpreward.DEFENCE)
+                .put(Skill.HITPOINTS, InterfaceID.Xpreward.HITPOINTS)
+                .put(Skill.PRAYER, InterfaceID.Xpreward.PRAYER)
+                .put(Skill.AGILITY, InterfaceID.Xpreward.AGILITY)
+                .put(Skill.HERBLORE, InterfaceID.Xpreward.HERBLORE)
+                .put(Skill.THIEVING, InterfaceID.Xpreward.THIEVING)
+                .put(Skill.CRAFTING, InterfaceID.Xpreward.CRAFTING)
+                .put(Skill.RUNECRAFT, InterfaceID.Xpreward.RUNECRAFT)
+                .put(Skill.SLAYER, InterfaceID.Xpreward.SLAYER)
+                .put(Skill.FARMING, InterfaceID.Xpreward.FARMING)
+                .put(Skill.MINING, InterfaceID.Xpreward.MINING)
+                .put(Skill.SMITHING, InterfaceID.Xpreward.SMITHING)
+                .put(Skill.FISHING, InterfaceID.Xpreward.FISHING)
+                .put(Skill.COOKING, InterfaceID.Xpreward.COOKING)
+                .put(Skill.FIREMAKING, InterfaceID.Xpreward.FIREMAKING)
+                .put(Skill.WOODCUTTING, InterfaceID.Xpreward.WOODCUTTING)
+                .put(Skill.FLETCHING, InterfaceID.Xpreward.FLETCHING)
+                .put(Skill.CONSTRUCTION, InterfaceID.Xpreward.CONSTRUCTION)
+                .put(Skill.HUNTER, InterfaceID.Xpreward.HUNTER)
+                .build();
     }
 
     public static int getExperienceAt(int level)
@@ -61,45 +92,13 @@ public class SkillAPI
         return -1;
     }
 
-    public static int getExperienceToNextLevel(Skill skill)
-    {
+    public static int getExperienceToNextLevel(Skill skill) {
         int nextLevel = getLevel(skill) + 1;
-        if (nextLevel > MAX_SKILL_LEVEL)
-        {
+        if (nextLevel > MAX_SKILL_LEVEL) {
             return 0;
         }
 
         return getExperienceAt(nextLevel) - getExperience(skill);
-    /**
-     * Mapping of skills to their reward widget packed IDs.
-     */
-    private static final Map<Skill, Integer> skillRewardMap;
-    static {
-        skillRewardMap = ImmutableMap.<Skill, Integer>builder()
-            .put(Skill.ATTACK, InterfaceID.Xpreward.ATTACK)
-            .put(Skill.STRENGTH, InterfaceID.Xpreward.STRENGTH)
-            .put(Skill.RANGED, InterfaceID.Xpreward.RANGED)
-            .put(Skill.MAGIC, InterfaceID.Xpreward.MAGIC)
-            .put(Skill.DEFENCE, InterfaceID.Xpreward.DEFENCE)
-            .put(Skill.HITPOINTS, InterfaceID.Xpreward.HITPOINTS)
-            .put(Skill.PRAYER, InterfaceID.Xpreward.PRAYER)
-            .put(Skill.AGILITY, InterfaceID.Xpreward.AGILITY)
-            .put(Skill.HERBLORE, InterfaceID.Xpreward.HERBLORE)
-            .put(Skill.THIEVING, InterfaceID.Xpreward.THIEVING)
-            .put(Skill.CRAFTING, InterfaceID.Xpreward.CRAFTING)
-            .put(Skill.RUNECRAFT, InterfaceID.Xpreward.RUNECRAFT)
-            .put(Skill.SLAYER, InterfaceID.Xpreward.SLAYER)
-            .put(Skill.FARMING, InterfaceID.Xpreward.FARMING)
-            .put(Skill.MINING, InterfaceID.Xpreward.MINING)
-            .put(Skill.SMITHING, InterfaceID.Xpreward.SMITHING)
-            .put(Skill.FISHING, InterfaceID.Xpreward.FISHING)
-            .put(Skill.COOKING, InterfaceID.Xpreward.COOKING)
-            .put(Skill.FIREMAKING, InterfaceID.Xpreward.FIREMAKING)
-            .put(Skill.WOODCUTTING, InterfaceID.Xpreward.WOODCUTTING)
-            .put(Skill.FLETCHING, InterfaceID.Xpreward.FLETCHING)
-            .put(Skill.CONSTRUCTION, InterfaceID.Xpreward.CONSTRUCTION)
-            .put(Skill.HUNTER, InterfaceID.Xpreward.HUNTER)
-            .build();
     }
 
     public static int getLevel(Skill skill)
