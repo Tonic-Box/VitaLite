@@ -1,9 +1,12 @@
 package com.tonic.injector;
 
 import com.tonic.injector.util.BytecodeBuilder;
+import com.tonic.injector.util.LdcRewriter;
 import com.tonic.injector.util.MappingProvider;
+import com.tonic.injector.util.expreditor.impls.*;
 import com.tonic.util.dto.JClass;
 import com.tonic.util.dto.JField;
+import com.tonic.vitalite.Main;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
@@ -12,12 +15,35 @@ import java.util.List;
 
 public class OSGlobalMixin
 {
+    private static final PathsGetReplacer pathsGetReplacer = new PathsGetReplacer();
+    private static final ModifyResourceLoading modifyResourceLoading = new ModifyResourceLoading();
+    private static final ReplaceMethodByString replaceMethodByString = new ReplaceMethodByString("Attempted to load patches of already loading midiplayer!");
+    private static final RuntimeMaxMemoryReplacer memoryReplacer = new RuntimeMaxMemoryReplacer(778502144L);
+    private static final SystemPropertyReplacer propertyReplacer = new SystemPropertyReplacer();
+    private static final IntegerLiteralReplacer integerReplacer = new IntegerLiteralReplacer(-1094877034);
+
     public static void patch(ClassNode classNode)
     {
+        pathsGetReplacer.instrument(classNode);
+        modifyResourceLoading.instrument(classNode);
+        replaceMethodByString.instrument(classNode);
+        memoryReplacer.instrument(classNode);
+        propertyReplacer.instrument(classNode);
+        integerReplacer.instrument(classNode);
+
         for(MethodNode method : classNode.methods)
         {
             randomDat(classNode, method);
             mouseFlag(method);
+
+            if(!Main.optionsParser.isIncognito())
+            {
+                LdcRewriter.rewriteString(
+                        method,
+                        "Welcome to RuneScape",
+                        "<col=FFFFFF>Welcome to </col><col=00FFFF>VitaLite</col>"
+                );
+            }
         }
     }
 
