@@ -238,7 +238,7 @@ public class ProfilesRootPanel extends PluginPanel {
 
                 String displayName = nameField.getText();
 
-                if (jagCharacter.getDisplayName() != null & !jagCharacter.getDisplayName().isEmpty()) {
+                if (jagCharacter.getDisplayName() != null && !jagCharacter.getDisplayName().isEmpty()) {
                     displayName = jagCharacter.getDisplayName();
                 }
 
