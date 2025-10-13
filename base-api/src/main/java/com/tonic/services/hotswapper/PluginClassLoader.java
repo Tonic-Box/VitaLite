@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
 public class PluginClassLoader extends URLClassLoader {
-    private final ClassLoader parent;
     private final JarFile jarFile;
+    private ClassLoader parent;
 
     public PluginClassLoader(File plugin, ClassLoader parent) throws MalformedURLException
     {
@@ -28,6 +28,7 @@ public class PluginClassLoader extends URLClassLoader {
         catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+
         this.parent = parent;
     }
 
@@ -42,6 +43,7 @@ public class PluginClassLoader extends URLClassLoader {
                 .getAllClasses()
                 .stream()
                 .filter(info -> !info.getName().equals("module-info"))
+                .filter(info -> !info.getName().startsWith("META-INF"))
                 .map(ClassPath.ClassInfo::load)
                 .collect(Collectors.toList());
     }
@@ -59,16 +61,33 @@ public class PluginClassLoader extends URLClassLoader {
     }
 
     @Override
-    public Class<?> loadClass(String name) throws ClassNotFoundException
-    {
-        try
-        {
-            return super.loadClass(name);
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
+        Class<?> loadedClass = findLoadedClass(name);
+        if (loadedClass != null) {
+            return loadedClass;
         }
-        catch (Throwable ex)
-        {
-            return parent.loadClass(name);
+
+        try {
+            if (parent != null) {
+                return parent.loadClass(name);
+            }
         }
+        catch (ClassNotFoundException ignored) {};
+
+        return findClass(name);
+    }
+
+    public Class<?> loadClass(String name, boolean allowParentDelegation) throws ClassNotFoundException {
+        if (allowParentDelegation) {
+            return loadClass(name);
+        }
+
+        Class<?> loadedClass = findLoadedClass(name);
+        if (loadedClass != null) {
+            return loadedClass;
+        }
+
+        return findClass(name);
     }
 
     @Override

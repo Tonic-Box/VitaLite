@@ -48,31 +48,11 @@ public class PluginManagerMixin {
         InsnList list = BytecodeBuilder.create()
                 .pop()
                 .pushInt(1)
+                .invokeStatic("com/tonic/services/hotswapper/PluginReloader", "init", "()V")
+                .returnVoid()
                 .build();
         method.instructions.insert(insertionPoint, list);
         LogCallRemover.removeLogInfoCall(method);
-
-        for(AbstractInsnNode node : method.instructions)
-        {
-            if (node instanceof TypeInsnNode)
-            {
-                TypeInsnNode typeInsn = (TypeInsnNode) node;
-                if(!typeInsn.desc.equals("net/runelite/client/plugins/PluginClassLoader"))
-                    continue;
-
-                typeInsn.desc = "com/tonic/services/hotswapper/PluginClassLoader";
-                continue;
-            }
-
-            if(node instanceof MethodInsnNode)
-            {
-                MethodInsnNode methodInsn = (MethodInsnNode) node;
-                if(methodInsn.owner.equals("net/runelite/client/plugins/PluginClassLoader"))
-                {
-                    methodInsn.owner = "com/tonic/services/hotswapper/PluginClassLoader";
-                }
-            }
-        }
     }
 
     @Insert(

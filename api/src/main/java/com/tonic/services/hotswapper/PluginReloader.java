@@ -5,7 +5,9 @@ import com.tonic.Static;
 import com.tonic.util.ReflectBuilder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.Plugin;
+import net.runelite.client.plugins.PluginInstantiationException;
 import net.runelite.client.plugins.PluginManager;
 import javax.swing.*;
 import java.awt.*;
@@ -18,10 +20,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 public class PluginReloader {
-    @Getter
-    @Setter
-    private static ClassLoader classLoader;
+    private static MultiPluginClassLoader pluginClassLoader;
     private static PluginManager pluginManager;
 
     private static boolean isLoaded = false;
@@ -38,29 +39,21 @@ public class PluginReloader {
                 .map(Path::toFile)
                 .collect(Collectors.toList());
 
+        pluginClassLoader = new MultiPluginClassLoader(jars.toArray(File[]::new), Static.getClassLoader());
+
+        try {
+            pluginManager.loadPlugins(pluginClassLoader.getPluginClasses(), null);
+        } catch (PluginInstantiationException e) {
+            log.error(e.getMessage());
+        }
+
         for (File jar : jars) {
-            try
-            {
-                PluginClassLoader classLoader = new PluginClassLoader(jar, Static.getClassLoader());
-                List<Class<?>> pluginClasses = classLoader.getPluginClasses();
-
-                List<Plugin> plugins = new ArrayList<>();
-                for(Class<?> clazz : pluginClasses)
-                {
-                    Plugin plugin = findLoadedPlugin(clazz);
-                    if(plugin != null)
-                    {
-                        plugins.add(plugin);
-                    }
-                }
-
-                PluginContext.getLoadedPlugins().put(jar.getAbsolutePath(), new PluginContext(
-                        classLoader, plugins, jar.lastModified()
-                ));
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
+            var loader = pluginClassLoader.getClassLoader(jar);
+            var pluginClasses = pluginClassLoader.getPluginClasses(jar);
+            var plugins = pluginClasses.stream().map(PluginReloader::findLoadedPlugin).collect(Collectors.toList());
+            PluginContext.getLoadedPlugins().put(jar.getAbsolutePath(), new PluginContext(
+                    loader, plugins, jar.lastModified()
+            ));
         }
     }
 
@@ -93,14 +86,12 @@ public class PluginReloader {
                 }
             }
 
-            PluginClassLoader newClassLoader = new PluginClassLoader(jarFile, Static.getClassLoader());
-
-            List<Class<?>> newClasses = newClassLoader.getClasses();
-
-            List<Plugin> newPlugins = pluginManager.loadPlugins(newClasses, null);
+            pluginClassLoader.reload(jarFile);
+            var loader = pluginClassLoader.getClassLoader(jarFile);
+            var newPlugins = pluginManager.loadPlugins(loader.getPluginClasses(), null);
 
             PluginContext.getLoadedPlugins().put(jarFile.getAbsolutePath(), new PluginContext(
-                    newClassLoader, newPlugins, jarFile.lastModified()
+                    loader, newPlugins, jarFile.lastModified()
             ));
 
             if (oldContext != null) {
