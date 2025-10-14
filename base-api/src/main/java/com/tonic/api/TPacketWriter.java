@@ -15,6 +15,27 @@ public interface TPacketWriter
      * @return the Isaac cipher
      */
     TIsaacCipher getIsaacCipher();
+
+    /**
+     * Gets the current server packet.
+     *
+     * @return the current server packet
+     */
+    TServerPacket getServerPacket();
+
+    /**
+     * Gets the length of the current server packet.
+     *
+     * @return the length of the current server packet
+     */
+    int getServerPacketLength();
+
+    /**
+     * Gets the server packet buffer.
+     *
+     * @return the server packet buffer
+     */
+    TPacketBuffer getServerPacketBuffer();
     
     /**
      * Sends a mouse click packet.

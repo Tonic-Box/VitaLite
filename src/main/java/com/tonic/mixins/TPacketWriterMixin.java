@@ -24,6 +24,18 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     @Shadow("client")
     public static TClient client;
 
+    @Shadow("serverPacket")
+    @Getter
+    public TServerPacket serverPacket;
+
+    @Shadow("serverPacketLength")
+    @Getter
+    public int serverPacketLength;
+
+    @Shadow("serverPacketBuffer")
+    @Getter
+    public TPacketBuffer serverPacketBuffer;
+
 //    @Shadow("addNode2")
 //    public abstract void addNode(TPacketWriter packetWriter, TPacketBufferNode node);
 //
