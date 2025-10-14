@@ -47,7 +47,7 @@ VitaLite is a launcher for RuneLite that offers additional features and customiz
 | `-noMusic`   | Boolean | Prevent the loading of music tracks                  |
 | `-incognito` | Boolean | Visually display as 'RuneLite' instead of 'VitaLite' |
 | `-help`      | Boolean | Displays help information about command line options |
-| `-proxy`     | String  | Set a proxy server to use (e.g., ip:port or ip:port:username:password) |
+| `--proxy`     | String  | Set a proxy server to use (e.g., ip:port or ip:port:username:password) |
 
 ## Disclaimer
 
