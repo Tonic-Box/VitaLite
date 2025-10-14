@@ -7,7 +7,7 @@ import java.util.Map;
 
 import static net.runelite.api.gameval.ItemID.*;
 
-public enum RunepouchRune
+public enum RunePouchRune
 {
     AIR(1, AIRRUNE),
     WATER(2, WATERRUNE),
@@ -38,25 +38,25 @@ public enum RunepouchRune
     @Getter
     private final int itemId;
 
-    private static final Map<Integer, RunepouchRune> runes;
+    private static final Map<Integer, RunePouchRune> runes;
 
     static
     {
-        ImmutableMap.Builder<Integer, RunepouchRune> builder = new ImmutableMap.Builder<>();
-        for (RunepouchRune rune : values())
+        ImmutableMap.Builder<Integer, RunePouchRune> builder = new ImmutableMap.Builder<>();
+        for (RunePouchRune rune : values())
         {
             builder.put(rune.getId(), rune);
         }
         runes = builder.build();
     }
 
-    RunepouchRune(int id, int itemId)
+    RunePouchRune(int id, int itemId)
     {
         this.id = id;
         this.itemId = itemId;
     }
 
-    public static RunepouchRune getRune(int varbit)
+    public static RunePouchRune getRune(int varbit)
     {
         return runes.get(varbit);
     }
