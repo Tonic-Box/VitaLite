@@ -4,6 +4,7 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.widgets.BankAPI;
 import com.tonic.data.ItemEx;
+import com.tonic.events.BankCacheChanged;
 import com.tonic.queries.InventoryQuery;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMaps;
@@ -15,6 +16,7 @@ import net.runelite.client.eventbus.Subscribe;
 import java.nio.ByteBuffer;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -31,7 +33,15 @@ public class BankCache
      *
      * @return Map of item IDs to their quantities in the cached bank.
      */
-    public static Int2IntMap getCachedBank()
+    public static Map<Integer, Integer> getCachedBank()
+    {
+        Client client = Static.getClient();
+        if(client.getLocalPlayer() == null || client.getLocalPlayer().getName() == null)
+            return EMPTY;
+        return bankCache.getOrDefault(client.getLocalPlayer().getName(), EMPTY);
+    }
+
+    private static Int2IntMap _getCachedBank()
     {
         Client client = Static.getClient();
         if(client.getLocalPlayer() == null || client.getLocalPlayer().getName() == null)
@@ -57,7 +67,7 @@ public class BankCache
      * @return The first matching item ID, or -1 if none are found.
      */
     public static int cachedBankGetFirst(int... itemIds) {
-        Int2IntMap bank = getCachedBank();
+        Int2IntMap bank = _getCachedBank();
         for(int id : itemIds) {
             if(bank.containsKey(id)) // Direct containsKey is faster
                 return id;
@@ -72,7 +82,7 @@ public class BankCache
      * @return The count of the specified item ID in the cached bank.
      */
     public static int cachedBankCount(int itemId) {
-        var bank = getCachedBank();
+        var bank = _getCachedBank();
         return bank.getOrDefault(itemId, 0);
     }
 
@@ -110,6 +120,7 @@ public class BankCache
             if(!itemMap.equals(emptyMap))
             {
                 bankCache.put(playerName, emptyMap);
+                Static.post(BankCacheChanged.INSTANCE);
                 if(Static.getVitaConfig().shouldCacheBank())
                 {
                     String serialized = serialize(emptyMap);
@@ -128,6 +139,7 @@ public class BankCache
         String serialized = configManager.getStringOrDefault(client.getLocalPlayer().getName(), "");
         Int2IntMap map = deserialize(serialized);
         bankCache.put(client.getLocalPlayer().getName(), map);
+        Static.post(BankCacheChanged.INSTANCE);
         Logger.info("[Loaded] cached bank for " + client.getLocalPlayer().getName());
     }
 
