@@ -9,7 +9,6 @@ public class DiscordServiceMixin
     @MethodOverride("<init>")
     public DiscordServiceMixin()
     {
-        super();
         // Disable Discord integration
     }
 
