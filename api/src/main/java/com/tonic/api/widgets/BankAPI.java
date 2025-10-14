@@ -226,7 +226,6 @@ public class BankAPI
                 continue;
             }
 
-            System.out.println("We have " + count + " of " + item.getIdentifier() + " but we need " + item.getAmount() + ", depositing " + extra);
             deposit(carried.get(0).getId(), extra);
             actions++;
         }
