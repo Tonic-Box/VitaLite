@@ -1,7 +1,6 @@
 package com.tonic.plugins.bankvaluer;
 
 import com.tonic.model.ui.components.FancyCard;
-import com.tonic.util.PriceFormatter;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.PluginPanel;
@@ -85,29 +84,33 @@ public class BankValuerPanel extends PluginPanel
 		JPanel row = new JPanel(new BorderLayout(10, 0));
 		row.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		row.setBorder(new EmptyBorder(8, 10, 8, 10));
-		row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+		row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
 
 		JLabel iconLabel = new JLabel();
-		iconLabel.setToolTipText(buildToolTip(itemId, value));
 		iconLabel.setVerticalAlignment(SwingConstants.CENTER);
 		iconLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		BankValuerUtils.getItemImage(iconLabel, itemId, 1);
 		row.add(iconLabel, BorderLayout.WEST);
 
-		JPanel centerPanel = new JPanel(new BorderLayout());
+		JPanel centerPanel = new JPanel();
+		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
 		centerPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 
 		JLabel nameLabel = new JLabel(BankValuerUtils.getName(itemId));
 		nameLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
 		nameLabel.setFont(FontManager.getRunescapeFont());
-		centerPanel.add(nameLabel, BorderLayout.CENTER);
+		nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		JLabel valueLabel = new JLabel(QuantityFormatter.quantityToStackSize(value));
+		valueLabel.setForeground(getColor(value));
+		valueLabel.setFont(FontManager.getRunescapeSmallFont());
+		valueLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+		centerPanel.add(nameLabel);
+		centerPanel.add(Box.createVerticalStrut(2));
+		centerPanel.add(valueLabel);
 
 		row.add(centerPanel, BorderLayout.CENTER);
-
-		JLabel valueLabel = new JLabel(PriceFormatter.format(value));
-		valueLabel.setForeground(getColor(value));
-		valueLabel.setFont(FontManager.getRunescapeBoldFont());
-		row.add(valueLabel, BorderLayout.EAST);
 
 		return row;
 	}
@@ -130,16 +133,5 @@ public class BankValuerPanel extends PluginPanel
 		{
 			return Color.RED;
 		}
-	}
-
-	private static String buildToolTip(int id, long value)
-	{
-		final String name = BankValuerUtils.getName(id);
-		final StringBuilder sb = new StringBuilder("<html>" + name);
-
-		sb.append("<br>GE: ").append(QuantityFormatter.quantityToStackSize(value));
-
-		sb.append("</html>");
-		return sb.toString();
 	}
 }
