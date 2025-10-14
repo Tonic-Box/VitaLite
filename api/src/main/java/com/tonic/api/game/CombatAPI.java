@@ -151,7 +151,7 @@ public class CombatAPI
             return;
         }
 
-        WidgetAPI.interact(1, InterfaceID.CombatInterface.SP_ATTACKBAR, -1, -1);
+        WidgetAPI.interact(1, InterfaceID.CombatInterface.SPECIAL_ATTACK, -1, -1);
     }
 
     /**
