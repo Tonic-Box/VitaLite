@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * Replaces method implementations with complete bytecode replacement.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD,ElementType.CONSTRUCTOR})
 public @interface MethodOverride {
     /**
      * @return target method name to override
