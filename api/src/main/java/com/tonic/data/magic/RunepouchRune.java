@@ -29,7 +29,9 @@ public enum RunepouchRune
     LAVA(18, LAVARUNE),
     STEAM(19, STEAMRUNE),
     SMOKE(20, SMOKERUNE),
-    WRATH(21, WRATHRUNE);
+    WRATH(21, WRATHRUNE),
+    SUNFIRE(22, SUNFIRERUNE),
+    AETHER(23, AETHERRUNE);
 
     @Getter
     private final int id;
