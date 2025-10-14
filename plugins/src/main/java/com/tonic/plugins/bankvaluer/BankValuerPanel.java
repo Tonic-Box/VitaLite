@@ -122,7 +122,7 @@ public class BankValuerPanel extends PluginPanel
 		String valueStr = QuantityFormatter.quantityToStackSize(value);
 		if(valueStr.endsWith("K"))
 		{
-			return Color.YELLOW;
+			return Color.WHITE;
 		}
 		else if(valueStr.endsWith("M"))
 		{
@@ -130,7 +130,7 @@ public class BankValuerPanel extends PluginPanel
 		}
 		else
 		{
-			return Color.WHITE;
+			return Color.YELLOW;
 		}
 	}
 }
