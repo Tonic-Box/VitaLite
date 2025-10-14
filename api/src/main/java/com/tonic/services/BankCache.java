@@ -6,10 +6,13 @@ import com.tonic.api.widgets.BankAPI;
 import com.tonic.data.ItemEx;
 import com.tonic.events.BankCacheChanged;
 import com.tonic.queries.InventoryQuery;
+import com.tonic.util.ThreadPool;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMaps;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
+import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.client.eventbus.Subscribe;
@@ -127,6 +130,14 @@ public class BankCache
                     configManager.setProperty(playerName, serialized);
                 }
             }
+        }
+    }
+
+    @Subscribe
+    public void onGameStateChanged(GameStateChanged event)
+    {
+        if (event.getGameState() == GameState.LOGIN_SCREEN) {
+            Static.post(BankCacheChanged.INSTANCE);
         }
     }
 

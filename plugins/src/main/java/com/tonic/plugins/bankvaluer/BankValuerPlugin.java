@@ -52,7 +52,7 @@ public class BankValuerPlugin extends Plugin
     public void onGameStateChanged(GameStateChanged event)
     {
         if (event.getGameState() == GameState.LOGIN_SCREEN) {
-            panel.refresh();
+            ThreadPool.submit(panel::refresh);
         }
     }
 
