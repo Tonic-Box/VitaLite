@@ -18,7 +18,7 @@ public class OSGlobalMixin
     private static final PathsGetReplacer pathsGetReplacer = new PathsGetReplacer();
     private static final ModifyResourceLoading modifyResourceLoading = new ModifyResourceLoading();
     private static final ReplaceMethodByString replaceMethodByString = new ReplaceMethodByString("Attempted to load patches of already loading midiplayer!");
-    private static final RuntimeMaxMemoryReplacer memoryReplacer = new RuntimeMaxMemoryReplacer(778502144L);
+    private static final RuntimeMaxMemoryReplacer memoryReplacer = new RuntimeMaxMemoryReplacer(805_306_368L);
     private static final SystemPropertyReplacer propertyReplacer = new SystemPropertyReplacer();
     private static final IntegerLiteralReplacer integerReplacer = new IntegerLiteralReplacer(-1094877034);
 
