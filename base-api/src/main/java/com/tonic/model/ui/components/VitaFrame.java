@@ -18,9 +18,14 @@ public class VitaFrame extends JFrame {
 
     private JPanel titleBar;
     private JLabel titleLabel;
+    private JLabel iconLabel;  // Added for icon support
     private JButton minimizeBtn, maximizeBtn, closeBtn;
     @Getter
     private JPanel contentPanel;
+
+    // Menu bar support
+    private JMenuBar menuBar;
+    private JPanel mainContainer;
 
     // For window dragging
     private Point mouseDownPoint;
@@ -74,11 +79,17 @@ public class VitaFrame extends JFrame {
         titleBar.setPreferredSize(new Dimension(getWidth(), 32));
         titleBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER_COLOR));
 
-        // Title label with icon
-        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        // Title panel with icon support
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
         titlePanel.setOpaque(false);
 
-        // You can add an icon here
+        // Icon label (initially empty)
+        iconLabel = new JLabel();
+        iconLabel.setPreferredSize(new Dimension(20, 20)); // Reserve space
+        iconLabel.setVisible(false); // Initially hidden
+        titlePanel.add(iconLabel);
+
+        // Title label
         titleLabel = new JLabel(title);
         titleLabel.setForeground(TEXT_COLOR);
         titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -145,22 +156,66 @@ public class VitaFrame extends JFrame {
         titleBar.addMouseListener(dragListener);
         titleBar.addMouseMotionListener(dragListener);
 
+        // Create main container for menu bar and content
+        mainContainer = new JPanel(new BorderLayout());
+        mainContainer.setBackground(CONTENT_COLOR);
+
         // Content panel with padding
         contentPanel = new JPanel();
         contentPanel.setBackground(CONTENT_COLOR);
         contentPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         contentPanel.setLayout(new BorderLayout());
 
+        // Add content panel to main container
+        mainContainer.add(contentPanel, BorderLayout.CENTER);
+
         // Add border to the frame
         getRootPane().setBorder(new LineBorder(BORDER_COLOR, 1));
 
         // Add components to frame - IMPORTANT: use getContentPane()
         getContentPane().add(titleBar, BorderLayout.NORTH);
-        getContentPane().add(contentPanel, BorderLayout.CENTER);
+        getContentPane().add(mainContainer, BorderLayout.CENTER);
 
         // Force a repaint to ensure visibility
         revalidate();
         repaint();
+    }
+
+    /**
+     * Override setJMenuBar to place menu bar correctly under title bar
+     */
+    @Override
+    public void setJMenuBar(JMenuBar menubar) {
+        if (this.menuBar != null) {
+            mainContainer.remove(this.menuBar);
+        }
+        this.menuBar = menubar;
+        if (menubar != null) {
+            // Style the menu bar to match dark theme
+            menubar.setBackground(new Color(35, 37, 41));
+            menubar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER_COLOR));
+
+            // Style menu items if needed
+            for (int i = 0; i < menubar.getMenuCount(); i++) {
+                JMenu menu = menubar.getMenu(i);
+                if (menu != null) {
+                    menu.setForeground(TEXT_COLOR);
+                }
+            }
+
+            // Add menu bar to main container, not to frame
+            mainContainer.add(menubar, BorderLayout.NORTH);
+        }
+        revalidate();
+        repaint();
+    }
+
+    /**
+     * Override getJMenuBar to return our custom menu bar
+     */
+    @Override
+    public JMenuBar getJMenuBar() {
+        return menuBar;
     }
 
     private JButton createControlButton(String text) {
@@ -312,6 +367,35 @@ public class VitaFrame extends JFrame {
         super.setTitle(title);
         if (titleLabel != null) {
             titleLabel.setText(title);
+        }
+    }
+
+    /**
+     * Override setIconImage to display icon in title bar
+     */
+    @Override
+    public void setIconImage(Image image) {
+        super.setIconImage(image);
+        if (iconLabel != null && image != null) {
+            // Scale the image to fit the title bar height (20x20 pixels)
+            Image scaledImage = image.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+            iconLabel.setIcon(new ImageIcon(scaledImage));
+            iconLabel.setVisible(true);
+        } else if (iconLabel != null) {
+            iconLabel.setIcon(null);
+            iconLabel.setVisible(false);
+        }
+    }
+
+    /**
+     * Override setIconImages for multiple icon support
+     */
+    @Override
+    public void setIconImages(java.util.List<? extends Image> icons) {
+        super.setIconImages(icons);
+        if (icons != null && !icons.isEmpty()) {
+            // Use the first icon for the title bar
+            setIconImage(icons.get(0));
         }
     }
 
