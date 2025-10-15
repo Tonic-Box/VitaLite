@@ -2,6 +2,7 @@ package com.tonic.mixins;
 
 import com.tonic.Static;
 import com.tonic.api.TGameEngine;
+import com.tonic.data.LoginMessage;
 import com.tonic.data.LoginResponse;
 import com.tonic.injector.annotations.*;
 import org.slf4j.Logger;
@@ -49,5 +50,11 @@ public class TGameEngineMixin implements TGameEngine
     public static void onGetLoginError(int code)
     {
         Static.post(LoginResponse.fromIndex(code));
+    }
+
+    @MethodHook("setLoginResponse")
+    public static void onSetLoginResponse(String line1, String line2, String line3)
+    {
+        Static.post(new LoginMessage(line1, line2, line3));
     }
 }
