@@ -1,6 +1,7 @@
 package com.tonic.api.widgets;
 
 import com.tonic.Static;
+import com.tonic.api.game.VarAPI;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
@@ -150,6 +151,7 @@ public enum PrayerAPI {
     private final int interfaceId;
     private final int level;
     private final int quickPrayerIndex;
+    private static final int KNIGHTWAVES_COMPLETED = 8;
 
     PrayerAPI(int varbit, double drainRate, int interfaceId, int level, int quickPrayerIndex)
     {
@@ -449,10 +451,34 @@ public enum PrayerAPI {
             }
 
             int finalPlayerPrayerLevel = playerPrayerLevel;
-            return Arrays.stream(prayerMap)
+
+            PrayerAPI highestPrayer = Arrays.stream(prayerMap)
                     .filter(prayer -> prayer.getLevel() <= finalPlayerPrayerLevel)
                     .reduce((a, b) -> b)
                     .orElse(null);
+
+            if(highestPrayer != null){
+                switch (highestPrayer){
+                    case CHIVALRY:
+                    case PIETY:
+                        if(VarAPI.getVar(VarbitID.KR_KNIGHTWAVES_STATE) != KNIGHTWAVES_COMPLETED){
+                            highestPrayer = SUPERHUMAN_STRENGTH;
+                        }
+                        break;
+                    case RIGOUR:
+                        if(VarAPI.getVar(VarbitID.PRAYER_RIGOUR_UNLOCKED) != 1){
+                            highestPrayer = EAGLE_EYE;
+                        }
+                        break;
+                    case AUGURY:
+                        if(VarAPI.getVar(VarbitID.PRAYER_AUGURY_UNLOCKED) != 1){
+                            highestPrayer = MYSTIC_MIGHT;
+                        }
+                        break;
+                }
+            }
+
+            return highestPrayer;
         }
 
         private final PrayerAPI[] prayerMap;
