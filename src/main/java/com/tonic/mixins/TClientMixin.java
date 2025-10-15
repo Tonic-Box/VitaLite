@@ -54,11 +54,4 @@ public abstract class TClientMixin implements TClient
     public static boolean onIdleCycleSet(int value) {
         return false;
     }
-
-    @FieldHook("client")
-    public static boolean onClientSet(TClient client)
-    {
-        Static.set(client, "RL_CLIENT");
-        return true;
-    }
 }

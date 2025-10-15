@@ -30,6 +30,11 @@ public class Install {
         }
     }
 
+    public static void install() {
+        Guice injector = Static.getRuneLite().getInjector();
+        Static.set(injector.getBinding("net.runelite.api.Client"), "RL_CLIENT");
+    }
+
     private Path loadBuildIns() {
         File tempJar = getBuiltIns();
         if (tempJar == null) {

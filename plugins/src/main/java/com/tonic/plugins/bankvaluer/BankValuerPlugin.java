@@ -42,6 +42,7 @@ public class BankValuerPlugin extends Plugin
                 .build();
 
         clientToolbar.addNavigation(navButton);
+        ThreadPool.submit(panel::refresh);
     }
 
     @Override

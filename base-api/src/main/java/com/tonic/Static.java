@@ -66,13 +66,19 @@ public class Static
         switch (name)
         {
             case "RL_CLIENT":
-                CLIENT_OBJECT = Objects.requireNonNull(object, "RL_CLIENT cannot be null");
+                if(CLIENT_OBJECT != null)
+                    return;
+                CLIENT_OBJECT = object;
                 break;
             case "RL":
-                RL = (RuneLite) Objects.requireNonNull(object, "RL cannot be null");
+                if(RL != null)
+                    return;
+                RL = (RuneLite) object;
                 break;
             case "CLASSLOADER":
-                classLoader = (ClassLoader) Objects.requireNonNull(object, "CLASSLOADER cannot be null");
+                if(classLoader != null)
+                    return;
+                classLoader = (ClassLoader) object;
                 break;
             default:
                 throw new IllegalArgumentException("Unknown class name: " + name);
