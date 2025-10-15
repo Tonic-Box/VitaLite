@@ -66,7 +66,6 @@ public class JdkVersionUtil {
             return null;
         }
 
-        System.out.println("Detected platform: " + platform);
         return extractJavaVersion(platform);
     }
 
