@@ -1,6 +1,7 @@
 package com.tonic.classloader;
 
 import com.tonic.VitaLite;
+import com.tonic.injector.util.SignerMapper;
 import com.tonic.runelite.Install;
 import com.tonic.vitalite.Main;
 import com.tonic.model.Libs;
@@ -16,6 +17,8 @@ import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
 import java.util.HashMap;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class RLClassLoader extends URLClassLoader {
     private final HashMap<String, byte[]> resources = new HashMap<>();
@@ -86,6 +89,17 @@ public class RLClassLoader extends URLClassLoader {
                 return loadedClass;
             }
 
+            if (SignerMapper.shouldIgnore(name)) {
+                Class<?> clazz = loadClassFromSignedJar(name);
+                Object[] signers = clazz.getSigners();
+                if(signers == null || signers.length == 0)
+                {
+                    throw new Exception("Signers couldnt be loaded for class '" + name + "'");
+                }
+                System.out.println("Loaded signed class: " + name + " with " + clazz.getSigners().length + " signers.");
+                return clazz;
+            }
+
             byte[] bytes;
             if (ProxyClassProvider.PROXY_CLASSES.containsKey(name)) {
                 bytes = ProxyClassProvider.PROXY_CLASSES.get(name);
@@ -108,6 +122,43 @@ public class RLClassLoader extends URLClassLoader {
         } catch (Exception ignored) {
         }
         return super.loadClass(name);
+    }
+
+    private Class<?> loadClassFromSignedJar(String className) throws ClassNotFoundException {
+        try {
+            URL jarUrl = Main.LIBS.getUrls().get(className);
+            if (jarUrl == null) {
+                throw new ClassNotFoundException(className);
+            }
+
+            File jarFile = new File(jarUrl.toURI());
+            try (JarFile jar = new JarFile(jarFile, true)) {  // true = verify signatures
+                String entryName = className.replace('.', '/') + ".class";
+                JarEntry entry = jar.getJarEntry(entryName);
+
+                if (entry == null) {
+                    throw new ClassNotFoundException(className);
+                }
+
+                // Read and verify signature
+                byte[] classBytes;
+                try (InputStream is = jar.getInputStream(entry)) {
+                    classBytes = is.readAllBytes();
+                }
+
+                // Get certificates AFTER reading (triggers verification)
+                Certificate[] certs = entry.getCertificates();
+
+                // Create ProtectionDomain with original JAR location and certificates
+                CodeSource cs = new CodeSource(jarUrl, certs);
+                ProtectionDomain pd = new ProtectionDomain(cs, null, this, null);
+
+                // Define class with proper ProtectionDomain
+                return defineClass(className, classBytes, 0, classBytes.length, pd);
+            }
+        } catch (Exception e) {
+            throw new ClassNotFoundException(className, e);
+        }
     }
 
     private Class<?> loadArtifactClass(String name, byte[] bytes) {
