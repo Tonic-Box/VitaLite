@@ -72,7 +72,7 @@ public class WorldQuery extends AbstractQuery<World, WorldQuery>
      */
     public WorldQuery withOutActivity(String activity)
     {
-        return removeIf(world -> TextUtil.sanitize(world.getActivity().toLowerCase()).contains(activity.toLowerCase()));
+        return removeIf(w -> w.getActivity() == null || TextUtil.sanitize(w.getActivity().toLowerCase()).contains(activity.toLowerCase()));
     }
 
     /**
@@ -84,6 +84,17 @@ public class WorldQuery extends AbstractQuery<World, WorldQuery>
     public WorldQuery withTypes(WorldType... types)
     {
         return keepIf(w -> w.getTypes() != null && w.getTypes().stream().anyMatch(t -> ArrayUtils.contains(types, t)));
+    }
+
+    /**
+     * Filters the worlds to exclude those with the specified types.
+     *
+     * @param types The types to exclude.
+     * @return WorldQuery
+     */
+    public WorldQuery withOutTypes(WorldType... types)
+    {
+        return removeIf(w -> w.getTypes() == null || w.getTypes().stream().anyMatch(t -> ArrayUtils.contains(types, t)));
     }
 
     /**
@@ -161,13 +172,28 @@ public class WorldQuery extends AbstractQuery<World, WorldQuery>
     }
 
     /**
-     * Filters the worlds to include only those with the specified skill total activity.
+     * Filters the worlds to include only those with the skill total activity and a minimum level requirement less than or equal to the specified total.
      *
      * @return WorldQuery
      */
     public WorldQuery skillTotalWorlds(int total)
     {
-        return withActivity(total + " skill total");
+        return keepIf(w ->
+        {
+            if (!w.getTypes().contains(WorldType.SKILL_TOTAL) || w.getActivity() == null)
+            {
+                return false;
+            }
+            int minLevel = 0;
+            try
+            {
+                minLevel = Integer.parseInt(w.getActivity().replaceAll("[^0-9.]", ""));
+            }
+            catch (NumberFormatException ignored)
+            {
+            }
+            return minLevel <= total;
+        });
     }
 
     /**
@@ -177,7 +203,7 @@ public class WorldQuery extends AbstractQuery<World, WorldQuery>
      */
     public WorldQuery notSkillTotalWorlds()
     {
-        return withOutActivity("skill total");
+        return withOutTypes(WorldType.SKILL_TOTAL);
     }
 
     /**
@@ -187,7 +213,7 @@ public class WorldQuery extends AbstractQuery<World, WorldQuery>
      */
     public WorldQuery notPvp()
     {
-        return withOutActivity("PvP World");
+        return withOutTypes(WorldType.PVP);
     }
 
     /**
@@ -197,6 +223,17 @@ public class WorldQuery extends AbstractQuery<World, WorldQuery>
      */
     public WorldQuery isMainGame()
     {
-        return withOutActivity("skill total").withOutActivity("Fresh").withOutActivity("Deadman").withOutActivity("PvP").withOutActivity("Beta").withOutActivity("Leagues");
+        return withOutTypes(
+                WorldType.PVP_ARENA,
+                WorldType.QUEST_SPEEDRUNNING,
+                WorldType.BETA_WORLD,
+                WorldType.LEGACY_ONLY,
+                WorldType.EOC_ONLY,
+                WorldType.NOSAVE_MODE,
+                WorldType.TOURNAMENT,
+                WorldType.FRESH_START_WORLD,
+                WorldType.DEADMAN,
+                WorldType.SEASONAL
+        );
     }
 }
