@@ -61,7 +61,6 @@ public class Main {
             LauncherCom.sendReadySignal(Integer.parseInt(optionsParser.getPort()), "Done");
         }
         CLASSLOADER.launch(args);
-        Install.install();
         Logger.norm("VitaLite started. - Did you know... " + CatFacts.get(-1));
     }
 

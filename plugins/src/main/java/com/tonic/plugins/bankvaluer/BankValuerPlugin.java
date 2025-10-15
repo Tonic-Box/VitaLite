@@ -53,14 +53,9 @@ public class BankValuerPlugin extends Plugin
     @Subscribe
     public void onGameStateChanged(GameStateChanged event)
     {
-        if (event.getGameState() == GameState.LOGIN_SCREEN) {
-            ThreadPool.submit(() -> {
-                while(Static.getClient() == null)
-                {
-                    Delays.wait(100);
-                }
-                panel.refresh();
-            });
+        if (event.getGameState() == GameState.LOGIN_SCREEN)
+        {
+            ThreadPool.submit(panel::refresh);
         }
     }
 

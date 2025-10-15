@@ -1,6 +1,7 @@
 package com.tonic.mixins;
 
 import com.tonic.Logger;
+import com.tonic.Static;
 import com.tonic.api.*;
 import com.tonic.injector.annotations.*;
 import com.tonic.injector.util.ExceptionUtil;
@@ -52,5 +53,12 @@ public abstract class TClientMixin implements TClient
     @FieldHook("MouseHandler_idleCycles")
     public static boolean onIdleCycleSet(int value) {
         return false;
+    }
+
+    @FieldHook("client")
+    public static boolean onClientSet(TClient client)
+    {
+        Static.set(client, "RL_CLIENT");
+        return true;
     }
 }
