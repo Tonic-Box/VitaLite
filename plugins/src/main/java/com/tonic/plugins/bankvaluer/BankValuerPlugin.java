@@ -1,5 +1,7 @@
 package com.tonic.plugins.bankvaluer;
 
+import com.tonic.Static;
+import com.tonic.api.threaded.Delays;
 import com.tonic.events.BankCacheChanged;
 import com.tonic.util.ThreadPool;
 import net.runelite.api.GameState;
@@ -52,7 +54,13 @@ public class BankValuerPlugin extends Plugin
     public void onGameStateChanged(GameStateChanged event)
     {
         if (event.getGameState() == GameState.LOGIN_SCREEN) {
-            ThreadPool.submit(panel::refresh);
+            ThreadPool.submit(() -> {
+                while(Static.getClient() == null)
+                {
+                    Delays.wait(100);
+                }
+                panel.refresh();
+            });
         }
     }
 
