@@ -36,7 +36,7 @@ public enum RunePouch {
             if(pRune == 0) continue;
 
             // the pRune is not the itemId
-            int runeItemId = RunepouchRune.getRune(pRune).getItemId();
+            int runeItemId = RunePouchRune.getRune(pRune).getItemId();
 
             // TODO: support combination runes
             if(runeItemId != rune.getRuneId()) continue;
