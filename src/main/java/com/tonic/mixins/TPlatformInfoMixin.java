@@ -30,7 +30,7 @@ public class TPlatformInfoMixin
         fieldNames.put(index++, "maxMemory");
         fieldNames.put(index++, "cpuCores");
         fieldNames.put(index++, "systemMemory");
-        fieldNames.put(index++, "clockSpeed");
+        fieldNames.put(index++, "signers");
 
         fieldNames.put(index++, "Unknown_3");
         fieldNames.put(index++, "Unknown_4");
