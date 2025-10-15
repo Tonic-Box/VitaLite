@@ -24,10 +24,12 @@ public class WidgetAPI
      * @param widget widget
      * @param actions action list
      */
-    public static void interact(Widget widget, String... actions) {
+    public static void interact(Widget widget, String... actions)
+    {
         if (widget == null || widget.getActions() == null)
             return;
-        for (String action : actions) {
+        for (String action : actions)
+        {
             for(int i = 0; i < widget.getActions().length; i++)
             {
                 String option = widget.getActions()[i];
@@ -45,7 +47,8 @@ public class WidgetAPI
      * @param widget widget
      * @param action action index
      */
-    public static void interact(Widget widget, int action) {
+    public static void interact(Widget widget, int action)
+    {
         if (widget == null)
             return;
         WidgetAPI.interact(action, widget.getId(), widget.getIndex(), widget.getItemId());
@@ -98,40 +101,47 @@ public class WidgetAPI
         String[] actions = composition.getInventoryActions();
         String[][] subOps = composition.getSubops();
 
-        if (subOps == null) {
+        if (subOps == null)
+        {
             return;
         }
 
         int menuIndex = -1;
         int actionIndex = -1;
 
-        for (int i = 0; i < actions.length; i++) {
+        for (int i = 0; i < actions.length; i++)
+        {
             String a = actions[i];
 
-            if (a != null && a.equalsIgnoreCase(menu)) {
+            if (a != null && a.equalsIgnoreCase(menu))
+            {
                 menuIndex = i + 1;
                 break;
             }
         }
 
-        for (String[] subOp : subOps) {
+        for (String[] subOp : subOps)
+        {
             if (actionIndex != -1)
                 break;
 
             if (subOp == null)
                 continue;
 
-            for (int i = 0; i < subOp.length; i++) {
+            for (int i = 0; i < subOp.length; i++)
+            {
                 String op = subOp[i];
 
-                if (op != null && op.equalsIgnoreCase(action)) {
+                if (op != null && op.equalsIgnoreCase(action))
+                {
                     actionIndex = i;
                     break;
                 }
             }
         }
 
-        if (menuIndex == -1 || actionIndex == -1) {
+        if (menuIndex == -1 || actionIndex == -1)
+        {
             return;
         }
 
@@ -366,7 +376,8 @@ public class WidgetAPI
      * @param source source widget
      * @param dest destination widget
      */
-    public static void onWidget(Widget source, Widget dest) {
+    public static void onWidget(Widget source, Widget dest)
+    {
         onWidget(source.getId(), source.getItemId(), source.getIndex(), dest.getId(), dest.getItemId(), dest.getIndex());
     }
 
