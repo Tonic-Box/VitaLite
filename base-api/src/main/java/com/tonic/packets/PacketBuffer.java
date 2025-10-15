@@ -75,6 +75,54 @@ public class PacketBuffer {
         this.writeBytes(var7, 0, var7.length);
     }
 
+    public void decryptRsa(int encryptedLength, BigInteger privateExponent, BigInteger modulus) {
+        if (encryptedLength <= 0) {
+            throw new IllegalArgumentException("Invalid RSA encrypted length: " + encryptedLength);
+        }
+
+        // Read encrypted bytes
+        byte[] encryptedBytes = new byte[encryptedLength];
+        this.readBytes(encryptedBytes, 0, encryptedLength);
+
+        // Convert to BigInteger with positive sign
+        BigInteger encrypted = new BigInteger(1, encryptedBytes);
+
+        // Decrypt
+        BigInteger decrypted = encrypted.modPow(privateExponent, modulus);
+
+        // Get decrypted bytes
+        byte[] decryptedBytes = decrypted.toByteArray();
+
+        // Reset buffer and write decrypted data
+        this.offset = 0;
+        this.writeBytes(decryptedBytes, 0, decryptedBytes.length);
+        this.offset = 0; // Reset for reading
+    }
+
+    public void xteaDecrypt(int[] var1, int var2, int var3) {
+        int var4 = this.offset;
+        this.offset = var2;
+        int var5 = (var3 - var2) / 8;
+
+        for (int var6 = 0; var6 < var5; ++var6) {
+            int var7 = this.readInt();
+            int var8 = this.readInt();
+            int var9 = -957401312;
+            int var10 = -1640531527;
+
+            for (int var11 = 32; var11-- > 0; var7 -= var8 + (var8 << 4 ^ var8 >>> 5) ^ var9 + var1[var9 & 3]) {
+                var8 -= var7 + (var7 << 4 ^ var7 >>> 5) ^ var1[var9 >>> 11 & 3] + var9;
+                var9 -= var10;
+            }
+
+            this.offset -= 8;
+            this.writeInt(var7);
+            this.writeInt(var8);
+        }
+
+        this.offset = var4;
+    }
+
     public void readBytes(byte[] var1, int var2, int var3) {
         for(int var4 = var2; var4 < var3 + var2; ++var4) {
             var1[var4] = payload.getByte(offset++);
@@ -313,9 +361,23 @@ public class PacketBuffer {
 
     public String readStringCp1252NullTerminated() {
         int start = offset;
+
+        // Find the null terminator
         while(payload.getByte(offset++) != 0);
-        int end = offset - start - 1;
-        return end == 0 ? "" : TextUtil.decodeStringCp1252(payload.array(), start, end);
+
+        int length = offset - start - 1;
+
+        if (length == 0) {
+            return "";
+        }
+
+        // Read the bytes properly from ByteBuf
+        byte[] stringBytes = new byte[length];
+        for (int i = 0; i < length; i++) {
+            stringBytes[i] = payload.getByte(start + i);
+        }
+
+        return TextUtil.decodeStringCp1252(stringBytes, 0, length);
     }
 
     public String readStringCp1252NullCircumfixed() {

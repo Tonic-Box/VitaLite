@@ -4,19 +4,14 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.events.PacketReceived;
 import com.tonic.events.PacketSent;
-import com.tonic.model.DeviceID;
-import com.tonic.model.RandomDat;
 import com.tonic.model.ui.components.*;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
-import com.tonic.services.ConfigManager;
 import com.tonic.util.ReflectBuilder;
 import com.tonic.util.ReflectUtil;
 import com.tonic.util.ThreadPool;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.Map;
 
 public class VitaLiteOptionsPanel extends VPluginPanel {
 
@@ -218,7 +213,8 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
         FancyButton checkButton = new FancyButton("Check Platform Info");
         checkButton.addActionListener(e -> {
-            checkShit();
+            //checkShit();
+            PlatformInfoViewer.toggle();
             Logger.info("Platform info checked and logged.");
         });
         contentPanel.add(checkButton);

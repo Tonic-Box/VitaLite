@@ -5,12 +5,14 @@ import com.tonic.api.*;
 import com.tonic.events.PacketSent;
 import com.tonic.injector.annotations.*;
 import com.tonic.model.ui.VitaLiteOptionsPanel;
+import com.tonic.packets.PacketBuffer;
 import com.tonic.packets.PacketMapReader;
 import com.tonic.packets.types.MapEntry;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.WidgetInfo;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +20,10 @@ import java.util.Map;
 @Mixin("PacketWriter")
 public abstract class TPacketWriterMixin implements TPacketWriter
 {
+    @Inject
+    private static final BigInteger key = new BigInteger("10001", 16);
+    @Inject
+    private static final BigInteger modulus = new BigInteger("c1c5120b1d2da47766923df0b8a585f6d9b640dd7b0154d77bd3e05e8ae3643378809c4a4e8a7f7b59e74977063cfce80bcfe1c729fdfdfff4696155e9d6ba70510e5f9832a80b1f3c39d7efa909d0ffdd46af7683f2a96dc7a479ed52d416102dd327fa03cab6623095946204f5caed41d94d1e4a0195a04b20b239f59e7335", 16);
     @Shadow("isaacCipher")
     public TIsaacCipher isaacCipher;
 
@@ -58,8 +64,10 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     @Inject
     public static void addNodeHook(TPacketBufferNode node)
     {
-        if(node == null ||  node.getClientPacket() == null)
+        if(node == null || node.getClientPacket() == null)
+        {
             return;
+        }
 
         TPacketBuffer buffer = node.getPacketBuffer();
         TClientPacket packet = node.getClientPacket();

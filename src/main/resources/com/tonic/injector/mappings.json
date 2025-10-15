@@ -75879,10 +75879,12 @@
     ],
     "methods": [
       {
+        "name": "write",
         "obfuscatedName": "ab",
         "owner": "PlatformInfo",
         "ownerObfuscatedName": "ud",
         "descriptor": "(Lwj;I)V",
+        "garbageValue": -2147483648,
         "isStatic": false
       },
       {
