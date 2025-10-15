@@ -1,5 +1,6 @@
 package com.tonic.injector.util.expreditor.impls;
 
+import com.tonic.bootstrap.JdkVersionUtil;
 import com.tonic.injector.util.expreditor.ExprEditor;
 import com.tonic.injector.util.expreditor.MethodCall;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -18,7 +19,7 @@ public class SystemPropertyReplacer extends ExprEditor {
             if ("java.vendor".equals(propertyKey)) {
                 replaceWithHardcodedValue(call, "Eclipse Adoptium");
             } else if ("java.version".equals(propertyKey)) {
-                replaceWithHardcodedValue(call, "11.0.22");
+                replaceWithHardcodedValue(call, JdkVersionUtil.calculateJreVersion());
             }
         }
     }
@@ -77,15 +78,5 @@ public class SystemPropertyReplacer extends ExprEditor {
         }
         
         return null;
-    }
-    
-    private String getPropertyKeyFromLdc(AbstractInsnNode ldcInsn) {
-        if (ldcInsn instanceof LdcInsnNode) {
-            LdcInsnNode ldc = (LdcInsnNode) ldcInsn;
-            if (ldc.cst instanceof String) {
-                return (String) ldc.cst;
-            }
-        }
-        return "unknown";
     }
 }
