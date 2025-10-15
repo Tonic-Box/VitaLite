@@ -14,6 +14,10 @@ public class MultiPluginClassLoader extends ClassLoader {
         this.parent = parent;
 
         for (var jar : plugins) {
+            preLoad(jar);
+        }
+
+        for (var jar : plugins) {
             load(jar);
         }
     }
@@ -41,14 +45,21 @@ public class MultiPluginClassLoader extends ClassLoader {
     }
 
     public void reload(File jar) {
+        preLoad(jar);
         load(jar);
     }
 
     private void load(File jar) {
+        var loader = pluginLoaders.get(jar.getAbsolutePath());
+        try {
+            pluginClasses.put(jar.getAbsolutePath(), loader.getPluginClasses());
+        } catch (Exception ignored) {}
+    }
+
+    private void preLoad(File jar) {
         try {
             var loader = new PluginClassLoader(jar, this);
             pluginLoaders.put(jar.getAbsolutePath(), loader);
-            pluginClasses.put(jar.getAbsolutePath(), loader.getPluginClasses());
         }
         catch (Exception ex) {
             ex.printStackTrace();

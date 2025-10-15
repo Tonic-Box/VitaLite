@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.List;
+import java.util.Objects;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -20,7 +21,8 @@ public class PluginClassLoader extends URLClassLoader {
 
     public PluginClassLoader(File plugin, ClassLoader parent) throws MalformedURLException
     {
-        super(new URL[]{plugin.toURI().toURL()}, null);
+        // Officially setting parent is important for JVM parent chain validation
+        super(new URL[]{plugin.toURI().toURL()}, parent);
         try
         {
             jarFile = new JarFile(plugin, true, ZipFile.OPEN_READ, JarFile.runtimeVersion());
@@ -32,20 +34,43 @@ public class PluginClassLoader extends URLClassLoader {
         this.parent = parent;
     }
 
-    public List<Class<?>> getPluginClasses() throws IOException {
-        return getClasses().stream()
-            .filter(this::inheritsPluginClass)
-            .collect(Collectors.toList());
+    /**
+     * Gets all plugin classes inside the jar, without parent delegation
+     * @return
+     */
+    public List<Class<?>> getPluginClasses() {
+        try {
+            return getClasses().stream()
+                    .filter(this::inheritsPluginClass)
+                    .collect(Collectors.toList());
+        }
+        catch (Exception ignored) {
+            return null;
+        }
     }
 
-    public List<Class<?>> getClasses() throws IOException {
-        return ClassPath.from(this)
-                .getAllClasses()
-                .stream()
-                .filter(info -> !info.getName().equals("module-info"))
-                .filter(info -> !info.getName().startsWith("META-INF"))
-                .map(ClassPath.ClassInfo::load)
+    /**
+     * Gets all classes inside the jar, without parent delegation
+     * @return
+     * @throws IOException
+     */
+    private List<Class<?>> getClasses() throws IOException {
+        return jarFile.stream()
+                .filter(e -> e.getName().endsWith(".class"))
+                .map(e -> e.getName().replace('/', '.').replace(".class", ""))
+                .map(this::safeLoad)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Attempts to load a class without parent delegation, returning null on failure.
+     * @param name
+     * @return
+     */
+    private Class<?> safeLoad(String name) {
+        try { return loadClass(name, false); }
+        catch (Throwable t) { return null; }
     }
 
     public boolean inheritsPluginClass(Class<?> clazz) {
