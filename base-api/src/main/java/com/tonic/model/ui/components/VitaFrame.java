@@ -376,15 +376,7 @@ public class VitaFrame extends JFrame {
     @Override
     public void setIconImage(Image image) {
         super.setIconImage(image);
-        if (iconLabel != null && image != null) {
-            // Scale the image to fit the title bar height (20x20 pixels)
-            Image scaledImage = image.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
-            iconLabel.setIcon(new ImageIcon(scaledImage));
-            iconLabel.setVisible(true);
-        } else if (iconLabel != null) {
-            iconLabel.setIcon(null);
-            iconLabel.setVisible(false);
-        }
+        updateTitleBarIcon(image);
     }
 
     /**
@@ -393,9 +385,26 @@ public class VitaFrame extends JFrame {
     @Override
     public void setIconImages(java.util.List<? extends Image> icons) {
         super.setIconImages(icons);
+        // Update title bar icon with the first image
         if (icons != null && !icons.isEmpty()) {
-            // Use the first icon for the title bar
-            setIconImage(icons.get(0));
+            updateTitleBarIcon(icons.get(0));
+        } else {
+            updateTitleBarIcon(null);
+        }
+    }
+
+    /**
+     * Helper method to update the title bar icon without causing recursion
+     */
+    private void updateTitleBarIcon(Image image) {
+        if (iconLabel != null && image != null) {
+            // Scale the image to fit the title bar height (20x20 pixels)
+            Image scaledImage = image.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+            iconLabel.setIcon(new ImageIcon(scaledImage));
+            iconLabel.setVisible(true);
+        } else if (iconLabel != null) {
+            iconLabel.setIcon(null);
+            iconLabel.setVisible(false);
         }
     }
 
