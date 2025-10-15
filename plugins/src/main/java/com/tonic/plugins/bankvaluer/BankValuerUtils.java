@@ -38,6 +38,8 @@ public class BankValuerUtils
      */
     public static Map<Integer,Long> getTopTenItems()
     {
+        if(Static.getClient() == null)
+            return new HashMap<>();
         return Static.invoke(() -> {
             Map<Integer,Long> topTen = new HashMap<>();
             Map<Integer,Integer> cache = BankCache.getCachedBank();
