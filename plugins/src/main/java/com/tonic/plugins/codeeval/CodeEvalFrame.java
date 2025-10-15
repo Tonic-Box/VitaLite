@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 import com.tonic.Static;
+import com.tonic.model.ui.components.VitaFrame;
 import com.tonic.services.GameManager;
 import com.tonic.util.ThreadPool;
 import net.runelite.client.ui.ClientToolbar;
@@ -24,7 +25,7 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.autocomplete.*;
 
-public class CodeEvalFrame extends JFrame {
+public class CodeEvalFrame extends VitaFrame {
     private static CodeEvalFrame INSTANCE;
     private SimpleCodeEvaluator evaluator;
     private final RSyntaxTextArea codeArea;
@@ -78,10 +79,11 @@ public class CodeEvalFrame extends JFrame {
 
     public CodeEvalFrame() {
         super("VitaLite Code Evaluator");
+        JPanel contentPanel = getContentPanel();
         this.evaluator = new SimpleCodeEvaluator(GameManager.class.getClassLoader());
 
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        setLayout(new BorderLayout());
+        contentPanel.setLayout(new BorderLayout());
 
         final BufferedImage iconImage = ImageUtil.loadImageResource(CodeEvalFrame.class, "jshell.png");
         setIconImage(iconImage);
@@ -188,7 +190,7 @@ public class CodeEvalFrame extends JFrame {
         splitPane.setBottomComponent(outputPanel);
         splitPane.setDividerLocation(500);
 
-        add(splitPane, BorderLayout.CENTER);
+        contentPanel.add(splitPane, BorderLayout.CENTER);
 
         setAlwaysOnTop(true);
 

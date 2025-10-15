@@ -1,6 +1,7 @@
 package com.tonic.model.ui;
 
 import com.tonic.model.PlatformInfoData;
+import com.tonic.model.ui.components.VitaFrame;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -9,25 +10,28 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.Map;
 
-public class PlatformInfoViewer extends JFrame {
+public class PlatformInfoViewer extends VitaFrame {
 
     private static PlatformInfoViewer instance;
     private DefaultTableModel tableModel;
     private JTable table;
+    private JLabel statusLabel;
 
     private PlatformInfoViewer() {
-        setTitle("Platform Information Viewer");
+        super("Platform Information Viewer");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         setLocationRelativeTo(null);
-
-        // Set dark background for the frame
-        getContentPane().setBackground(new Color(35, 45, 60));
 
         initComponents();
     }
 
     private void initComponents() {
+        // IMPORTANT: Get the content panel from VitaFrame
+        JPanel contentPanel = getContentPanel();
+        contentPanel.setLayout(new BorderLayout());
+        contentPanel.setBackground(new Color(35, 45, 60));
+
         // Create table model with non-editable cells
         tableModel = new DefaultTableModel(new Object[]{"Field Name", "Value"}, 0) {
             @Override
@@ -66,12 +70,8 @@ public class PlatformInfoViewer extends JFrame {
         scrollPane.getViewport().setBackground(new Color(45, 55, 70));
         scrollPane.setBackground(new Color(35, 45, 60));
 
-        // Add components to frame
-        setLayout(new BorderLayout());
-        add(scrollPane, BorderLayout.CENTER);
-
         // Add a status bar at the bottom with dark theme
-        JLabel statusLabel = new JLabel(" Ready", SwingConstants.LEFT);
+        statusLabel = new JLabel(" Ready", SwingConstants.LEFT);
         statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
         statusLabel.setForeground(new Color(200, 210, 220));  // Light gray text
         statusLabel.setBackground(new Color(30, 40, 55));  // Dark background
@@ -80,7 +80,10 @@ public class PlatformInfoViewer extends JFrame {
                 BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(60, 80, 110)),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
-        add(statusLabel, BorderLayout.SOUTH);
+
+        // IMPORTANT: Add components to the content panel, not directly to frame
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
+        contentPanel.add(statusLabel, BorderLayout.SOUTH);
     }
 
     /**
@@ -136,6 +139,7 @@ public class PlatformInfoViewer extends JFrame {
         if (data == null || data.isEmpty()) {
             tableModel.addRow(new Object[]{"No Data", "No platform information available"});
             adjustRowHeights();
+            statusLabel.setText(" No data available");
             return;
         }
 
@@ -152,14 +156,7 @@ public class PlatformInfoViewer extends JFrame {
         adjustRowHeights();
 
         // Update status bar
-        Component[] components = getContentPane().getComponents();
-        for (Component comp : components) {
-            if (comp instanceof JLabel) {
-                JLabel label = (JLabel) comp;
-                label.setText(" Displaying " + data.size() + " field(s)");
-                label.setForeground(new Color(200, 210, 220));  // Ensure visibility
-            }
-        }
+        statusLabel.setText(" Displaying " + data.size() + " field(s)");
     }
 
     /**
@@ -186,7 +183,7 @@ public class PlatformInfoViewer extends JFrame {
             }
 
             // Set the row height
-            table.setRowHeight(row, maxHeight); // Add padding
+            table.setRowHeight(row, maxHeight);
         }
     }
 
