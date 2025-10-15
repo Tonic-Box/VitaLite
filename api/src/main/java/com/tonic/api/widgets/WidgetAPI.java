@@ -6,8 +6,10 @@ import com.tonic.data.WidgetInfoExtended;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.Client;
-import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.gameval.NpcID;
+import net.runelite.api.ItemComposition;
+import net.runelite.api.NPC;
+import net.runelite.api.Player;
+import net.runelite.api.TileObject;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 
@@ -16,21 +18,26 @@ import net.runelite.api.widgets.WidgetInfo;
  */
 public class WidgetAPI
 {
+
     /**
-     * invoke a widget action by action name
+     * invoke a widget action by first found action name
      * @param widget widget
-     * @param action action
+     * @param actions action list
      */
-    public static void interact(Widget widget, String action) {
+    public static void interact(Widget widget, String... actions)
+    {
         if (widget == null || widget.getActions() == null)
             return;
-        for(int i = 0; i < widget.getActions().length; i++)
+        for (String action : actions)
         {
-            String option = widget.getActions()[i];
-            if(option != null && option.toLowerCase().contains(action.toLowerCase()))
+            for(int i = 0; i < widget.getActions().length; i++)
             {
-                interact(widget, i);
-                return;
+                String option = widget.getActions()[i];
+                if(option != null && option.toLowerCase().contains(action.toLowerCase()))
+                {
+                    interact(widget, i);
+                    return;
+                }
             }
         }
     }
@@ -40,7 +47,8 @@ public class WidgetAPI
      * @param widget widget
      * @param action action index
      */
-    public static void interact(Widget widget, int action) {
+    public static void interact(Widget widget, int action)
+    {
         if (widget == null)
             return;
         WidgetAPI.interact(action, widget.getId(), widget.getIndex(), widget.getItemId());
@@ -76,6 +84,68 @@ public class WidgetAPI
             ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
             client.getPacketWriter().widgetActionSubOpPacket(action, subOp, widgetId, childId, itemId);
         });
+    }
+
+    /**
+     * invoke a widget sub op packet
+     * @param widget runelite Widget - should come from Inventory
+     * @param menu right click menu i.e "Rub"
+     * @param action action insdie right click menu i.e "Grand Exchange"
+     */
+    public static void interact(Widget widget, String menu, String action)
+    {
+        Client client = Static.getClient();
+
+        ItemComposition composition = client.getItemDefinition(widget.getItemId());
+
+        String[] actions = composition.getInventoryActions();
+        String[][] subOps = composition.getSubops();
+
+        if (subOps == null)
+        {
+            return;
+        }
+
+        int menuIndex = -1;
+        int actionIndex = -1;
+
+        for (int i = 0; i < actions.length; i++)
+        {
+            String a = actions[i];
+
+            if (a != null && a.equalsIgnoreCase(menu))
+            {
+                menuIndex = i + 1;
+                break;
+            }
+        }
+
+        for (String[] subOp : subOps)
+        {
+            if (actionIndex != -1)
+                break;
+
+            if (subOp == null)
+                continue;
+
+            for (int i = 0; i < subOp.length; i++)
+            {
+                String op = subOp[i];
+
+                if (op != null && op.equalsIgnoreCase(action))
+                {
+                    actionIndex = i;
+                    break;
+                }
+            }
+        }
+
+        if (menuIndex == -1 || actionIndex == -1)
+        {
+            return;
+        }
+
+        interact(menuIndex, actionIndex, widget.getId(), widget.getIndex(), widget.getItemId());
     }
 
     /**
@@ -158,6 +228,29 @@ public class WidgetAPI
     }
 
     /**
+     * Use a widget on a game object
+     *
+     * @param source widget
+     * @param dest tile object
+     * @param ctrl if ctrl is held
+     * */
+    public static void onTileObject(Widget source, TileObject dest, boolean ctrl)
+    {
+        onTileObject(source.getId(), source.getItemId(), source.getIndex(), dest.getId(), dest.getWorldLocation().getX(), dest.getWorldLocation().getY(), ctrl);
+    }
+
+    /**
+     * Use a widget on a game object without holding ctrl
+     *
+     * @param source widget
+     * @param dest tile object
+     * */
+    public static void onTileObject(Widget source, TileObject dest)
+    {
+        onTileObject(source, dest, false);
+    }
+
+    /**
      * Use a widget on a ground item
      *
      * @param selectedWidgetId selected widget ID
@@ -196,6 +289,29 @@ public class WidgetAPI
     }
 
     /**
+     * Use a widget on an NPC
+     *
+     * @param source widget
+     * @param dest npc
+     * @param ctrl if ctrl is held
+     */
+    public static void onNpc(Widget source, NPC dest, boolean ctrl)
+    {
+        onNpc(source.getId(), source.getItemId(), source.getIndex(), dest.getIndex(), ctrl);
+    }
+
+    /**
+     * Use a widget on an NPC without holding ctrl
+     *
+     * @param source widget
+     * @param dest npc
+     */
+    public static void onNpc(Widget source, NPC dest)
+    {
+        onNpc(source, dest, false);
+    }
+
+    /**
      * Use a widget on a player
      *
      * @param selectedWidgetId selected widget ID
@@ -211,6 +327,29 @@ public class WidgetAPI
             ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
             client.getPacketWriter().widgetTargetOnPlayerPacket(playerIndex, selectedWidgetId, itemId, slot, ctrl);
         });
+    }
+
+    /**
+     * Use a widget on a player
+     *
+     * @param source widget
+     * @param dest player
+     * @param ctrl if ctrl is held
+     */
+    public static void onPlayer(Widget source, Player dest, boolean ctrl)
+    {
+        onPlayer(source.getId(), source.getItemId(), source.getIndex(), dest.getId(), ctrl);
+    }
+
+    /**
+     * Use a widget on a player without holding ctrl
+     *
+     * @param source widget
+     * @param dest player
+     */
+    public static void onPlayer(Widget source, Player dest)
+    {
+        onPlayer(source, dest, false);
     }
 
     /**
@@ -230,6 +369,16 @@ public class WidgetAPI
             ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
             client.getPacketWriter().widgetOnWidgetPacket(selectedWidgetId, itemId, slot, targetWidgetId, itemId2, slot2);
         });
+    }
+
+    /**
+     * Uses a widget on another widget
+     * @param source source widget
+     * @param dest destination widget
+     */
+    public static void onWidget(Widget source, Widget dest)
+    {
+        onWidget(source.getId(), source.getItemId(), source.getIndex(), dest.getId(), dest.getItemId(), dest.getIndex());
     }
 
     /**
