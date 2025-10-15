@@ -39,9 +39,8 @@ public class PluginListItemMixin
                             .invokeStatic(
                                     "com/tonic/services/hotswapper/PluginReloader",
                                     "addRedButtonAfterPin",
-                                    "(Ljavax/swing/JPanel;Lnet/runelite/client/plugins/Plugin;)Ljavax/swing/JButton;"
-                            )
-                            .pop();
+                                    "(Ljavax/swing/JPanel;Lnet/runelite/client/plugins/Plugin;)V"
+                            );
                 },
                 catchBlock -> {
                     catchBlock

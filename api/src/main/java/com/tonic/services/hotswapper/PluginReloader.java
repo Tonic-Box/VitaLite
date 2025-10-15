@@ -142,57 +142,58 @@ public class PluginReloader {
     /*
      * INTERNAL USE ONLY: A call to this is injected into RuneLite's plugin list items
      */
-    public static JButton addRedButtonAfterPin(JPanel pluginListItem, Plugin plugin) {
-        if (!(pluginListItem.getLayout() instanceof BorderLayout)) {
-            return null;
-        }
-
-        if(plugin == null) {
-            return null;
-        }
-
-        PluginContext context = PluginContext.of(plugin.getClass().getName());
-        if (context == null) {
-            return null;
-        }
-
-        BorderLayout layout = (BorderLayout) pluginListItem.getLayout();
-        Component pinComponent = layout.getLayoutComponent(BorderLayout.LINE_START);
-
-        if (pinComponent instanceof JPanel) {
-            return null;
-        }
-
-        if (!(pinComponent instanceof JToggleButton)) {
-            return null;
-        }
-
-        JToggleButton pinButton = (JToggleButton) pinComponent;
-        pluginListItem.remove(pinButton);
-
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BorderLayout(2, 0));
-        leftPanel.setOpaque(false);
-        leftPanel.add(pinButton, BorderLayout.WEST);
-
-        CycleButton cycleButton = new CycleButton();
-        cycleButton.addActionListener(e -> {
-            File jar = context.getFile();
-            if(!reloadPlugin(jar))
-            {
-                forceRebuildPluginList();
-                Logger.error("Failed to reload plugin: " + jar.getName());
+    public static void addRedButtonAfterPin(JPanel pluginListItem, Plugin plugin) {
+        SwingUtilities.invokeLater(() -> {
+            if (!(pluginListItem.getLayout() instanceof BorderLayout)) {
                 return;
             }
-            forceRebuildPluginList();
-            Logger.info("Reloaded plugin: " + jar.getName());
-        });
 
-        leftPanel.add(cycleButton, BorderLayout.CENTER);
-        pluginListItem.add(leftPanel, BorderLayout.LINE_START);
-        pluginListItem.revalidate();
-        pluginListItem.repaint();
-        return cycleButton;
+            if(plugin == null) {
+                return;
+            }
+
+            PluginContext context = PluginContext.of(plugin.getClass().getName());
+            if (context == null) {
+                return;
+            }
+
+            BorderLayout layout = (BorderLayout) pluginListItem.getLayout();
+            Component pinComponent = layout.getLayoutComponent(BorderLayout.LINE_START);
+
+            if (pinComponent instanceof JPanel) {
+                return;
+            }
+
+            if (!(pinComponent instanceof JToggleButton)) {
+                return;
+            }
+
+            JToggleButton pinButton = (JToggleButton) pinComponent;
+            pluginListItem.remove(pinButton);
+
+            JPanel leftPanel = new JPanel();
+            leftPanel.setLayout(new BorderLayout(2, 0));
+            leftPanel.setOpaque(false);
+            leftPanel.add(pinButton, BorderLayout.WEST);
+
+            CycleButton cycleButton = new CycleButton();
+            cycleButton.addActionListener(e -> {
+                File jar = context.getFile();
+                if(!reloadPlugin(jar))
+                {
+                    forceRebuildPluginList();
+                    Logger.error("Failed to reload plugin: " + jar.getName());
+                    return;
+                }
+                forceRebuildPluginList();
+                Logger.info("Reloaded plugin: " + jar.getName());
+            });
+
+            leftPanel.add(cycleButton, BorderLayout.CENTER);
+            pluginListItem.add(leftPanel, BorderLayout.LINE_START);
+            pluginListItem.revalidate();
+            pluginListItem.repaint();
+        });
     }
 
     private static List<Path> findJars() {
