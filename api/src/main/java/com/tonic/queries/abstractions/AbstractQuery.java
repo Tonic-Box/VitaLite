@@ -4,6 +4,7 @@ import com.tonic.Static;
 import net.runelite.api.Client;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -91,6 +92,34 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
     public T last() {
         List<T> results = execute();
         return results.isEmpty() ? null : results.get(results.size() - 1);
+    }
+
+    /**
+     * Perform action on the first element, or else run elseAction if no results
+     * @param action action to perform on the first element
+     * @param elseAction action to perform if no results
+     */
+    public void firstOrElse(Consumer<T> action, Runnable elseAction) {
+        List<T> results = execute();
+        if (results.isEmpty()) {
+            elseAction.run();
+        } else {
+            action.accept(results.get(0));
+        }
+    }
+
+    /**
+     * Perform action on the last element, or else run elseAction if no results
+     * @param action action to perform on the last element
+     * @param elseAction action to perform if no results
+     */
+    public void lastOrElse(Consumer<T> action, Runnable elseAction) {
+        List<T> results = execute();
+        if (results.isEmpty()) {
+            elseAction.run();
+        } else {
+            action.accept(results.get(results.size() - 1));
+        }
     }
 
     /**
