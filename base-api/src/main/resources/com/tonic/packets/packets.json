@@ -379,13 +379,13 @@
       "length": 7
     },
     "writes": [
-      "writeByteAdd",
+      "writeByteSub",
       "writeShortAdd",
       "writeShortLE",
       "writeShortLE"
     ],
     "reads": [
-      "readByteAdd",
+      "readByteSub",
       "readShortAdd",
       "readShortLE",
       "readShortLE"

@@ -389,4 +389,13 @@ public enum NpcLocations {
     public void trade() {
         interact("Trade");
     }
+
+    public static NpcLocations fromName(String name) {
+        for (NpcLocations npc : values()) {
+            if (npc.getName().equalsIgnoreCase(name)) {
+                return npc;
+            }
+        }
+        return null;
+    }
 }

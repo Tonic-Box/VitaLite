@@ -1,13 +1,10 @@
 package com.tonic.mixins;
 
-import com.tonic.Static;
-import com.tonic.api.TBuffer;
 import com.tonic.injector.annotations.*;
 import com.tonic.injector.util.BytecodeBuilder;
-import com.tonic.packets.PacketBuffer;
+import com.tonic.injector.util.ControlFlow;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
-import org.objectweb.asm.tree.analysis.*;
 
 import java.util.*;
 
@@ -74,7 +71,7 @@ public class TPlatformInfoMixin
             method.instructions.insert(mapInit.build());
 
             // Perform control flow analysis to get execution order
-            List<AbstractInsnNode> executionOrder = analyzeControlFlow(method);
+            List<AbstractInsnNode> executionOrder = ControlFlow.normalize(method);
 
             Map<AbstractInsnNode, FieldInfo> instructions = new HashMap<>();
             int fieldIndex = 0;
@@ -173,90 +170,6 @@ public class TPlatformInfoMixin
 
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Analyze control flow and return instructions in approximate execution order
-     */
-    private static List<AbstractInsnNode> analyzeControlFlow(MethodNode method) throws AnalyzerException {
-        // Use a simple DFS traversal of the control flow graph
-        List<AbstractInsnNode> executionOrder = new ArrayList<>();
-        Set<AbstractInsnNode> visited = new HashSet<>();
-
-        // Build a map of labels to their positions
-        Map<LabelNode, AbstractInsnNode> labelMap = new HashMap<>();
-        for (AbstractInsnNode insn : method.instructions) {
-            if (insn instanceof LabelNode) {
-                labelMap.put((LabelNode) insn, insn);
-            }
-        }
-
-        // Start DFS from the first instruction
-        AbstractInsnNode start = method.instructions.getFirst();
-        dfsTraversal(start, executionOrder, visited, labelMap, method);
-
-        return executionOrder;
-    }
-
-    private static void dfsTraversal(AbstractInsnNode current, List<AbstractInsnNode> order,
-                                     Set<AbstractInsnNode> visited, Map<LabelNode, AbstractInsnNode> labelMap,
-                                     MethodNode method) {
-        if (current == null || visited.contains(current)) {
-            return;
-        }
-
-        visited.add(current);
-        order.add(current);
-
-        int opcode = current.getOpcode();
-
-        // Handle different control flow instructions
-        if (current instanceof JumpInsnNode) {
-            JumpInsnNode jump = (JumpInsnNode) current;
-
-            // For conditional jumps, explore both paths (false branch first, then true)
-            if (opcode != Opcodes.GOTO) {
-                // Continue to next instruction (false branch)
-                dfsTraversal(current.getNext(), order, visited, labelMap, method);
-            }
-
-            // Jump target (true branch or unconditional jump)
-            AbstractInsnNode target = labelMap.get(jump.label);
-            dfsTraversal(target, order, visited, labelMap, method);
-
-        } else if (current instanceof TableSwitchInsnNode) {
-            TableSwitchInsnNode switchInsn = (TableSwitchInsnNode) current;
-
-            // Visit default first
-            dfsTraversal(labelMap.get(switchInsn.dflt), order, visited, labelMap, method);
-
-            // Then visit all cases
-            for (LabelNode label : switchInsn.labels) {
-                dfsTraversal(labelMap.get(label), order, visited, labelMap, method);
-            }
-
-        } else if (current instanceof LookupSwitchInsnNode) {
-            LookupSwitchInsnNode switchInsn = (LookupSwitchInsnNode) current;
-
-            // Visit default first
-            dfsTraversal(labelMap.get(switchInsn.dflt), order, visited, labelMap, method);
-
-            // Then visit all cases
-            for (LabelNode label : switchInsn.labels) {
-                dfsTraversal(labelMap.get(label), order, visited, labelMap, method);
-            }
-
-        } else if (opcode == Opcodes.ATHROW || opcode == Opcodes.RETURN ||
-                opcode == Opcodes.ARETURN || opcode == Opcodes.IRETURN ||
-                opcode == Opcodes.LRETURN || opcode == Opcodes.FRETURN ||
-                opcode == Opcodes.DRETURN) {
-            // Terminal instruction - don't continue
-            return;
-
-        } else {
-            // Regular instruction - continue to next
-            dfsTraversal(current.getNext(), order, visited, labelMap, method);
         }
     }
 
