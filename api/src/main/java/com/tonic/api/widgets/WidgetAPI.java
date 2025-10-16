@@ -20,7 +20,7 @@ public class WidgetAPI
 {
 
     /**
-     * invoke a widget action by first found action name
+     * invoke a widget action by first matching action name
      * @param widget widget
      * @param actions action list
      */
@@ -33,9 +33,9 @@ public class WidgetAPI
             for(int i = 0; i < widget.getActions().length; i++)
             {
                 String option = widget.getActions()[i];
-                if(option != null && option.toLowerCase().contains(action.toLowerCase()))
+                if(option != null && option.equalsIgnoreCase(action))
                 {
-                    interact(widget, i);
+                    interact(widget, i + 1);
                     return;
                 }
             }
