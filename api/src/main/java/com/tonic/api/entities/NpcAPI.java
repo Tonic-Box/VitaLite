@@ -27,11 +27,11 @@ public class NpcAPI extends ActorAPI
     }
 
     /**
-     * interactShop with an npc by option string
+     * interact with an npc by first matching action
      * @param npc npc
-     * @param option option string
+     * @param actions actions list
      */
-    public static void interact(NPC npc, String option)
+    public static void interact(NPC npc, String... actions)
     {
         if(npc == null)
             return;
@@ -43,13 +43,18 @@ public class NpcAPI extends ActorAPI
 
             if(composition == null || composition.getActions() == null)
                 return;
-            String[] actions = composition.getActions();
-            for(int i = 0; i < actions.length; i++)
+
+            String[] compositionActions = composition.getActions();
+
+            for (String action : actions)
             {
-                if(actions[i] != null && actions[i].equalsIgnoreCase(option))
+                for(int i = 0; i < compositionActions.length; i++)
                 {
-                    interact(npc, i);
-                    return;
+                    if(compositionActions[i] != null && compositionActions[i].equalsIgnoreCase(action))
+                    {
+                        interact(npc, i);
+                        return;
+                    }
                 }
             }
         });
