@@ -17,52 +17,99 @@ import net.runelite.api.coords.WorldPoint;
 public class TileItemAPI
 {
     /**
-     * interact with a tile item
+     * interact with a tile item without holding down control
      * @param item tile item
      * @param action action
      */
     public static void interact(TileItemEx item, int action)
     {
-        if (item == null)
-            return;
-
-        interact(action, item.getId(), item.getWorldLocation().getX(), item.getWorldLocation().getY());
+        interact(item, action, false);
     }
 
     /**
      * interact with a tile item
      * @param item tile item
      * @param action action
+     * @param ctrlDown is control held
+     */
+
+    public static void interact(TileItemEx item, int action, boolean ctrlDown)
+    {
+        if (item == null)
+            return;
+
+        interact(action, item.getId(), item.getWorldLocation().getX(), item.getWorldLocation().getY(), ctrlDown);
+    }
+
+    /**
+     * interact with a tile item without holding down control
+     * @param item tile item
+     * @param action action
      */
     public static void interact(TileItemEx item, String action)
+    {
+        interact(item, action, false);
+    }
+
+    /**
+     * interact with a tile item
+     * @param item tile item
+     * @param action action
+     * @param ctrlDown is control held
+     */
+    public static void interact(TileItemEx item, String action, boolean ctrlDown)
     {
         if (item == null)
             return;
 
         int actionIndex = getActionIndex(item, action);
 
-        interact(actionIndex, item.getId(), item.getWorldLocation().getX(), item.getWorldLocation().getY());
+        interact(actionIndex, item.getId(), item.getWorldLocation().getX(), item.getWorldLocation().getY(), ctrlDown);
     }
 
     /**
-     * interact with a tile item
+     * interact with a tile item without holding down control
      * @param item tile item
      * @param action action
      */
     public static void interact(TileItem item, WorldPoint location, int action)
     {
-        if (item == null)
-            return;
-
-        interact(action, item.getId(), location.getX(), location.getY());
+        interact(item, location, action, false);
     }
 
     /**
      * interact with a tile item
      * @param item tile item
+     * @param location world point
+     * @param action action index
+     * @param ctrlDown is control held
+     */
+    public static void interact(TileItem item, WorldPoint location, int action, boolean ctrlDown)
+    {
+        if (item == null)
+            return;
+
+        interact(action, item.getId(), location.getX(), location.getY(), ctrlDown);
+    }
+
+    /**
+     * interact with a tile item without holding down control
+     * @param item tile item
      * @param action action
      */
     public static void interact(TileItem item, WorldPoint location, String action)
+    {
+        interact(item, location, action, false);
+    }
+
+    /**
+     * interact with a tile item
+     * @param item tile item
+     * @param location world point
+     * @param action action
+     * @param ctrl is control held
+     */
+    public static void interact(TileItem item, WorldPoint location, String action, boolean ctrl)
     {
         if (item == null)
             return;
@@ -75,14 +122,31 @@ public class TileItemAPI
 
         int actionIndex = getActionIndex(actions, action);
 
-        interact(actionIndex, item.getId(), location.getX(), location.getY());
+        interact(actionIndex, item.getId(), location.getX(), location.getY(), ctrl);
+    }
+
+    /**
+     * interact with a tile item without holding down control
+     * @param action action index
+     * @param identifier item id
+     * @param worldX world point x
+     * @param worldY world point y
+     */
+    public static void interact(int action, int identifier, int worldX, int worldY)
+    {
+        interact(action, identifier, worldX, worldY, false);
     }
 
     /**
      * interact with a tile item
-     * @param action action
+     * @param action action index
+     * @param identifier item id
+     * @param worldX world point x
+     * @param worldY world point y
+     * @param ctrlDown is control held
      */
-    public static void interact(int action, int identifier, int worldX, int worldY)
+
+    public static void interact(int action, int identifier, int worldX, int worldY, boolean ctrlDown)
     {
         Client client = Static.getClient();
         if(!client.getGameState().equals(GameState.LOGGED_IN))
@@ -92,7 +156,7 @@ public class TileItemAPI
         Static.invoke(() ->
         {
             ClickManager.click(PacketInteractionType.TILEITEM_INTERACT);
-            tClient.getPacketWriter().groundItemActionPacket(action, identifier, worldX, worldY, false);
+            tClient.getPacketWriter().groundItemActionPacket(action, identifier, worldX, worldY, ctrlDown);
         });
     }
 

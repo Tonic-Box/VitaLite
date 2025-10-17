@@ -87,10 +87,15 @@ public class MovementAPI {
      */
     public static void walkToWorldPoint(int worldX, int worldY)
     {
+        walkToWorldPoint(worldX, worldY, false);
+    }
+
+    public static void walkToWorldPoint(int worldX, int worldY, boolean ctrlDown)
+    {
         TClient client = Static.getClient();
         Static.invoke(() -> {
             ClickManager.click(PacketInteractionType.MOVEMENT_INTERACT);
-            client.getPacketWriter().walkPacket(worldX, worldY, false);
+            client.getPacketWriter().walkPacket(worldX, worldY, ctrlDown);
         });
     }
 
