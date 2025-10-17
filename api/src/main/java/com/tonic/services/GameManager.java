@@ -14,6 +14,7 @@ import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.Step;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.ThreadPool;
+import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
@@ -134,6 +135,9 @@ public class GameManager extends Overlay {
         setPriority(PRIORITY_LOW);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
 
+        this.tileOverlays = new TileOverlays(this);
+        overlayManager.add(tileOverlays);
+
         Static.getRuneLite()
                 .getEventBus()
                 .register(this);
@@ -156,8 +160,12 @@ public class GameManager extends Overlay {
 
     private final List<TileItemEx> tileItemCache = new CopyOnWriteArrayList<>();
     private int tickCount = 0;
+    @Getter
     private volatile List<WorldPoint> pathPoints = null;
+    @Getter
     private volatile List<WorldPoint> testPoints = null;
+
+    private final TileOverlays tileOverlays;
 
     public static void setPathPoints(List<WorldPoint> points)
     {
@@ -287,7 +295,6 @@ public class GameManager extends Overlay {
         {
             WorldMapAPI.drawPath(graphics, testPoints, Color.MAGENTA);
             MiniMapAPI.drawPath(graphics, testPoints, Color.MAGENTA);
-            drawWorldTiles(graphics, testPoints, Color.MAGENTA);
             WorldPoint last = testPoints.get(testPoints.size() - 1);
             WorldMapAPI.drawRedMapMarker(graphics, last);
         }
@@ -299,42 +306,11 @@ public class GameManager extends Overlay {
         {
             WorldMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
             MiniMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
-            drawWorldTiles(graphics, pathPoints, Color.CYAN);
             WorldPoint last = pathPoints.get(pathPoints.size() - 1);
             WorldMapAPI.drawGreenMapMarker(graphics, last);
         }
 
         return null;
-    }
-
-    private void drawWorldTiles(Graphics2D graphics, List<WorldPoint> points, Color color)
-    {
-        if(points == null || points.isEmpty())
-            return;
-
-        final Client client = Static.getClient();
-        final WorldView worldView = client.getTopLevelWorldView();
-        final WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
-        final int MAX_DRAW_DISTANCE = 32;
-
-        Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 50);
-        Stroke stroke = new BasicStroke(2.0f);
-
-        for(WorldPoint point : points)
-        {
-            if(point.distanceTo(playerLocation) >= MAX_DRAW_DISTANCE)
-                continue;
-
-            LocalPoint localPoint = LocalPoint.fromWorld(worldView, point);
-            if(localPoint == null)
-                continue;
-
-            Polygon polygon = Perspective.getCanvasTilePoly(client, localPoint);
-            if(polygon == null)
-                continue;
-
-            OverlayUtil.renderPolygon(graphics, polygon, color, fillColor, stroke);
-        }
     }
     @Subscribe
     public void onLoginResponse(LoginResponse event)

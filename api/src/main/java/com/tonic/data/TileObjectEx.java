@@ -5,8 +5,12 @@ import com.tonic.util.TextUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.*;
+import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+
+import java.awt.*;
 
 @RequiredArgsConstructor
 @Getter
@@ -86,6 +90,41 @@ public class TileObjectEx
             wp = WorldPoint.fromScene(wv, p.getX(), p.getY(), wv.getPlane());
         }
         return wp;
+    }
+
+    public WorldArea getWorldArea()
+    {
+        int width = 1;
+        int height = 1;
+        if(tileObject instanceof GameObject) {
+            GameObject go = (GameObject) tileObject;
+            Point min = go.getSceneMinLocation();
+            Point max = go.getSceneMaxLocation();
+            width = max.getX() - min.getX() + 1;
+            height = max.getY() - min.getY() + 1;
+        }
+        return new WorldArea(getWorldLocation(), width, height);
+    }
+
+    public Shape getShape()
+    {
+        if(tileObject instanceof GameObject) {
+            GameObject go = (GameObject) tileObject;
+            return go.getConvexHull();
+        }
+        else if(tileObject instanceof WallObject) {
+            WallObject wo = (WallObject) tileObject;
+            return wo.getConvexHull();
+        }
+        else if(tileObject instanceof DecorativeObject) {
+            DecorativeObject deco = (DecorativeObject) tileObject;
+            return deco.getConvexHull();
+        }
+        else if(tileObject instanceof GroundObject) {
+            GroundObject ground = (GroundObject) tileObject;
+            return ground.getConvexHull();
+        }
+        return tileObject.getClickbox();
     }
 
     public LocalPoint getLocalLocation() {

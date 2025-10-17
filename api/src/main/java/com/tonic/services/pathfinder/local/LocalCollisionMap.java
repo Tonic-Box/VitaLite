@@ -3,13 +3,16 @@ package com.tonic.services.pathfinder.local;
 import com.tonic.Static;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.Pathfinder;
+import com.tonic.services.pathfinder.collision.Flags;
 import com.tonic.util.WorldPointUtil;
 import gnu.trove.map.hash.TIntIntHashMap;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.runelite.api.Client;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 
+import java.awt.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -128,7 +131,7 @@ public class LocalCollisionMap
         return Static.invoke(() ->
                 GameManager.objectStream()
                         .filter(o -> {
-                            String name = o.getName().toLowerCase();
+                            String name = o.getName() == null ? "" :  o.getName().toLowerCase();
                             return (name.contains("door") || name.contains("gate")) && !name.contains("trapdoor");
                         })
                         .map(door -> WorldPointUtil.compress(door.getWorldLocation().getX(), door.getWorldLocation().getY(), door.getWorldLocation().getPlane()))

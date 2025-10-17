@@ -172,6 +172,16 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         ));
         contentPanel.add(Box.createVerticalStrut(12));
 
+        ToggleSlider drawCollision = new ToggleSlider();
+        drawCollision.setSelected(Static.getVitaConfig().shouldDrawCollision());
+        contentPanel.add(createToggleOption(
+                "Draw tile collision",
+                "Draw the walker path on the floating and mini maps",
+                drawCollision,
+                () -> Static.getVitaConfig().setShouldDrawCollision(drawCollision.isSelected())
+        ));
+        contentPanel.add(Box.createVerticalStrut(12));
+
         FancyDualSpinner pointSpinner = new FancyDualSpinner(
                 "Static Click Point",
                 Integer.MIN_VALUE, Integer.MAX_VALUE, Static.getVitaConfig().getClickPointX(),
