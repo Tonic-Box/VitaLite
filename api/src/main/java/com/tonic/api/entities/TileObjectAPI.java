@@ -56,46 +56,59 @@ public class TileObjectAPI
     }
 
     /**
-     * interact with a tile object
+     * interact with a tile object with first matching action
      * @param object object
-     * @param action action
+     * @param actions actions list
      */
-    public static void interact(TileObjectEx object, String action)
+    public static void interact(TileObjectEx object, String... actions)
     {
         Client client = Static.getClient();
         TClient tclient = Static.getClient();
         if(!client.getGameState().equals(GameState.LOGGED_IN) || object == null)
             return;
 
-        int actionIndex = object.getActionIndex(action);
-
-        final WorldPoint wp = object.getWorldLocation();
-        Static.invoke(() ->
+        for (String action : actions)
         {
-            ClickManager.click(PacketInteractionType.TILEOBJECT_INTERACT);
-            tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), wp.getX(), wp.getY(), false);
-        });
+            int actionIndex = object.getActionIndex(action);
+
+            if (actionIndex == -1)
+                continue;
+
+            final WorldPoint wp = object.getWorldLocation();
+            Static.invoke(() ->
+            {
+                ClickManager.click(PacketInteractionType.TILEOBJECT_INTERACT);
+                tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), wp.getX(), wp.getY(), false);
+            });
+            return;
+        }
     }
 
     /**
-     * interact with a tile object
+     * interact with a tile object by first matching action
      * @param object object
-     * @param action action
+     * @param actions action list
      */
-    public static void interact(TileObject object, String action)
+    public static void interact(TileObject object, String... actions)
     {
         Client client = Static.getClient();
         TClient tclient = Static.getClient();
         if(!client.getGameState().equals(GameState.LOGGED_IN) || object == null)
             return;
 
-        int actionIndex = getAction(object, action);
-
-        Static.invoke(() ->
+        for (String action : actions)
         {
-            ClickManager.click(PacketInteractionType.TILEOBJECT_INTERACT);
-            tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false);
-        });
+            int actionIndex = getAction(object, action);
+
+            if (actionIndex == -1)
+                continue;
+
+            Static.invoke(() ->
+            {
+                ClickManager.click(PacketInteractionType.TILEOBJECT_INTERACT);
+                tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false);
+            });
+        }
     }
 
     /**

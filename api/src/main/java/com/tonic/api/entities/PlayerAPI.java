@@ -23,19 +23,23 @@ public class PlayerAPI extends ActorAPI
     }
 
     /**
-     * interactShop with a player by option string
+     * interacts with a player by first matching action
      * @param player player
-     * @param option option string
+     * @param actions actions list
      */
-    public static void interact(Player player, String option)
+    public static void interact(Player player, String... actions)
     {
         Client client = Static.getClient();
-        String[] actions = Static.invoke(client::getPlayerOptions);
-        for(int i = 0; i < actions.length; i++)
+        String[] playerActions = Static.invoke(client::getPlayerOptions);
+        for (String action : actions)
         {
-            if(actions[i].equalsIgnoreCase(option.toLowerCase()))
+            for(int i = 0; i < playerActions.length; i++)
             {
-                interact(player, i);
+                if(playerActions[i].equalsIgnoreCase(action.toLowerCase()))
+                {
+                    interact(player, i);
+                    return;
+                }
             }
         }
     }
