@@ -484,7 +484,7 @@
     "name": "OP_WIDGET_ACTION_SUBOP",
     "packet": {
       "id": 9,
-      "length": 9
+      "length": 10
     },
     "writes": [
       "writeInt",
@@ -568,14 +568,14 @@
     "writes": [
       "writeIntIME",
       "writeShortLE",
-      "writeByteAdd",
+      "writeByteSub",
       "writeShort",
       "writeShort"
     ],
     "reads": [
       "readIntIME",
       "readShortLE",
-      "readByteAdd",
+      "readByteSub",
       "readShort",
       "readShort"
     ],
@@ -608,11 +608,11 @@
     },
     "writes": [
       "writeShort",
-      "writeByteAdd"
+      "writeByteSub"
     ],
     "reads": [
       "readShort",
-      "readByteAdd"
+      "readByteSub"
     ],
     "args": [
       "identifier",
@@ -687,13 +687,13 @@
     },
     "writes": [
       "writeShortAddLE",
-      "writeByteAdd",
+      "writeByteSub",
       "writeShortLE",
       "writeShortLE"
     ],
     "reads": [
       "readShortAddLE",
-      "readByteAdd",
+      "readByteSub",
       "readShortLE",
       "readShortLE"
     ],
@@ -916,7 +916,7 @@
       "writeIntLE",
       "writeShort",
       "writeShortAddLE",
-      "writeByteAdd",
+      "writeByteSub",
       "writeShortLE"
     ],
     "reads": [
@@ -925,7 +925,7 @@
       "readIntLE",
       "readShort",
       "readShortAddLE",
-      "readByteAdd",
+      "readByteSub",
       "readShortLE"
     ],
     "args": [
@@ -1063,14 +1063,14 @@
       "length": 11
     },
     "writes": [
-      "writeByteAdd",
+      "writeByteSub",
       "writeShortLE",
       "writeShortAdd",
       "writeInt",
       "writeShort"
     ],
     "reads": [
-      "readByteAdd",
+      "readByteSub",
       "readShortLE",
       "readShortAdd",
       "readInt",
@@ -1104,11 +1104,11 @@
       "length": 3
     },
     "writes": [
-      "writeByte",
+      "writeByteNeg",
       "writeShortLE"
     ],
     "reads": [
-      "readByte",
+      "readByteNeg",
       "readShortLE"
     ],
     "args": [

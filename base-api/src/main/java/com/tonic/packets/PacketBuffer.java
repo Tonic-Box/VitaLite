@@ -312,6 +312,22 @@ public class PacketBuffer {
         return value;
     }
 
+    public int readZigzagVarInt() {
+        int value = 0;
+        int shift = 0;
+        int b;
+
+        // Read the variable-length integer
+        do {
+            b = readByte() & 0xFF;
+            value |= (b & 0x7F) << shift;
+            shift += 7;
+        } while ((b & 0x80) != 0);
+
+        // Decode zigzag encoding: reverse of (n << 1) ^ (n >> 31)
+        return (value >>> 1) ^ -(value & 1);
+    }
+
     public int readLengthInt() {
         if (offset < 4) {
             return -1;
@@ -518,6 +534,16 @@ public class PacketBuffer {
             writeByte((value >>> 7) | 0x80);
         }
         writeByte(value & 0x7F);
+    }
+
+    public void writeZigzagVarInt(int value)
+    {
+        value = value << 1 ^ value >> 31;
+        while (value < 0 || value > 127) {
+            this.writeByte(128 | value & 127);
+            value >>>= 7;
+        }
+        writeByte(value);
     }
 
     public void writeLengthInt(int var1) {
