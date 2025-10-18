@@ -1,5 +1,6 @@
 package com.tonic.services.pathfinder.teleports;
 
+import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import net.runelite.api.ItemID;
@@ -67,6 +68,7 @@ public enum TeleportItem
     ECTOPHIAL(new WorldPoint(3659, 3523, 0), "Empty", null, ItemID.ECTOPHIAL),
     TELEPORT_CRYSTAL_LLETYA(new WorldPoint(2330, 3172, 0), "Lletya", null, MovementConstants.TELEPORT_CRYSTAL),
     TELEPORT_CRYSTAL_PRIFDDINAS(new WorldPoint(3264, 6065, 0), "Prifddinas", Quest.SONG_OF_THE_ELVES, MovementConstants.TELEPORT_CRYSTAL),
+    QUETZAL_WHISTLE(new WorldPoint(1585,3053,0),"Signal", Quest.CHILDREN_OF_THE_SUN, MovementConstants.QUETZAL_WHISTLE),
 
     // TODO move these to teleport loader since they are equippable...
     //	CHAMPIONS_GUILD_CHRONICLE(new WorldPoint(3202, 3357, 0), "Champions' Guild", null, ItemID.CHRONICLE),
@@ -74,6 +76,9 @@ public enum TeleportItem
     WATERBIRTH_ISLAND_LYRE(new WorldPoint(2550, 3756, 0), "Waterbirth Island", Quest.THE_FREMENNIK_TRIALS, MovementConstants.ENCHANTED_LYRE),
     NEITIZNOT_LYRE(new WorldPoint(2336, 3801, 0), "Neitiznot", Quest.THE_FREMENNIK_TRIALS, MovementConstants.ENCHANTED_LYRE),
     JATIZSO_LYRE(new WorldPoint(2409, 3809, 0), "Jatizso", Quest.THE_FREMENNIK_TRIALS, MovementConstants.ENCHANTED_LYRE),
+
+    // Diary
+    ARDOUGNE_CLOAK(new WorldPoint(2606, 3222, 0), "Monastery Teleport", null, MovementConstants.ARDOUGNE_CLOAK)
     ;
 
     private final WorldPoint destination;
@@ -125,6 +130,10 @@ public enum TeleportItem
                 return hasQuestReqs && VarAPI.getVarp(165) >= 30;
             case SALVE_GRAVEYARD_TELEPORT_TAB:
                 return hasQuestReqs && VarAPI.getVarp(302) >= 61;
+            case QUETZAL_WHISTLE:
+                //cannot be used from within the hunter guild
+                int regionID = PlayerAPI.getLocal().getWorldLocation().getRegionID();
+                return hasQuestReqs && regionID != 6191 && regionID != 6291;
             default:
                 return hasQuestReqs;
         }

@@ -275,4 +275,17 @@ public class MovementConstants
             ItemID.AMULET_OF_GLORY6,
             ItemID.LUMBRIDGE_TELEPORT
     };
+
+    public static final int[] QUETZAL_WHISTLE = {
+            ItemID.BASIC_QUETZAL_WHISTLE,
+            ItemID.ENHANCED_QUETZAL_WHISTLE,
+            ItemID.PERFECTED_QUETZAL_WHISTLE
+    };
+
+    public static final int[] ARDOUGNE_CLOAK = {
+            ItemID.ARDOUGNE_CLOAK_1,
+            ItemID.ARDOUGNE_CLOAK_2,
+            ItemID.ARDOUGNE_CLOAK_3,
+            ItemID.ARDOUGNE_CLOAK_4
+    };
 }

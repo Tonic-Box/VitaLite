@@ -20,10 +20,12 @@ public enum FairyRing
 {
     AIR("AIR", new WorldPoint(2699, 3249, 0)),
     AIQ("AIQ", new WorldPoint(2995, 3112, 0)),
+    AJP("AJP", new WorldPoint(1650,3010,0),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN, QuestState.FINISHED)),
     AJR("AJR", new WorldPoint(2779, 3615, 0)),
     AJS("AJS", new WorldPoint(2499, 3898, 0)),
     AKP("AKP", new WorldPoint(3283, 2704, 0)),
-    AKQ("AKQ", new WorldPoint(2318, 3617, 0)),
+    AKQ("AKQ", new WorldPoint(2321, 3619, 0)),
     AKS("AKS", new WorldPoint(2570, 2958, 0)),
     ALP("ALP", new WorldPoint(2502, 3638, 0)),
     ALQ("ALQ", new WorldPoint(3598, 3496, 0)),

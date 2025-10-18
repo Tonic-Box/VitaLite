@@ -519,7 +519,7 @@ public class TransportLoader
                 consumers.add(() -> {
                     TileObjectEx current = new TileObjectQuery<>()
                             .withName("Fairy ring")
-                            .first();
+                            .nearest();
                     TileObjectAPI.interact(current, "Configure");
                     Delays.waitUntil(() -> WidgetAPI.get(InterfaceID.Fairyrings.CONFIRM) != null);
                     while(!destination.travel())
