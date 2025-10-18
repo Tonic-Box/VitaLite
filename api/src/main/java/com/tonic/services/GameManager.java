@@ -151,7 +151,6 @@ public class GameManager extends Overlay {
                 Delays.wait(1000);
                 client = Static.getClient();
             }
-            PluginReloader.init();
             PluginReloader.forceRebuildPluginList();
         });
 
