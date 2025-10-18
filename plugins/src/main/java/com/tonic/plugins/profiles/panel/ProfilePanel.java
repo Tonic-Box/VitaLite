@@ -33,47 +33,73 @@ public class ProfilePanel extends JPanel {
 
     private final AuthHooks authHooks;
 
-    public ProfilePanel(ProfilesPlugin plugin, Profile profile) {
+        public ProfilePanel(ProfilesPlugin plugin, Profile profile)
+    {
         this.client = plugin.getClient();
         this.clientThread = plugin.getClientThread();
         this.profile = profile;
+        
         setLayout(new BorderLayout());
-        setMinimumSize(new Dimension(200, 80));
-        setPreferredSize(new Dimension(200, 80));
-        setMaximumSize(new Dimension(200, 80));
+        setBackground(new Color(25, 25, 25));
+        setBorder(BorderFactory.createEmptyBorder(4, 0, 4, 0)); // space between rows
+        setPreferredSize(new Dimension(200, 40));
 
-        JPanel titlePanel = new JPanel(new BorderLayout());
-        titlePanel.setPreferredSize(new Dimension(220, 48));
-        titlePanel.setMinimumSize(new Dimension(220, 48));
-        titlePanel.setMaximumSize(new Dimension(220, 48));
-        titlePanel.setBackground(new Color(30, 30, 30));
+        //row
+        JPanel rowPanel = new JPanel(new BorderLayout(5, 0));
+        rowPanel.setBackground(new Color(35, 35, 35));
+        rowPanel.setBorder(BorderFactory.createLineBorder(new Color(20, 20, 20)));
 
-        JLabel titleLabel = new JLabel(profile.getIdentifier());
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 0));
-        JButton loginButton = new JButton(profile.getIdentifier());
-        collapseExpandButton = new JButton("+");
-
-        titlePanel.add(loginButton, BorderLayout.CENTER);
-
-        contentPanel = new JPanel();
-        contentPanel.setLayout(new GridLayout(1, 2));
-        JLabel usernameLabel = new JLabel(profile.getCharacterName());
-        usernameLabel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 0));
-        editButton = new JButton("Edit");
-        editButton.setBackground(new Color(48, 48, 48));
-        editButton.setPreferredSize(new Dimension());
-        deleteButton = new JButton("Delete");
-        deleteButton.setBackground(new Color(48, 48, 48));
-        contentPanel.add(editButton);
-        contentPanel.add(deleteButton);
-
-        add(titlePanel, BorderLayout.NORTH);
-        add(contentPanel, BorderLayout.CENTER);
-
+        //username
+        JButton loginButton = createButton(profile.getIdentifier(), new Color(45, 45, 45));
+        loginButton.setHorizontalAlignment(SwingConstants.LEFT);
         loginButton.addActionListener(e -> login());
-        collapseExpandButton.addActionListener(e -> toggleContent());
+
+        
+        //edit/del button
+        JPanel editorButtons = new JPanel(new GridLayout(2, 1, 0, 2));
+        editorButtons.setOpaque(false);
+        editorButtons.setPreferredSize(new Dimension(50, 36));
+        editButton = createSmallButton("Edit");
+        deleteButton = createSmallButton("Del");
+        editorButtons.add(editButton);
+        editorButtons.add(deleteButton);
+        
+        rowPanel.add(loginButton, BorderLayout.CENTER);
+        rowPanel.add(editorButtons, BorderLayout.EAST);
+        add(rowPanel, BorderLayout.CENTER);
+
+        //idk these are, were not in ui?
+        collapseExpandButton = new JButton("+");
+        collapseExpandButton.setVisible(false);
+        contentPanel = new JPanel();
+        contentPanel.setVisible(false);
 
         this.authHooks = GsonUtil.loadJsonResource(ProfilesPlugin.class, "authHooks.json", AuthHooks.class);
+    }
+    private JButton createButton(String text, Color bg)
+    {
+        JButton button = new JButton(text);
+        button.setFocusPainted(false);
+        button.setBackground(bg);
+        button.setForeground(Color.WHITE);
+        button.setMargin(new Insets(0, 8, 0, 8));
+        button.setOpaque(true);
+        button.setBorderPainted(false);
+        button.setPreferredSize(new Dimension(160, 40));
+        return button;
+    }
+    private JButton createSmallButton(String text)
+    {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Dialog", Font.PLAIN, 11));
+        button.setBackground(new Color(55, 55, 55));
+        button.setForeground(Color.LIGHT_GRAY);
+        button.setFocusPainted(false);
+        button.setMargin(new Insets(0, 4, 0, 4));
+        button.setOpaque(true);
+        button.setBorderPainted(false);
+        button.setPreferredSize(new Dimension(45, 16));
+        return button;
     }
 
     private void toggleContent() {
