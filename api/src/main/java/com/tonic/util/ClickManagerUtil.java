@@ -11,31 +11,41 @@ public class ClickManagerUtil
 {
     public static void queueClickBox(TileObjectEx object)
     {
-        Shape shape = object.getTileObject().getClickbox();
-        if(shape == null)
-        {
-            shape = Static.getRuneLite().getGameApplet().getWorldViewportArea();
-        }
-        ClickManager.queueClickBox(shape);
+        Static.invoke(() -> {
+            Shape shape = object.getTileObject().getClickbox();
+            if(shape == null)
+            {
+                shape = Static.getRuneLite().getGameApplet().getWorldViewportArea();
+            }
+            ClickManager.queueClickBox(shape);
+            return true;
+        });
     }
 
     public static void queueClickBox(Actor actor)
     {
-        Shape shape = actor.getConvexHull();
-        if(shape == null)
-        {
-            shape = Static.getRuneLite().getGameApplet().getWorldViewportArea();
-        }
-        ClickManager.queueClickBox(shape);
+        Static.invoke(() -> {
+            Shape shape = actor.getConvexHull();
+            if(shape == null)
+            {
+                shape = Static.getRuneLite().getGameApplet().getWorldViewportArea();
+            }
+            ClickManager.queueClickBox(shape);
+            return true;
+        });
+
     }
 
     public static void queueClickBox(ItemEx item)
     {
-        Shape shape = item.getClickBox();
-        if(shape == null)
-        {
-            shape = Static.getRuneLite().getGameApplet().getSideMenuArea();
-        }
-        ClickManager.queueClickBox(shape);
+        Static.invoke(() -> {
+            Shape shape = item.getClickBox();
+            if(shape == null)
+            {
+                shape = Static.getRuneLite().getGameApplet().getSideMenuArea();
+            }
+            ClickManager.queueClickBox(shape);
+            return true;
+        });
     }
 }
