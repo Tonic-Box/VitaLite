@@ -115,6 +115,7 @@ public class BreakHandlerPlugin extends Plugin
     @Override
     protected void shutDown() throws Exception
     {
+        breakHandler.cancel();
         clientToolbar.removeNavigation(navigationButton);
         if (updater != null)
         {
@@ -197,8 +198,7 @@ public class BreakHandlerPlugin extends Plugin
         if (client.getVarcIntValue(VarClientID.TOPLEVEL_PANEL) != 10)
         {
             client.runScript(SWITCH_TAB_SCRIPT_ID, 10);
-            breakHandler.log("[%s] Can't find logout button, " +
-                    "trying to switch interface tabs", "Break Handler");
+            breakHandler.log("[%s] Switching to logout interface tab", "Break Handler");
         }
 
         if (isLogoutButtonVisible())

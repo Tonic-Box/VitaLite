@@ -2,7 +2,6 @@ package com.tonic.plugins.breakhandler.ui;
 
 import com.tonic.plugins.breakhandler.BreakHandler;
 import com.tonic.plugins.breakhandler.settings.Property;
-import com.tonic.plugins.breakhandler.settings.Settings;
 import com.tonic.plugins.profiles.data.Profile;
 import com.tonic.plugins.profiles.session.ProfilesSession;
 import com.tonic.services.ConfigManager;

@@ -32,12 +32,6 @@ public class BreakHandler
         return INSTANCE;
     }
 
-    private static final String GROUP = "BreakHandler.";
-    private static final String KEY_MIN_BETWEEN  = "minBetween";
-    private static final String KEY_MAX_BETWEEN  = "maxBetween";
-    private static final String KEY_MIN_DURATION = "minDuration";
-    private static final String KEY_MAX_DURATION = "maxDuration";
-
     @Getter
     private final ConfigManager configManager;
     private final Map<String, Session> sessions = new ConcurrentHashMap<>();
@@ -47,7 +41,6 @@ public class BreakHandler
     {
         this.configManager = configManager;
     }
-
 
     /**
      * Registers a plugin for breaks without any conditions to logout.
@@ -217,6 +210,18 @@ public class BreakHandler
         scheduleBreak(session);
     }
 
+    /**
+     * Gets all breaks
+     * @return list of all breaks from registered plugins
+     */
+    public List<Break> getAllBreaks()
+    {
+        return sessions.values().stream()
+                .filter(session -> session.scheduledBreak != null)
+                .map(session -> session.scheduledBreak)
+                .collect(Collectors.toList());
+    }
+
     boolean isReadyToLogin()
     {
         return sessions.entrySet()
@@ -317,17 +322,10 @@ public class BreakHandler
         }
     }
 
-    public List<Break> getAllBreaks() {
-        return sessions.values().stream()
-                .filter(session -> session.scheduledBreak != null)
-                .map(session -> session.scheduledBreak)
-                .collect(Collectors.toList());
-    }
-
     private void scheduleBreak(Session s)
     {
-        Duration between = randomBetweenMinutes(KEY_MIN_BETWEEN, KEY_MAX_BETWEEN, 120, 240);
-        Duration duration = randomBetweenMinutes(KEY_MIN_DURATION, KEY_MAX_DURATION, 120, 240);
+        Duration between = randomBetweenMinutes(Property.MIN_BETWEEN.key(), Property.MAX_BETWEEN.key(), 120, 240);
+        Duration duration = randomBetweenMinutes(Property.MIN_DURATION.key(), Property.MAX_DURATION.key(), 120, 240);
 
         Instant startAt = Instant.now().plus(between);
 
@@ -344,8 +342,8 @@ public class BreakHandler
 
     private Duration randomBetweenMinutes(String minKey, String maxKey, int defMin, int defMax)
     {
-        int min = configManager.getIntOrDefault(GROUP + minKey, defMin);
-        int max = configManager.getIntOrDefault(GROUP + maxKey, defMax);
+        int min = configManager.getIntOrDefault(minKey, defMin);
+        int max = configManager.getIntOrDefault(maxKey, defMax);
         if (max < min) max = min;
         int span = max - min;
         int pick = min + (span == 0 ? 0 : random.nextInt(span + 1));
