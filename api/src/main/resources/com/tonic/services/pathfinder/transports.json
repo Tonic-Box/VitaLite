@@ -81249,5 +81249,65 @@
     "action": "Open",
     "objectId": 2690,
     "requirements": {}
+  },
+  {
+    "source": {
+      "x": 1558,
+      "y": 9451,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1558,
+      "y": 3047,
+      "plane": 0
+    },
+    "action": "Climb-up",
+    "objectId": 51642,
+    "requirements": {}
+  },
+  {
+    "source": {
+      "x": 1558,
+      "y": 3047,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1558,
+      "y": 9451,
+      "plane": 0
+    },
+    "action": "Climb-down",
+    "objectId": 51641,
+    "requirements": {}
+  },
+  {
+    "source": {
+      "x": 1559,
+      "y": 3046,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1556,
+      "y": 3046,
+      "plane": 2
+    },
+    "action": "Climb-up",
+    "objectId": 51643,
+    "requirements": {}
+  },
+  {
+    "source": {
+      "x": 1556,
+      "y": 3046,
+      "plane": 2
+    },
+    "destination": {
+      "x": 1559,
+      "y": 3046,
+      "plane": 0
+    },
+    "action": "Climb-down",
+    "objectId": 51644,
+    "requirements": {}
   }
 ]
