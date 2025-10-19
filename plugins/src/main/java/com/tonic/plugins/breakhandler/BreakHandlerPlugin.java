@@ -209,7 +209,7 @@ public class BreakHandlerPlugin extends Plugin
             return;
         }
 
-        if (!isLogoutDoorVisible())
+        if (isLogoutDoorVisible())
         {
             WidgetAPI.interact(1, InterfaceID.Worldswitcher.LOGOUT, -1, -1);
             logoutAttempts++;
