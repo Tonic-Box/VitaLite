@@ -1,11 +1,9 @@
 package com.tonic.plugins.profiles.panel;
 
-import com.tonic.plugins.profiles.ProfilesPlugin;
 import com.tonic.plugins.profiles.data.Profile;
 import com.tonic.plugins.profiles.session.ProfilesSession;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.client.callback.ClientThread;
 
 import javax.swing.*;
 import java.awt.*;

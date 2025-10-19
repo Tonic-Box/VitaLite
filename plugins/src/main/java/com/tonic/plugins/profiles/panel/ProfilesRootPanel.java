@@ -1,6 +1,5 @@
 package com.tonic.plugins.profiles.panel;
 
-import com.tonic.plugins.profiles.ProfilesPlugin;
 import com.tonic.plugins.profiles.data.Profile;
 import com.tonic.plugins.profiles.jagex.JagexAccountService;
 import com.tonic.plugins.profiles.jagex.model.JagCharacter;
