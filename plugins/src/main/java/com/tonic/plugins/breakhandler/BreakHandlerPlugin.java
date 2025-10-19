@@ -133,7 +133,7 @@ public class BreakHandlerPlugin extends Plugin
         }
 
         String username = System.getProperty("vUsername", "");
-        String password = System.getProperty("vUpassword", "");
+        String password = System.getProperty("vPassword", "");
 
         if (!username.isEmpty() && !password.isEmpty())
         {
