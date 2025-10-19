@@ -3,7 +3,6 @@ package com.tonic.plugins.breakhandler;
 import com.google.inject.Inject;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.plugins.breakhandler.settings.Property;
-import com.tonic.plugins.breakhandler.settings.Settings;
 import com.tonic.plugins.breakhandler.ui.BreakHandlerPanel;
 import com.tonic.plugins.profiles.data.Profile;
 import com.tonic.plugins.profiles.session.ProfilesSession;
@@ -216,7 +215,6 @@ public class BreakHandlerPlugin extends Plugin
             logoutAttempts++;
             loginAttemptDelay = LOGOUT_ATTEMPT_DELAY;
             breakHandler.log("[%s] Logout attempted, attempt %d", "Break Handler", logoutAttempts);
-            return;
         }
     }
 

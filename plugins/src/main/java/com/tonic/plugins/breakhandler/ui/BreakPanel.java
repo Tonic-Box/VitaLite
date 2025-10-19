@@ -40,20 +40,6 @@ public class BreakPanel extends JPanel
         updateTimer.start();
     }
 
-    public void update(Break scheduledBreak)
-    {
-        if (scheduledBreak == null)
-            return;
-
-        boolean pluginChanged = !this.scheduledBreak.getPluginName().equals(scheduledBreak.getPluginName());
-        this.scheduledBreak = scheduledBreak;
-
-        if (pluginChanged)
-            pluginLabel.setText(scheduledBreak.getPluginName());
-
-        updateCountdown();
-    }
-
     private void updateCountdown()
     {
         if (scheduledBreak == null)

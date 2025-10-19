@@ -13,7 +13,6 @@ public class BreakHandlerPanel extends PluginPanel
     private final BreakHandler breakHandler;
     private final JPanel breaksContainer;
     private final JLabel noBreaksLabel;
-    private final BreakSettingsPanel settingsPanel;
 
     public BreakHandlerPanel()
     {
@@ -41,7 +40,7 @@ public class BreakHandlerPanel extends PluginPanel
         breaksContainer.add(noBreaksLabel);
         add(breaksContainer, BorderLayout.CENTER);
 
-        settingsPanel = new BreakSettingsPanel();
+        BreakSettingsPanel settingsPanel = new BreakSettingsPanel();
         add(settingsPanel, BorderLayout.SOUTH);
 
         refreshBreakList();
