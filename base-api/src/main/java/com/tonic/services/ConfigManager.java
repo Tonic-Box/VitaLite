@@ -153,13 +153,7 @@ public class ConfigManager {
      * @return value
      */
     public Object getProperty(String propertyName) {
-        Object property = null;
-        try {
-            if (builder.getConfiguration().containsKey(propertyName))
-                property = builder.getConfiguration().getProperty(propertyName);
-        } catch (ConfigurationException ignored) {
-        }
-        return property;
+        return getPropertyOrDefault(propertyName, null);
     }
 
     /**
@@ -207,14 +201,7 @@ public class ConfigManager {
      * @return value
      */
     public String getString(String propertyName) {
-        String property = null;
-        try {
-            if (builder.getConfiguration().containsKey(propertyName))
-                property = builder.getConfiguration().getString(propertyName);
-        } catch (ConfigurationException e) {
-            Logger.error(e);
-        }
-        return property;
+        return getStringOrDefault(propertyName, null);
     }
 
     /**
@@ -266,13 +253,7 @@ public class ConfigManager {
      * @return value
      */
     public int getInt(String propertyName) {
-        try {
-            if (!builder.getConfiguration().containsKey(propertyName)) return 0;
-            return builder.getConfiguration().getInt(propertyName);
-        } catch (ConfigurationException e) {
-            Logger.error(e);
-        }
-        return 0;
+        return getIntOrDefault(propertyName, 0);
     }
 
     /**
@@ -283,7 +264,7 @@ public class ConfigManager {
      */
     public int getIntOrDefault(String propertyName, int defaultValue) {
         try {
-            if (!builder.getConfiguration().containsKey(propertyName)) return 0;
+            if (!builder.getConfiguration().containsKey(propertyName)) return defaultValue;
             return builder.getConfiguration().getInt(propertyName);
         } catch (ConfigurationException e) {
             Logger.error(e);
@@ -324,7 +305,7 @@ public class ConfigManager {
      */
     public boolean getBooleanOrDefault(String propertyName, boolean defaultValue) {
         try {
-            if (!builder.getConfiguration().containsKey(propertyName)) return false;
+            if (!builder.getConfiguration().containsKey(propertyName)) return defaultValue;
             return builder.getConfiguration().getBoolean(propertyName);
         } catch (ConfigurationException e) {
             Logger.error(e);
