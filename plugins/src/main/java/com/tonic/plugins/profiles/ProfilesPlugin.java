@@ -2,6 +2,7 @@ package com.tonic.plugins.profiles;
 
 import com.google.inject.Inject;
 import com.tonic.plugins.profiles.panel.ProfilesRootPanel;
+import com.tonic.plugins.profiles.session.ProfilesSession;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.client.callback.ClientThread;
@@ -31,6 +32,9 @@ public class ProfilesPlugin extends Plugin {
 
     @Inject
     private ClientToolbar clientToolbar;
+
+    @Getter
+    private final ProfilesSession profilesSession = ProfilesSession.getInstance();
     private NavigationButton navigationButton;
 
     @Override

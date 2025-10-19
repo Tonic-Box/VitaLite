@@ -1,40 +1,21 @@
 package com.tonic.plugins.profiles.panel;
 
-import com.google.gson.reflect.TypeToken;
-import com.tonic.Static;
-import com.tonic.model.DeviceID;
 import com.tonic.plugins.profiles.ProfilesPlugin;
 import com.tonic.plugins.profiles.data.Profile;
 import com.tonic.plugins.profiles.jagex.JagexAccountService;
 import com.tonic.plugins.profiles.jagex.model.JagCharacter;
 import com.tonic.plugins.profiles.jagex.model.JagLoginToken;
-import com.tonic.plugins.profiles.util.GsonUtil;
-import com.tonic.plugins.profiles.util.OS;
+import com.tonic.plugins.profiles.session.ProfilesSession;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.PluginPanel;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -45,28 +26,26 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class ProfilesRootPanel extends PluginPanel {
-    private static final String BASE64_KEY = generateAESKey();
-    private static final String DIRECTORY = Static.VITA_DIR + "\\profiles.db";
 
     private final ProfilesPlugin plugin;
 
     private final JPanel profilesPanel;
 
-    private final Set<Profile> profiles;
+    private final ProfilesSession profiles;
     private final Set<ProfilePanel> profilePanelSet;
     private JTextField searchField;
 
 
     public ProfilesRootPanel(ProfilesPlugin plugin) {
         this.plugin = plugin;
-        profiles = new HashSet<>();
+        this.profiles = this.plugin.getProfilesSession();
         this.profilePanelSet = new HashSet<>();
         this.profilesPanel = new JPanel();
 
         this.initialize();
 
-        loadProfilesFromFile(profiles);
-        loadProfilesList(profiles);
+        this.profiles.loadProfilesFromFile();
+        loadProfilesList(this.profiles.getProfiles());
     }
 
     private void initialize() {
@@ -158,7 +137,7 @@ public class ProfilesRootPanel extends PluginPanel {
 
         SelectCharacterPanel characterSelectPanel = new SelectCharacterPanel(Arrays.asList(token.getCharacters()));
 
-        loadProfilesFromFile(profiles);
+        profiles.loadProfilesFromFile();
 
         int selectCharacterReponse = JOptionPane.showOptionDialog(null,
                 characterSelectPanel,
@@ -225,7 +204,7 @@ public class ProfilesRootPanel extends PluginPanel {
                     continue;
                 }
 
-                if (profiles.stream().anyMatch(p -> p.getIdentifier().equals(nameField.getText()))) {
+                if (profiles.getProfiles().stream().anyMatch(p -> p.getIdentifier().equals(nameField.getText()))) {
                     characters.remove(0);
                     continue;
                 }
@@ -247,13 +226,13 @@ public class ProfilesRootPanel extends PluginPanel {
                         displayName, token.getSessionId(),
                         jagCharacter.getAccountId(), bankPinText);
 
-                profiles.add(profile);
+                profiles.getProfiles().add(profile);
                 characters.remove(0);
             }
         }
 
-        saveProfilesToFile(profiles);
-        loadProfilesList(profiles);
+        profiles.saveProfilesToFile();
+        loadProfilesList(profiles.getProfiles());
         service.shutdownServer();
     }
 
@@ -318,9 +297,9 @@ public class ProfilesRootPanel extends PluginPanel {
                 return;
             }
 
-            loadProfilesFromFile(profiles);
+            profiles.loadProfilesFromFile();
 
-            boolean alreadyExists = profiles.stream()
+            boolean alreadyExists = profiles.getProfiles().stream()
                     .anyMatch(p -> p != null && p.getIdentifier().equals(identifier));
 
             if (alreadyExists) {
@@ -344,9 +323,9 @@ public class ProfilesRootPanel extends PluginPanel {
                     bankPin
             );
 
-            profiles.add(profile);
-            saveProfilesToFile(profiles);
-            loadProfilesList(profiles);
+            profiles.getProfiles().add(profile);
+            profiles.saveProfilesToFile();
+            loadProfilesList(profiles.getProfiles());
 
             JOptionPane.showMessageDialog(null, "Jagex account added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -356,9 +335,9 @@ public class ProfilesRootPanel extends PluginPanel {
         AddLegacyAccountPanel addProxyPanel = new AddLegacyAccountPanel();
 
         addProxyPanel.addRsAccountActionListener((event) -> {
-            loadProfilesFromFile(profiles);
+            profiles.loadProfilesFromFile();
 
-            if (!profiles.isEmpty() && profiles.stream().anyMatch(p -> p != null && p.getIdentifier().equals(addProxyPanel.getIdentifierField().getText()))) {
+            if (!profiles.getProfiles().isEmpty() && profiles.getProfiles().stream().anyMatch(p -> p != null && p.getIdentifier().equals(addProxyPanel.getIdentifierField().getText()))) {
                 return;
             }
 
@@ -377,124 +356,11 @@ public class ProfilesRootPanel extends PluginPanel {
                     bankPin);
 
 
-            profiles.add(profile);
-            saveProfilesToFile(profiles);
-            loadProfilesList(profiles);
+            profiles.getProfiles().add(profile);
+            profiles.saveProfilesToFile();
+            loadProfilesList(profiles.getProfiles());
         });
         return addProxyPanel;
-    }
-
-    public static String encrypt(String plaintext) {
-        try {
-            byte[] keyBytes = Base64.getDecoder().decode(BASE64_KEY);
-            SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
-
-            byte[] iv = new byte[16];
-            new SecureRandom().nextBytes(iv);
-            IvParameterSpec ivSpec = new IvParameterSpec(iv);
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
-
-            byte[] cipherBytes = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
-
-            byte[] combined = new byte[iv.length + cipherBytes.length];
-            System.arraycopy(iv, 0, combined, 0, iv.length);
-            System.arraycopy(cipherBytes, 0, combined, iv.length, cipherBytes.length);
-
-            return Base64.getEncoder().encodeToString(combined);
-        } catch (Exception e) {
-            throw new RuntimeException("Encryption failed", e);
-        }
-    }
-
-    public static String decrypt(String base64IvAndCiphertext) {
-        try {
-            byte[] combined = Base64.getDecoder().decode(base64IvAndCiphertext);
-            byte[] keyBytes = Base64.getDecoder().decode(BASE64_KEY);
-            SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
-
-            byte[] iv = new byte[16];
-            System.arraycopy(combined, 0, iv, 0, iv.length);
-            IvParameterSpec ivSpec = new IvParameterSpec(iv);
-
-            int ctLen = combined.length - iv.length;
-            byte[] ct = new byte[ctLen];
-            System.arraycopy(combined, iv.length, ct, 0, ctLen);
-
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-
-            byte[] plainBytes = cipher.doFinal(ct);
-            return new String(plainBytes, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            throw new RuntimeException("Decryption failed", e);
-        }
-    }
-
-    private static String generateAESKey() {
-        try {
-            String deviceId = DeviceID.vanillaGetDeviceID(OS.detect().getValue());
-
-            // Hash the device ID to get exactly 32 bytes (256-bit) for AES-256
-            MessageDigest sha = MessageDigest.getInstance("SHA-256");
-            byte[] hash = sha.digest(deviceId.getBytes(StandardCharsets.UTF_8));
-
-            // Encode the 32-byte hash to base64
-            return Base64.getEncoder().encodeToString(hash);
-        } catch (Exception e) {
-            // Fallback to a default key if something fails
-            return Base64.getEncoder().encodeToString(
-                    "DEFAULT_KEY_FALLBACK_1234567890".getBytes()
-            );
-        }
-    }
-
-    public static void saveProfilesToFile(Set<Profile> profiles) {
-        try {
-            if (!Files.exists(Paths.get(DIRECTORY))) {
-                Files.createFile(Paths.get(DIRECTORY));
-            }
-        } catch (IOException e) {
-        }
-        try (Writer writer = new FileWriter(DIRECTORY)) {
-            String json = GsonUtil.GSON.toJson(profiles);
-            String enc = encrypt(json);
-            writer.write(enc);
-        } catch (IOException e) {
-        }
-    }
-
-    public static void loadProfilesFromFile(Set<Profile> profiles) {
-        try {
-            if (!Files.exists(Paths.get(DIRECTORY))) {
-                Files.createFile(Paths.get(DIRECTORY));
-            }
-        } catch (IOException e) {
-        }
-        try (Reader reader = new FileReader(DIRECTORY)) {
-            StringBuilder builder = new StringBuilder();
-            int ch;
-            while ((ch = reader.read()) != -1) {
-                builder.append((char) ch);
-            }
-            String enc = builder.toString();
-
-            if (enc.isEmpty()) {
-                return;
-            }
-
-            String json = decrypt(enc);
-            Type setType = new TypeToken<Set<Profile>>(){}.getType();
-            Set<Profile> loadedProfiles = GsonUtil.GSON.fromJson(json, setType);
-
-            if (loadedProfiles == null) {
-                profiles.clear();
-            } else {
-                profiles.addAll(loadedProfiles);
-            }
-        } catch (IOException e) {
-        }
     }
 
     private void loadProfilesList(Set<Profile> profiles) {
@@ -576,30 +442,30 @@ public class ProfilesRootPanel extends PluginPanel {
     }
 
     private void removeProfile(Profile profile) {
-        profiles.remove(profile);
-        saveProfilesToFile(profiles);
-        loadProfilesList(profiles);
+        profiles.getProfiles().remove(profile);
+        profiles.saveProfilesToFile();
+        loadProfilesList(profiles.getProfiles());
     }
 
     private void editProfile(Profile profile, String tag, String bankPin) {
-        profiles.remove(profile);
+        profiles.getProfiles().remove(profile);
         profile.setIdentifier(tag);
         profile.setBankPin(bankPin);
-        profiles.add(profile);
-        saveProfilesToFile(profiles);
-        loadProfilesList(profiles);
+        profiles.getProfiles().add(profile);
+        profiles.saveProfilesToFile();
+        loadProfilesList(profiles.getProfiles());
     }
 
     private void editProfile(Profile profile, String tag, String user, String pass, String pin) {
-        profiles.remove(profile);
+        profiles.getProfiles().remove(profile);
         profile.setIdentifier(tag);
         profile.setUsername(user);
         profile.setCharacterName(user);
         profile.setPassword(pass);
         profile.setBankPin(pin);
-        profiles.add(profile);
-        saveProfilesToFile(profiles);
-        loadProfilesList(profiles);
+        profiles.getProfiles().add(profile);
+        profiles.saveProfilesToFile();
+        loadProfilesList(profiles.getProfiles());
     }
 
     private JPanel createEditPanel(JTextField tagField, JTextField usernameField, JTextField passwordField, JTextField bankPinField) {
