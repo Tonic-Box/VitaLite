@@ -39,7 +39,7 @@ public class ProfilesPlugin extends Plugin {
 
     @Override
     protected void startUp() throws Exception {
-        ProfilesRootPanel panel = new ProfilesRootPanel(this);
+        ProfilesRootPanel panel = new ProfilesRootPanel(profilesSession);
         
         navigationButton = NavigationButton.builder()
                 .icon(profilesIcon)

@@ -1,26 +1,18 @@
 package com.tonic.plugins.profiles.panel;
 
 import com.tonic.plugins.profiles.ProfilesPlugin;
-import com.tonic.plugins.profiles.data.AuthHooks;
 import com.tonic.plugins.profiles.data.Profile;
 import com.tonic.plugins.profiles.session.ProfilesSession;
-import com.tonic.plugins.profiles.util.GsonUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
 import net.runelite.client.callback.ClientThread;
 
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 @Slf4j
 public class ProfilePanel extends JPanel {
 
-    private final Client client;
-    private final ClientThread clientThread;
     @Getter
     private final Profile profile;
 
@@ -34,9 +26,7 @@ public class ProfilePanel extends JPanel {
 
     private final ProfilesSession profilesSession;
 
-    public ProfilePanel(ProfilesPlugin plugin, Profile profile) {
-        this.client = plugin.getClient();
-        this.clientThread = plugin.getClientThread();
+    public ProfilePanel(Profile profile) {
         this.profile = profile;
         setLayout(new BorderLayout());
         setMinimumSize(new Dimension(200, 80));

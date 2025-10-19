@@ -27,8 +27,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProfilesRootPanel extends PluginPanel {
 
-    private final ProfilesPlugin plugin;
-
     private final JPanel profilesPanel;
 
     private final ProfilesSession profiles;
@@ -36,9 +34,8 @@ public class ProfilesRootPanel extends PluginPanel {
     private JTextField searchField;
 
 
-    public ProfilesRootPanel(ProfilesPlugin plugin) {
-        this.plugin = plugin;
-        this.profiles = this.plugin.getProfilesSession();
+    public ProfilesRootPanel(ProfilesSession profiles) {
+        this.profiles = profiles;
         this.profilePanelSet = new HashSet<>();
         this.profilesPanel = new JPanel();
 
@@ -374,7 +371,7 @@ public class ProfilesRootPanel extends PluginPanel {
         }
 
         for (Profile profile : profileList) {
-            ProfilePanel panel = new ProfilePanel(plugin, profile);
+            ProfilePanel panel = new ProfilePanel(profile);
             panel.getDeleteButton().addActionListener(e -> {
                 int result = JOptionPane.showConfirmDialog(null, "Do you want to delete " + profile.getIdentifier() + "?", "Remove account", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null);
 
