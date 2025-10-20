@@ -647,7 +647,7 @@ public class Walker
     private boolean handlePassThroughObjects(Player local, List<Step> steps, Step step)
     {
         TileObjectEx object = new TileObjectQuery<>()
-                .withNamesContains("door", "gate")
+                .withNamesContains("door", "gate", "curtain")
                 .keepIf(o -> (o.getWorldLocation().equals(local.getWorldLocation()) || o.getWorldLocation().equals(step.getPosition())))
                 .sortNearest()
                 .first();
