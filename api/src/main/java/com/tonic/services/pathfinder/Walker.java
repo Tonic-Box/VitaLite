@@ -671,11 +671,6 @@ public class Walker
                 return true;
             }
             Logger.info("[Pathfinder] Failed to find Passthrough, atempting to circumvent");
-            if(repathDelay < 5)
-            {
-                repathDelay++;
-                return true;
-            }
             rePath(steps);
             return true;
         }
