@@ -67,6 +67,7 @@ public class Walker
     @Setter
     private boolean useTeleports = true;
     private boolean justInteracted = false;
+    private int repathDelay = 0;
 
     private Walker()
     {
@@ -321,6 +322,7 @@ public class Walker
 
     private void reset()
     {
+        repathDelay = 0;
         teleport = null;
         cooldown = 0;
         timeout = 0;
@@ -665,6 +667,11 @@ public class Walker
         }
         else {
             Logger.info("[Pathfinder] Failed to find Passthrough, atempting to circumvent");
+            if(repathDelay < 5)
+            {
+                repathDelay++;
+                return false;
+            }
             rePath(steps);
             return true;
         }
