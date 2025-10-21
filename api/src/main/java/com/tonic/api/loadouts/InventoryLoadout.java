@@ -18,7 +18,7 @@ public class InventoryLoadout implements Iterable<LoadoutItem>
   private final String name;
   private final Map<String, LoadoutItem> items;
 
-  private ItemDepletionListener itemDepletionListener;
+  private transient ItemDepletionListener itemDepletionListener;
 
   public InventoryLoadout(String name)
   {

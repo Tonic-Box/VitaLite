@@ -10,7 +10,8 @@ import net.runelite.api.gameval.InventoryID;
 import java.util.Comparator;
 import java.util.List;
 
-public class NamedLoadoutItem extends LoadoutItem {
+public class NamedLoadoutItem extends LoadoutItem
+{
 
   private final String[] names;
 
@@ -168,7 +169,7 @@ public class NamedLoadoutItem extends LoadoutItem {
         throw new LoadoutException("Names not specified for NamedLoadoutItem");
       }
 
-      return new NamedLoadoutItem(identifier, amount, minimumAmount, stackable, noted, optional, equipmentSlot, restockConfig, names);
+      return new NamedLoadoutItem(identifier, minimumAmount, amount, stackable, noted, optional, equipmentSlot, restockConfig, names);
     }
   }
 }
