@@ -6,7 +6,6 @@ import com.tonic.api.TClient;
 import com.tonic.services.ClickPacket.ClickPacket;
 import com.tonic.services.ClickPacket.PacketInteractionType;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -39,12 +38,15 @@ public class ClickManager
      */
     public static void queueClickBox(Shape shape)
     {
-        if(shape == null)
-        {
-            ClickManager.shape = null;
-            return;
-        }
-        ClickManager.shape = shape;
+        Static.invoke(() -> {
+            if(shape == null)
+            {
+                ClickManager.shape = null;
+                return;
+            }
+            ClickManager.shape = shape;
+        });
+
     }
 
     /**
