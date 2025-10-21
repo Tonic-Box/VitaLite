@@ -2,6 +2,8 @@ package com.tonic.api.widgets;
 
 import com.tonic.Static;
 import com.tonic.api.TClient;
+import com.tonic.api.loadouts.EquipmentLoadout;
+import com.tonic.api.loadouts.item.LoadoutItem;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.data.EquipmentSlot;
 import com.tonic.data.ItemEx;
@@ -84,6 +86,38 @@ public class EquipmentAPI
         ItemEx item = fromSlot(slot);
         if(item != null) {
             interact(item, 1);
+        }
+    }
+
+    /**
+     * Equips a loadout
+     * @param loadout The loadout to equip
+     */
+    public static void equip(EquipmentLoadout loadout)
+    {
+        for (LoadoutItem item : loadout)
+        {
+            List<ItemEx> carried = item.getCarried();
+            List<ItemEx> worn = item.getWorn();
+            if (carried.isEmpty() && worn.isEmpty())
+            {
+                if (!item.isOptional() && loadout.getItemDepletionListener() != null)
+                {
+                    loadout.getItemDepletionListener().onDeplete(item);
+                }
+
+                continue;
+            }
+
+            if (!item.isStackable() && !worn.isEmpty())
+            {
+                continue;
+            }
+
+            for (ItemEx equippable : carried)
+            {
+                InventoryAPI.interact(equippable, 3);
+            }
         }
     }
 
