@@ -16,7 +16,9 @@ import com.tonic.data.StrongholdSecurityQuestion;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.queries.TileObjectQuery;
+import com.tonic.services.ClickManager;
 import com.tonic.services.GameManager;
+import com.tonic.services.ClickVisualizationOverlay;
 import com.tonic.services.pathfinder.model.Step;
 import com.tonic.services.pathfinder.teleports.Teleport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
@@ -27,12 +29,15 @@ import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.*;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.WidgetInfo;
 import org.apache.commons.lang3.ArrayUtils;
+
+import java.awt.Polygon;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -292,6 +297,13 @@ public class Walker
 
         target = applyRedirect(target);
 
+        WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
+        if (playerLocation.equals(target))
+        {
+            running = false;
+            return;
+        }
+
         reset();
         this.useTeleports = useTeleports;
         TransportLoader.refreshTransports();
@@ -390,6 +402,7 @@ public class Walker
                         GameManager.clearPathPoints();
                         return;
                     }
+                    recordWalkClick(end);
                     MovementAPI.walkToWorldPoint(end);
                     handlePrayer();
                     Delays.tick();
@@ -419,6 +432,7 @@ public class Walker
     private void cancel()
     {
         running = false;
+        GameManager.clearPathPoints();
     }
 
     /**
@@ -619,7 +633,6 @@ public class Walker
         }
 
         int s = 0;
-        //rand 5 - 12
         int rand = ThreadLocalRandom.current().nextInt(5, 16);
         while(s <= rand && s < steps.size() && !steps.get(s).hasTransport())
         {
@@ -639,6 +652,7 @@ public class Walker
             steps.remove(0);
         }
         step = steps.get(0);
+        recordWalkClick(step.getPosition());
         MovementAPI.walkTowards(step.getPosition());
         if(!step.hasTransport())
             steps.remove(step);
@@ -753,5 +767,70 @@ public class Walker
         steps.clear();
         Pathfinder engine = new Pathfinder(wp);
         steps.addAll(engine.find());
+    }
+
+    /**
+     * Record a click visualization for walking to a destination
+     * @param destination The destination WorldPoint
+     */
+    private void recordWalkClick(WorldPoint destination) {
+        if (destination == null) {
+            return;
+        }
+
+        try {
+            LocalPoint localPoint = LocalPoint.fromWorld(client, destination);
+            if (localPoint != null) {
+                Point screenPoint = Perspective.localToCanvas(client, localPoint, client.getPlane());
+
+                boolean isValidScreenPoint = false;
+                if (screenPoint != null) {
+                    java.awt.Rectangle viewport = client.getCanvas().getBounds();
+                    isValidScreenPoint = screenPoint.getX() >= 0 &&
+                                        screenPoint.getX() <= viewport.width &&
+                                        screenPoint.getY() >= 0 &&
+                                        screenPoint.getY() <= viewport.height;
+                }
+
+                if (screenPoint != null && isValidScreenPoint) {
+                    Polygon tilePoly = Perspective.getCanvasTilePoly(client, localPoint);
+                    if (tilePoly != null) {
+                        ClickManager.queueClickBox(tilePoly);
+                    } else {
+                        ClickManager.setPoint(screenPoint.getX(), screenPoint.getY());
+                    }
+
+                    ClickVisualizationOverlay.recordClick(
+                        screenPoint.getX(),
+                        screenPoint.getY(),
+                        ClickVisualizationOverlay.ClickType.MOVEMENT,
+                        "Walk"
+                    );
+                } else {
+                    Point minimapPoint = Static.invoke(() -> Perspective.localToMinimap(client, localPoint));
+                    if (minimapPoint != null) {
+                        int radius = 3;
+                        int[] xPoints = new int[8];
+                        int[] yPoints = new int[8];
+                        for (int i = 0; i < 8; i++) {
+                            double angle = 2 * Math.PI * i / 8;
+                            xPoints[i] = minimapPoint.getX() + (int)(radius * Math.cos(angle));
+                            yPoints[i] = minimapPoint.getY() + (int)(radius * Math.sin(angle));
+                        }
+                        Polygon minimapClickBox = new Polygon(xPoints, yPoints, 8);
+
+                        ClickManager.queueClickBox(minimapClickBox);
+
+                        ClickVisualizationOverlay.recordClick(
+                            minimapPoint.getX(),
+                            minimapPoint.getY(),
+                            ClickVisualizationOverlay.ClickType.MOVEMENT,
+                            "Walk (Minimap)"
+                        );
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
     }
 }
