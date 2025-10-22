@@ -9,9 +9,13 @@ import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
 import com.tonic.util.ReflectBuilder;
 import com.tonic.util.ReflectUtil;
+import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 public class VitaLiteOptionsPanel extends VPluginPanel {
 
@@ -219,9 +223,12 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
         contentPanel.add(Box.createVerticalStrut(12));
 
-        FancyButton transportButton = new FancyButton("Transport Editor");
-        transportButton.addActionListener(e -> toggleTransportsEditor());
-        contentPanel.add(transportButton);
+        if(!Static.isRunningFromShadedJar())
+        {
+            FancyButton transportButton = new FancyButton("Transport Editor");
+            transportButton.addActionListener(e -> toggleTransportsEditor());
+            contentPanel.add(transportButton);
+        }
 
         contentPanel.add(Box.createVerticalStrut(20));
         JLabel debugLabel = new JLabel("Debug");

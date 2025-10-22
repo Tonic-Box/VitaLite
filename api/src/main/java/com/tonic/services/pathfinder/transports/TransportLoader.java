@@ -112,7 +112,7 @@ public class TransportLoader
             for (ArrayList<Transport> list : ALL_STATIC_TRANSPORTS.valueCollection()) {
                 for(var transport : list)
                 {
-                    if(transport.getRequirements().fulfilled() || !filter)
+                    if(transport.getRequirements() == null || transport.getRequirements().fulfilled() || !filter)
                     {
                         filteredStatic.add(transport);
                     }
@@ -444,9 +444,9 @@ public class TransportLoader
 
             if(filter)
             {
-                LAST_TRANSPORT_LIST.forEachValue(list -> list.removeIf(t -> !t.getRequirements().fulfilled()));
-                        LAST_TRANSPORT_LIST.forEachValue(list -> {
-                    list.removeIf(t -> !t.getRequirements().fulfilled());
+                LAST_TRANSPORT_LIST.forEachValue(list -> list.removeIf(t -> t.getRequirements() != null && !t.getRequirements().fulfilled()));
+                LAST_TRANSPORT_LIST.forEachValue(list -> {
+                    list.removeIf(t -> t.getRequirements() != null && !t.getRequirements().fulfilled());
                     return true;
                 });
                 LAST_TRANSPORT_LIST.retainEntries((key, value) ->  !value.isEmpty());
