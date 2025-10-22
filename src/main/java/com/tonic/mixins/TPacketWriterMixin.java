@@ -42,24 +42,24 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     @Getter
     public TPacketBuffer serverPacketBuffer;
 
-//    @Shadow("addNode2")
-//    public abstract void addNode(TPacketWriter packetWriter, TPacketBufferNode node);
-//
-//    @MethodHook("addNode2")
-//    @Inject
-//    public static void onAddNode2(TPacketWriter packetWriter, TPacketBufferNode node)
-//    {
-//        addNodeHook(node);
-//    }
+    @Shadow("addNode2")
+    public abstract void addNode(TPacketWriter packetWriter, TPacketBufferNode node);
 
-    @Shadow("addNode")
-    public abstract void addNode(TPacketBufferNode node);
-    @MethodHook("addNode")
+    @MethodHook("addNode2")
     @Inject
-    public static void onAddNode1(TPacketBufferNode node)
+    public static void onAddNode2(TPacketWriter packetWriter, TPacketBufferNode node)
     {
         addNodeHook(node);
     }
+
+//    @Shadow("addNode")
+//    public abstract void addNode(TPacketBufferNode node);
+//    @MethodHook("addNode")
+//    @Inject
+//    public static void onAddNode1(TPacketBufferNode node)
+//    {
+//        addNodeHook(node);
+//    }
 
     @Inject
     public static void addNodeHook(TPacketBufferNode node)
@@ -89,8 +89,8 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     @Inject
     private void addNodeSwitch(TPacketBufferNode node)
     {
-        this.addNode(node);
-        //this.addNode(this, node);
+        //this.addNode(node);
+        this.addNode(this, node);
     }
 
     @Inject
