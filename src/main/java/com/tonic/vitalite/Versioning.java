@@ -30,7 +30,7 @@ public final class Versioning
             if (version == null)
             {
                 System.out.println("Could not find manifest, assuming dev environment");
-                return RuneliteConfigUtil.getTagValueFromURL("release");
+                return RuneliteConfigUtil.getRuneLiteVersion();
             }
             return version;
         } catch (final IOException e) {
@@ -40,7 +40,7 @@ public final class Versioning
 
     public static String getLiveRuneliteVersion()
     {
-        return RuneliteConfigUtil.getTagValueFromURL("release");
+        return RuneliteConfigUtil.getRuneLiteVersion();
     }
 
     public static boolean isRunningFromShadedJar() {

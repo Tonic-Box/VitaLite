@@ -1,12 +1,7 @@
 package com.tonic.util;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import com.google.gson.JsonParser;
 import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.jar.JarFile;
@@ -15,7 +10,7 @@ public class RuneliteConfigUtil
 {
     public static String fetchUrl()
     {
-        String injectedVersion   = getTagValueFromURL("release");
+        String injectedVersion   = getRuneLiteVersion();
         String injectedFilename  = "injected-client-" + injectedVersion + ".jar";
         return "https://repo.runelite.net/net/runelite/injected-client/" + injectedVersion + "/" + injectedFilename;
     }
@@ -26,34 +21,24 @@ public class RuneliteConfigUtil
         return ((JarURLConnection) jarUrl.openConnection()).getJarFile();
     }
 
-    /**
-     * Extracts the value of the specified tag from an XML file at a given URL.
-     *
-     * @param tagName   The name of the tag to extract.
-     * @return The value of the specified tag, or null if not found.
-     */
-    public static String getTagValueFromURL(String tagName) {
+    public static String getRuneLiteVersion() {
         try {
-            URL url = new URL("https://repo.runelite.net/net/runelite/injected-client/maven-metadata.xml");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            if (connection.getResponseCode() == 200) {
-                try (InputStream inputStream = connection.getInputStream()) {
-                    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder builder = factory.newDocumentBuilder();
-                    Document document = builder.parse(inputStream);
-                    document.getDocumentElement().normalize();
-                    NodeList nodeList = document.getElementsByTagName(tagName);
-                    if (nodeList.getLength() > 0) {
-                        return nodeList.item(0).getTextContent();
-                    }
+            URL url = new URL("https://static.runelite.net/bootstrap.json");
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                StringBuilder json = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    json.append(line);
                 }
-            } else {
-                System.out.println("Failed to fetch XML. HTTP Response Code: " + connection.getResponseCode());
+                return JsonParser.parseString(json.toString())
+                        .getAsJsonObject()
+                        .get("version")
+                        .getAsString();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return "unknown";
     }
 }

@@ -10,6 +10,7 @@ import com.tonic.services.pathfinder.ui.components.TransportListPanel;
 import com.tonic.services.pathfinder.ui.components.ToolbarPanel;
 import com.tonic.services.pathfinder.ui.utils.JsonFileManager;
 import com.tonic.util.ThreadPool;
+import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
 
 import javax.swing.*;
@@ -43,12 +44,26 @@ public class TransportEditorFrame extends JFrame {
     private TransportDetailPanel detailPanel;
 
     // Data
-    private List<TransportDto> transports = new ArrayList<>();
+    @Getter
+    private static List<TransportDto> transports = new ArrayList<>();
     private boolean hasUnsavedChanges = false;
     private JMenu testsMenu;
     private JMenuItem cancel;
     private final List<JMenuItem> tests = new ArrayList<>();
     private Color origonalColor;
+
+    public static List<TransportDto> getTransportsAt(WorldPoint point)
+    {
+        List<TransportDto> results = new ArrayList<>();
+        for(TransportDto transport : transports)
+        {
+            if(transport.getSource().equals(point))
+            {
+                results.add(transport);
+            }
+        }
+        return results;
+    }
 
     public TransportEditorFrame() {
         initializeFrame();
@@ -281,14 +296,11 @@ public class TransportEditorFrame extends JFrame {
         int index = transports.indexOf(oldTransport);
         if (index >= 0) {
             transports.set(index, newTransport);
-            listPanel.refreshTransportList(transports);
-            listPanel.selectTransport(newTransport);
+            // Use lightweight in-place update instead of full refresh to prevent cursor resets
+            // and avoid re-triggering selection events that would reset the detail panel
+            listPanel.updateTransportInPlace(oldTransport, newTransport);
             setHasUnsavedChanges(true);
         }
-    }
-
-    public List<TransportDto> getTransports() {
-        return transports;
     }
 
     public boolean selectTransportByObjectAndSource(int objectId, WorldPoint worldPoint) {
