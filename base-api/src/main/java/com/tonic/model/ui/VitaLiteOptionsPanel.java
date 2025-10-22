@@ -9,9 +9,13 @@ import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
 import com.tonic.util.ReflectBuilder;
 import com.tonic.util.ReflectUtil;
+import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 public class VitaLiteOptionsPanel extends VPluginPanel {
 
@@ -33,6 +37,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private static final Color ACCENT_COLOR = new Color(64, 169, 211);
     private final ToggleSlider headlessToggle;
     private final ToggleSlider logPacketsToggle;
+    private final ToggleSlider nameLogging;
     private final ToggleSlider logServerPacketsToggle;
     private final ToggleSlider logMenuActionsToggle;
     private final ToggleSlider hideLoggerToggle;
@@ -121,8 +126,18 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 logMenuActionsToggle,
                 () -> {}
         ));
-        contentPanel.add(Box.createVerticalStrut(12));
 
+        contentPanel.add(Box.createVerticalStrut(12));
+        nameLogging = new ToggleSlider();
+        nameLogging.setSelected(Static.getVitaConfig().shouldLogNames());
+        contentPanel.add(createToggleOption(
+                "Logger Names",
+                "Show gameval names in logging",
+                nameLogging,
+                () -> Static.getVitaConfig().setShouldLogNames(nameLogging.isSelected())
+        ));
+
+        contentPanel.add(Box.createVerticalStrut(12));
         hideLoggerToggle = new ToggleSlider();
         contentPanel.add(createToggleOption(
                 "Hide Logger",
@@ -208,9 +223,12 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
         contentPanel.add(Box.createVerticalStrut(12));
 
-        FancyButton transportButton = new FancyButton("Transport Editor");
-        transportButton.addActionListener(e -> toggleTransportsEditor());
-        contentPanel.add(transportButton);
+        if(!Static.isRunningFromShadedJar())
+        {
+            FancyButton transportButton = new FancyButton("Transport Editor");
+            transportButton.addActionListener(e -> toggleTransportsEditor());
+            contentPanel.add(transportButton);
+        }
 
         contentPanel.add(Box.createVerticalStrut(20));
         JLabel debugLabel = new JLabel("Debug");
