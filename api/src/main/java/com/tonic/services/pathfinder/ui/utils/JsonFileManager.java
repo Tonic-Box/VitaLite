@@ -22,8 +22,9 @@ public class JsonFileManager {
 
     public JsonFileManager() {
         this.gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .create();
+                .registerTypeAdapterFactory(new EmptyCollectionTypeAdapterFactory())
+                .setPrettyPrinting()
+                .create();
     }
 
     /**
@@ -170,7 +171,6 @@ public class JsonFileManager {
         try (FileWriter writer = new FileWriter(file, false)) {
             gson.toJson(transports, writer);
             writer.flush();
-
         } catch (Exception e) {
             throw new IOException("Failed to save transport file: " + e.getMessage(), e);
         }
