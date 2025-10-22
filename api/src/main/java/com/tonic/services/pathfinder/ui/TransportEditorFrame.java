@@ -10,6 +10,7 @@ import com.tonic.services.pathfinder.ui.components.TransportListPanel;
 import com.tonic.services.pathfinder.ui.components.ToolbarPanel;
 import com.tonic.services.pathfinder.ui.utils.JsonFileManager;
 import com.tonic.util.ThreadPool;
+import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
 
 import javax.swing.*;
@@ -43,12 +44,26 @@ public class TransportEditorFrame extends JFrame {
     private TransportDetailPanel detailPanel;
 
     // Data
-    private List<TransportDto> transports = new ArrayList<>();
+    @Getter
+    private static List<TransportDto> transports = new ArrayList<>();
     private boolean hasUnsavedChanges = false;
     private JMenu testsMenu;
     private JMenuItem cancel;
     private final List<JMenuItem> tests = new ArrayList<>();
     private Color origonalColor;
+
+    public static List<TransportDto> getTransportsAt(WorldPoint point)
+    {
+        List<TransportDto> results = new ArrayList<>();
+        for(TransportDto transport : transports)
+        {
+            if(transport.getSource().equals(point))
+            {
+                results.add(transport);
+            }
+        }
+        return results;
+    }
 
     public TransportEditorFrame() {
         initializeFrame();
@@ -285,10 +300,6 @@ public class TransportEditorFrame extends JFrame {
             listPanel.selectTransport(newTransport);
             setHasUnsavedChanges(true);
         }
-    }
-
-    public List<TransportDto> getTransports() {
-        return transports;
     }
 
     public boolean selectTransportByObjectAndSource(int objectId, WorldPoint worldPoint) {

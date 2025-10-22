@@ -33,6 +33,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private static final Color ACCENT_COLOR = new Color(64, 169, 211);
     private final ToggleSlider headlessToggle;
     private final ToggleSlider logPacketsToggle;
+    private final ToggleSlider nameLogging;
     private final ToggleSlider logServerPacketsToggle;
     private final ToggleSlider logMenuActionsToggle;
     private final ToggleSlider hideLoggerToggle;
@@ -121,8 +122,18 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 logMenuActionsToggle,
                 () -> {}
         ));
-        contentPanel.add(Box.createVerticalStrut(12));
 
+        contentPanel.add(Box.createVerticalStrut(12));
+        nameLogging = new ToggleSlider();
+        nameLogging.setSelected(Static.getVitaConfig().shouldLogNames());
+        contentPanel.add(createToggleOption(
+                "Logger Names",
+                "Show gameval names in logging",
+                nameLogging,
+                () -> Static.getVitaConfig().setShouldLogNames(nameLogging.isSelected())
+        ));
+
+        contentPanel.add(Box.createVerticalStrut(12));
         hideLoggerToggle = new ToggleSlider();
         contentPanel.add(createToggleOption(
                 "Hide Logger",
