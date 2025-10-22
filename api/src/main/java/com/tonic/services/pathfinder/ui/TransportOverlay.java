@@ -1,7 +1,11 @@
 package com.tonic.services.pathfinder.ui;
 
 import com.google.common.base.Strings;
+import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.api.game.ClientScriptAPI;
+import com.tonic.api.threaded.Delays;
+import com.tonic.services.pathfinder.model.TransportDto;
 import com.tonic.services.pathfinder.transports.Transport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.WorldPointUtil;
@@ -23,6 +27,7 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TransportOverlay extends Overlay
@@ -35,6 +40,7 @@ public class TransportOverlay extends Overlay
 
     public TransportOverlay()
     {
+        ClientScriptAPI.closeNumericInputDialogue();
         Static.getRuneLite().getEventBus().register(this);
         setPosition(OverlayPosition.DYNAMIC);
         setPriority(PRIORITY_LOW);
@@ -55,7 +61,7 @@ public class TransportOverlay extends Overlay
                 return;
 
             WorldPoint worldPoint = WorldPointUtil.get(worldView.getSelectedSceneTile().getWorldLocation());
-            ArrayList<Transport> tr = TransportLoader.getTransports().get(WorldPointUtil.compress(worldPoint));
+            List<Transport> tr = TransportLoader.getTransports().get(WorldPointUtil.compress(worldPoint));
             if(tr != null && !tr.isEmpty())
             {
                 for(Transport t : tr)
@@ -66,13 +72,20 @@ public class TransportOverlay extends Overlay
                                 .setOption("Hardcoded Transport [-> " + WorldPointUtil.fromCompressed(t.getDestination()) + "]")
                                 .setTarget(color + "Transport ")
                                 .setType(MenuAction.RUNELITE);
-                        continue;
                     }
+                }
+            }
+
+            List<TransportDto> tr2 = TransportEditorFrame.getTransportsAt(worldPoint);
+            if(!tr2.isEmpty())
+            {
+                for(TransportDto t : tr2)
+                {
                     client.createMenuEntry(1)
-                            .setOption("Edit Transport [-> " + WorldPointUtil.fromCompressed(t.getDestination()) + "]")
+                            .setOption("Edit Transport [-> " + t.getDestination() + "]")
                             .setTarget(color + "Transport ")
                             .setType(MenuAction.RUNELITE)
-                            .onClick(c -> TransportEditorFrame.INSTANCE.selectTransportByObjectAndSource(t.getId(), worldPoint));
+                            .onClick(c -> TransportEditorFrame.INSTANCE.selectTransportByObjectAndSource(t.getObjectId(), worldPoint));
                 }
             }
         }
@@ -139,7 +152,7 @@ public class TransportOverlay extends Overlay
         int z = wv.getPlane();
         Tile tile;
         WorldPoint point;
-        ArrayList<Transport> tr;
+        List<TransportDto> tr;
 
         for (int x = 0; x < Constants.SCENE_SIZE; ++x)
         {
@@ -152,8 +165,8 @@ public class TransportOverlay extends Overlay
                     continue;
                 }
                 point = tile.getWorldLocation();
-                tr = TransportLoader.getTransports().get(WorldPointUtil.compress(point));
-                if(tr != null && !tr.isEmpty())
+                tr = TransportEditorFrame.getTransportsAt(point);
+                if(!tr.isEmpty())
                 {
                     points.put(tile.getWorldLocation(), tr.size());
                 }

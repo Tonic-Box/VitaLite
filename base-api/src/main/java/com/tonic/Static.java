@@ -5,14 +5,18 @@ import com.tonic.api.TClient;
 import com.tonic.headless.HeadlessMode;
 import com.tonic.model.RuneLite;
 import com.tonic.util.ClientConfig;
+import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.config.ConfigFactory;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  * Static access to important stuff
@@ -134,5 +138,17 @@ public class Static
     public static void setHeadless(boolean headless) {
         Static.headless = headless;
         HeadlessMode.toggleHeadless(headless);
+    }
+
+    public static boolean isRunningFromShadedJar() {
+        try {
+            final Manifest manifest = new Manifest(Static.class.getClassLoader()
+                    .getResourceAsStream("META-INF/MANIFEST.MF"));
+            final Attributes attrs = manifest.getMainAttributes();
+            final String version = attrs.getValue("Implementation-Version");
+            return version != null;
+        } catch (final IOException e) {
+            return false;
+        }
     }
 }
