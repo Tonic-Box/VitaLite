@@ -6,7 +6,8 @@ import com.tonic.data.ItemEx;
 
 import java.util.List;
 
-public abstract class LoadoutItem {
+public abstract class LoadoutItem
+{
 
   private final String identifier;
   private final int minimumAmount;

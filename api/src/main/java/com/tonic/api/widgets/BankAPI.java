@@ -173,7 +173,7 @@ public class BankAPI
     }
 
     private static int depositForeignLoadoutItems(InventoryLoadout loadout, int maxActionsPerTick) {
-        List<ItemEx> foreign = loadout.getCarriedForeignItems();
+        List<ItemEx> foreign = loadout.getForeignItems();
         if (foreign.isEmpty())
         {
             return 0;
@@ -209,7 +209,7 @@ public class BankAPI
     }
 
     private static int depositExcessLoadoutItems(InventoryLoadout loadout) {
-        List<LoadoutItem> excess = loadout.getCarriedExcessItems();
+        List<LoadoutItem> excess = loadout.getExcessItems();
         int actions = 0;
         for (LoadoutItem item : excess)
         {
