@@ -2,6 +2,7 @@ package com.tonic.api.game;
 
 import com.tonic.Static;
 import net.runelite.api.Client;
+import org.lwjgl.system.linux.Stat;
 
 /**
  * Varbit and Varp related API
@@ -40,6 +41,18 @@ public class VarAPI
     {
         Client client = Static.getClient();
         return Static.invoke(() -> client.getVarcStrValue(varc));
+    }
+
+    public static void setVarcInteger(int varc, int value)
+    {
+        Client client = Static.getClient();
+        Static.invoke(() -> client.setVarcIntValue(varc, value));
+    }
+
+    public static void setVarcString(int varc, String value)
+    {
+        Client client = Static.getClient();
+        Static.invoke(() -> client.setVarcStrValue(varc, value));
     }
 
     /**
