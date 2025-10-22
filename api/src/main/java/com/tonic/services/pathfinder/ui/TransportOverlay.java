@@ -152,7 +152,7 @@ public class TransportOverlay extends Overlay
         int z = wv.getPlane();
         Tile tile;
         WorldPoint point;
-        ArrayList<Transport> tr;
+        List<TransportDto> tr;
 
         for (int x = 0; x < Constants.SCENE_SIZE; ++x)
         {
@@ -165,8 +165,8 @@ public class TransportOverlay extends Overlay
                     continue;
                 }
                 point = tile.getWorldLocation();
-                tr = TransportLoader.getTransports().get(WorldPointUtil.compress(point));
-                if(tr != null && !tr.isEmpty())
+                tr = TransportEditorFrame.getTransportsAt(point);
+                if(!tr.isEmpty())
                 {
                     points.put(tile.getWorldLocation(), tr.size());
                 }

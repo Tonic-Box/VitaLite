@@ -296,8 +296,9 @@ public class TransportEditorFrame extends JFrame {
         int index = transports.indexOf(oldTransport);
         if (index >= 0) {
             transports.set(index, newTransport);
-            listPanel.refreshTransportList(transports);
-            listPanel.selectTransport(newTransport);
+            // Use lightweight in-place update instead of full refresh to prevent cursor resets
+            // and avoid re-triggering selection events that would reset the detail panel
+            listPanel.updateTransportInPlace(oldTransport, newTransport);
             setHasUnsavedChanges(true);
         }
     }

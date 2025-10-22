@@ -76702,5 +76702,117 @@
     },
     "action": "Climb-down",
     "objectId": 51644
+  },
+  {
+    "source": {
+      "x": 2466,
+      "y": 3496,
+      "plane": 3
+    },
+    "destination": {
+      "x": 2466,
+      "y": 3496,
+      "plane": 0
+    },
+    "action": "Bottom-Floor",
+    "objectId": 56229
+  },
+  {
+    "source": {
+      "x": 2466,
+      "y": 3496,
+      "plane": 0
+    },
+    "destination": {
+      "x": 2466,
+      "y": 3496,
+      "plane": 3
+    },
+    "action": "Top-Floor",
+    "objectId": 4458
+  },
+  {
+    "source": {
+      "x": 2467,
+      "y": 3495,
+      "plane": 3
+    },
+    "destination": {
+      "x": 2467,
+      "y": 3495,
+      "plane": 0
+    },
+    "action": "Bottom-Floor",
+    "objectId": 56229
+  },
+  {
+    "source": {
+      "x": 2465,
+      "y": 3495,
+      "plane": 0
+    },
+    "destination": {
+      "x": 2465,
+      "y": 3495,
+      "plane": 3
+    },
+    "action": "Top-Floor",
+    "objectId": 4458
+  },
+  {
+    "source": {
+      "x": 2465,
+      "y": 3495,
+      "plane": 3
+    },
+    "destination": {
+      "x": 2465,
+      "y": 3495,
+      "plane": 0
+    },
+    "action": "Bottom-Floor",
+    "objectId": 56229
+  },
+  {
+    "source": {
+      "x": 2466,
+      "y": 3494,
+      "plane": 3
+    },
+    "destination": {
+      "x": 2466,
+      "y": 3494,
+      "plane": 0
+    },
+    "action": "Bottom-Floor",
+    "objectId": 56229
+  },
+  {
+    "source": {
+      "x": 2467,
+      "y": 3495,
+      "plane": 0
+    },
+    "destination": {
+      "x": 2467,
+      "y": 3495,
+      "plane": 3
+    },
+    "action": "Top-Floor",
+    "objectId": 4458
+  },
+  {
+    "source": {
+      "x": 2466,
+      "y": 3494,
+      "plane": 0
+    },
+    "destination": {
+      "x": 2466,
+      "y": 3494,
+      "plane": 3
+    },
+    "action": "Top-Floor",
+    "objectId": 4458
   }
 ]
