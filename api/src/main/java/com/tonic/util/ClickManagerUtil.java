@@ -5,6 +5,7 @@ import com.tonic.data.ItemEx;
 import com.tonic.data.TileObjectEx;
 import com.tonic.services.ClickManager;
 import net.runelite.api.Actor;
+import net.runelite.api.widgets.Widget;
 import java.awt.*;
 
 public class ClickManagerUtil
@@ -40,6 +41,19 @@ public class ClickManagerUtil
     {
         Static.invoke(() -> {
             Shape shape = item.getClickBox();
+            if(shape == null)
+            {
+                shape = Static.getRuneLite().getGameApplet().getSideMenuArea();
+            }
+            ClickManager.queueClickBox(shape);
+            return true;
+        });
+    }
+
+    public static void queueClickBox(Widget widget)
+    {
+        Static.invoke(() -> {
+            Shape shape = widget.getBounds();
             if(shape == null)
             {
                 shape = Static.getRuneLite().getGameApplet().getSideMenuArea();

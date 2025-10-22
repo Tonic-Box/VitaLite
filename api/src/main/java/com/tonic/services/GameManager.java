@@ -131,6 +131,10 @@ public class GameManager extends Overlay {
     {
         OverlayManager overlayManager = Static.getInjector().getInstance(OverlayManager.class);
         overlayManager.add(this);
+
+        ClickVisualizationOverlay clickVizOverlay = Static.getInjector().getInstance(ClickVisualizationOverlay.class);
+        overlayManager.add(clickVizOverlay);
+
         setPosition(OverlayPosition.DYNAMIC);
         setPriority(PRIORITY_LOW);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
