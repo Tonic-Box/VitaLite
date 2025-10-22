@@ -48,4 +48,9 @@ public interface ClientConfig extends VitaConfig {
     boolean shouldDrawCollision();
     @ConfigKey(value = "drawCollision")
     void setShouldDrawCollision(boolean shouldDraw);
+
+    @ConfigKey(value = "logNames", defaultValue = "true")
+    boolean shouldLogNames();
+    @ConfigKey(value = "logNames")
+    void setShouldLogNames(boolean shouldDraw);
 }

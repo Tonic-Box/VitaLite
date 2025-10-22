@@ -17,7 +17,7 @@ public class RuneLite
     private final RLClientUI clientUI;
     private final GameApplet gameApplet = new GameApplet();
     private final String USER_AGENT;
-    private final String version = RuneliteConfigUtil.getTagValueFromURL("release");
+    private final String version = RuneliteConfigUtil.getRuneLiteVersion();
 
     public RuneLite(Class<?> runeLiteMain) throws Exception {
         this.runeLiteMain = runeLiteMain;

@@ -3,6 +3,7 @@ package com.tonic.packets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.tonic.Static;
 import com.tonic.packets.types.MapEntry;
 import com.tonic.packets.types.PacketDefinition;
 import com.tonic.util.StaticIntFinder;
@@ -84,23 +85,26 @@ public class PacketMapReader
                 {
                     num = -1;
                 }
-                if(entry.getArgs().get(i).toLowerCase().contains("widgetid"))
+                if(Static.getVitaConfig().shouldLogNames())
                 {
-                    name = StaticIntFinder.find(InterfaceID.class, (int) num);
-                    out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
-                    continue;
-                }
-                if(entry.getArgs().get(i).toLowerCase().contains("itemid"))
-                {
-                    name = StaticIntFinder.find(ItemID.class, (int) num);
-                    out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
-                    continue;
-                }
-                if(entry.getName().startsWith("OP_GAME_OBJECT_ACTION_") && entry.getArgs().get(i).equals("identifier"))
-                {
-                    name = StaticIntFinder.find(ObjectID.class, (int) num);
-                    out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
-                    continue;
+                    if(entry.getArgs().get(i).toLowerCase().contains("widgetid"))
+                    {
+                        name = StaticIntFinder.find(InterfaceID.class, (int) num);
+                        out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
+                        continue;
+                    }
+                    if(entry.getArgs().get(i).toLowerCase().contains("itemid"))
+                    {
+                        name = StaticIntFinder.find(ItemID.class, (int) num);
+                        out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
+                        continue;
+                    }
+                    if(entry.getName().startsWith("OP_GAME_OBJECT_ACTION_") && entry.getArgs().get(i).equals("identifier"))
+                    {
+                        name = StaticIntFinder.find(ObjectID.class, (int) num);
+                        out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
+                        continue;
+                    }
                 }
                 out.append(entry.getArgs().get(i)).append("=").append(num).append(", ");
             }

@@ -245,6 +245,43 @@ public class TransportListPanel extends JPanel {
         }
     }
 
+    /**
+     * Updates a single transport in place without triggering full list refresh.
+     * This is much more efficient than refreshTransportList() for single item updates.
+     * Used when editing fields to prevent cursor resets and visual glitches.
+     */
+    public void updateTransportInPlace(TransportDto oldTransport, TransportDto newTransport) {
+        System.out.println("updateTransportInPlace called: " +
+            (oldTransport != null ? oldTransport.getAction() : "null") + " -> " +
+            (newTransport != null ? newTransport.getAction() : "null"));
+
+        // Update in allTransports list
+        int allIndex = allTransports.indexOf(oldTransport);
+        if (allIndex >= 0) {
+            allTransports.set(allIndex, newTransport);
+            System.out.println("Updated in allTransports at index " + allIndex);
+        }
+
+        // Update in filteredTransports list
+        int filteredIndex = filteredTransports.indexOf(oldTransport);
+        if (filteredIndex >= 0) {
+            filteredTransports.set(filteredIndex, newTransport);
+            System.out.println("Updated in filteredTransports at index " + filteredIndex);
+
+            // Update just this item in the list model without triggering selection events
+            // This prevents the detail panel from being refreshed and resetting the cursor
+            transportList.removeListSelectionListener(selectionListener);
+            try {
+                listModel.setElementAt(newTransport, filteredIndex);
+                System.out.println("Updated in listModel at index " + filteredIndex);
+            } finally {
+                transportList.addListSelectionListener(selectionListener);
+            }
+        }
+
+        System.out.println("updateTransportInPlace completed");
+    }
+
     // Private methods
 
     private void updateActionFilter() {
@@ -326,10 +363,14 @@ public class TransportListPanel extends JPanel {
         transportList.removeListSelectionListener(selectionListener);
 
         try {
-            // Use setListData for better performance with large datasets
-            TransportDto[] transportArray = filteredTransports.toArray(new TransportDto[0]);
-            System.out.println("Setting list data with " + transportArray.length + " elements...");
-            transportList.setListData(transportArray);
+            // Clear and repopulate the model to maintain DefaultListModel functionality
+            // This allows refreshCurrentSelection() to work via setElementAt()
+            System.out.println("Clearing list model...");
+            listModel.clear();
+            System.out.println("Adding " + filteredTransports.size() + " elements to model...");
+            for (TransportDto transport : filteredTransports) {
+                listModel.addElement(transport);
+            }
             System.out.println("List data set successfully");
         } finally {
             // Always re-add the listener, even if there's an exception
