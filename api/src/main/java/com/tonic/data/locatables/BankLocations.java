@@ -1,14 +1,13 @@
 package com.tonic.data.locatables;
 
-import com.tonic.Static;
 import com.tonic.api.game.QuestAPI;
+import com.tonic.api.game.SkillAPI;
 import com.tonic.services.pathfinder.Walker;
-import com.tonic.services.pathfinder.model.Step;
 import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
-import net.runelite.api.Client;
 import net.runelite.api.Quest;
 import net.runelite.api.QuestState;
+import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import org.apache.commons.lang3.ArrayUtils;
@@ -16,7 +15,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -65,6 +63,8 @@ public enum BankLocations {
     BURTHORPE_BANK(new WorldArea(3037, 4961, 13, 17, 1)),
     ZANERIS_BANK(new WorldArea(2379, 4453, 6, 7, 0), () -> QuestAPI.getState(Quest.LOST_CITY) == QuestState.FINISHED),
     CIVITAS_ILLA_FORTIS(new WorldArea(1777, 3093, 9, 11, 0), () -> QuestAPI.getState(Quest.CHILDREN_OF_THE_SUN) == QuestState.FINISHED),
+    FARMING_GUILD_BANK_CHEST(new WorldArea(1251, 3739, 3, 3, 0), () -> SkillAPI.getBoostedLevel(Skill.FARMING) >= 45),
+    FARMING_GUILD_BANK(new WorldArea(1246, 3756, 5, 2, 0), () -> SkillAPI.getBoostedLevel(Skill.FARMING) >= 85),
 
     ;
 
