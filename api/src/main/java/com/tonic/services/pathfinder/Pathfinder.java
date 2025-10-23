@@ -2,7 +2,6 @@ package com.tonic.services.pathfinder;
 
 import com.tonic.Logger;
 import com.tonic.Static;
-import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.services.pathfinder.collections.BFSCache;
 import com.tonic.services.pathfinder.collections.HybridIntQueue;
 import com.tonic.services.pathfinder.collision.CollisionMap;
@@ -11,6 +10,7 @@ import com.tonic.services.pathfinder.collision.GlobalCollisionMap;
 import com.tonic.services.pathfinder.collision.Properties;
 import com.tonic.services.pathfinder.local.LocalCollisionMap;
 import com.tonic.services.pathfinder.model.Step;
+import com.tonic.services.pathfinder.objects.ObjectMap;
 import com.tonic.services.pathfinder.teleports.Teleport;
 import com.tonic.services.pathfinder.transports.Transport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
@@ -22,20 +22,20 @@ import net.runelite.api.Client;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.ItemID;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Pathfinder class to find paths between points in the game world.
  */
-public class Pathfinder
-{
+public class Pathfinder {
     static {
         try {
             collisionMap = GlobalCollisionMap.load();
+            objectMap = ObjectMap.load();
         } catch (Exception e) {
             Logger.error(e, "[Pathfinder] Failed to load collision map: %e");
         }
@@ -43,6 +43,8 @@ public class Pathfinder
 
     @Getter
     private static CollisionMap collisionMap;
+    @Getter
+    private static ObjectMap objectMap;
     private LocalCollisionMap localMap;
     @Getter
     private Teleport teleport;

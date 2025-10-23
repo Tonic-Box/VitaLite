@@ -26706,15 +26706,15 @@
   {
     "source": {
       "x": 2466,
-      "y": 3496,
+      "y": 3494,
       "plane": 1
     },
     "destination": {
       "x": 2466,
-      "y": 3496,
-      "plane": 0
+      "y": 3494,
+      "plane": 3
     },
-    "action": "Climb-down",
+    "action": "Top-Floor",
     "objectId": 56233
   },
   {
@@ -76814,5 +76814,61 @@
     },
     "action": "Top-Floor",
     "objectId": 4458
+  },
+  {
+    "source": {
+      "x": 2466,
+      "y": 3496,
+      "plane": 1
+    },
+    "destination": {
+      "x": 2466,
+      "y": 3496,
+      "plane": 0
+    },
+    "action": "Climb-down",
+    "objectId": 56233
+  },
+  {
+    "source": {
+      "x": 2467,
+      "y": 3495,
+      "plane": 1
+    },
+    "destination": {
+      "x": 2467,
+      "y": 3495,
+      "plane": 3
+    },
+    "action": "Top-Floor",
+    "objectId": 56233
+  },
+  {
+    "source": {
+      "x": 2466,
+      "y": 3496,
+      "plane": 1
+    },
+    "destination": {
+      "x": 2466,
+      "y": 3496,
+      "plane": 3
+    },
+    "action": "Top-Floor",
+    "objectId": 56233
+  },
+  {
+    "source": {
+      "x": 2465,
+      "y": 3495,
+      "plane": 1
+    },
+    "destination": {
+      "x": 2465,
+      "y": 3495,
+      "plane": 3
+    },
+    "action": "Top-Floor",
+    "objectId": 56233
   }
 ]

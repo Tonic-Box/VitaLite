@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.tonic.data.locatables.BankLocations;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.TransportDto;
+import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.services.pathfinder.ui.components.TransportDetailPanel;
 import com.tonic.services.pathfinder.ui.components.TransportListPanel;
 import com.tonic.services.pathfinder.ui.components.ToolbarPanel;
@@ -218,6 +219,7 @@ public class TransportEditorFrame extends JFrame {
             fileManager.saveTransports(transportArray);
             setHasUnsavedChanges(false);
             showStatusMessage("Saved " + transports.size() + " transports");
+            ThreadPool.submit(TransportLoader::init);
         } catch (Exception e) {
             showErrorDialog("Failed to save transports", e);
         }

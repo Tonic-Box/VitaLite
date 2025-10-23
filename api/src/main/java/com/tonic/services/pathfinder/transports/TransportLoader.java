@@ -52,6 +52,7 @@ public class TransportLoader
 
     public static void init()
     {
+        ALL_STATIC_TRANSPORTS.clear();
         try (InputStream stream = Walker.class.getResourceAsStream("transports.json"))
         {
             if (stream == null)
