@@ -63,6 +63,46 @@ public class WorldsAPI
     }
 
     /**
+     * Hops to the next members world with an ID higher than the current and not skill total, not pvp, main game.
+     * If you're on the highest world already, it hops back to the first world in the list
+     */
+    public static void hopNextMembers()
+    {
+        World world = createDefaultQuery(false).isP2p().next();
+        hop(world);
+    }
+
+    /**
+     * Hops to the next members world with an ID lower than the current and not skill total, not pvp, main game.
+     * If you're on the lowest world already, it hops back to the last world in the list
+     */
+    public static void hopPreviousMembers()
+    {
+        World world = createDefaultQuery(false).isP2p().previous();
+        hop(world);
+    }
+
+    /**
+     * Hops to the next free to play world with an ID higher than the current and not skill total, not pvp, main game.
+     * If you're on the highest world already, it hops back to the first world in the list
+     */
+    public static void hopNextF2p()
+    {
+        World world = createDefaultQuery(false).isF2p().next();
+        hop(world);
+    }
+
+    /**
+     * Hops to the next free to play world with an ID lower than the current and not skill total, not pvp, main game.
+     * If you're on the lowest world already, it hops back to the last world in the list
+     */
+    public static void hopPreviousF2p()
+    {
+        World world = createDefaultQuery(false).isF2p().previous();
+        hop(world);
+    }
+
+    /**
      * Hop to a specific world by its ID
      * @param worldId The ID of the world to hop to
      */
