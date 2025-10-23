@@ -31,18 +31,25 @@ public class WorldsAPI
     }
 
     /**
+     * @param includeCurrentWorld Whether to include the current world or not
+     * @return A query filtering out *generally unwanted* worlds. This means skill totals, non main game worlds, and pvp are filtered
+     */
+    public static WorldQuery createDefaultQuery(boolean includeCurrentWorld)
+    {
+        Client client = Static.getClient();
+        return new WorldQuery()
+            .notSkillTotalWorlds()
+            .isMainGame()
+            .notPvp()
+            .keepIf(w -> includeCurrentWorld || w.getId() != client.getWorld());
+    }
+
+    /**
      * Hop to a random members world (not skill total, not pvp, main game)
      */
     public static void hopRandomMembers()
     {
-        Client client = Static.getClient();
-        World world = new WorldQuery()
-                .isP2p()
-                .notSkillTotalWorlds()
-                .isMainGame()
-                .notPvp()
-                .keepIf(w -> w.getId() != client.getWorld())
-                .random();
+        World world = createDefaultQuery(false).isP2p().random();
         hop(world);
     }
 
@@ -51,14 +58,7 @@ public class WorldsAPI
      */
     public static void hopRandomF2p()
     {
-        Client client = Static.getClient();
-        World world = new WorldQuery()
-                .isF2p()
-                .notSkillTotalWorlds()
-                .isMainGame()
-                .notPvp()
-                .keepIf(w -> w.getId() != client.getWorld())
-                .random();
+        World world = createDefaultQuery(false).isF2p().random();
         hop(world);
     }
 
