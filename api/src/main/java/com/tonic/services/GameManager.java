@@ -146,6 +146,7 @@ public class GameManager extends Overlay {
                 .getEventBus()
                 .register(this);
         TransportLoader.init();
+        Pathfinder.getObjectMap();
         BankCache.init();
 
         ThreadPool.submit(() -> {
