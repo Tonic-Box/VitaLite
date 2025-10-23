@@ -57,7 +57,7 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
     /**
      * Execute the query and get results
      */
-    protected List<T> execute() {
+    private List<T> execute() {
         return Static.invoke(() -> {
             Stream<T> stream = dataSource.get().stream();
 

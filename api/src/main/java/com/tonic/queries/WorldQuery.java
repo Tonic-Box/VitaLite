@@ -245,8 +245,7 @@ public class WorldQuery extends AbstractQuery<World, WorldQuery>
         Client client = Static.getClient();
         int currentWorld = client.getWorld();
 
-        List<World> results = execute();
-        results.sort(Comparator.comparingInt(World::getId));
+        List<World> results = sortByIdAsc().collect();
         for (World world : results)
         {
             if (world.getId() > currentWorld)
@@ -263,8 +262,7 @@ public class WorldQuery extends AbstractQuery<World, WorldQuery>
         Client client = Static.getClient();
         int currentWorld = client.getWorld();
 
-        List<World> results = execute();
-        results.sort(Comparator.comparingInt(World::getId));
+        List<World> results = sortByIdAsc().collect();
         for (World world : results)
         {
             if (world.getId() < currentWorld)
