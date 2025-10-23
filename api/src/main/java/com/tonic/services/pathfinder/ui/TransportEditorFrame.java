@@ -24,6 +24,7 @@ import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Main application frame for editing pathfinder transport configurations.
@@ -46,7 +47,7 @@ public class TransportEditorFrame extends JFrame {
 
     // Data
     @Getter
-    private static List<TransportDto> transports = new ArrayList<>();
+    private static List<TransportDto> transports = new CopyOnWriteArrayList<>();
     private boolean hasUnsavedChanges = false;
     private JMenu testsMenu;
     private JMenuItem cancel;
@@ -295,7 +296,17 @@ public class TransportEditorFrame extends JFrame {
 
     public void onTransportUpdated(TransportDto oldTransport, TransportDto newTransport) {
         // Replace the transport in the list (since TransportDto is immutable)
-        int index = transports.indexOf(oldTransport);
+        // Use identity-based search (==) instead of value-based (indexOf/equals)
+        // This ensures we update the exact object instance, not just any transport with matching values
+        // Critical for duplicates and transports with identical field values
+        int index = -1;
+        for (int i = 0; i < transports.size(); i++) {
+            if (transports.get(i) == oldTransport) {  // Identity check, not equals
+                index = i;
+                break;
+            }
+        }
+
         if (index >= 0) {
             transports.set(index, newTransport);
             // Use lightweight in-place update instead of full refresh to prevent cursor resets
@@ -305,8 +316,29 @@ public class TransportEditorFrame extends JFrame {
         }
     }
 
-    public boolean selectTransportByObjectAndSource(int objectId, WorldPoint worldPoint) {
-        return selectTransportByObjectAndSource(objectId, worldPoint.getX(), worldPoint.getY(), worldPoint.getPlane());
+    public boolean selectTransportByObjectAndSource(int objectId, int index) {
+        for(int i = 0; i < transports.size(); i++)
+        {
+            TransportDto transport = transports.get(i);
+            if(transport.getObjectId() == objectId && i == index)
+            {
+                // Found matching transport - select it
+                listPanel.selectTransport(transport);
+                detailPanel.displayTransport(transport);
+
+                // Bring window to front if it exists
+                SwingUtilities.invokeLater(() -> {
+                    if (!isVisible()) {
+                        setVisible(true);
+                    }
+                    toFront();
+                    requestFocus();
+                });
+
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

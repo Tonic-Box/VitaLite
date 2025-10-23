@@ -76,17 +76,19 @@ public class TransportOverlay extends Overlay
                 }
             }
 
-            List<TransportDto> tr2 = TransportEditorFrame.getTransportsAt(worldPoint);
-            if(!tr2.isEmpty())
-            {
-                for(TransportDto t : tr2)
-                {
-                    client.createMenuEntry(1)
-                            .setOption("Edit Transport [-> " + t.getDestination() + "]")
-                            .setTarget(color + "Transport ")
-                            .setType(MenuAction.RUNELITE)
-                            .onClick(c -> TransportEditorFrame.INSTANCE.selectTransportByObjectAndSource(t.getObjectId(), worldPoint));
-                }
+            TransportDto transport;
+            for (int i = 0; i < TransportEditorFrame.getTransports().size(); i++) {
+                transport = TransportEditorFrame.getTransports().get(i);
+                if(!transport.getSource().equals(worldPoint))
+                    continue;
+
+                TransportDto finalTransport = transport;
+                int finalI = i;
+                client.createMenuEntry(1)
+                        .setOption("Edit Transport [-> " + transport.getDestination() + "]")
+                        .setTarget(color + "Transport ")
+                        .setType(MenuAction.RUNELITE)
+                        .onClick(c -> TransportEditorFrame.INSTANCE.selectTransportByObjectAndSource(finalTransport.getObjectId(), finalI));
             }
         }
     }

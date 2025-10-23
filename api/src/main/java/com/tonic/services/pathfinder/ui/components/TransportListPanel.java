@@ -255,15 +255,28 @@ public class TransportListPanel extends JPanel {
             (oldTransport != null ? oldTransport.getAction() : "null") + " -> " +
             (newTransport != null ? newTransport.getAction() : "null"));
 
-        // Update in allTransports list
-        int allIndex = allTransports.indexOf(oldTransport);
+        // Update in allTransports list - use identity check (==) not equals
+        // This ensures we find the exact object instance, not just matching values
+        int allIndex = -1;
+        for (int i = 0; i < allTransports.size(); i++) {
+            if (allTransports.get(i) == oldTransport) {  // Identity check, not equals
+                allIndex = i;
+                break;
+            }
+        }
         if (allIndex >= 0) {
             allTransports.set(allIndex, newTransport);
             System.out.println("Updated in allTransports at index " + allIndex);
         }
 
-        // Update in filteredTransports list
-        int filteredIndex = filteredTransports.indexOf(oldTransport);
+        // Update in filteredTransports list - use identity check (==) not equals
+        int filteredIndex = -1;
+        for (int i = 0; i < filteredTransports.size(); i++) {
+            if (filteredTransports.get(i) == oldTransport) {  // Identity check, not equals
+                filteredIndex = i;
+                break;
+            }
+        }
         if (filteredIndex >= 0) {
             filteredTransports.set(filteredIndex, newTransport);
             System.out.println("Updated in filteredTransports at index " + filteredIndex);
