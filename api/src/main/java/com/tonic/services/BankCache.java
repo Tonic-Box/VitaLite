@@ -115,8 +115,14 @@ public class BankCache
             List<ItemEx> items = InventoryQuery.fromInventoryId(InventoryID.BANK).collect();
             for(ItemEx item : items)
             {
-                int currentQty = emptyMap.getOrDefault(item.getCanonicalId(), 0);
-                emptyMap.put(item.getCanonicalId(), item.getQuantity() + currentQty);
+                if (item.isPlaceholder())
+                {
+                    continue;
+                }
+
+                int canonicalId = item.getCanonicalId();
+                int currentQty = emptyMap.getOrDefault(canonicalId, 0);
+                emptyMap.put(canonicalId, item.getQuantity() + currentQty);
             }
 
             Int2IntMap itemMap = bankCache.getOrDefault(playerName, EMPTY);
