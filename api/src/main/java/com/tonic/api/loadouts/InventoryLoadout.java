@@ -1,6 +1,6 @@
 package com.tonic.api.loadouts;
 
-import com.tonic.api.loadouts.item.ItemDepletionListener;
+import com.tonic.api.loadouts.item.Loadout;
 import com.tonic.api.loadouts.item.LoadoutItem;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.data.ItemEx;
@@ -10,41 +10,38 @@ import java.util.*;
 /**
  * A high-level loadout API designed for use in conjunction with banking and resupplying.
  */
-public class InventoryLoadout implements Iterable<LoadoutItem>
+public class InventoryLoadout extends Loadout
 {
 
   private static final int CAPACITY = 28;
 
-  private final String name;
-  private final Map<String, LoadoutItem> items;
-
-  private ItemDepletionListener itemDepletionListener;
-
   public InventoryLoadout(String name)
   {
-    this.name = name.toLowerCase(); //TODO if we support serialization, verify that the name is a valid identifier
-    this.items = new LinkedHashMap<>();
+    super(name);
   }
 
-  public String getName()
+  @Override
+  protected List<ItemEx> getLiveItems()
   {
-    return name;
+    return InventoryAPI.getItems();
   }
 
-  /**
-   * @return A listener to trigger when an item is attempted to be withdrawn but is not available in the desired quantity.
-   * This can be utilised to trigger states in your plugin such as restocking.
-   */
-  public ItemDepletionListener getItemDepletionListener()
+  @Override
+  public List<LoadoutItem> getRequiredItems()
   {
-    return itemDepletionListener;
+    List<LoadoutItem> missing = new ArrayList<>();
+    for (LoadoutItem entry : this)
+    {
+      if (!entry.isCarried())
+      {
+        missing.add(entry);
+      }
+    }
+
+    return missing;
   }
 
-  public void setItemDepletionListener(ItemDepletionListener itemDepletionListener)
-  {
-    this.itemDepletionListener = itemDepletionListener;
-  }
-
+  @Override
   public void add(LoadoutItem item)
   {
     if (!isEligible(item))
@@ -75,6 +72,18 @@ public class InventoryLoadout implements Iterable<LoadoutItem>
     throw new LoadoutException("Failed to add " + item.getIdentifier() + " as it would cause loadout to overflow");
   }
 
+  /**
+   * Adds missing equipment items to this loadout
+   * @param equipmentLoadout The loadout to add from
+   */
+  public void fulfill(EquipmentLoadout equipmentLoadout)
+  {
+    for (LoadoutItem item : equipmentLoadout.getRequiredItems())
+    {
+      add(item);
+    }
+  }
+
   public int getSlotCount(LoadoutItem entry)
   {
     return entry.isStackable() || entry.isNoted() ? 1 : entry.getAmount();
@@ -94,92 +103,5 @@ public class InventoryLoadout implements Iterable<LoadoutItem>
     }
 
     return available >= entry.getAmount();
-  }
-
-  public LoadoutItem get(String key)
-  {
-    return items.get(key);
-  }
-
-  public LoadoutItem remove(String key)
-  {
-    return items.remove(key);
-  }
-
-  public boolean isFulfilled()
-  {
-    for (LoadoutItem item : getRequiredItems())
-    {
-      if (!item.isOptional())
-      {
-        return false;
-      }
-    }
-
-    return getCarriedExcessItems().isEmpty();
-  }
-
-  /**
-   * @return A List containing the remainder of items that we still need
-   */
-  public List<LoadoutItem> getRequiredItems() {
-    List<LoadoutItem> missing = new ArrayList<>();
-    for (LoadoutItem entry : this)
-    {
-      if (!entry.isCarried())
-      {
-        missing.add(entry);
-      }
-    }
-
-    return missing;
-  }
-
-  /**
-   * @return A List of foreign items that are currently in the inventory.
-   * A foreign item includes anything that isn't in this loadout
-   */
-  public List<ItemEx> getCarriedForeignItems() {
-    List<ItemEx> invalid = new LinkedList<>(InventoryAPI.getItems());
-    List<ItemEx> valid = new ArrayList<>();
-    for (LoadoutItem item : this)
-    {
-      valid.addAll(item.getCarried());
-    }
-
-    invalid.removeIf(valid::contains);
-    return invalid;
-  }
-
-  /**
-   * @return A List of items that are not foreign to this loadout, but are present in excess quantities
-   */
-  public List<LoadoutItem> getCarriedExcessItems() {
-    List<LoadoutItem> excess = new ArrayList<>();
-    for (LoadoutItem item : this)
-    {
-      List<ItemEx> present = item.getCarried();
-      if (present.isEmpty())
-      {
-        continue;
-      }
-
-      ItemEx carried = present.get(0);
-      int count = item.isStackable() ? carried.getQuantity() : present.size();
-      if (count <= item.getAmount())
-      {
-        continue;
-      }
-
-      excess.add(item);
-    }
-
-    return excess;
-  }
-
-  @Override
-  public Iterator<LoadoutItem> iterator()
-  {
-    return items.values().iterator();
   }
 }

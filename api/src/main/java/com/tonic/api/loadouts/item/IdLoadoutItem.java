@@ -10,7 +10,8 @@ import net.runelite.api.gameval.InventoryID;
 import java.util.Comparator;
 import java.util.List;
 
-public class IdLoadoutItem extends LoadoutItem {
+public class IdLoadoutItem extends LoadoutItem
+{
 
   private final int[] ids;
 
@@ -157,7 +158,7 @@ public class IdLoadoutItem extends LoadoutItem {
         throw new LoadoutException("IDs not specified for IdLoadoutItem");
       }
 
-      return new IdLoadoutItem(identifier, amount, minimumAmount, stackable, noted, optional, equipmentSlot, restockConfig, ids);
+      return new IdLoadoutItem(identifier, minimumAmount, amount, stackable, noted, optional, equipmentSlot, restockConfig, ids);
     }
   }
 }
