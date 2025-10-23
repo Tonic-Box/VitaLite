@@ -336,7 +336,7 @@ public class InventoryQuery extends AbstractQuery<ItemEx, InventoryQuery>
      */
     public List<ItemEx> unique()
     {
-        List<ItemEx> results = execute();
+        List<ItemEx> results = collect();
         Set<Integer> unique = new HashSet<>();
         results.removeIf(item -> !unique.add(item.getId()));
         return results;
