@@ -35,7 +35,14 @@ public class WorldsAPI
      */
     public static void hopRandomMembers()
     {
-        World world = new WorldQuery().isP2p().notSkillTotalWorlds().isMainGame().notPvp().random();
+        Client client = Static.getClient();
+        World world = new WorldQuery()
+                .isP2p()
+                .notSkillTotalWorlds()
+                .isMainGame()
+                .notPvp()
+                .keepIf(w -> w.getId() != client.getWorld())
+                .random();
         hop(world);
     }
 
@@ -44,7 +51,14 @@ public class WorldsAPI
      */
     public static void hopRandomF2p()
     {
-        World world = new WorldQuery().isF2p().notSkillTotalWorlds().isMainGame().notPvp().random();
+        Client client = Static.getClient();
+        World world = new WorldQuery()
+                .isF2p()
+                .notSkillTotalWorlds()
+                .isMainGame()
+                .notPvp()
+                .keepIf(w -> w.getId() != client.getWorld())
+                .random();
         hop(world);
     }
 
