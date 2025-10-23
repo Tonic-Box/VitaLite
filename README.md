@@ -48,6 +48,7 @@ VitaLite is a launcher for RuneLite that offers additional features and customiz
 | `-incognito` | Boolean | Visually display as 'RuneLite' instead of 'VitaLite' |
 | `-help`      | Boolean | Displays help information about command line options |
 | `--proxy`     | String  | Set a proxy server to use (e.g., ip:port or ip:port:username:password) |
+| `-disableMouseHook`      | Boolean | Disable RuneLite's mousehook rlicn DLL from being loaded or called |
 
 ## Disclaimer
 
