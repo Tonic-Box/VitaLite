@@ -1,7 +1,6 @@
 package com.tonic.data.magic;
 
 import com.tonic.api.game.VarAPI;
-import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.WidgetAPI;
@@ -87,27 +86,27 @@ public enum RunePouch {
         storeInPouch(runeItemId, "Store-All");
     }
 
-    public void withdrawOneFromPouch(Rune rune){
-        withdrawOneFromPouch(rune.getRuneId());
+    public void takeOneFromPouch(Rune rune){
+        takeOneFromPouch(rune.getRuneId());
     }
 
-    public void withdrawOneFromPouch(int runeItemId){
-        withdrawFromPouch(runeItemId, "Withdraw-1");
+    public void takeOneFromPouch(int runeItemId){
+        takeFromPouch(runeItemId, "Withdraw-1");
     }
 
-    public void withdrawFiveFromPouch(Rune rune){
-        withdrawFiveFromPouch(rune.getRuneId());
+    public void takeFiveFromPouch(Rune rune){
+        takeFiveFromPouch(rune.getRuneId());
     }
 
-    public void withdrawFiveFromPouch(int runeItemId){
-        withdrawFromPouch(runeItemId, "Withdraw-5");
+    public void takeFiveFromPouch(int runeItemId){
+        takeFromPouch(runeItemId, "Withdraw-5");
     }
 
-    public void withdrawXFromPouch(Rune rune, int amount){
-        withdrawXFromPouch(rune.getRuneId(), amount);
+    public void takeXFromPouch(Rune rune, int amount){
+        takeXFromPouch(rune.getRuneId(), amount);
     }
 
-    public void withdrawXFromPouch(int runeItemId, int amount){
+    public void takeXFromPouch(int runeItemId, int amount){
         if(amount < 0){
             return;
         }
@@ -123,12 +122,12 @@ public enum RunePouch {
         }
     }
 
-    public void withdrawAllFromPouch(Rune rune){
-        withdrawAllFromPouch(rune.getRuneId());
+    public void takeAllFromPouch(Rune rune){
+        takeAllFromPouch(rune.getRuneId());
     }
 
-    public void withdrawAllFromPouch(int runeItemId){
-        withdrawFromPouch(runeItemId, "Withdraw-All");
+    public void takeAllFromPouch(int runeItemId){
+        takeFromPouch(runeItemId, "Withdraw-All");
     }
 
     public int getQuantityOfRune(Rune rune){
@@ -201,7 +200,7 @@ public enum RunePouch {
         }
     }
 
-    private static void withdrawFromPouch(int runeItemId, String action){
+    private static void takeFromPouch(int runeItemId, String action){
         for(int slot = 0; slot < POUCH_SLOT_COUNT; slot++){
             Widget widget = WidgetAPI.get(InterfaceID.RUNE_POUCH, POUCH_CHILD_ID, slot);
             if(widget == null || widget.getItemId() != runeItemId || widget.getItemQuantity() <= 0)
