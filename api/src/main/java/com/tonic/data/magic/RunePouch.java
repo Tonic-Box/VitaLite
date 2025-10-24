@@ -1,6 +1,7 @@
 package com.tonic.data.magic;
 
 import com.tonic.api.game.VarAPI;
+import com.tonic.api.widgets.BankAPI;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.WidgetAPI;
@@ -27,6 +28,8 @@ public enum RunePouch {
     private static final int POUCH_SLOT_COUNT = 4;
     private static final int INVENTORY_CHILD_ID = 7;
     private static final int INVENTORY_SLOT_COUNT = 28;
+    private static final int BANKSIDE_RUNE_POUCH_CHILD_ID = 3;
+    private static final int BANKSIDE_RUNE_POUCH_CHILD_INDEX = 0;
 
     RunePouch(int pouchId) {
         this.pouchId = pouchId;
@@ -128,6 +131,19 @@ public enum RunePouch {
 
     public void takeAllFromPouch(int runeItemId){
         takeFromPouch(runeItemId, "Withdraw-All");
+    }
+
+    public void emptyIntoBank(){
+        if(!BankAPI.isOpen()){
+            return;
+        }
+
+        Widget widget = WidgetAPI.get(InterfaceID.BANKSIDE, BANKSIDE_RUNE_POUCH_CHILD_ID, BANKSIDE_RUNE_POUCH_CHILD_INDEX);
+        if(widget == null || widget.getItemId() != this.pouchId){
+            return;
+        }
+
+        WidgetAPI.interact(widget, "Empty");
     }
 
     public int getQuantityOfRune(Rune rune){
