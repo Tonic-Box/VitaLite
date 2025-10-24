@@ -1,12 +1,9 @@
 package com.tonic.plugins.bankvaluer;
 
-import com.tonic.Static;
-import com.tonic.api.threaded.Delays;
 import com.tonic.events.BankCacheChanged;
 import com.tonic.util.ThreadPool;
 import net.runelite.api.GameState;
 import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -28,6 +25,7 @@ public class BankValuerPlugin extends Plugin
     private ClientToolbar clientToolbar;
     private BankValuerPanel panel;
     private NavigationButton navButton;
+
     @Override
     protected void startUp() throws Exception
     {
