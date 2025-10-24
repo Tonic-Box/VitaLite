@@ -10,9 +10,9 @@ public class AddJagexAccountPanel extends JPanel {
 
     public AddJagexAccountPanel() {
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(220, 232));
+        setPreferredSize(new Dimension(220, 300));
         setMinimumSize(new Dimension(220, 232));
-        setMaximumSize(new Dimension(220, 232));
+        setMaximumSize(new Dimension(220, 310));
 
         JPanel titlePanel = new JPanel(new BorderLayout());
         titlePanel.setPreferredSize(new Dimension(220, 32));
@@ -51,6 +51,9 @@ public class AddJagexAccountPanel extends JPanel {
         gbc.gridy++;
         gbc.weighty = 0.0;
         contentPanel.add(addJagexAccountButton, gbc);
+
+        gbc.gridy++;
+        contentPanel.add(importJagexAccount, gbc);
 
         add(titlePanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
