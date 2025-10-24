@@ -1,10 +1,16 @@
 package com.tonic.data.magic;
 
 import com.tonic.api.game.VarAPI;
+import com.tonic.api.threaded.Delays;
+import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.InventoryAPI;
+import com.tonic.api.widgets.WidgetAPI;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.widgets.Widget;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +24,11 @@ public enum RunePouch {
     private final int pouchId;
     private final boolean has4Slots;
 
+    private static final int POUCH_CHILD_ID = 4;
+    private static final int POUCH_SLOT_COUNT = 4;
+    private static final int INVENTORY_CHILD_ID = 7;
+    private static final int INVENTORY_SLOT_COUNT = 28;
+
     RunePouch(int pouchId) {
         this.pouchId = pouchId;
         this.has4Slots = false;
@@ -26,6 +37,98 @@ public enum RunePouch {
     RunePouch(int pouchId, boolean has4Slots) {
         this.pouchId = pouchId;
         this.has4Slots = has4Slots;
+    }
+
+    public void open(){
+        InventoryAPI.interact(this.pouchId, "Open");
+    }
+
+    public void storeOneInPouch(Rune rune){
+        storeOneInPouch(rune.getRuneId());
+    }
+
+    public void storeOneInPouch(int runeItemId){
+        storeInPouch(runeItemId, "Store-1");
+    }
+
+    public void storeFiveInPouch(Rune rune){
+        storeFiveInPouch(rune.getRuneId());
+    }
+
+    public void storeFiveInPouch(int runeItemId){
+        storeInPouch(runeItemId, "Store-5");
+    }
+
+    public void storeXInPouch(Rune rune, int amount){
+        storeXInPouch(rune.getRuneId(), amount);
+    }
+
+    public void storeXInPouch(int runeItemId, int amount){
+        if(amount < 0){
+            return;
+        }
+
+        for(int slot = 0; slot < INVENTORY_SLOT_COUNT; slot++){
+            Widget widget = WidgetAPI.get(InterfaceID.RUNE_POUCH, INVENTORY_CHILD_ID, slot);
+            if(widget == null || widget.getItemId() != runeItemId || widget.getItemQuantity() <= 0)
+                continue;
+
+            WidgetAPI.interact(widget, "Store-X");
+            DialogueAPI.resumeNumericDialogue(amount);
+            return;
+        }
+    }
+
+    public void storeAllInPouch(Rune rune){
+        storeAllInPouch(rune.getRuneId());
+    }
+
+    public void storeAllInPouch(int runeItemId){
+        storeInPouch(runeItemId, "Store-All");
+    }
+
+    public void withdrawOneFromPouch(Rune rune){
+        withdrawOneFromPouch(rune.getRuneId());
+    }
+
+    public void withdrawOneFromPouch(int runeItemId){
+        withdrawFromPouch(runeItemId, "Withdraw-1");
+    }
+
+    public void withdrawFiveFromPouch(Rune rune){
+        withdrawFiveFromPouch(rune.getRuneId());
+    }
+
+    public void withdrawFiveFromPouch(int runeItemId){
+        withdrawFromPouch(runeItemId, "Withdraw-5");
+    }
+
+    public void withdrawXFromPouch(Rune rune, int amount){
+        withdrawXFromPouch(rune.getRuneId(), amount);
+    }
+
+    public void withdrawXFromPouch(int runeItemId, int amount){
+        if(amount < 0){
+            return;
+        }
+
+        for(int slot = 0; slot < POUCH_SLOT_COUNT; slot++){
+            Widget widget = WidgetAPI.get(InterfaceID.RUNE_POUCH, POUCH_CHILD_ID, slot);
+            if(widget == null || widget.getItemId() != runeItemId || widget.getItemQuantity() <= 0)
+                continue;
+
+            WidgetAPI.interact(widget, "Withdraw-X");
+            DialogueAPI.resumeNumericDialogue(amount);
+            return;
+        }
+    }
+
+    public void withdrawAllFromPouch(Rune rune){
+        withdrawAllFromPouch(rune.getRuneId());
+    }
+
+    public void withdrawAllFromPouch(int runeItemId){
+        withdrawFromPouch(runeItemId, "Withdraw-All");
     }
 
     public int getQuantityOfRune(Rune rune){
@@ -86,4 +189,26 @@ public enum RunePouch {
             add(VarbitID.RUNE_POUCH_QUANTITY_4);
         }
     };
+
+    private static void storeInPouch(int runeItemId, String action){
+        for(int slot = 0; slot < INVENTORY_SLOT_COUNT; slot++){
+            Widget widget = WidgetAPI.get(InterfaceID.RUNE_POUCH, INVENTORY_CHILD_ID, slot);
+            if(widget == null || widget.getItemId() != runeItemId || widget.getItemQuantity() <= 0)
+                continue;
+
+            WidgetAPI.interact(widget, action);
+            return;
+        }
+    }
+
+    private static void withdrawFromPouch(int runeItemId, String action){
+        for(int slot = 0; slot < POUCH_SLOT_COUNT; slot++){
+            Widget widget = WidgetAPI.get(InterfaceID.RUNE_POUCH, POUCH_CHILD_ID, slot);
+            if(widget == null || widget.getItemId() != runeItemId || widget.getItemQuantity() <= 0)
+                continue;
+
+            WidgetAPI.interact(widget, action);
+            return;
+        }
+    }
 }
