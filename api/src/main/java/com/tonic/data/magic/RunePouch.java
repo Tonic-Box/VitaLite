@@ -1,16 +1,19 @@
 package com.tonic.data.magic;
 
+import com.tonic.Static;
+import com.tonic.api.TClient;
 import com.tonic.api.game.VarAPI;
+import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.BankAPI;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.WidgetAPI;
+import com.tonic.util.ThreadPool;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +33,7 @@ public enum RunePouch {
     private static final int INVENTORY_SLOT_COUNT = 28;
     private static final int BANKSIDE_RUNE_POUCH_CHILD_ID = 3;
     private static final int BANKSIDE_RUNE_POUCH_CHILD_INDEX = 0;
+    private static final int CONFIGURE_MODE_CHILD_ID = 20;
 
     RunePouch(int pouchId) {
         this.pouchId = pouchId;
@@ -146,6 +150,50 @@ public enum RunePouch {
         WidgetAPI.interact(widget, "Empty");
     }
 
+    public void withdrawOneFromBank(Rune rune){
+        withdrawOneFromBank(rune.getRuneId());
+    }
+
+    public void withdrawOneFromBank(int runeItemId){
+        withdrawFromBank(runeItemId, 1);
+    }
+
+    public void withdrawFiveFromBank(Rune rune){
+        withdrawFiveFromBank(rune.getRuneId());
+    }
+
+    public void withdrawFiveFromBank(int runeItemId){
+        withdrawFromBank(runeItemId, 5);
+    }
+
+    public void withdrawTenFromBank(Rune rune){
+        withdrawTenFromBank(rune.getRuneId());
+    }
+
+    public void withdrawTenFromBank(int runeItemId){
+        withdrawFromBank(runeItemId, 10);
+    }
+
+    public void withdrawXFromBank(Rune rune, int amount){
+        withdrawXFromBank(rune.getRuneId(), amount);
+    }
+
+    public void withdrawXFromBank(int runeItemId, int amount){
+        if(amount < 0){
+            return;
+        }
+
+        withdrawFromBank(runeItemId, amount);
+    }
+
+    public void withdrawAllFromBank(Rune rune){
+        withdrawAllFromBank(rune.getRuneId());
+    }
+
+    public void withdrawAllFromBank(int runeItemId){
+        withdrawFromBank(runeItemId, -1);
+    }
+
     public int getQuantityOfRune(Rune rune){
         var size = this.has4Slots ? 4 : 3;
         for(int i = 0; i < size; i++){
@@ -225,5 +273,51 @@ public enum RunePouch {
             WidgetAPI.interact(widget, action);
             return;
         }
+    }
+
+    private void withdrawFromBank(int runeItemId, int amount){
+        TClient client = Static.getClient();
+        if(client != null && client.isClientThread()){
+            ThreadPool.submit(() -> this.withdrawFromBank(runeItemId, amount));
+            return;
+        }
+
+        if(!switchToConfigureMode()){
+            return;
+        }
+
+        BankAPI.withdraw(runeItemId, amount, false);
+    }
+
+    private boolean switchToConfigureMode(){
+        if(!BankAPI.isOpen()){
+            return false;
+        }
+
+        if(isInConfigureMode()){
+            return true;
+        }
+
+        Widget widget = WidgetAPI.get(InterfaceID.BANKSIDE, BANKSIDE_RUNE_POUCH_CHILD_ID, BANKSIDE_RUNE_POUCH_CHILD_INDEX);
+        if(widget == null || widget.getItemId() != this.pouchId){
+            return false;
+        }
+
+        WidgetAPI.interact(widget, "Configure");
+
+        TClient client = Static.getClient();
+        if(client != null && client.isClientThread()){
+            return false;
+        }
+
+        if(!Delays.waitUntil(RunePouch::isInConfigureMode, 2000)){
+            return false;
+        }
+
+        return true;
+    }
+
+    private static boolean isInConfigureMode(){
+        return WidgetAPI.isVisible(InterfaceID.BANKSIDE, CONFIGURE_MODE_CHILD_ID);
     }
 }
