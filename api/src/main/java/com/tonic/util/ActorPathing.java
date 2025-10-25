@@ -95,7 +95,7 @@ public class ActorPathing
 
     public static List<WorldPoint> dumbPathing(final WorldPoint start, final WorldPoint destination, final int actorWidth, final int actorHeight, final List<WorldPoint> blacklist)
     {
-        return dumbPathing(start, destination, actorWidth, actorHeight, blacklist, null);
+        return dumbPathing(start, destination, actorWidth, actorHeight, blacklist, new LocalCollisionMap());
     }
 
     /**
@@ -119,7 +119,7 @@ public class ActorPathing
         Client client = Static.getClient();
         if(client.getTopLevelWorldView().isInstance())
         {
-            localCollisionMap = new LocalCollisionMap();
+            localCollisionMap = localMap;
         }
 
         List<WorldPoint> path = new ArrayList<>();
