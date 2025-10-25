@@ -119,7 +119,7 @@ public class ActorPathing
         Client client = Static.getClient();
         if(client.getTopLevelWorldView().isInstance())
         {
-            localCollisionMap = localMap;
+            localCollisionMap = new LocalCollisionMap();
         }
 
         List<WorldPoint> path = new ArrayList<>();
