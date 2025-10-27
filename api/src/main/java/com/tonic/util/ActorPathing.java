@@ -95,7 +95,7 @@ public class ActorPathing
 
     public static List<WorldPoint> dumbPathing(final WorldPoint start, final WorldPoint destination, final int actorWidth, final int actorHeight, final List<WorldPoint> blacklist)
     {
-        return dumbPathing(start, destination, actorWidth, actorHeight, blacklist, null);
+        return dumbPathing(start, destination, actorWidth, actorHeight, blacklist, new LocalCollisionMap());
     }
 
     /**
