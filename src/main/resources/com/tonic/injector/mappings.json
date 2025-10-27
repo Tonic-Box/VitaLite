@@ -6193,7 +6193,7 @@
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "characterId",
         "obfuscatedName": "oq",
         "ownerObfuscatedName": "bu",
         "descriptor": "Ljava/lang/String;",
@@ -83933,7 +83933,7 @@
         "isStatic": false
       },
       {
-        "name": "characterId",
+        "name": "",
         "obfuscatedName": "ks",
         "ownerObfuscatedName": "ut",
         "descriptor": "Ljava/lang/String;",
