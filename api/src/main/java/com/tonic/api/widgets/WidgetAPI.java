@@ -98,7 +98,7 @@ public class WidgetAPI
 
         ItemComposition composition = client.getItemDefinition(widget.getItemId());
 
-        String[] actions = composition.getInventoryActions();
+        String[] actions = widget.getActions(); //composition.getInventoryActions();
         String[][] subOps = composition.getSubops();
 
         if (subOps == null)
