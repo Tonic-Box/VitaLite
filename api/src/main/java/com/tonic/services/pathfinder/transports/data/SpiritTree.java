@@ -15,7 +15,7 @@ import java.util.Arrays;
 public enum SpiritTree
 {
     TREE_GNOME_VILLAGE(new WorldPoint(2542, 3170, 0), 0, new QuestRequirement(Quest.TREE_GNOME_VILLAGE, QuestState.FINISHED)),
-    GNOME_STRONGHOLD(new WorldPoint(2461, 3444, 0), 1, new QuestRequirement(Quest.THE_GRAND_TREE, QuestState.FINISHED)),
+    GNOME_STRONGHOLD(new WorldPoint(2461, 3444, 0), 1),
     BATTLEFIELD_OF_KHAZARD(new WorldPoint(2555, 3259, 0), 2),
     GRAND_EXCHANGE(new WorldPoint(3185, 3508, 0), 3),
     FELDIP_HILLS(new WorldPoint(2488, 2850, 0), 4),
