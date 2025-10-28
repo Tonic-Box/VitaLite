@@ -69,6 +69,16 @@ public class EquipmentAPI
     }
 
     /**
+     * get an equipped item by predicate
+     * @param predicate predicate
+     * @return ItemEx
+     */
+    public static ItemEx getItem(Predicate<ItemEx> predicate)
+    {
+        return Static.invoke(() -> InventoryQuery.fromInventoryId(InventoryID.WORN).keepIf(predicate).first());
+    }
+
+    /**
      * unequip an item
      * @param item item
      */
@@ -137,6 +147,16 @@ public class EquipmentAPI
     public static void equip(String itemName)
     {
         InventoryAPI.interact(itemName, 3);
+    }
+
+    /**
+     * interact with an item in your inventory by action name
+     * @param item item
+     * @param action action name
+     */
+    public static void interact(ItemEx item, String action)
+    {
+        itemAction(item.getSlot(), ItemEx.getEquippedActionIndex(item, action));
     }
 
     /**
