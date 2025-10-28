@@ -87,7 +87,8 @@ public class ItemEx {
      */
     public static int getEquippedActionIndex(ItemEx item, String option)
     {
-        switch (option) {
+        String op = option.toLowerCase();
+        switch (op) {
             case "remove":
             case "unequip":
                 return 1;
@@ -102,7 +103,7 @@ public class ItemEx {
                 String action = comp.getStringValue(EQUIP_OP_PARAMS[i]);
                 if (action == null)
                     continue;
-                if (action.toLowerCase().contains(option.toLowerCase()))
+                if (action.toLowerCase().contains(op))
                 {
                     return i + 2;
                 }
