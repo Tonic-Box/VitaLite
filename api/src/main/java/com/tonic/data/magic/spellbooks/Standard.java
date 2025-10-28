@@ -455,7 +455,7 @@ public enum Standard implements Spell
         this.questRequirement = null;
         this.varbitRequirement = -1;
         this.autoCastWidgetIndex = -1;
-        this.spellIndex = spellIndex; // new
+        this.spellIndex = spellIndex;
     }
 
     Standard(int level, int interfaceId, int spellIndex, boolean members, Quest questRequirement, RuneRequirement... requirements)
@@ -467,7 +467,7 @@ public enum Standard implements Spell
         this.questRequirement = questRequirement;
         this.varbitRequirement = -1;
         this.autoCastWidgetIndex = -1;
-        this.spellIndex = spellIndex; // new
+        this.spellIndex = spellIndex;
     }
 
     Standard(int level, int interfaceId, int spellIndex, boolean members, int varbitRequirement, RuneRequirement... requirements)
@@ -479,7 +479,7 @@ public enum Standard implements Spell
         this.questRequirement = null;
         this.varbitRequirement = varbitRequirement;
         this.autoCastWidgetIndex = -1;
-        this.spellIndex = spellIndex; // new
+        this.spellIndex = spellIndex;
     }
 
     Standard(int level, int interfaceId, int spellIndex, int autoCastWidgetIndex, boolean members, RuneRequirement... requirements)
@@ -491,7 +491,7 @@ public enum Standard implements Spell
         this.questRequirement = null;
         this.varbitRequirement = -1;
         this.autoCastWidgetIndex = autoCastWidgetIndex;
-        this.spellIndex = spellIndex; // new
+        this.spellIndex = spellIndex;
     }
 
 
