@@ -75,27 +75,25 @@ public class GameManager extends Overlay {
         return Static.invoke(() -> {
             ArrayList<TileObjectEx> temp = new ArrayList<>();
             Client client = Static.getClient();
-            Tile[][][] tiles = client.getTopLevelWorldView().getScene().getTiles();
-            for (Tile[][] value : tiles) {
-                for (Tile[] item : value) {
-                    for (Tile tile : item) {
-                        if (tile != null) {
-                            if (tile.getGameObjects() != null) {
-                                for (GameObject gameObject : tile.getGameObjects()) {
-                                    if (gameObject != null && gameObject.getSceneMinLocation().equals(tile.getSceneLocation())) {
-                                        temp.add(new TileObjectEx(gameObject));
-                                    }
+            Tile[][] value = client.getTopLevelWorldView().getScene().getTiles()[client.getTopLevelWorldView().getPlane()];
+            for (Tile[] item : value) {
+                for (Tile tile : item) {
+                    if (tile != null) {
+                        if (tile.getGameObjects() != null) {
+                            for (GameObject gameObject : tile.getGameObjects()) {
+                                if (gameObject != null && gameObject.getSceneMinLocation().equals(tile.getSceneLocation())) {
+                                    temp.add(new TileObjectEx(gameObject));
                                 }
                             }
-                            if (tile.getWallObject() != null) {
-                                temp.add(new TileObjectEx(tile.getWallObject()));
-                            }
-                            if (tile.getDecorativeObject() != null) {
-                                temp.add(new TileObjectEx(tile.getDecorativeObject()));
-                            }
-                            if (tile.getGroundObject() != null) {
-                                temp.add(new TileObjectEx(tile.getGroundObject()));
-                            }
+                        }
+                        if (tile.getWallObject() != null) {
+                            temp.add(new TileObjectEx(tile.getWallObject()));
+                        }
+                        if (tile.getDecorativeObject() != null) {
+                            temp.add(new TileObjectEx(tile.getDecorativeObject()));
+                        }
+                        if (tile.getGroundObject() != null) {
+                            temp.add(new TileObjectEx(tile.getGroundObject()));
                         }
                     }
                 }
@@ -106,12 +104,16 @@ public class GameManager extends Overlay {
 
     public static Stream<TileItemEx> tileItemStream()
     {
-        return new ArrayList<>(INSTANCE.tileItemCache).stream();
+        return tileItemList().stream();
     }
 
     public static ArrayList<TileItemEx> tileItemList()
     {
-        return new ArrayList<>(INSTANCE.tileItemCache);
+        Client client = Static.getClient();
+        WorldView wv = client.getTopLevelWorldView();
+        ArrayList<TileItemEx> copy = new ArrayList<>(INSTANCE.tileItemCache);
+        copy.removeIf(i -> i.getWorldLocation().getPlane() != wv.getPlane());
+        return copy;
     }
 
 
