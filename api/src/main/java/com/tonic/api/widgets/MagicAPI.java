@@ -1,5 +1,6 @@
 package com.tonic.api.widgets;
 
+import com.tonic.Static;
 import com.tonic.api.game.SkillAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.data.magic.Spell;
@@ -65,7 +66,7 @@ public class MagicAPI
      */
     public static void setBestAutoCast()
     {
-        Spell bestSpell = comparator();
+        Spell bestSpell = Static.invoke(MagicAPI::comparator);
         bestSpell.setAutoCast();
     }
 
