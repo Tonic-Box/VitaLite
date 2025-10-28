@@ -604,6 +604,15 @@ public class TransportLoader
                     continue;
                 }
 
+                Requirements req = new Requirements();
+                req.addRequirements(destination.getRequirements().getAll());
+
+                // Gnome Stronghold can be travelled to, but not from, if The Grand Tree is unfinished
+                if (tree == SpiritTree.GNOME_STRONGHOLD)
+                {
+                    req.addRequirement(new QuestRequirement(Quest.THE_GRAND_TREE, QuestState.FINISHED));
+                }
+
                 List<Runnable> consumers = new ArrayList<>();
                 consumers.add(() -> {
                     TileObjectEx current = new TileObjectQuery<>()
@@ -613,7 +622,7 @@ public class TransportLoader
                     Delays.waitUntil(() -> WidgetAPI.get(12255235) != null);
                     DialogueAPI.resumePause(12255235, destination.getIndex());
                 });
-                Transport transport = new Transport(WorldPointUtil.compress(tree.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 3, consumers, destination.getRequirements(), -1);
+                Transport transport = new Transport(WorldPointUtil.compress(tree.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 3, consumers, req, -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(tree.getLocation()), transport);
             }
         }
