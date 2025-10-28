@@ -67,6 +67,51 @@ public class ItemEx {
         return actions;
     }
 
+    private static final int[] EQUIP_OP_PARAMS = {
+            451, // OP1
+            452, // OP2
+            453, // OP3
+            454, // OP4
+            455, // OP5
+            456, // OP6
+            457, // OP7
+            458  // OP8
+    };
+    /**
+     * Resolve an **equipped item action index** by reading ItemComposition param opcodes.
+     * TODO: Fix for equipmentitem subops (Con cape, Max cape, Diary cape, ..)
+     * see <a href="https://github.com/runelite/runelite/blob/master/runelite-api/src/main/java/net/runelite/api/ParamID.java#L41">here</a> for params
+     * @param item item
+     * @param option option
+     * @return int index
+     */
+    public static int getEquippedActionIndex(ItemEx item, String option)
+    {
+        String op = option.toLowerCase();
+        switch (op) {
+            case "remove":
+            case "unequip":
+                return 1;
+            case "examine":
+                return 10;
+        }
+        return Static.invoke(() -> {
+            ItemManager itemManager = Static.getInjector().getInstance(ItemManager.class);
+            ItemComposition comp = itemManager.getItemComposition(item.getId());
+            for (int i = 0; i < EQUIP_OP_PARAMS.length; i++)
+            {
+                String action = comp.getStringValue(EQUIP_OP_PARAMS[i]);
+                if (action == null)
+                    continue;
+                if (action.toLowerCase().contains(op))
+                {
+                    return i + 2;
+                }
+            }
+            return -1;
+        });
+    }
+
     public boolean hasAction(String action)
     {
         String[] actions = getActions();
