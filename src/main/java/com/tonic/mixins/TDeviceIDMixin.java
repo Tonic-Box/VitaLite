@@ -15,7 +15,7 @@ import java.util.UUID;
 @Mixin("PlatformInfo")
 public abstract class TDeviceIDMixin
 {
-    @Shadow("characterId")
+    @Shadow("JX_CHARACTER_ID")
     public static String characterId;
 
 //    @MethodOverride("getDeviceId2")

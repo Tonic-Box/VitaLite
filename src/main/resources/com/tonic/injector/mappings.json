@@ -6193,7 +6193,7 @@
         "isStatic": false
       },
       {
-        "name": "characterId",
+        "name": "JX_CHARACTER_ID",
         "obfuscatedName": "oq",
         "ownerObfuscatedName": "bu",
         "descriptor": "Ljava/lang/String;",
@@ -11418,7 +11418,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "JX_REFRESH_TOKEN",
         "obfuscatedName": "nt",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -22519,7 +22519,7 @@
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "JX_SESSION_ID",
         "obfuscatedName": "ns",
         "ownerObfuscatedName": "dz",
         "descriptor": "Ljava/lang/String;",
@@ -42918,7 +42918,7 @@
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "JX_ACCESS_TOKEN",
         "obfuscatedName": "nm",
         "ownerObfuscatedName": "jj",
         "descriptor": "Ljava/lang/String;",

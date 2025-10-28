@@ -24,7 +24,7 @@ public abstract class TRandomDatMixin
     @Shadow("client")
     public static Client client;
 
-    @Shadow("characterId")
+    @Shadow("JX_CHARACTER_ID")
     public static String characterId;
 
     @Shadow("randomDat")
