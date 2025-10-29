@@ -7,6 +7,9 @@ import com.tonic.injector.annotations.Shadow;
 @Mixin("Client")
 public abstract class TJagexAccountsMixin implements TClient
 {
+    @Shadow("JX_DISPLAY_NAME")
+    public static String displayName;
+
     @Shadow("JX_CHARACTER_ID")
     public static String characterId;
 
@@ -20,27 +23,21 @@ public abstract class TJagexAccountsMixin implements TClient
     public static String accessToken;
 
     @Override
+    public String getDisplayName()
+    {
+        return displayName;
+    }
+
+    @Override
     public String getCharacterId()
     {
         return characterId;
     }
 
     @Override
-    public String getSessionId()
+    public void setDisplayName(String name)
     {
-        return sessionId;
-    }
-
-    @Override
-    public String getRefreshToken()
-    {
-        return refreshToken;
-    }
-
-    @Override
-    public String getAccessToken()
-    {
-        return accessToken;
+        displayName = name;
     }
 
     @Override

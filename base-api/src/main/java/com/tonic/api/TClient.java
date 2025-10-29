@@ -108,6 +108,10 @@ public interface TClient
      */
     void invokeMenuAction(String option, String target, int identifier, int opcode, int param0, int param1, int itemId, int x, int y);
 
+    String getDisplayName();
+
+    void setDisplayName(String name);
+
     String getCharacterId();
 
     void setCharacterId(String id);

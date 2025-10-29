@@ -6582,7 +6582,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "JX_DISPLAY_NAME",
         "obfuscatedName": "cl",
         "ownerObfuscatedName": "bv",
         "descriptor": "Ljava/lang/String;",
