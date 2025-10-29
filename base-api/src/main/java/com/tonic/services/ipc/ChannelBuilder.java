@@ -7,7 +7,7 @@ public class ChannelBuilder {
     protected final String clientId;
     protected final String clientName;
     protected int port = 5000;
-    protected String multicastGroup = "230.0.0.1";
+    protected String multicastGroup = "230.0.0.0";
     protected int ttl = 1;
     protected NetworkInterface networkInterface;
 
