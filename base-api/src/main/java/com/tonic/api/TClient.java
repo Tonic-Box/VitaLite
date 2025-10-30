@@ -127,4 +127,10 @@ public interface TClient
     String getAccessToken();
 
     void setAccessToken(String token);
+
+    void setLoginIndex(int index);
+
+    void setAccountTypeLegacy();
+
+    void setAccountTypeJagex();
 }

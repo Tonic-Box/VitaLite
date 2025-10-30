@@ -2,9 +2,8 @@ package com.tonic.plugins.profiles.session;
 
 import com.google.gson.reflect.TypeToken;
 import com.tonic.Static;
+import com.tonic.api.TClient;
 import com.tonic.model.DeviceID;
-import com.tonic.plugins.profiles.ProfilesPlugin;
-import com.tonic.plugins.profiles.data.AuthHooks;
 import com.tonic.plugins.profiles.data.Profile;
 import com.tonic.plugins.profiles.util.GsonUtil;
 import com.tonic.plugins.profiles.util.OS;
@@ -21,8 +20,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -34,6 +31,7 @@ import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 public class ProfilesSession
 {
     private static final String BASE64_KEY = generateAESKey();
@@ -51,16 +49,11 @@ public class ProfilesSession
         return INSTANCE;
     }
 
-    @Getter
     private final Set<Profile> profiles;
-
-    @Getter
-    private final AuthHooks authHooks;
 
     private ProfilesSession()
     {
         profiles = new HashSet<>();
-        authHooks = GsonUtil.loadJsonResource(ProfilesPlugin.class, "authHooks.json", AuthHooks.class);
     }
 
     public Profile getByName(String name)
@@ -143,86 +136,22 @@ public class ProfilesSession
         }
     }
 
-    private void setLoginIndex(int index)
-    {
-        Client client = Static.getClient();
-
-        try
-        {
-            if (this.authHooks.getSetLoginIndexGarbageValue() <= Byte.MAX_VALUE && this.authHooks.getSetLoginIndexGarbageValue() >= Byte.MIN_VALUE)
-            {
-                Class<?> paramComposition = Class.forName(this.authHooks.getSetLoginIndexClassName(), true,
-                        client.getClass().getClassLoader());
-                Method updateLoginIndex = paramComposition.getDeclaredMethod(this.authHooks.getSetLoginIndexMethodName(),
-                        int.class, byte.class);
-                updateLoginIndex.setAccessible(true);
-                updateLoginIndex.invoke(null, index, (byte) this.authHooks.getSetLoginIndexGarbageValue());
-                updateLoginIndex.setAccessible(false);
-            }
-            else if (this.authHooks.getSetLoginIndexGarbageValue() <= Short.MAX_VALUE && this.authHooks.getSetLoginIndexGarbageValue() >= Short.MIN_VALUE)
-            {
-                Class<?> paramComposition = Class.forName(this.authHooks.getSetLoginIndexClassName(), true,
-                        client.getClass().getClassLoader());
-                Method updateLoginIndex = paramComposition.getDeclaredMethod(this.authHooks.getSetLoginIndexMethodName(),
-                        int.class, short.class);
-                updateLoginIndex.setAccessible(true);
-                updateLoginIndex.invoke(null, index, (short) this.authHooks.getSetLoginIndexGarbageValue());
-                updateLoginIndex.setAccessible(false);
-            }
-            else
-            {
-                Class<?> paramComposition = Class.forName(this.authHooks.getSetLoginIndexClassName(), true,
-                        client.getClass().getClassLoader());
-                Method updateLoginIndex = paramComposition.getDeclaredMethod(this.authHooks.getSetLoginIndexMethodName(),
-                        int.class, int.class);
-                updateLoginIndex.setAccessible(true);
-                updateLoginIndex.invoke(null, index, this.authHooks.getSetLoginIndexGarbageValue());
-                updateLoginIndex.setAccessible(false);
-            }
-        }
-        catch (Exception ignored)
-        {
-
-        }
-    }
-
     public void setLoginWithJagexAccount(Profile profile, boolean login)
     {
         Client client = Static.getClient();
-        ClientThread clientThread = Static.getInjector().getInstance(ClientThread.class);
-
-        clientThread.invokeLater(() -> {
+        TClient tClient = (TClient) client;
+        Static.invokeLater(() -> {
             if (client.getGameState() != GameState.LOGIN_SCREEN)
             {
                 return;
             }
-
-            try
-            {
-                setLoginIndex(10);
-
-                Class<?> jxSessionClass = Class.forName(this.authHooks.getJxSessionClassName(), true, client.getClass().getClassLoader());
-                Field jxSessionField = jxSessionClass.getDeclaredField(this.authHooks.getJxSessionFieldName());
-                jxSessionField.setAccessible(true);
-                jxSessionField.set(null, profile.getSessionId());
-                jxSessionField.setAccessible(false);
-
-                Class<?> jxAccountIdClass = Class.forName(this.authHooks.getJxAccountIdClassName(), true, client.getClass().getClassLoader());
-                Field jxAccountIdField = jxAccountIdClass.getDeclaredField(this.authHooks.getJxAccountIdFieldName());
-                jxAccountIdField.setAccessible(true);
-                jxAccountIdField.set(null, profile.getCharacterId());
-                jxAccountIdField.setAccessible(false);
-
-                Class<?> jxDisplayNameClass = Class.forName(this.authHooks.getJxDisplayNameClassName(), true, client.getClass().getClassLoader());
-                Field jxDisplayNameField = jxDisplayNameClass.getDeclaredField(this.authHooks.getJxDisplayNameFieldName());
-                jxDisplayNameField.setAccessible(true);
-                jxDisplayNameField.set(null, profile.getCharacterName());
-                jxDisplayNameField.setAccessible(false);
-            }
-            catch (Exception ignored)
-            {
-
-            }
+            client.setUsername("");
+            client.setPassword("");
+            tClient.setAccountTypeJagex();
+            tClient.setLoginIndex(10);
+            tClient.setSessionId(profile.getSessionId());
+            tClient.setCharacterId(profile.getCharacterId());
+            tClient.setDisplayName(profile.getCharacterName());
 
             if (login)
             {
@@ -235,59 +164,20 @@ public class ProfilesSession
     public void setLoginWithUsernamePassword(Profile profile, boolean login)
     {
         Client client = Static.getClient();
-        ClientThread clientThread = Static.getInjector().getInstance(ClientThread.class);
-
-        clientThread.invokeLater(() -> {
+        TClient tClient = (TClient) client;
+        Static.invokeLater(() -> {
             if (client.getGameState() != GameState.LOGIN_SCREEN)
             {
                 return;
             }
 
-            try
-            {
-                Class<?> jxSessionClass = Class.forName(this.authHooks.getJxSessionClassName(), true, client.getClass().getClassLoader());
-                Field jxSessionField = jxSessionClass.getDeclaredField(this.authHooks.getJxSessionFieldName());
-                jxSessionField.setAccessible(true);
-                jxSessionField.set(null, null);
-                jxSessionField.setAccessible(false);
+            tClient.setSessionId(null);
+            tClient.setCharacterId(null);
+            tClient.setDisplayName(null);
 
-                Class<?> jxAccountIdClass = Class.forName(this.authHooks.getJxAccountIdClassName(), true, client.getClass().getClassLoader());
-                Field jxAccountIdField = jxAccountIdClass.getDeclaredField(this.authHooks.getJxAccountIdFieldName());
-                jxAccountIdField.setAccessible(true);
-                jxAccountIdField.set(null, null);
-                jxAccountIdField.setAccessible(false);
+            tClient.setAccountTypeLegacy();
 
-                Class<?> jxDisplayNameClass = Class.forName(this.authHooks.getJxDisplayNameClassName(), true, client.getClass().getClassLoader());
-                Field jxDisplayNameField = jxDisplayNameClass.getDeclaredField(this.authHooks.getJxDisplayNameFieldName());
-                jxDisplayNameField.setAccessible(true);
-                jxDisplayNameField.set(null, null);
-                jxAccountIdField.setAccessible(false);
-
-                Class<?> jxLegacyAccountValueClass = Class.forName(this.authHooks.getJxLegacyValueClassName(), true, client.getClass().getClassLoader());
-                Field jxLegacyAccountValueField = jxLegacyAccountValueClass.getDeclaredField(this.authHooks.getJxLegacyValueFieldName());
-                jxLegacyAccountValueField.setAccessible(true);
-                Object jxLegacyAccountObject = jxLegacyAccountValueField.get(null);
-                jxLegacyAccountValueField.setAccessible(false);
-
-                Class<?> clientClass = client.getClass(); // Class.forName("client", true, client.getClass.getClassLoader());
-                Field jxAccountCheckField = clientClass.getDeclaredField(this.authHooks.getJxAccountCheckFieldName());
-                jxAccountCheckField.setAccessible(true);
-                jxAccountCheckField.set(null, jxLegacyAccountObject);
-                jxAccountCheckField.setAccessible(false);
-            }
-            catch (Exception ignored)
-            {
-
-            }
-
-            try
-            {
-                setLoginIndex(2);
-            }
-            catch (Exception ignored)
-            {
-
-            }
+            tClient.setLoginIndex(2);
 
             client.setUsername(profile.getUsername());
             client.setPassword(profile.getPassword());

@@ -12,6 +12,7 @@ import com.tonic.runelite.jvm.JvmParams;
 import com.tonic.injector.Injector;
 import com.tonic.injector.RLInjector;
 import com.tonic.model.Libs;
+import com.tonic.services.AutoLogin;
 import com.tonic.services.CatFacts;
 import com.tonic.services.proxy.ProxyManager;
 import com.tonic.util.LauncherCom;
@@ -46,6 +47,14 @@ public class Main {
         {
             System.out.println("Using Proxy: " + optionsParser.getProxy());
             ProxyManager.process(optionsParser.getProxy());
+        }
+        if(optionsParser.getLegacyLogin() != null)
+        {
+            AutoLogin.setCredentials(optionsParser.getLegacyLogin());
+        }
+        if(optionsParser.getJagexLogin() != null)
+        {
+            AutoLogin.setCredentials(optionsParser.getJagexLogin());
         }
         Files.createDirectories(REPOSITORY_DIR);
         JvmParams.set();
