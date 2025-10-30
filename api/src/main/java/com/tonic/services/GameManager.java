@@ -17,7 +17,6 @@ import com.tonic.util.ThreadPool;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.Point;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.InterfaceID;
@@ -42,6 +41,12 @@ public class GameManager extends Overlay {
     {
         return INSTANCE.tickCount;
     }
+    private static int lastUpdateTileObjects = 0;
+    private static int lastUpdatePlayers = 0;
+    private static int lastUpdateNpcs = 0;
+    private static final List<TileObjectEx> tileObjects = new ArrayList<>();
+    private static final List<NPC> npcs = new ArrayList<>();
+    private static final List<Player> players = new ArrayList<>();
 
     public static Stream<Player> playerStream()
     {
@@ -53,16 +58,34 @@ public class GameManager extends Overlay {
         return npcList().stream();
     }
 
-    public static ArrayList<Player> playerList()
+    public static List<Player> playerList()
     {
         Client client = Static.getClient();
-        return Static.invoke(() -> client.getTopLevelWorldView().players().stream().collect(Collectors.toCollection(ArrayList::new)));
+
+        if (lastUpdatePlayers < client.getTickCount())
+        {
+            players.clear();
+            List<Player> playersList = Static.invoke(() -> client.getTopLevelWorldView().players().stream().collect(Collectors.toCollection(ArrayList::new)));
+            players.addAll(playersList);
+            lastUpdatePlayers = client.getTickCount();
+        }
+
+        return players;
     }
 
-    public static ArrayList<NPC> npcList()
+    public static List<NPC> npcList()
     {
         Client client = Static.getClient();
-        return Static.invoke(() -> client.getTopLevelWorldView().npcs().stream().collect(Collectors.toCollection(ArrayList::new)));
+
+        if (lastUpdateNpcs < client.getTickCount())
+        {
+            npcs.clear();
+            List<NPC> npcsList = Static.invoke(() -> client.getTopLevelWorldView().npcs().stream().collect(Collectors.toCollection(ArrayList::new)));
+            npcs.addAll(npcsList);
+            lastUpdateNpcs = client.getTickCount();
+        }
+
+        return npcs;
     }
 
     public static Stream<TileObjectEx> objectStream()
@@ -70,36 +93,47 @@ public class GameManager extends Overlay {
         return objectList().stream();
     }
 
-    public static ArrayList<TileObjectEx> objectList()
+    public static List<TileObjectEx> objectList()
     {
-        return Static.invoke(() -> {
-            ArrayList<TileObjectEx> temp = new ArrayList<>();
-            Client client = Static.getClient();
-            Tile[][] value = client.getTopLevelWorldView().getScene().getTiles()[client.getTopLevelWorldView().getPlane()];
-            for (Tile[] item : value) {
-                for (Tile tile : item) {
-                    if (tile != null) {
-                        if (tile.getGameObjects() != null) {
-                            for (GameObject gameObject : tile.getGameObjects()) {
-                                if (gameObject != null && gameObject.getSceneMinLocation().equals(tile.getSceneLocation())) {
-                                    temp.add(new TileObjectEx(gameObject));
+        Client client = Static.getClient();
+
+        if (lastUpdateTileObjects < client.getTickCount())
+        {
+            tileObjects.clear();
+
+            ArrayList<TileObjectEx> objects = Static.invoke(() -> {
+                ArrayList<TileObjectEx> temp = new ArrayList<>();
+                Tile[][] value = client.getTopLevelWorldView().getScene().getTiles()[client.getTopLevelWorldView().getPlane()];
+                for (Tile[] item : value) {
+                    for (Tile tile : item) {
+                        if (tile != null) {
+                            if (tile.getGameObjects() != null) {
+                                for (GameObject gameObject : tile.getGameObjects()) {
+                                    if (gameObject != null && gameObject.getSceneMinLocation().equals(tile.getSceneLocation())) {
+                                        temp.add(new TileObjectEx(gameObject));
+                                    }
                                 }
                             }
-                        }
-                        if (tile.getWallObject() != null) {
-                            temp.add(new TileObjectEx(tile.getWallObject()));
-                        }
-                        if (tile.getDecorativeObject() != null) {
-                            temp.add(new TileObjectEx(tile.getDecorativeObject()));
-                        }
-                        if (tile.getGroundObject() != null) {
-                            temp.add(new TileObjectEx(tile.getGroundObject()));
+                            if (tile.getWallObject() != null) {
+                                temp.add(new TileObjectEx(tile.getWallObject()));
+                            }
+                            if (tile.getDecorativeObject() != null) {
+                                temp.add(new TileObjectEx(tile.getDecorativeObject()));
+                            }
+                            if (tile.getGroundObject() != null) {
+                                temp.add(new TileObjectEx(tile.getGroundObject()));
+                            }
                         }
                     }
                 }
-            }
-            return temp;
-        });
+                return temp;
+            });
+
+            tileObjects.addAll(objects);
+            lastUpdateTileObjects = client.getTickCount();
+        }
+
+        return GameManager.tileObjects;
     }
 
     public static Stream<TileItemEx> tileItemStream()
