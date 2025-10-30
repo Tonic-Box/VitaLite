@@ -7068,9 +7068,11 @@
         "isStatic": true
       },
       {
+        "name": "setLoginIndex",
         "obfuscatedName": "aq",
         "ownerObfuscatedName": "bz",
         "descriptor": "(II)V",
+        "garbageValue": 0,
         "isStatic": true
       },
       {
@@ -11617,7 +11619,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "accountTypeCheck",
         "obfuscatedName": "fz",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -91892,11 +91894,13 @@
     ]
   },
   {
+    "name": "AccountType",
     "obfuscatedName": "xn",
     "fields": [
       {
         "name": "",
         "obfuscatedName": "aw",
+        "owner": "AccountType",
         "ownerObfuscatedName": "xn",
         "descriptor": "I",
         "getter": -2098599481,
@@ -91904,8 +91908,9 @@
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "jagexType",
         "obfuscatedName": "at",
+        "owner": "AccountType",
         "ownerObfuscatedName": "xn",
         "descriptor": "Lxn;",
         "isStatic": true
@@ -91913,6 +91918,7 @@
       {
         "name": "",
         "obfuscatedName": "ag",
+        "owner": "AccountType",
         "ownerObfuscatedName": "xn",
         "descriptor": "Lxn;",
         "isStatic": true
@@ -91920,6 +91926,7 @@
       {
         "name": "",
         "obfuscatedName": "an",
+        "owner": "AccountType",
         "ownerObfuscatedName": "xn",
         "descriptor": "Lxn;",
         "isStatic": true
@@ -91927,6 +91934,7 @@
       {
         "name": "",
         "obfuscatedName": "ak",
+        "owner": "AccountType",
         "ownerObfuscatedName": "xn",
         "descriptor": "I",
         "getter": -666243253,
@@ -91936,13 +91944,15 @@
       {
         "name": "",
         "obfuscatedName": "aj",
+        "owner": "AccountType",
         "ownerObfuscatedName": "xn",
         "descriptor": "Lxn;",
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "legacyType",
         "obfuscatedName": "av",
+        "owner": "AccountType",
         "ownerObfuscatedName": "xn",
         "descriptor": "Lxn;",
         "isStatic": true
@@ -91950,6 +91960,7 @@
       {
         "name": "",
         "obfuscatedName": "ae",
+        "owner": "AccountType",
         "ownerObfuscatedName": "xn",
         "descriptor": "Lxn;",
         "isStatic": true
@@ -91958,6 +91969,7 @@
     "methods": [
       {
         "obfuscatedName": "av",
+        "owner": "AccountType",
         "ownerObfuscatedName": "xn",
         "descriptor": "(B)I",
         "garbageValue": 0,
@@ -91965,12 +91977,14 @@
       },
       {
         "obfuscatedName": "\u003cclinit\u003e",
+        "owner": "AccountType",
         "ownerObfuscatedName": "xn",
         "descriptor": "()V",
         "isStatic": true
       },
       {
         "obfuscatedName": "ae",
+        "owner": "AccountType",
         "ownerObfuscatedName": "xn",
         "descriptor": "(B)Z",
         "garbageValue": 0,
@@ -91978,6 +91992,7 @@
       },
       {
         "obfuscatedName": "\u003cinit\u003e",
+        "owner": "AccountType",
         "ownerObfuscatedName": "xn",
         "descriptor": "(II)V",
         "isStatic": false

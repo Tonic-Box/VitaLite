@@ -63,6 +63,18 @@ public class VitaLiteOptions extends OptionsParser
     )
     private boolean disableMouseHook = false;
 
+    @CLIArgument(
+            name = "legacyLogin",
+            description = "details for logging int (user:pass)"
+    )
+    private String legacyLogin = null;
+
+    @CLIArgument(
+            name = "jagexLogin",
+            description = "details for logging int (sessionID:characterID:displayName)"
+    )
+    private String jagexLogin = null;
+
     public void _checkAudio()
     {
         if(!AudioDeviceChecker.hasAudioDevice())

@@ -195,6 +195,29 @@ public class GameManager extends Overlay {
     {
         if(event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
             tickCount = 0;
+
+        if(event.getGameState() == GameState.LOGIN_SCREEN)
+        {
+            if(AutoLogin.getCredentials() != null)
+            {
+                ThreadPool.submit(() ->{
+                    String[] parts = AutoLogin.getCredentials().split(":");
+                    AutoLogin.setCredentials(null);
+                    while(Static.getClient() == null)
+                    {
+                        Delays.wait(100);
+                    }
+                    if(parts.length == 2)
+                    {
+                        LoginService.login(parts[0], parts[1], true);
+                    }
+                    else if(parts.length == 3)
+                    {
+                        LoginService.login(parts[0], parts[1], parts[2], true);
+                    }
+                });
+            }
+        }
     }
 
     @Subscribe
