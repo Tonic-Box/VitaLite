@@ -20,6 +20,7 @@ public class Injector {
     public static HashMap<String, ClassNode> gamepack = new HashMap<>();
 
     public static void patch() throws Exception {
+        // Load all gamepack classes (required for mixin resolution and transformers)
         for (var entry : Main.LIBS.getGamepack().classes.entrySet()) {
             String name = entry.getKey();
             byte[] bytes = entry.getValue();
@@ -31,16 +32,17 @@ public class Injector {
         applyInterfaces(pairs);
         applyMixins(pairs);
 
-        for (var entry : gamepack.entrySet()) {
-            String name = entry.getKey();
-
+        // Optimized output phase: Process and clear classes one-by-one to reduce memory pressure
+        ArrayList<String> classNames = new ArrayList<>(gamepack.keySet());
+        for (String name : classNames) {
             if(SignerMapper.shouldIgnore(name))
             {
                 System.out.println("Skipping cert-checked class: " + name);
+                gamepack.remove(name);
                 continue;
             }
 
-            ClassNode classNode = entry.getValue();
+            ClassNode classNode = gamepack.remove(name); // Remove from map immediately
             FieldHookTransformer.instrument(classNode);
             OSGlobalMixin.patch(classNode);
 
@@ -48,6 +50,9 @@ public class Injector {
 
             StripAnnotationsTransformer.stripAnnotations(classNode);
             Main.LIBS.getGamepackClean().classes.put(name, ClassNodeUtil.toBytes(classNode));
+
+            // Help GC by clearing reference immediately
+            classNode = null;
         }
         gamepack.clear();
         JarDumper.dump(Main.LIBS.getGamepackClean().classes);

@@ -1,9 +1,11 @@
 package com.tonic.services.hotswapper;
 
+import com.tonic.Logger;
 import lombok.Getter;
 import net.runelite.client.plugins.Plugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,5 +48,20 @@ public class PluginContext {
             }
         }
         return null;
+    }
+
+    /**
+     * Cleanup this plugin context and release all references to allow garbage collection.
+     * This is critical for preventing ClassLoader memory leaks.
+     */
+    public void cleanup() {
+        plugins.clear();
+        try {
+            if (classLoader != null) {
+                classLoader.close();
+            }
+        } catch (IOException e) {
+            Logger.error("Failed to close PluginClassLoader: " + e.getMessage());
+        }
     }
 }
