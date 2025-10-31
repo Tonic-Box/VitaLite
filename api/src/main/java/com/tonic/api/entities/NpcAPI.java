@@ -2,6 +2,7 @@ package com.tonic.api.entities;
 
 import com.tonic.Static;
 import com.tonic.api.TClient;
+import com.tonic.queries.NpcQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.NPC;
@@ -13,6 +14,15 @@ import net.runelite.client.game.NPCManager;
  */
 public class NpcAPI extends ActorAPI
 {
+    /**
+     * Creates an instance of NpcQuery
+     * @return NpcQuery
+     */
+    public static NpcQuery search()
+    {
+        return new NpcQuery();
+    }
+
     /**
      * interact with an npc by int option
      * @param npc npc
