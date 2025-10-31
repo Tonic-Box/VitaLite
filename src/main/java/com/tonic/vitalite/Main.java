@@ -11,6 +11,8 @@ import com.tonic.runelite.Install;
 import com.tonic.runelite.jvm.JvmParams;
 import com.tonic.injector.Injector;
 import com.tonic.injector.RLInjector;
+import com.tonic.injector.util.PatchGenerator;
+import com.tonic.injector.util.PatchApplier;
 import com.tonic.model.Libs;
 import com.tonic.services.AutoLogin;
 import com.tonic.services.CatFacts;
@@ -62,8 +64,27 @@ public class Main {
         loadArtifacts();
         SignerMapper.map();
         loadClassLoader();
-        Injector.patch();
-        RLInjector.patch();
+
+        if(optionsParser.isRunInjector())
+        {
+            // IDE/Dev mode: Run full ASM injection pipeline and generate patches
+            PatchGenerator.enableCapture();
+            Injector.patch();
+            RLInjector.patch();
+            try {
+                String resourcesPath = "src/main/resources";
+                PatchGenerator.writePatchesZip(resourcesPath);
+                System.out.println("[Main] Patch generation complete: " + PatchGenerator.getStatistics());
+            } catch (Exception e) {
+                System.err.println("[Main] Failed to write patches.zip: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            PatchApplier.applyPatches();
+        }
+
         MappingProvider.getMappings().clear();
         if(optionsParser.getPort() != null)
         {

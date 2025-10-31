@@ -60,11 +60,19 @@ public class Injector {
                 continue;
             }
 
+            // Store original bytecode for patch generation
+            byte[] original = Main.LIBS.getGamepack().classes.get(name);
+            PatchGenerator.storeOriginalGamepack(name, original);
+
             ClassNode classNode = gamepack.remove(name); // Remove from map immediately
             FieldHookTransformer.instrument(classNode);
             OSGlobalMixin.patch(classNode);
 
-            Main.LIBS.getGamepack().classes.put(name, ClassNodeUtil.toBytes(classNode));
+            byte[] modified = ClassNodeUtil.toBytes(classNode);
+            Main.LIBS.getGamepack().classes.put(name, modified);
+
+            // Capture diff if patch generation is enabled
+            PatchGenerator.captureGamepackDiff(name, modified);
 
             StripAnnotationsTransformer.stripAnnotations(classNode);
             Main.LIBS.getGamepackClean().classes.put(name, ClassNodeUtil.toBytes(classNode));
