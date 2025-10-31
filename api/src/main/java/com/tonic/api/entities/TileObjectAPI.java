@@ -18,6 +18,15 @@ import java.util.function.Predicate;
 public class TileObjectAPI
 {
     /**
+     * Creates an instance of TileObjectQuery
+     * @return TileObjectQuery
+     */
+    public static TileObjectQuery<TileObjectEx> search()
+    {
+        return new TileObjectQuery<>();
+    }
+
+    /**
      * interact with a tile object
      * @param object object
      * @param action action
@@ -122,6 +131,13 @@ public class TileObjectAPI
             ObjectComposition composition = client.getObjectDefinition(tileObject.getId());
             if(composition == null)
                 return new String[]{};
+
+            if (composition.getImpostorIds() == null)
+            {
+                return composition.getActions();
+            }
+
+            composition = composition.getImpostor();
             return composition.getActions();
         });
     }

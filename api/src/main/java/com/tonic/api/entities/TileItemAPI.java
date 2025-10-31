@@ -4,6 +4,7 @@ import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.TItemComposition;
 import com.tonic.data.TileItemEx;
+import com.tonic.queries.TileItemQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.Client;
@@ -16,6 +17,15 @@ import net.runelite.api.coords.WorldPoint;
  */
 public class TileItemAPI
 {
+    /**
+     * Creates an instance of TileItemQuery
+     * @return TileItemQuery
+     */
+    public static TileItemQuery search()
+    {
+        return new TileItemQuery();
+    }
+
     /**
      * interact with a tile item without holding down control
      * @param item tile item
