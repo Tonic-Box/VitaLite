@@ -67,24 +67,18 @@ public class FancyDualSpinner extends JPanel {
 
         // Create spinner panel
         JPanel spinnerPanel = new JPanel();
-        spinnerPanel.setLayout(new BoxLayout(spinnerPanel, BoxLayout.X_AXIS));
+        spinnerPanel.setLayout(new GridLayout(1, 2, 4, 0));
         spinnerPanel.setOpaque(false);
         spinnerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        spinnerPanel.setMaximumSize(new Dimension(VPluginPanel.PANEL_WIDTH - 44, 26));
 
         // Style left spinner
         styleSpinner(leftSpinner);
-        leftSpinner.setMaximumSize(new Dimension((VPluginPanel.PANEL_WIDTH - 48) / 2, 26));
-        leftSpinner.setPreferredSize(new Dimension((VPluginPanel.PANEL_WIDTH - 48) / 2, 26));
 
         // Style right spinner
         styleSpinner(rightSpinner);
-        rightSpinner.setMaximumSize(new Dimension((VPluginPanel.PANEL_WIDTH - 48) / 2, 26));
-        rightSpinner.setPreferredSize(new Dimension((VPluginPanel.PANEL_WIDTH - 48) / 2, 26));
 
         // Add spinners to panel with gap
         spinnerPanel.add(leftSpinner);
-        spinnerPanel.add(Box.createHorizontalStrut(4));
         spinnerPanel.add(rightSpinner);
 
         add(spinnerPanel);

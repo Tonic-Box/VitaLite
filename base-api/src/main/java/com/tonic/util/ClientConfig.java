@@ -53,4 +53,9 @@ public interface ClientConfig extends VitaConfig {
     boolean shouldLogNames();
     @ConfigKey(value = "logNames")
     void setShouldLogNames(boolean shouldDraw);
+
+    @ConfigKey(value = "neverLog", defaultValue = "true")
+    boolean shouldNeverLog();
+    @ConfigKey(value = "neverLog")
+    void setNeverLog(boolean neverLog);
 }
