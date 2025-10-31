@@ -75,6 +75,12 @@ public class VitaLiteOptions extends OptionsParser
     )
     private String jagexLogin = null;
 
+    @CLIArgument(
+            name = "runInjector",
+            description = "For use with developing mixins to runt he injector on launch"
+    )
+    private boolean runInjector = false;
+
     public void _checkAudio()
     {
         if(!AudioDeviceChecker.hasAudioDevice())
