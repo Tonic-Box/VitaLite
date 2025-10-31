@@ -71,7 +71,7 @@ public class VitaLiteOptions extends OptionsParser
 
     @CLIArgument(
             name = "jagexLogin",
-            description = "details for logging int (sessionID:characterID:displayName)"
+            description = "details for logging int (sessionID:characterID:displayName) or path to runelite credentials file"
     )
     private String jagexLogin = null;
 
