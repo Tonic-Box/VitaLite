@@ -21,14 +21,22 @@ import java.util.List;
 public class ActorPathing
 {
     public static boolean hasLineOfWalk(Actor actor, WorldPoint destination, List<WorldPoint> blacklist) {
-        return hasLineOfWalk(actor.getWorldLocation(), destination, actor.getWorldArea().getWidth(), actor.getWorldArea().getHeight(), blacklist);
+        return hasLineOfWalk(actor, destination, blacklist, null);
+    }
+
+    public static boolean hasLineOfWalk(Actor actor, WorldPoint destination, List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap) {
+        return hasLineOfWalk(actor.getWorldLocation(), destination, actor.getWorldArea().getWidth(), actor.getWorldArea().getHeight(), blacklist, localMap);
     }
 
     public static boolean hasLineOfWalk(WorldPoint start, WorldPoint end, int actorWidth, int actorHeight, List<WorldPoint> blacklist) {
+        return hasLineOfWalk(start, end, actorWidth, actorHeight, blacklist, null);
+    }
+
+    public static boolean hasLineOfWalk(WorldPoint start, WorldPoint end, int actorWidth, int actorHeight, List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap) {
         WorldArea area = new WorldArea(start, actorWidth, actorHeight);
         if(area.distanceTo(end) < 1)
             return true;
-        List<WorldPoint> path = dumbPathing(start, end, actorWidth, actorHeight, blacklist);
+        List<WorldPoint> path = dumbPathing(start, end, actorWidth, actorHeight, blacklist, localMap);
         return !path.isEmpty() && path.get(path.size() - 1).equals(end);
     }
 
@@ -42,30 +50,35 @@ public class ActorPathing
     @Nullable
     public static Pair<WorldPoint,List<WorldPoint>> dumbTargeting(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist)
     {
-        blacklist.addAll(actorTiles(actor));
-        final WorldPoint start = actor.getWorldLocation();
-        int width = actor.getWorldArea().getWidth();
-        int height = actor.getWorldArea().getHeight();
-        final List<WorldPoint> path = dumbPathing(start, destination, width, height, blacklist);
-        if(path.isEmpty())
-            return null;
-
-        if(!destination.equals(path.get(path.size() - 1)))
-            return Pair.of(destination, path);
-
-        if(path.size() < 2)
-            return null;
-
-        final WorldPoint trueEnd = path.get(path.size() - 2);
-        return Pair.of(trueEnd,dumbPathing(start, trueEnd, width, height, blacklist));
+        return dumbTargeting(actor, destination, blacklist, null);
     }
 
-    public static Pair<WorldPoint,List<WorldPoint>> dumbTargetingNoNpcBlocking(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist, LocalCollisionMap localCollisionMap)
+    /**
+     * Calculates the pathing for targeting
+     * @param actor actor
+     * @param destination the destination tile of the other actor to be targeted
+     * @param blacklist tiles to avoid
+     * @param localMap collision map for inside instances
+     * @return Pare.of(true destination next to target, path)
+     */
+    @Nullable
+    public static Pair<WorldPoint,List<WorldPoint>> dumbTargeting(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap)
+    {
+        blacklist.addAll(actorTiles(actor));
+        return dumbTargetingNoNpcBlocking(actor, destination, blacklist, localMap);
+    }
+
+    public static Pair<WorldPoint,List<WorldPoint>> dumbTargetingNoNpcBlocking(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist)
+    {
+        return dumbTargetingNoNpcBlocking(actor, destination, blacklist, null);
+    }
+
+    public static Pair<WorldPoint,List<WorldPoint>> dumbTargetingNoNpcBlocking(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap)
     {
         final WorldPoint start = actor.getWorldLocation();
         int width = actor.getWorldArea().getWidth();
         int height = actor.getWorldArea().getHeight();
-        final List<WorldPoint> path = dumbPathing(start, destination, width, height, blacklist, localCollisionMap);
+        final List<WorldPoint> path = dumbPathing(start, destination, width, height, blacklist, localMap);
         if(path.isEmpty())
             return null;
 
@@ -76,7 +89,7 @@ public class ActorPathing
             return null;
 
         final WorldPoint trueEnd = path.get(path.size() - 2);
-        return Pair.of(trueEnd,dumbPathing(start, trueEnd, width, height, blacklist, localCollisionMap));
+        return Pair.of(trueEnd,dumbPathing(start, trueEnd, width, height, blacklist, localMap));
     }
 
     /**
@@ -88,14 +101,27 @@ public class ActorPathing
      * @return path
      */
     public static List<WorldPoint> dumbPathing(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist) {
+        return dumbPathing(actor, destination, blacklist, null);
+    }
+
+    /**
+     * Calcumates the dumb path of an actor to the destination tile while considering other actors blocking
+     *
+     * @param actor actor
+     * @param destination destibnation tile
+     * @param blacklist list of hardcoded worldpoints to avoid
+     * @param localMap collision map for inside instances
+     * @return path
+     */
+    public static List<WorldPoint> dumbPathing(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap) {
         blacklist.addAll(actorTiles(actor));
         final WorldArea area = actor.getWorldArea();
-        return dumbPathing(actor.getWorldLocation(), destination, area.getWidth(), area.getHeight(), blacklist);
+        return dumbPathing(actor.getWorldLocation(), destination, area.getWidth(), area.getHeight(), blacklist, localMap);
     }
 
     public static List<WorldPoint> dumbPathing(final WorldPoint start, final WorldPoint destination, final int actorWidth, final int actorHeight, final List<WorldPoint> blacklist)
     {
-        return dumbPathing(start, destination, actorWidth, actorHeight, blacklist, new LocalCollisionMap());
+        return dumbPathing(start, destination, actorWidth, actorHeight, blacklist, null);
     }
 
     /**
@@ -107,19 +133,11 @@ public class ActorPathing
      * @param blacklist list of hardcoded worldpoints to avoid
      * @return path
      */
-    public static List<WorldPoint> dumbPathing(final WorldPoint start, final WorldPoint destination, final int actorWidth, final int actorHeight, final List<WorldPoint> blacklist, LocalCollisionMap localMap) {
+    public static List<WorldPoint> dumbPathing(final WorldPoint start, final WorldPoint destination, final int actorWidth, final int actorHeight, final List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap) {
         IntArrayList blist = new IntArrayList();
         if(blacklist != null && !blacklist.isEmpty())
         {
             blacklist.forEach(p -> blist.add(WorldPointUtil.compress(p)));
-        }
-
-        LocalCollisionMap localCollisionMap = null;
-
-        Client client = Static.getClient();
-        if(client.getTopLevelWorldView().isInstance())
-        {
-            localCollisionMap = localMap;
         }
 
         List<WorldPoint> path = new ArrayList<>();
@@ -136,24 +154,24 @@ public class ActorPathing
         while (curX != destX || curY != destY) {
             int difX = destX - curX;
             int difY = destY - curY;
-            int dx = Integer.signum(difX); // -1, 0 or 1
-            int dy = Integer.signum(difY); // same
+            int dx = Integer.signum(difX);
+            int dy = Integer.signum(difY);
 
-            if(((difX == 1 && difY == 1) || (difX == 1 && difY == -1)) && cantStep(localCollisionMap, curX, curY, plane, 1, 0)) {
-                break; //west side corner stuck
-            } else if(((difX == -1 && difY == -1) || (difX == -1 && difY == 1)) && cantStep(localCollisionMap, curX, curY, plane, -1, 0)) {
-                break; //east side corner stuck
+            if(((difX == 1 && difY == 1) || (difX == 1 && difY == -1)) && cantStep(localMap, curX, curY, plane, 1, 0)) {
+                break;
+            } else if(((difX == -1 && difY == -1) || (difX == -1 && difY == 1)) && cantStep(localMap, curX, curY, plane, -1, 0)) {
+                break;
             }
 
-            else if (canStep(localCollisionMap, curX, curY, plane, dx, dy, actorWidth, actorHeight, blist)) {
+            else if (canStep(localMap, curX, curY, plane, dx, dy, actorWidth, actorHeight, blist)) {
                 curX += dx;
                 curY += dy;
-            } else if (dx != 0 && dy != 0 && canStep(localCollisionMap, curX, curY, plane, dx, 0, actorWidth, actorHeight, blist)) { // if horizontal, try horizontal
+            } else if (dx != 0 && dy != 0 && canStep(localMap, curX, curY, plane, dx, 0, actorWidth, actorHeight, blist)) {
                 curX += dx;
-            } else if (dx != 0 && dy != 0 && canStep(localCollisionMap, curX, curY, plane, 0, dy, actorWidth, actorHeight, blist)) { // if vertical, try vertical
+            } else if (dx != 0 && dy != 0 && canStep(localMap, curX, curY, plane, 0, dy, actorWidth, actorHeight, blist)) {
                 curY += dy;
             } else {
-                break; // No movement possible
+                break;
             }
 
             path.add(new WorldPoint(curX, curY, plane));
@@ -161,13 +179,13 @@ public class ActorPathing
         return path;
     }
 
-    private static boolean canStep(final LocalCollisionMap localCollisionMap, final int currX, final int currY, final int curZ, final int dx, final int dy, final int actorWidth, final int actorHeight, final IntArrayList blacklist)
+    private static boolean canStep(final LocalCollisionMap localMap, final int currX, final int currY, final int curZ, final int dx, final int dy, final int actorWidth, final int actorHeight, final IntArrayList blacklist)
     {
         for (int x = 0; x < actorWidth; x++) {
             for (int y = 0; y < actorHeight; y++) {
                 if(blacklist.contains(WorldPointUtil.compress(currX + x, currY + y, curZ)))
                     return false;
-                else if (cantStep(localCollisionMap, currX + x, currY + y, curZ, dx, dy)) {
+                else if (cantStep(localMap, currX + x, currY + y, curZ, dx, dy)) {
                     return false;
                 }
             }
@@ -175,7 +193,7 @@ public class ActorPathing
         return true;
     }
 
-    private static boolean loacalCantStep(LocalCollisionMap localCollisionMap, final int currX, final int currY, final int curZ, final int dx, final int dy)
+    private static boolean loacalCantStep(LocalCollisionMap localMap, final int currX, final int currY, final int curZ, final int dx, final int dy)
     {
         final short x = (short) currX;
         final short y = (short) currY;
@@ -184,31 +202,31 @@ public class ActorPathing
         switch((dx + 1) * 3 + (dy + 1))
         {
             case 0:
-                return localCollisionMap.sw(x, y, plane);
+                return localMap.sw(x, y, plane);
             case 1:
-                return localCollisionMap.w(x, y, plane);
+                return localMap.w(x, y, plane);
             case 2:
-                return localCollisionMap.nw(x, y, plane);
+                return localMap.nw(x, y, plane);
             case 3:
-                return localCollisionMap.s(x, y, plane);
+                return localMap.s(x, y, plane);
             case 5:
-                return localCollisionMap.n(x, y, plane);
+                return localMap.n(x, y, plane);
             case 6:
-                return localCollisionMap.se(x, y, plane);
+                return localMap.se(x, y, plane);
             case 7:
-                return localCollisionMap.e(x, y, plane);
+                return localMap.e(x, y, plane);
             case 8:
-                return localCollisionMap.ne(x, y, plane);
+                return localMap.ne(x, y, plane);
         }
 
         return true;
     }
 
-    private static boolean cantStep(final LocalCollisionMap localCollisionMap, final int currX, final int currY, final int curZ, final int dx, final int dy)
+    private static boolean cantStep(final LocalCollisionMap localMap, final int currX, final int currY, final int curZ, final int dx, final int dy)
     {
-        if(localCollisionMap != null)
+        if(localMap != null)
         {
-            return loacalCantStep(localCollisionMap, currX, currY, curZ, dx, dy);
+            return loacalCantStep(localMap, currX, currY, curZ, dx, dy);
         }
 
         CollisionMap map = Pathfinder.getCollisionMap();
