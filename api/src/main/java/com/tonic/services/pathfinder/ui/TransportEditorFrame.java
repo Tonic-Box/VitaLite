@@ -208,6 +208,7 @@ public class TransportEditorFrame extends JFrame {
                 detailPanel.clearSelection();
                 setHasUnsavedChanges(false);
                 showStatusMessage("Loaded " + transports.size() + " transports");
+                TransportOverlay.rebuildTransportIndex(transports);
             }
         } catch (Exception e) {
             showErrorDialog("Failed to load transports", e);
@@ -243,6 +244,7 @@ public class TransportEditorFrame extends JFrame {
         listPanel.refreshTransportList(transports);
         listPanel.selectTransport(newTransport);
         setHasUnsavedChanges(true);
+        TransportOverlay.rebuildTransportIndex(transports);
     }
 
     public void duplicateTransport(TransportDto transport) {
@@ -278,6 +280,7 @@ public class TransportEditorFrame extends JFrame {
             System.out.println("Setting unsaved changes flag...");
             setHasUnsavedChanges(true);
             System.out.println("deleteTransport completed successfully");
+            TransportOverlay.rebuildTransportIndex(transports);
         } else {
             System.out.println("Deletion cancelled or transport was null");
         }
@@ -313,6 +316,7 @@ public class TransportEditorFrame extends JFrame {
             // and avoid re-triggering selection events that would reset the detail panel
             listPanel.updateTransportInPlace(oldTransport, newTransport);
             setHasUnsavedChanges(true);
+            TransportOverlay.rebuildTransportIndex(transports);
         }
     }
 

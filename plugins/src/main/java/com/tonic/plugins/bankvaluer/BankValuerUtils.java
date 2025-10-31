@@ -33,33 +33,44 @@ public class BankValuerUtils
     }
 
     /**
-     * gets the top 10 most valuble items in your bank
-     * @return Map<ItemId,ItemValue>
+     * Gets the top valued items in your bank limited by the provided amount.
+     *
+     * @param limit the maximum number of items to return
+     * @return Map<ItemId, ItemValue>
      */
-    public static Map<Integer,Long> getTopTenItems()
+    public static Map<Integer, Long> getTopItems(int limit, boolean hideUntradeables)
     {
-        if(Static.getClient() == null)
+        if (Static.getClient() == null || limit <= 0)
             return new HashMap<>();
         return Static.invoke(() -> {
-            Map<Integer,Long> topTen = new HashMap<>();
+            Map<Integer, Long> topItems = new HashMap<>();
             Map<Integer,Integer> cache = BankCache.getCachedBank();
             if(cache == null || cache.isEmpty())
-                return topTen;
+                return topItems;
+
+            ItemManager itemManager = Static.getInjector().getInstance(ItemManager.class);
 
 
             for(Map.Entry<Integer,Integer> entry : cache.entrySet())
             {
                 int id = entry.getKey();
                 int quantity = entry.getValue();
-                long itemPrice = getGePrice(id, quantity);
+                ItemComposition itemDef = itemManager.getItemComposition(id);
+
+                if (hideUntradeables && !itemDef.isTradeable())
+                {
+                    continue;
+                }
+
+                long itemPrice = getGePrice(itemManager, itemDef, id, quantity);
                 if(itemPrice <= 0)
                     continue;
-                topTen.put(id,itemPrice);
-                if(topTen.size() > 10)
+                topItems.put(id,itemPrice);
+                if(topItems.size() > limit)
                 {
                     int lowestId = -1;
                     long lowestValue = Long.MAX_VALUE;
-                    for(Map.Entry<Integer,Long> e : topTen.entrySet())
+                    for(Map.Entry<Integer,Long> e : topItems.entrySet())
                     {
                         if(e.getValue() < lowestValue)
                         {
@@ -68,16 +79,22 @@ public class BankValuerUtils
                         }
                     }
                     if(lowestId != -1)
-                        topTen.remove(lowestId);
+                        topItems.remove(lowestId);
                 }
             }
-            return topTen;
+            return topItems;
         });
     }
 
     public static long getGePrice(int id, int quantity)
     {
         ItemManager itemManager = Static.getInjector().getInstance(ItemManager.class);
+        ItemComposition itemDef = itemManager.getItemComposition(id);
+        return getGePrice(itemManager, itemDef, id, quantity);
+    }
+
+    private static long getGePrice(ItemManager itemManager, ItemComposition itemDef, int id, int quantity)
+    {
         if (id == ItemID.COINS)
         {
             return quantity;
@@ -86,8 +103,6 @@ public class BankValuerUtils
         {
             return quantity * 1000L;
         }
-
-        ItemComposition itemDef = itemManager.getItemComposition(id);
 
         if (itemDef.getPrice() <= 0)
         {

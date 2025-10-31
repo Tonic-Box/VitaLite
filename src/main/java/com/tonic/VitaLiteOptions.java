@@ -63,6 +63,24 @@ public class VitaLiteOptions extends OptionsParser
     )
     private boolean disableMouseHook = false;
 
+    @CLIArgument(
+            name = "legacyLogin",
+            description = "details for logging int (user:pass)"
+    )
+    private String legacyLogin = null;
+
+    @CLIArgument(
+            name = "jagexLogin",
+            description = "details for logging int (sessionID:characterID:displayName) or path to runelite credentials file"
+    )
+    private String jagexLogin = null;
+
+    @CLIArgument(
+            name = "runInjector",
+            description = "For use with developing mixins to runt he injector on launch"
+    )
+    private boolean runInjector = false;
+
     public void _checkAudio()
     {
         if(!AudioDeviceChecker.hasAudioDevice())

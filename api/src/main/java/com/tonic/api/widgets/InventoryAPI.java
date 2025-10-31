@@ -139,6 +139,40 @@ public class InventoryAPI
     }
 
     /**
+     * interact with an item in your inventory by subOp and action
+     * @param item item
+     * @param menu menu (Eg. "Rub")
+     * @param action action (Eg. "Grand Exchange")
+     */
+    public static void interactSubOp(ItemEx item, String menu, String action) {
+        if (item == null)
+            return;
+        WidgetAPI.interact(item.getWidget(), menu, action);
+    }
+
+    /**
+     * interact with an item in your inventory by id, subOp and action
+     * @param itemId itemId
+     * @param menu menu (Eg. "Rub")
+     * @param action action (Eg. "Grand Exchange")
+     */
+    public static void interactSubOp(int itemId, String menu, String action) {
+        ItemEx item = getItem(itemId);
+        interactSubOp(item, menu, action);
+    }
+
+    /**
+     * interact with an item in your inventory by name, subOp and action
+     * @param itemName itemName
+     * @param menu menu (Eg. "Rub")
+     * @param action action (Eg. "Grand Exchange")
+     */
+    public static void interactSubOp(String itemName, String menu, String action) {
+        ItemEx item = getItem(itemName);
+        interactSubOp(item, menu, action);
+    }
+
+    /**
      * interact with an item in your inventory by slot, id and action index
      * @param slot slot
      * @param id id

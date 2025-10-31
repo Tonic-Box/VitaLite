@@ -121,6 +121,28 @@ public class Static
         }
     }
 
+    public static void invokeLater(Runnable runnable)
+    {
+        TClient T_CLIENT = (TClient) CLIENT_OBJECT;
+        if (!T_CLIENT.isClientThread()) {
+            getRuneLite().getClientThread().invokeLater(runnable);
+        } else {
+            runnable.run();
+        }
+    }
+
+    public static <T> T invokeLater(Supplier<T> supplier) {
+        TClient T_CLIENT = (TClient) CLIENT_OBJECT;
+        if (!T_CLIENT.isClientThread()) {
+            CompletableFuture<T> future = new CompletableFuture<>();
+            Runnable runnable = () -> future.complete(supplier.get());
+            invokeLater(runnable);
+            return future.join();
+        } else {
+            return supplier.get();
+        }
+    }
+
     /**
      * post event to event bus
      * @param event event object

@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.tonic"
-version = "1.11.23_1"
+version = "1.11.25_1"
 
 repositories {
     mavenCentral()
@@ -207,6 +207,7 @@ dependencies {
 
     implementation(group = "com.fifesoft", name = "rsyntaxtextarea", version = "3.1.2")
     implementation(group = "com.fifesoft", name = "autocomplete", version = "3.1.1")
+    implementation("io.sigpipe:jbsdiff:1.0")
 
 //    implementation("com.lmax:disruptor:3.4.4")
 //    implementation("org.jctools:jctools-core:4.0.5")

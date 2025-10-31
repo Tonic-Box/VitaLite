@@ -39,15 +39,19 @@ VitaLite is a launcher for RuneLite that offers additional features and customiz
 5. Submit a pull request
 
 ## Client Command Line Options
-| Option       | Type    | Description                                          |
-|--------------|---------|------------------------------------------------------|
-| `--rsdump`   | String  | Path to dump the gamepack to (optional)              |
-| `-noPlugins` | Boolean | Disables loading of core plugins                     |
-| `-min`       | Boolean | Runs jvm with minimal alotted memory.                |
-| `-noMusic`   | Boolean | Prevent the loading of music tracks                  |
-| `-incognito` | Boolean | Visually display as 'RuneLite' instead of 'VitaLite' |
-| `-help`      | Boolean | Displays help information about command line options |
-| `--proxy`     | String  | Set a proxy server to use (e.g., ip:port or ip:port:username:password) |
+| Option         | Type    | Description                                                                                       |
+|----------------|---------|---------------------------------------------------------------------------------------------------|
+| `-runInjector` | Boolean | Run the injector on startup and update patch difs (for mixin development)                         |
+| `--rsdump`     | String  | Path to dump the gamepack to (optional)                                                           |
+| `-noPlugins`   | Boolean | Disables loading of core plugins                                                                  |
+| `-min`         | Boolean | Runs jvm with minimal alotted memory.                                                             |
+| `-noMusic`     | Boolean | Prevent the loading of music tracks                                                               |
+| `-incognito`   | Boolean | Visually display as 'RuneLite' instead of 'VitaLite'                                              |
+| `-help`        | Boolean | Displays help information about command line options                                              |
+| `--legacyLogin` | String | details for logging int (user:pass)                                                               |
+| `--jagexLogin` | String | details for logging int (sessionID:characterID:displayName)  or path to runelite credentials file |
+| `--proxy`      | String  | Set a proxy server to use (e.g., ip:port or ip:port:username:password)                            |
+
 
 ## Disclaimer
 

@@ -90,112 +90,154 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         titlePanel.add(Box.createVerticalStrut(10));
 
         contentPanel.add(titlePanel);
-        contentPanel.add(Box.createVerticalStrut(10));
+        contentPanel.add(Box.createVerticalStrut(15));
 
+        // General Settings
+        CollapsiblePanel generalPanel = new CollapsiblePanel("General");
         headlessToggle = new ToggleSlider();
-        contentPanel.add(createToggleOption(
+        generalPanel.addContent(createToggleOption(
                 "Headless Mode",
                 "Run without rendering",
                 headlessToggle,
                 () -> Static.setHeadless(headlessToggle.isSelected())
         ));
-        contentPanel.add(Box.createVerticalStrut(12));
+        generalPanel.addVerticalStrut(12);
+        ToggleSlider neverLogToggle = new ToggleSlider();
+        neverLogToggle.setSelected(Static.getVitaConfig().shouldNeverLog());
+        generalPanel.addContent(createToggleOption(
+                "Never Log",
+                "Prevent the AFK logout",
+                neverLogToggle,
+                () -> Static.getVitaConfig().setNeverLog(neverLogToggle.isSelected())
+        ));
+        contentPanel.add(generalPanel);
+        contentPanel.add(Box.createVerticalStrut(10));
+
+        // Logging Settings
+        CollapsiblePanel loggingPanel = new CollapsiblePanel("Logging");
 
         logPacketsToggle = new ToggleSlider();
-        contentPanel.add(createToggleOption(
+        loggingPanel.addContent(createToggleOption(
                 "Log Packets",
                 "Enable packet logging",
                 logPacketsToggle,
                 () -> {}
         ));
-        contentPanel.add(Box.createVerticalStrut(12));
+        loggingPanel.addVerticalStrut(12);
 
         logServerPacketsToggle = new ToggleSlider();
-        contentPanel.add(createToggleOption(
+        loggingPanel.addContent(createToggleOption(
                 "Log Server Packets",
                 "Enable server packet logging",
                 logServerPacketsToggle,
                 () -> {}
         ));
-        contentPanel.add(Box.createVerticalStrut(12));
+        loggingPanel.addVerticalStrut(12);
 
         logMenuActionsToggle = new ToggleSlider();
-        contentPanel.add(createToggleOption(
+        loggingPanel.addContent(createToggleOption(
                 "Log Menu Actions",
                 "Enable menu action logging",
                 logMenuActionsToggle,
                 () -> {}
         ));
+        loggingPanel.addVerticalStrut(12);
 
-        contentPanel.add(Box.createVerticalStrut(12));
         nameLogging = new ToggleSlider();
         nameLogging.setSelected(Static.getVitaConfig().shouldLogNames());
-        contentPanel.add(createToggleOption(
+        loggingPanel.addContent(createToggleOption(
                 "Logger Names",
                 "Show gameval names in logging",
                 nameLogging,
                 () -> Static.getVitaConfig().setShouldLogNames(nameLogging.isSelected())
         ));
+        loggingPanel.addVerticalStrut(12);
 
-        contentPanel.add(Box.createVerticalStrut(12));
         hideLoggerToggle = new ToggleSlider();
-        contentPanel.add(createToggleOption(
+        loggingPanel.addContent(createToggleOption(
                 "Hide Logger",
                 "Hide the logger panel",
                 hideLoggerToggle,
                 () -> Logger.setLoggerVisible(!hideLoggerToggle.isSelected())
         ));
-        contentPanel.add(Box.createVerticalStrut(12));
+
+        contentPanel.add(loggingPanel);
+        contentPanel.add(Box.createVerticalStrut(10));
+
+        // Caching Settings
+        CollapsiblePanel cachingPanel = new CollapsiblePanel("Caching");
 
         ToggleSlider cachedRandomDat = new ToggleSlider();
         cachedRandomDat.setSelected(Static.getVitaConfig().shouldCacheRandomDat());
-        contentPanel.add(createToggleOption(
+        cachingPanel.addContent(createToggleOption(
                 "Cached RandomDat",
                 "Spoof and cache per-account Random dat data",
                 cachedRandomDat,
                 () -> Static.getVitaConfig().setShouldCacheRandomDat(cachedRandomDat.isSelected())
         ));
-        contentPanel.add(Box.createVerticalStrut(12));
+        cachingPanel.addVerticalStrut(12);
 
         ToggleSlider cachedDeviceID = new ToggleSlider();
         cachedDeviceID.setSelected(Static.getVitaConfig().shouldCacheDeviceId());
-        contentPanel.add(createToggleOption(
+        cachingPanel.addContent(createToggleOption(
                 "Cached DeviceID",
                 "Spoof and cache per-account DeviceID",
                 cachedDeviceID,
                 () -> Static.getVitaConfig().setShouldCacheDeviceId(cachedDeviceID.isSelected())
         ));
-        contentPanel.add(Box.createVerticalStrut(12));
+        cachingPanel.addVerticalStrut(12);
 
         bankCacheToggle = new ToggleSlider();
         bankCacheToggle.setSelected(Static.getVitaConfig().shouldCacheBank());
-        contentPanel.add(createToggleOption(
+        cachingPanel.addContent(createToggleOption(
                 "Persist Bank Cache",
                 "Save the bank caching for reuse between sessions",
                 bankCacheToggle,
                 () -> Static.getVitaConfig().setShouldCacheBank(bankCacheToggle.isSelected())
         ));
-        contentPanel.add(Box.createVerticalStrut(12));
+
+        contentPanel.add(cachingPanel);
+        contentPanel.add(Box.createVerticalStrut(10));
+
+        // Walker Settings
+        CollapsiblePanel walkerPanel = new CollapsiblePanel("Walker");
 
         ToggleSlider drawPath = new ToggleSlider();
         drawPath.setSelected(Static.getVitaConfig().shouldDrawWalkerPath());
-        contentPanel.add(createToggleOption(
-                "Draw walker path",
+        walkerPanel.addContent(createToggleOption(
+                "Draw Walker Path",
                 "Draw the walker path on the floating and mini maps",
                 drawPath,
                 () -> Static.getVitaConfig().setShouldDrawWalkerPath(drawPath.isSelected())
         ));
-        contentPanel.add(Box.createVerticalStrut(12));
+        walkerPanel.addVerticalStrut(12);
 
         ToggleSlider drawCollision = new ToggleSlider();
         drawCollision.setSelected(Static.getVitaConfig().shouldDrawCollision());
-        contentPanel.add(createToggleOption(
-                "Draw tile collision",
-                "Draw the walker path on the floating and mini maps",
+        walkerPanel.addContent(createToggleOption(
+                "Draw Tile Collision",
+                "Draw tile collision on the floating and mini maps",
                 drawCollision,
                 () -> Static.getVitaConfig().setShouldDrawCollision(drawCollision.isSelected())
         ));
-        contentPanel.add(Box.createVerticalStrut(12));
+
+        if(!Static.isRunningFromShadedJar())
+        {
+            walkerPanel.addVerticalStrut(12);
+            FancyButton transportButton = new FancyButton("Transport Editor");
+            transportButton.addActionListener(e -> toggleTransportsEditor());
+            walkerPanel.addContent(transportButton);
+        }
+
+        contentPanel.add(walkerPanel);
+        contentPanel.add(Box.createVerticalStrut(10));
+
+        // Input Settings
+        CollapsiblePanel inputPanel = new CollapsiblePanel("Input");
+
+        FancyDropdown<ClickStrategy> clickStrategyDropdown = new FancyDropdown<>("Click Strategy", ClickStrategy.class);
+        ClickStrategy strat = Static.getVitaConfig().getClickStrategy();
+        clickStrategyDropdown.setSelectedItem(strat);
 
         FancyDualSpinner pointSpinner = new FancyDualSpinner(
                 "Static Click Point",
@@ -203,51 +245,39 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 Integer.MIN_VALUE, Integer.MAX_VALUE, Static.getVitaConfig().getClickPointY()
         );
         ClickManager.setPoint(pointSpinner.getLeftValue().intValue(), pointSpinner.getRightValue().intValue());
+        pointSpinner.setVisible(strat == ClickStrategy.STATIC);
         pointSpinner.addChangeListener(e -> {
             Static.getVitaConfig().setClickPointX(pointSpinner.getLeftValue().intValue());
             Static.getVitaConfig().setClickPointY(pointSpinner.getRightValue().intValue());
             ClickManager.setPoint(pointSpinner.getLeftValue().intValue(), pointSpinner.getRightValue().intValue());
         });
 
-        FancyDropdown<ClickStrategy> clickStrategyDropdown = new FancyDropdown<>("Click Strategy", ClickStrategy.class);
-        ClickStrategy strat = Static.getVitaConfig().getClickStrategy();
-        clickStrategyDropdown.setSelectedItem(strat);
-        pointSpinner.setVisible(strat == ClickStrategy.STATIC);
         clickStrategyDropdown.addSelectionListener(event -> {
             Static.getVitaConfig().setClickStrategy(clickStrategyDropdown.getSelectedItem());
             pointSpinner.setVisible(clickStrategyDropdown.getSelectedItem() == ClickStrategy.STATIC);
         });
-        contentPanel.add(clickStrategyDropdown);
-        contentPanel.add(Box.createVerticalStrut(12));
-        contentPanel.add(pointSpinner);
 
-        contentPanel.add(Box.createVerticalStrut(12));
+        inputPanel.addContent(clickStrategyDropdown);
+        inputPanel.addVerticalStrut(12);
+        inputPanel.addContent(pointSpinner);
 
-        if(!Static.isRunningFromShadedJar())
-        {
-            FancyButton transportButton = new FancyButton("Transport Editor");
-            transportButton.addActionListener(e -> toggleTransportsEditor());
-            contentPanel.add(transportButton);
-        }
+        contentPanel.add(inputPanel);
+        contentPanel.add(Box.createVerticalStrut(10));
 
-        contentPanel.add(Box.createVerticalStrut(20));
-        JLabel debugLabel = new JLabel("Debug");
-        debugLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        debugLabel.setForeground(HEADER_COLOR);
-        debugLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        debugLabel.add(Box.createVerticalStrut(10));
-        contentPanel.add(debugLabel);
-        contentPanel.add(Box.createVerticalStrut(12));
+        // Debug Settings
+        CollapsiblePanel debugPanel = new CollapsiblePanel("Debug");
 
         FancyButton checkButton = new FancyButton("Check Platform Info");
         checkButton.addActionListener(e -> PlatformInfoViewer.toggle());
-        contentPanel.add(checkButton);
-
-        contentPanel.add(Box.createVerticalStrut(12));
+        debugPanel.addContent(checkButton);
+        debugPanel.addVerticalStrut(12);
 
         FancyButton mouseButton = new FancyButton("Check Mouse Values");
         mouseButton.addActionListener(e -> checkMouseValues());
-        contentPanel.add(mouseButton);
+        debugPanel.addContent(mouseButton);
+
+        contentPanel.add(debugPanel);
+        contentPanel.add(Box.createVerticalStrut(15));
 
         // Now set the proper dimensions after all components are added
         contentPanel.setPreferredSize(new Dimension(PANEL_WIDTH, contentPanel.getPreferredSize().height));

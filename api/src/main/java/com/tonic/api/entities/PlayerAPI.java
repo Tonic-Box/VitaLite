@@ -2,6 +2,7 @@ package com.tonic.api.entities;
 
 import com.tonic.Static;
 import com.tonic.api.TClient;
+import com.tonic.queries.PlayerQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.Client;
@@ -12,6 +13,15 @@ import net.runelite.api.Player;
  */
 public class PlayerAPI extends ActorAPI
 {
+    /**
+     * Creates an instance of PlayerQuery
+     * @return PlayerQuery
+     */
+    public static PlayerQuery search()
+    {
+        return new PlayerQuery();
+    }
+
     /**
      * interact with a player by option number
      * @param player player

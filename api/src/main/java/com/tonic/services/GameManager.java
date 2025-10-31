@@ -17,7 +17,6 @@ import com.tonic.util.ThreadPool;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.Point;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.InterfaceID;
@@ -25,13 +24,17 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 
 /**
  * GameManager
@@ -42,6 +45,12 @@ public class GameManager extends Overlay {
     {
         return INSTANCE.tickCount;
     }
+    private static int lastUpdateTileObjects = 0;
+    private static int lastUpdatePlayers = 0;
+    private static int lastUpdateNpcs = 0;
+    private static final List<TileObjectEx> tileObjects = new ArrayList<>();
+    private static final List<NPC> npcs = new ArrayList<>();
+    private static final List<Player> players = new ArrayList<>();
 
     public static Stream<Player> playerStream()
     {
@@ -53,16 +62,34 @@ public class GameManager extends Overlay {
         return npcList().stream();
     }
 
-    public static ArrayList<Player> playerList()
+    public static List<Player> playerList()
     {
         Client client = Static.getClient();
-        return Static.invoke(() -> client.getTopLevelWorldView().players().stream().collect(Collectors.toCollection(ArrayList::new)));
+
+        if (lastUpdatePlayers < client.getTickCount())
+        {
+            players.clear();
+            List<Player> playersList = Static.invoke(() -> client.getTopLevelWorldView().players().stream().collect(Collectors.toCollection(ArrayList::new)));
+            players.addAll(playersList);
+            lastUpdatePlayers = client.getTickCount();
+        }
+
+        return players;
     }
 
-    public static ArrayList<NPC> npcList()
+    public static List<NPC> npcList()
     {
         Client client = Static.getClient();
-        return Static.invoke(() -> client.getTopLevelWorldView().npcs().stream().collect(Collectors.toCollection(ArrayList::new)));
+
+        if (lastUpdateNpcs < client.getTickCount())
+        {
+            npcs.clear();
+            List<NPC> npcsList = Static.invoke(() -> client.getTopLevelWorldView().npcs().stream().collect(Collectors.toCollection(ArrayList::new)));
+            npcs.addAll(npcsList);
+            lastUpdateNpcs = client.getTickCount();
+        }
+
+        return npcs;
     }
 
     public static Stream<TileObjectEx> objectStream()
@@ -70,13 +97,17 @@ public class GameManager extends Overlay {
         return objectList().stream();
     }
 
-    public static ArrayList<TileObjectEx> objectList()
+    public static List<TileObjectEx> objectList()
     {
-        return Static.invoke(() -> {
-            ArrayList<TileObjectEx> temp = new ArrayList<>();
-            Client client = Static.getClient();
-            Tile[][][] tiles = client.getTopLevelWorldView().getScene().getTiles();
-            for (Tile[][] value : tiles) {
+        Client client = Static.getClient();
+
+        if (lastUpdateTileObjects < client.getTickCount())
+        {
+            tileObjects.clear();
+
+            ArrayList<TileObjectEx> objects = Static.invoke(() -> {
+                ArrayList<TileObjectEx> temp = new ArrayList<>();
+                Tile[][] value = client.getTopLevelWorldView().getScene().getTiles()[client.getTopLevelWorldView().getPlane()];
                 for (Tile[] item : value) {
                     for (Tile tile : item) {
                         if (tile != null) {
@@ -99,19 +130,69 @@ public class GameManager extends Overlay {
                         }
                     }
                 }
-            }
-            return temp;
-        });
+                return temp;
+            });
+
+            tileObjects.addAll(objects);
+            lastUpdateTileObjects = client.getTickCount();
+        }
+
+        return GameManager.tileObjects;
     }
 
     public static Stream<TileItemEx> tileItemStream()
     {
-        return new ArrayList<>(INSTANCE.tileItemCache).stream();
+        return tileItemList().stream();
     }
 
     public static ArrayList<TileItemEx> tileItemList()
     {
-        return new ArrayList<>(INSTANCE.tileItemCache);
+        Client client = Static.getClient();
+        WorldView wv = client.getTopLevelWorldView();
+        ArrayList<TileItemEx> copy = new ArrayList<>(INSTANCE.tileItemCache);
+        copy.removeIf(i -> i.getWorldLocation().getPlane() != wv.getPlane());
+        return copy;
+    }
+
+    public static Stream<Widget> widgetStream()
+    {
+        return widgetList().stream();
+    }
+
+    public static List<Widget> widgetList() {
+        return Static.invoke(() -> {
+            Widget[] roots = ((Client) Static.getClient()).getWidgetRoots();
+
+            List<Widget> result = new ArrayList<>(256);
+            Set<Widget> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+            Deque<Widget> toProcess = new ArrayDeque<>();
+            addNonNull(toProcess, roots);
+            while (!toProcess.isEmpty()) {
+                Widget widget = toProcess.pop();
+
+                if (!visited.add(widget)) {
+                    continue;
+                }
+
+                result.add(widget);
+                addNonNull(toProcess, widget.getChildren());
+                addNonNull(toProcess, widget.getStaticChildren());
+                addNonNull(toProcess, widget.getDynamicChildren());
+                addNonNull(toProcess, widget.getNestedChildren());
+            }
+
+            return result;
+        });
+    }
+
+    private static void addNonNull(Deque<Widget> stack, Widget[] widgets) {
+        if (widgets != null) {
+            for (Widget w : widgets) {
+                if (w != null) {
+                    stack.push(w);
+                }
+            }
+        }
     }
 
 
@@ -193,6 +274,29 @@ public class GameManager extends Overlay {
     {
         if(event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
             tickCount = 0;
+
+        if(event.getGameState() == GameState.LOGIN_SCREEN)
+        {
+            if(AutoLogin.getCredentials() != null)
+            {
+                ThreadPool.submit(() ->{
+                    String[] parts = AutoLogin.getCredentials().split(":");
+                    AutoLogin.setCredentials(null);
+                    while(Static.getClient() == null)
+                    {
+                        Delays.wait(100);
+                    }
+                    if(parts.length == 2)
+                    {
+                        LoginService.login(parts[0], parts[1], true);
+                    }
+                    else if(parts.length == 3)
+                    {
+                        LoginService.login(parts[0], parts[1], parts[2], true);
+                    }
+                });
+            }
+        }
     }
 
     @Subscribe

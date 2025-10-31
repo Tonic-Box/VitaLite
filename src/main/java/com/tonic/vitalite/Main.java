@@ -11,7 +11,10 @@ import com.tonic.runelite.Install;
 import com.tonic.runelite.jvm.JvmParams;
 import com.tonic.injector.Injector;
 import com.tonic.injector.RLInjector;
+import com.tonic.injector.util.PatchGenerator;
+import com.tonic.injector.util.PatchApplier;
 import com.tonic.model.Libs;
+import com.tonic.services.AutoLogin;
 import com.tonic.services.CatFacts;
 import com.tonic.services.proxy.ProxyManager;
 import com.tonic.util.LauncherCom;
@@ -47,14 +50,41 @@ public class Main {
             System.out.println("Using Proxy: " + optionsParser.getProxy());
             ProxyManager.process(optionsParser.getProxy());
         }
+        if(optionsParser.getLegacyLogin() != null)
+        {
+            AutoLogin.setCredentials(optionsParser.getLegacyLogin());
+        }
+        if(optionsParser.getJagexLogin() != null)
+        {
+            AutoLogin.setCredentials(optionsParser.getJagexLogin());
+        }
         Files.createDirectories(REPOSITORY_DIR);
         JvmParams.set();
         RLUpdater.run();
         loadArtifacts();
         SignerMapper.map();
         loadClassLoader();
-        Injector.patch();
-        RLInjector.patch();
+
+        if(optionsParser.isRunInjector())
+        {
+            // IDE/Dev mode: Run full ASM injection pipeline and generate patches
+            PatchGenerator.enableCapture();
+            Injector.patch();
+            RLInjector.patch();
+            try {
+                String resourcesPath = "src/main/resources";
+                PatchGenerator.writePatchesZip(resourcesPath);
+                System.out.println("[Main] Patch generation complete: " + PatchGenerator.getStatistics());
+            } catch (Exception e) {
+                System.err.println("[Main] Failed to write patches.zip: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            PatchApplier.applyPatches();
+        }
+
         MappingProvider.getMappings().clear();
         if(optionsParser.getPort() != null)
         {
