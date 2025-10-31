@@ -19,9 +19,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PluginReloader {
-    @Getter
-    @Setter
-    private static ClassLoader classLoader;
     private static PluginManager pluginManager;
 
     private static boolean isLoaded = false;
@@ -33,6 +30,18 @@ public class PluginReloader {
         isLoaded = true;
 
         pluginManager = Static.getInjector().getInstance(PluginManager.class);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            Logger.info("Cleaning up plugin classloaders...");
+            for (PluginContext context : PluginContext.getLoadedPlugins().values()) {
+                try {
+                    context.cleanup();
+                } catch (Exception e) {
+                    Logger.error("Error cleaning up plugin context: " + e.getMessage());
+                }
+            }
+            PluginContext.getLoadedPlugins().clear();
+        }, "PluginClassLoader-Cleanup"));
 
         List<File> jars = findJars().stream()
                 .map(Path::toFile)
@@ -78,7 +87,7 @@ public class PluginReloader {
 
     public static boolean reloadPlugin(File jarFile) {
         try {
-            PluginContext oldContext = PluginContext.getLoadedPlugins().get(jarFile.getAbsolutePath());
+            PluginContext oldContext = PluginContext.getLoadedPlugins().remove(jarFile.getAbsolutePath());
             if (oldContext != null) {
                 for (Plugin plugin : oldContext.getPlugins()) {
                     if (pluginManager.isPluginActive(plugin)) {
@@ -91,21 +100,16 @@ public class PluginReloader {
                     }
                     pluginManager.remove(plugin);
                 }
+
+                oldContext.cleanup();
             }
 
             PluginClassLoader newClassLoader = new PluginClassLoader(jarFile, Static.getClassLoader());
-
             List<Class<?>> newClasses = newClassLoader.getClasses();
-
             List<Plugin> newPlugins = pluginManager.loadPlugins(newClasses, null);
-
             PluginContext.getLoadedPlugins().put(jarFile.getAbsolutePath(), new PluginContext(
                     newClassLoader, newPlugins, jarFile.lastModified()
             ));
-
-            if (oldContext != null) {
-                oldContext.getClassLoader().close();
-            }
 
             pluginManager.loadDefaultPluginConfiguration(newPlugins);
             for(Plugin plugin : newPlugins)
