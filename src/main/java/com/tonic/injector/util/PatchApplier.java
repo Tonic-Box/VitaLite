@@ -5,8 +5,6 @@ import com.tonic.vitalite.Main;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -17,17 +15,16 @@ import java.util.zip.ZipInputStream;
 public class PatchApplier {
 
     /**
-     * Load patches.zip from resources and apply all diffs to gamepack and runelite classes.
-     * This replaces the full ASM injection pipeline with lightweight patch application.
+     * Stream patches.zip from resources and apply diffs one-by-one to minimize memory usage.
+     * This streaming approach avoids loading all patches into memory at once, reducing peak memory.
      *
      * @throws Exception if patches cannot be loaded or applied
      */
     public static void applyPatches() throws Exception {
-        System.out.println("[PatchApplier] Loading patches from resources...");
+        System.out.println("[PatchApplier] Streaming patches from resources...");
 
-        // Load patches.zip from classpath resources
-        Map<String, byte[]> gamepackDiffs = new HashMap<>();
-        Map<String, byte[]> runeliteDiffs = new HashMap<>();
+        int gamepackApplied = 0;
+        int runeliteApplied = 0;
 
         try (InputStream resourceStream = VitaLite.class.getResourceAsStream("patches.zip")) {
             if (resourceStream == null) {
@@ -45,7 +42,7 @@ public class PatchApplier {
                         continue;
                     }
 
-                    // Read diff bytes
+                    // Read diff bytes for this entry only
                     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                     byte[] chunk = new byte[8192];
                     int bytesRead;
@@ -57,55 +54,31 @@ public class PatchApplier {
                     // Parse class name from path (e.g., "gamepack/com/foo/Bar.diff" -> "com.foo.Bar")
                     String className = extractClassName(name);
 
-                    // Store in appropriate map
+                    // Apply patch immediately based on type
                     if (name.startsWith("gamepack/")) {
-                        gamepackDiffs.put(className, diffBytes);
+                        byte[] original = Main.LIBS.getGamepack().classes.get(className);
+                        if (original == null) {
+                            System.err.println("[PatchApplier] Warning: No original bytecode for " + className);
+                        } else {
+                            byte[] modified = BytecodePatcher.applyDiff(original, diffBytes);
+                            Main.LIBS.getGamepack().classes.put(className, modified);
+                            gamepackApplied++;
+                        }
                     } else if (name.startsWith("runelite/")) {
-                        runeliteDiffs.put(className, diffBytes);
+                        byte[] original = Main.LIBS.getRunelite().classes.get(className);
+                        if (original == null) {
+                            System.err.println("[PatchApplier] Warning: No original bytecode for " + className);
+                        } else {
+                            byte[] modified = BytecodePatcher.applyDiff(original, diffBytes);
+                            Main.LIBS.getRunelite().classes.put(className, modified);
+                            runeliteApplied++;
+                        }
                     }
 
+                    // diffBytes will be GC'd before next iteration, keeping memory low
                     zis.closeEntry();
                 }
             }
-        }
-
-        System.out.println("[PatchApplier] Loaded " + gamepackDiffs.size() + " gamepack patches, " +
-                          runeliteDiffs.size() + " runelite patches");
-
-        // Apply gamepack patches
-        System.out.println("[PatchApplier] Applying gamepack patches...");
-        int gamepackApplied = 0;
-        for (Map.Entry<String, byte[]> entry : gamepackDiffs.entrySet()) {
-            String className = entry.getKey();
-            byte[] diff = entry.getValue();
-
-            byte[] original = Main.LIBS.getGamepack().classes.get(className);
-            if (original == null) {
-                System.err.println("[PatchApplier] Warning: No original bytecode for " + className);
-                continue;
-            }
-
-            byte[] modified = BytecodePatcher.applyDiff(original, diff);
-            Main.LIBS.getGamepack().classes.put(className, modified);
-            gamepackApplied++;
-        }
-
-        // Apply runelite patches
-        System.out.println("[PatchApplier] Applying runelite patches...");
-        int runeliteApplied = 0;
-        for (Map.Entry<String, byte[]> entry : runeliteDiffs.entrySet()) {
-            String className = entry.getKey();
-            byte[] diff = entry.getValue();
-
-            byte[] original = Main.LIBS.getRunelite().classes.get(className);
-            if (original == null) {
-                System.err.println("[PatchApplier] Warning: No original bytecode for " + className);
-                continue;
-            }
-
-            byte[] modified = BytecodePatcher.applyDiff(original, diff);
-            Main.LIBS.getRunelite().classes.put(className, modified);
-            runeliteApplied++;
         }
 
         System.out.println("[PatchApplier] ✓ Applied " + gamepackApplied + " gamepack patches, " +
