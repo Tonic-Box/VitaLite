@@ -17,7 +17,6 @@ import com.tonic.util.ThreadPool;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.Point;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.*;
 import net.runelite.api.gameval.InterfaceID;
@@ -25,13 +24,17 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 
 /**
  * GameManager
@@ -114,6 +117,47 @@ public class GameManager extends Overlay {
         ArrayList<TileItemEx> copy = new ArrayList<>(INSTANCE.tileItemCache);
         copy.removeIf(i -> i.getWorldLocation().getPlane() != wv.getPlane());
         return copy;
+    }
+
+    public static Stream<Widget> widgetStream()
+    {
+        return widgetList().stream();
+    }
+
+    public static List<Widget> widgetList() {
+        return Static.invoke(() -> {
+            Widget[] roots = ((Client) Static.getClient()).getWidgetRoots();
+
+            List<Widget> result = new ArrayList<>(256);
+            Set<Widget> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+            Deque<Widget> toProcess = new ArrayDeque<>();
+            addNonNull(toProcess, roots);
+            while (!toProcess.isEmpty()) {
+                Widget widget = toProcess.pop();
+
+                if (!visited.add(widget)) {
+                    continue;
+                }
+
+                result.add(widget);
+                addNonNull(toProcess, widget.getChildren());
+                addNonNull(toProcess, widget.getStaticChildren());
+                addNonNull(toProcess, widget.getDynamicChildren());
+                addNonNull(toProcess, widget.getNestedChildren());
+            }
+
+            return result;
+        });
+    }
+
+    private static void addNonNull(Deque<Widget> stack, Widget[] widgets) {
+        if (widgets != null) {
+            for (Widget w : widgets) {
+                if (w != null) {
+                    stack.push(w);
+                }
+            }
+        }
     }
 
 
