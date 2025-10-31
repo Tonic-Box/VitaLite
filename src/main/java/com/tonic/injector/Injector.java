@@ -14,23 +14,41 @@ import org.objectweb.asm.tree.MethodNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Injector {
     private static final String MIXINS = "com.tonic.mixins";
-    public static HashMap<String, ClassNode> gamepack = new HashMap<>();
+    // Pre-sized HashMap for ~17K classes - saves 20-30MB during resize churn
+    public static HashMap<String, ClassNode> gamepack = new HashMap<>(17500, 0.75f);
 
     public static void patch() throws Exception {
-        // Load all gamepack classes (required for mixin resolution and transformers)
+        int totalClasses = Main.LIBS.getGamepack().classes.size();
+        System.out.println("Loading " + totalClasses + " classes with memory optimizations...");
+
+        // Phase 1: Identify mixin target classes
+        HashMap<ClassNode, ClassNode> pairs = PackageUtil.getPairs(MIXINS);
+        Set<String> mixinTargets = identifyMixinTargets(pairs);
+
+        System.out.println("Identified " + mixinTargets.size() + " mixin target classes (full frame expansion)");
+        System.out.println("Remaining " + (totalClasses - mixinTargets.size()) + " classes use optimized loading (skip frames)");
+
+        // Phase 2: Load all gamepack classes with selective frame expansion
         for (var entry : Main.LIBS.getGamepack().classes.entrySet()) {
             String name = entry.getKey();
             byte[] bytes = entry.getValue();
-            gamepack.put(name, ClassNodeUtil.toNode(bytes));
+
+            // Mixin targets need full frame expansion, others can skip frames (saves 200-300MB)
+            boolean needsFrames = mixinTargets.contains(name);
+            gamepack.put(name, ClassNodeUtil.toNode(bytes, needsFrames));
         }
 
-        HashMap<ClassNode, ClassNode> pairs = PackageUtil.getPairs(MIXINS);
+        System.out.println("Classes loaded. Applying mixins...");
 
         applyInterfaces(pairs);
         applyMixins(pairs);
+
+        System.out.println("Mixins applied. Processing output...");
 
         // Optimized output phase: Process and clear classes one-by-one to reduce memory pressure
         ArrayList<String> classNames = new ArrayList<>(gamepack.keySet());
@@ -55,7 +73,35 @@ public class Injector {
             classNode = null;
         }
         gamepack.clear();
+
+        // Clear string/type pools to release memory
+        ClassNodeUtil.clearPools();
+        System.out.println("Memory pools cleared. Injection complete.");
+
         JarDumper.dump(Main.LIBS.getGamepackClean().classes);
+    }
+
+    /**
+     * Scans mixin annotations to identify which gamepack classes will be transformation targets.
+     * These classes need full frame expansion. All others can use SKIP_FRAMES for memory savings.
+     */
+    private static Set<String> identifyMixinTargets(HashMap<ClassNode, ClassNode> pairs) {
+        Set<String> targets = new HashSet<>();
+
+        for (ClassNode mixin : pairs.keySet()) {
+            try {
+                String gamepackName = AnnotationUtil.getAnnotation(mixin, Mixin.class, "value");
+                JClass jClass = MappingProvider.getClass(gamepackName);
+                if (jClass != null) {
+                    targets.add(jClass.getObfuscatedName());
+                }
+            } catch (Exception e) {
+                // Continue processing other mixins
+                System.err.println("Warning: Failed to identify target for mixin " + mixin.name);
+            }
+        }
+
+        return targets;
     }
 
     private static void applyMixins(HashMap<ClassNode, ClassNode> pairs) throws ClassNotFoundException {
