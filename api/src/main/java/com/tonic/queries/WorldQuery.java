@@ -1,14 +1,17 @@
 package com.tonic.queries;
 
 import com.tonic.Static;
+import com.tonic.api.threaded.WorldsAPI;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.util.TextUtil;
+import net.runelite.api.Client;
 import net.runelite.client.game.WorldService;
 import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldRegion;
 import net.runelite.http.api.worlds.WorldType;
 import org.apache.commons.lang3.ArrayUtils;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -235,5 +238,39 @@ public class WorldQuery extends AbstractQuery<World, WorldQuery>
                 WorldType.DEADMAN,
                 WorldType.SEASONAL
         );
+    }
+
+    public World next()
+    {
+        Client client = Static.getClient();
+        int currentWorld = client.getWorld();
+
+        List<World> results = sortByIdAsc().collect();
+        for (World world : results)
+        {
+            if (world.getId() > currentWorld)
+            {
+                return world;
+            }
+        }
+
+        return !results.isEmpty() ? results.get(0) : null;
+    }
+
+    public World previous()
+    {
+        Client client = Static.getClient();
+        int currentWorld = client.getWorld();
+
+        List<World> results = sortByIdAsc().collect();
+        for (World world : results)
+        {
+            if (world.getId() < currentWorld)
+            {
+                return world;
+            }
+        }
+
+        return !results.isEmpty() ? results.get(results.size() - 1) : null;
     }
 }
