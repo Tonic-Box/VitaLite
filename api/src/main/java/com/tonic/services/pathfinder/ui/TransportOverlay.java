@@ -35,6 +35,7 @@ public class TransportOverlay extends Overlay
     private static final int MAX_DRAW_DISTANCE = 32;
     private static final Font FONT = FontManager.getRunescapeFont().deriveFont(Font.BOLD, 16);
     private final Map<WorldPoint,Integer> points = new HashMap<>();
+    private static final Map<Long, List<TransportDto>> TRANSPORT_INDEX = new HashMap<>();
     @Setter
     private boolean active = false;
 
@@ -154,11 +155,21 @@ public class TransportOverlay extends Overlay
         int z = wv.getPlane();
         Tile tile;
         WorldPoint point;
-        List<TransportDto> tr;
 
-        for (int x = 0; x < Constants.SCENE_SIZE; ++x)
+        WorldPoint player = client.getLocalPlayer().getWorldLocation();
+        int px = player.getX() - wv.getBaseX();
+        int py = player.getY() - wv.getBaseY();
+
+        int radius = MAX_DRAW_DISTANCE;
+        int startX = Math.max(0, px - radius);
+        int endX   = Math.min(Constants.SCENE_SIZE - 1, px + radius);
+        int startY = Math.max(0, py - radius);
+        int endY   = Math.min(Constants.SCENE_SIZE - 1, py + radius);
+
+        for (int x = startX; x <= endX; x++)
         {
-            for (int y = 0; y < Constants.SCENE_SIZE; ++y)
+            for (int y = startY; y <= endY; y++)
+
             {
                 tile = tiles[z][x][y];
 
@@ -166,13 +177,27 @@ public class TransportOverlay extends Overlay
                 {
                     continue;
                 }
-                point = tile.getWorldLocation();
-                tr = TransportEditorFrame.getTransportsAt(point);
-                if(!tr.isEmpty())
+                point = WorldPointUtil.get(tile.getWorldLocation()); // normalize
+                long key = WorldPointUtil.compress(point);
+                List<TransportDto> trIndexed = TRANSPORT_INDEX.get(key);
+                if(trIndexed != null && !trIndexed.isEmpty())
                 {
-                    points.put(tile.getWorldLocation(), tr.size());
+                    points.put(point, trIndexed.size());
                 }
+
             }
+        }
+    }
+
+    public static void rebuildTransportIndex(List<TransportDto> transports)
+    {
+        TRANSPORT_INDEX.clear();
+
+        for (TransportDto t : transports)
+        {
+            WorldPoint normalized = WorldPointUtil.get(t.getSource()); // normalize to same region-base
+            long key = WorldPointUtil.compress(normalized);
+            TRANSPORT_INDEX.computeIfAbsent(key, k -> new ArrayList<>()).add(t);
         }
     }
 }

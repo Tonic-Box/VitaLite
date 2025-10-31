@@ -42,10 +42,10 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     @Getter
     public TPacketBuffer serverPacketBuffer;
 
-    @Shadow("addNode2")
+    @Shadow("addNode")
     public abstract void addNode(TPacketWriter packetWriter, TPacketBufferNode node);
 
-    @MethodHook("addNode2")
+    @MethodHook("addNode")
     @Inject
     public static void onAddNode2(TPacketWriter packetWriter, TPacketBufferNode node)
     {

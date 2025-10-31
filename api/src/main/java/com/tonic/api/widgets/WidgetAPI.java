@@ -3,6 +3,7 @@ package com.tonic.api.widgets;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.data.WidgetInfoExtended;
+import com.tonic.queries.WidgetQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.PacketInteractionType;
 import net.runelite.api.Client;
@@ -18,6 +19,14 @@ import net.runelite.api.widgets.WidgetInfo;
  */
 public class WidgetAPI
 {
+    /**
+     * Creates an instance of WidgetQuery
+     * @return WidgetQuery
+     */
+    public static WidgetQuery search()
+    {
+        return new WidgetQuery();
+    }
 
     /**
      * invoke a widget action by first matching action name
@@ -98,7 +107,7 @@ public class WidgetAPI
 
         ItemComposition composition = client.getItemDefinition(widget.getItemId());
 
-        String[] actions = composition.getInventoryActions();
+        String[] actions = widget.getActions();
         String[][] subOps = composition.getSubops();
 
         if (subOps == null)

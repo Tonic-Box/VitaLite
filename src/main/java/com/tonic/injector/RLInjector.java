@@ -2,12 +2,9 @@ package com.tonic.injector;
 
 import com.tonic.injector.annotations.*;
 import com.tonic.injector.pipeline.*;
-import com.tonic.injector.util.AnnotationUtil;
-import com.tonic.injector.util.ClassFileUtil;
-import com.tonic.injector.util.SignerMapper;
+import com.tonic.injector.util.*;
 import com.tonic.util.PackageUtil;
 import com.tonic.vitalite.Main;
-import com.tonic.injector.util.ClassNodeUtil;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -31,6 +28,10 @@ public class RLInjector
                 continue;
             }
             byte[] bytes = entry.getValue();
+
+            // Store original bytecode for patch generation
+            PatchGenerator.storeOriginalRunelite(name, bytes);
+
             runelite.put(name.replace(".", "/"), ClassNodeUtil.toNode(bytes));
         }
 
@@ -93,22 +94,25 @@ public class RLInjector
                     bytes
             );
 
-            List<String> toDump = List.of(
-                    "net.runelite.client.RuneLite",
-                    "net.runelite.client.RuneLiteModule",
-                    "net.runelite.client.plugins.PluginManager",
-                    "net.runelite.client.ui.ClientUI",
-                    "net.runelite.client.ui.SplashScreen",
-                    "net.runelite.client.plugins.config.TopLevelConfigPanel"
-            );
-            if(toDump.contains(name))
-            {
-                ClassFileUtil.writeClass(
-                        name,
-                        bytes,
-                        Path.of("C:/test/dumper/")
-                );
-            }
+            // Capture diff if patch generation is enabled
+            PatchGenerator.captureRuneliteDiff(name, bytes);
+
+//            List<String> toDump = List.of(
+//                    "net.runelite.client.RuneLite",
+//                    "net.runelite.client.RuneLiteModule",
+//                    "net.runelite.client.plugins.PluginManager",
+//                    "net.runelite.client.ui.ClientUI",
+//                    "net.runelite.client.ui.SplashScreen",
+//                    "net.runelite.client.plugins.config.TopLevelConfigPanel"
+//            );
+//            if(toDump.contains(name))
+//            {
+//                ClassFileUtil.writeClass(
+//                        name,
+//                        bytes,
+//                        Path.of("C:/test/dumper/")
+//                );
+//            }
         }
         runelite.clear();
     }

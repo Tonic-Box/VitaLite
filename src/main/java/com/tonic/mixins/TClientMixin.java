@@ -52,6 +52,6 @@ public abstract class TClientMixin implements TClient
 
     @FieldHook("MouseHandler_idleCycles")
     public static boolean onIdleCycleSet(int value) {
-        return false;
+        return !Static.getVitaConfig().shouldNeverLog();
     }
 }

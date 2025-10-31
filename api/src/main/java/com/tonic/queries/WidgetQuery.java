@@ -2,6 +2,7 @@ package com.tonic.queries;
 
 import com.tonic.Static;
 import com.tonic.queries.abstractions.AbstractQuery;
+import com.tonic.services.GameManager;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
 import org.apache.commons.lang3.ArrayUtils;
@@ -17,7 +18,7 @@ public class WidgetQuery extends AbstractQuery<Widget, WidgetQuery>
      * Initializes the query with all widgets from the client.
      */
     public WidgetQuery() {
-        super(Arrays.asList(((Client)Static.getClient()).getWidgetRoots()));
+        super(GameManager.widgetList());
     }
 
     /**

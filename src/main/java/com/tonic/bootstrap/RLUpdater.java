@@ -3,7 +3,6 @@ package com.tonic.bootstrap;
 import com.google.gson.Gson;
 import com.tonic.bootstrap.beans.Artifact;
 import com.tonic.bootstrap.beans.Bootstrap;
-import com.tonic.bootstrap.beans.Diff;
 import com.tonic.util.HashUtil;
 
 import java.io.IOException;
@@ -60,28 +59,45 @@ public class RLUpdater
             Files.createDirectories(REPOSITORY_DIR);
         }
 
-        for (Artifact art : artifacts)
-        {
-            if (art.getDiffs() != null) {
-                for (Diff diff : art.getDiffs()) {
-                    Path oldFile = REPOSITORY_DIR.resolve(diff.getFrom());
-                    Files.deleteIfExists(oldFile);
-                }
-            }
-
+        // Phase 1: Check if any artifact needs updating
+        boolean needsUpdate = false;
+        for (Artifact art : artifacts) {
             Path localFile = REPOSITORY_DIR.resolve(art.getName());
-            boolean needsDownload = true;
 
-            if (Files.exists(localFile)) {
-                String localHash = HashUtil.computeSha256(localFile);
-                if (localHash.equalsIgnoreCase(art.getHash())) {
-                    needsDownload = false;
-                } else {
-                    Files.delete(localFile);
-                }
+            if (!Files.exists(localFile)) {
+                needsUpdate = true;
+                System.out.println("Missing artifact: " + art.getName());
+                break;
             }
 
-            if (needsDownload) {
+            String localHash = HashUtil.computeSha256(localFile);
+            if (!localHash.equalsIgnoreCase(art.getHash())) {
+                needsUpdate = true;
+                System.out.println("Hash mismatch for " + art.getName());
+                break;
+            }
+        }
+
+        // Phase 2: If update needed, nuke repository and re-download everything
+        if (needsUpdate) {
+            System.out.println("Updates detected, cleaning repository...");
+
+            // Delete all files in repository directory
+            if (Files.exists(REPOSITORY_DIR)) {
+                Files.list(REPOSITORY_DIR).forEach(file -> {
+                    try {
+                        Files.delete(file);
+                        System.out.println("Deleted: " + file.getFileName());
+                    } catch (IOException e) {
+                        System.err.println("Failed to delete " + file.getFileName() + ": " + e.getMessage());
+                    }
+                });
+            }
+
+            // Download all artifacts fresh
+            for (Artifact art : artifacts) {
+                Path localFile = REPOSITORY_DIR.resolve(art.getName());
+
                 System.out.println("Downloading " + art.getName());
                 downloadFile(art.getPath(), localFile);
 
@@ -92,9 +108,11 @@ public class RLUpdater
                             + ", got " + downloadedHash + ")");
                 }
             }
-        }
 
-        System.out.println("Repository is up to date!");
+            System.out.println("Repository updated successfully!");
+        } else {
+            System.out.println("Repository is up to date!");
+        }
     }
 
     private static void downloadFile(String url, Path destination)
