@@ -3,8 +3,10 @@ package com.tonic.services.pathfinder.teleports;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.InventoryAPI;
+import com.tonic.services.pathfinder.requirements.QuestRequirement;
 import net.runelite.api.ItemID;
 import net.runelite.api.Quest;
+import net.runelite.api.QuestState;
 import net.runelite.api.Varbits;
 import net.runelite.api.coords.WorldPoint;
 import org.apache.commons.lang3.ArrayUtils;
@@ -48,7 +50,7 @@ public enum TeleportItem
     DIGSITE_TELEPORT(new WorldPoint(3324, 3412, 0), "Teleport", null, ItemID.DIGSITE_TELEPORT),
     NARDAH_TELEPORT(new WorldPoint(3420, 2917, 0), "Teleport", null, ItemID.NARDAH_TELEPORT),
     LUMBERYARD_TELEPORT(new WorldPoint(3302, 3486, 0), "Teleport", null, ItemID.LUMBERYARD_TELEPORT),
-    TAI_BWO_TELEPORT(new WorldPoint(2789, 3066, 0), "Teleport", null, ItemID.TAI_BWO_WANNAI_TELEPORT),
+    TAI_BWO_TELEPORT(new WorldPoint(2789, 3066, 0), "Teleport",Quest.TAI_BWO_WANNAI_TRIO, ItemID.TAI_BWO_WANNAI_TELEPORT),
     ZULANDRA_TELEPORT(new WorldPoint(2197, 3055, 0), "Teleport", null, ItemID.ZULANDRA_TELEPORT),
     IORWERTH_TELEPORT(new WorldPoint(2194, 3258, 0), "Teleport", null, ItemID.IORWERTH_CAMP_TELEPORT),
     LUNAR_ISLE_TELEPORT(new WorldPoint(2093, 3912, 0), "Teleport", null, ItemID.LUNAR_ISLE_TELEPORT),
