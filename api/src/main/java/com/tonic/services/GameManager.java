@@ -280,19 +280,27 @@ public class GameManager extends Overlay {
             if(AutoLogin.getCredentials() != null)
             {
                 ThreadPool.submit(() ->{
-                    String[] parts = AutoLogin.getCredentials().split(":");
-                    AutoLogin.setCredentials(null);
-                    while(Static.getClient() == null)
+                    try
                     {
-                        Delays.wait(100);
+                        String[] parts = AutoLogin.getCredentials().split(":");
+                        AutoLogin.setCredentials(null);
+                        while(Static.getClient() == null)
+                        {
+                            Delays.wait(100);
+                        }
+                        Delays.wait(3000);
+                        if(parts.length == 2)
+                        {
+                            LoginService.login(parts[0], parts[1], true);
+                        }
+                        else if(parts.length == 3)
+                        {
+                            LoginService.login(parts[0], parts[1], parts[2], true);
+                        }
                     }
-                    if(parts.length == 2)
+                    catch (Exception e)
                     {
-                        LoginService.login(parts[0], parts[1], true);
-                    }
-                    else if(parts.length == 3)
-                    {
-                        LoginService.login(parts[0], parts[1], parts[2], true);
+                        Logger.error("AutoLogin failed: " + e.getMessage());
                     }
                 });
             }

@@ -16,18 +16,18 @@ public class AutoLogin
     private static String credentials = null;
 
     public static void setCredentials(String creds) {
-        if(creds == null) {
-            credentials = null;
-            return;
-        }
-        String[] parts = creds.split(":");
-        if(parts.length == 2 || parts.length == 3) {
-            credentials = creds;
-            return;
-        }
-
         try
         {
+            if(creds == null) {
+                credentials = null;
+                return;
+            }
+            String[] parts = creds.split(":");
+            if(parts.length == 2 || parts.length == 3) {
+                credentials = creds;
+                return;
+            }
+
             Properties props = readCredentials(creds);
             credentials = props.getProperty("JX_SESSION_ID") + ":" +
                     props.getProperty("JX_CHARACTER_ID") + ":" +
