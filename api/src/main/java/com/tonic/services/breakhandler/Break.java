@@ -1,4 +1,4 @@
-package com.tonic.plugins.breakhandler;
+package com.tonic.services.breakhandler;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
