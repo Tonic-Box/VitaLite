@@ -20,7 +20,7 @@ public enum TeleportItem
     LUMBRIDGE_TELEPORT_TAB(new WorldPoint(3225, 3219, 0), "Break", null, ItemID.LUMBRIDGE_TELEPORT),
     FALADOR_TELEPORT_TAB(new WorldPoint(2966, 3379, 0), "Break", null, ItemID.FALADOR_TELEPORT),
     CAMELOT_TELEPORT_TAB(new WorldPoint(2757, 3479, 0), "Break", null, ItemID.CAMELOT_TELEPORT),
-    ARDOUGNE_TELEPORT_TAB(new WorldPoint(2661, 3300, 0), "Break", null, ItemID.ARDOUGNE_TELEPORT),
+    ARDOUGNE_TELEPORT_TAB(new WorldPoint(2661, 3300, 0), "Break", Quest.PLAGUE_CITY, ItemID.ARDOUGNE_TELEPORT),
     WEST_ARDOUGNE_TELEPORT_TAB(new WorldPoint(2500, 3290, 0), "Break", null, ItemID.WEST_ARDOUGNE_TELEPORT),
     RIMMINGTON_TELEPORT_TAB(new WorldPoint(2954, 3224, 0), "Break", null, ItemID.RIMMINGTON_TELEPORT),
     TAVERLEY_TELEPORT_TAB(new WorldPoint(2894, 3465, 0), "Break", null, ItemID.TAVERLEY_TELEPORT),
