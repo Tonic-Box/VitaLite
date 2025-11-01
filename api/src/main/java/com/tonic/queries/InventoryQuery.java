@@ -11,7 +11,9 @@ import net.runelite.client.util.Text;
 import net.runelite.client.util.WildcardMatcher;
 import org.apache.commons.lang3.ArrayUtils;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -327,5 +329,16 @@ public class InventoryQuery extends AbstractQuery<ItemEx, InventoryQuery>
             count += item.getQuantity();
         }
         return count;
+    }
+
+    /**
+     * @return A list of items, only keeping a single instance of each item. Filtering out occurences of the same ID
+     */
+    public List<ItemEx> unique()
+    {
+        List<ItemEx> results = collect();
+        Set<Integer> unique = new HashSet<>();
+        results.removeIf(item -> !unique.add(item.getId()));
+        return results;
     }
 }
