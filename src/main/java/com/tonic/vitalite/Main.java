@@ -132,4 +132,8 @@ public class Main {
         Thread.currentThread().setContextClassLoader(CLASSLOADER);
         Static.set(CLASSLOADER, "CLASSLOADER");
     }
+
+    public static boolean isMinMode() {
+        return optionsParser.isNoPlugins() || optionsParser.isMin();
+    }
 }

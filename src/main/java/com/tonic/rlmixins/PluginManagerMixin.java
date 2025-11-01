@@ -11,10 +11,7 @@ import org.objectweb.asm.tree.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import static org.objectweb.asm.Opcodes.ALOAD;
-import static org.objectweb.asm.Opcodes.ASTORE;
+import static org.objectweb.asm.Opcodes.*;
 
 @Mixin("net/runelite/client/plugins/PluginManager")
 public class PluginManagerMixin {
@@ -180,7 +177,7 @@ public class PluginManagerMixin {
                         "()V"
                 )
 
-                // RuneLite.injector.getInstance(Install.class).injectSideLoadPlugins(plugins);
+                // RuneLite.injector.getInstance(Install.class).injectBuiltInPlugins(plugins);
                 .invokeStatic("com/tonic/Static",
                         "getInjector",
                         "()Lcom/google/inject/Injector;")
@@ -195,16 +192,19 @@ public class PluginManagerMixin {
                         "(Ljava/util/List;)V")
                 .build();
 
-
         method.instructions.insert(insertionPoint, code);
 
-        boolean isMin = Main.optionsParser.isNoPlugins() || Main.optionsParser.isMin();
-
+        // Build the filtering logic with runtime check
         InsnList code2 = BytecodeBuilder.create()
                 .newInstance("java/util/ArrayList")
                 .dup()
                 .invokeSpecial("java/util/ArrayList", "<init>", "()V")
                 .storeLocal(3, ASTORE)
+
+                // Store the runtime min check result in local var 7
+                .invokeStatic("com/tonic/vitalite/Main", "isMinMode", "()Z")
+                .storeLocal(7, ISTORE)
+
                 .loadLocal(2, ALOAD)
                 .invokeInterface("java/util/List", "iterator", "()Ljava/util/Iterator;")
                 .storeLocal(4, ASTORE)
@@ -221,31 +221,42 @@ public class PluginManagerMixin {
                                     .loadLocal(5, ALOAD)
                                     .invokeVirtual("java/lang/Class", "getName", "()Ljava/lang/String;")
                                     .storeLocal(6, ASTORE);
+
                             LabelNode skipAdd = body.createLabel("skipAdd");
+                            LabelNode checkDisallowed = body.createLabel("checkDisallowed");
+                            LabelNode addPlugin = body.createLabel("addPlugin");
+
+                            // Check if we're in min mode (compare boolean against 0)
+                            body.loadLocal(7, Opcodes.ILOAD)
+                                    .pushInt(0)  // CRITICAL: Push 0 for comparison
+                                    .jumpIf(ConditionType.EQUALS, checkDisallowed);  // if minMode == 0 (false), go to checkDisallowed
+
+                            // Min mode: check if plugin starts with allowed prefixes
                             body.pushInt(0);
-                            if(isMin)
-                            {
-                                for(String prefix : allowed)
-                                {
-                                    body.loadLocal(6, ALOAD)
-                                            .pushString(prefix)
-                                            .invokeVirtual("java/lang/String", "startsWith", "(Ljava/lang/String;)Z")
-                                            .or();
-                                }
+                            for(String prefix : allowed) {
+                                body.loadLocal(6, ALOAD)
+                                        .pushString(prefix)
+                                        .invokeVirtual("java/lang/String", "startsWith", "(Ljava/lang/String;)Z")
+                                        .or();
                             }
-                            else
-                            {
-                                for(String prefix : disallowed)
-                                {
-                                    body.loadLocal(6, ALOAD)
-                                            .pushString(prefix)
-                                            .invokeVirtual("java/lang/String", "startsWith", "(Ljava/lang/String;)Z")
-                                            .or();
-                                }
+                            body.pushInt(0)  // Push 0 for comparison
+                                    .jumpIf(ConditionType.NOT_EQUALS, addPlugin)  // if result != 0, add plugin
+                                    .gotoLabel(skipAdd);
+
+                            // Normal mode: check if plugin starts with disallowed prefixes
+                            body.placeLabel(checkDisallowed)
+                                    .pushInt(0);
+                            for(String prefix : disallowed) {
+                                body.loadLocal(6, ALOAD)
+                                        .pushString(prefix)
+                                        .invokeVirtual("java/lang/String", "startsWith", "(Ljava/lang/String;)Z")
+                                        .or();
                             }
-                            ConditionType cond = isMin ? ConditionType.EQUALS : ConditionType.NOT_EQUALS;
-                            body.pushInt(0)
-                                    .jumpIf(cond, skipAdd)
+                            body.pushInt(0)  // Push 0 for comparison
+                                    .jumpIf(ConditionType.NOT_EQUALS, skipAdd);  // if result != 0, skip add
+
+                            // Add the plugin
+                            body.placeLabel(addPlugin)
                                     .loadLocal(3, ALOAD)
                                     .loadLocal(5, ALOAD)
                                     .invokeInterface("java/util/List", "add", "(Ljava/lang/Object;)Z")
@@ -258,5 +269,6 @@ public class PluginManagerMixin {
                 .build();
 
         method.instructions.insert(insertionPoint, code2);
+        method.maxLocals = Math.max(method.maxLocals, 8);  // Ensure we have enough local variable slots
     }
 }
