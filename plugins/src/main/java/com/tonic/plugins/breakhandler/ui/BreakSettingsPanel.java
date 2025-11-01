@@ -1,10 +1,11 @@
 package com.tonic.plugins.breakhandler.ui;
 
-import com.tonic.plugins.breakhandler.BreakHandler;
-import com.tonic.plugins.breakhandler.settings.Property;
+import com.tonic.services.breakhandler.BreakHandler;
+import com.tonic.services.breakhandler.settings.Property;
 import com.tonic.plugins.profiles.data.Profile;
 import com.tonic.plugins.profiles.session.ProfilesSession;
 import com.tonic.services.ConfigManager;
+import net.runelite.client.RuneLite;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -14,7 +15,8 @@ import java.util.Set;
 
 public class BreakSettingsPanel extends JPanel
 {
-    private final ConfigManager configManager = BreakHandler.getInstance().getConfigManager();
+    private final BreakHandler breakHandler = RuneLite.getInjector().getInstance(BreakHandler.class);
+    private final ConfigManager configManager = breakHandler.getConfigManager();
 
     public BreakSettingsPanel()
     {

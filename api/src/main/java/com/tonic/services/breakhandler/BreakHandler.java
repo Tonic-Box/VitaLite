@@ -1,7 +1,9 @@
-package com.tonic.plugins.breakhandler;
+package com.tonic.services.breakhandler;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.tonic.Logger;
-import com.tonic.plugins.breakhandler.settings.Property;
+import com.tonic.services.breakhandler.settings.Property;
 import com.tonic.services.ConfigManager;
 import lombok.Getter;
 import net.runelite.client.plugins.Plugin;
@@ -17,29 +19,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
+@Singleton
 public class BreakHandler
 {
-    private static final ConfigManager CONFIG = new ConfigManager("BreakHandler");
-    private static BreakHandler INSTANCE;
-
-    public static BreakHandler getInstance()
-    {
-        if (INSTANCE == null)
-        {
-            INSTANCE = new BreakHandler(CONFIG);
-        }
-
-        return INSTANCE;
-    }
 
     @Getter
     private final ConfigManager configManager;
     private final Map<String, Session> sessions = new ConcurrentHashMap<>();
     private final Random random = new Random();
 
-    private BreakHandler(ConfigManager configManager)
+    @Inject
+    private BreakHandler()
     {
-        this.configManager = configManager;
+        this.configManager = new ConfigManager("BreakHandler");
     }
 
     /**
@@ -222,7 +214,7 @@ public class BreakHandler
                 .collect(Collectors.toList());
     }
 
-    boolean isReadyToLogin()
+    public boolean isReadyToLogin()
     {
         return sessions.entrySet()
                 .stream()
@@ -239,7 +231,7 @@ public class BreakHandler
                 });
     }
 
-    boolean isReadyToBreak()
+    public boolean isReadyToBreak()
     {
         return sessions.entrySet()
                 .stream()
@@ -258,17 +250,20 @@ public class BreakHandler
                 });
     }
 
-    void log(String format, Object... args)
+    public void log(String format, Object... args)
     {
         Logger.info(String.format(format, args));
     }
 
-    void cancel()
+    public void cancel()
     {
-        sessions.clear();
+        for (Map.Entry<String, Session> entry : sessions.entrySet())
+        {
+            entry.getValue().scheduledBreak = null;
+        }
     }
 
-    void notifyLogout()
+    public void notifyLogout()
     {
         Instant now = Instant.now();
         for (Session session : sessions.values())
@@ -299,7 +294,7 @@ public class BreakHandler
         }
     }
 
-    void notifyLogin()
+    public void notifyLogin()
     {
         for (Session session : sessions.values())
         {
