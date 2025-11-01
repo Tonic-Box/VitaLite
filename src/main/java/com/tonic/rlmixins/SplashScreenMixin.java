@@ -3,6 +3,7 @@ package com.tonic.rlmixins;
 import com.tonic.injector.annotations.*;
 import com.tonic.injector.util.BytecodeBuilder;
 import com.tonic.injector.util.LdcRewriter;
+import com.tonic.model.ConditionType;
 import com.tonic.vitalite.Main;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
@@ -19,15 +20,28 @@ public class SplashScreenMixin
     )
     public static void constructorHook(MethodNode method, AbstractInsnNode insertionPoint)
     {
-        if(Main.optionsParser.isIncognito())
-            return;
-        InsnList code = BytecodeBuilder.create()
+        BytecodeBuilder bb = BytecodeBuilder.create();
+        var label = bb.createLabel("skipPatch");
+        InsnList code = bb
+                .getStaticField(
+                        "com/tonic/vitalite/Main",
+                        "optionsParser",
+                        "Lcom/tonic/VitaLiteOptions;"
+                )
+                .invokeVirtual(
+                        "com/tonic/VitaLiteOptions",
+                        "isIncognito",
+                        "()Z"
+                )
+                .jumpIf(ConditionType.TRUE, label)
                 .pushThis()
                 .invokeStatic(
                         "com/tonic/runelite/ClientUIUpdater",
                         "patchSplashScreen",
                         "(Ljavax/swing/JFrame;)V"
-                ).build();
+                )
+                .placeLabel(label)
+                .build();
 
         method.instructions.insertBefore(
                 insertionPoint,
