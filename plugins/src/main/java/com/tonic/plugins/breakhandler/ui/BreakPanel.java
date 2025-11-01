@@ -1,6 +1,6 @@
 package com.tonic.plugins.breakhandler.ui;
 
-import com.tonic.plugins.breakhandler.Break;
+import com.tonic.services.breakhandler.Break;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,7 +35,13 @@ public class BreakPanel extends JPanel
         add(pluginLabel, BorderLayout.WEST);
         add(countdownLabel, BorderLayout.EAST);
 
-        updateTimer = new Timer(1000, e -> updateCountdown());
+        updateTimer = new Timer(1000, e ->
+        {
+            SwingUtilities.invokeLater(() ->
+            {
+                updateCountdown();
+            });
+        });
         updateTimer.setInitialDelay(0);
         updateTimer.start();
     }
