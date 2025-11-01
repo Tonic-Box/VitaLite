@@ -1,7 +1,8 @@
 package com.tonic.plugins.breakhandler.ui;
 
-import com.tonic.plugins.breakhandler.BreakHandler;
-import com.tonic.plugins.breakhandler.Break;
+import com.tonic.services.breakhandler.BreakHandler;
+import com.tonic.services.breakhandler.Break;
+import net.runelite.client.RuneLite;
 import net.runelite.client.ui.PluginPanel;
 
 import javax.swing.*;
@@ -10,13 +11,12 @@ import java.util.List;
 
 public class BreakHandlerPanel extends PluginPanel
 {
-    private final BreakHandler breakHandler;
+    private BreakHandler breakHandler = RuneLite.getInjector().getInstance(BreakHandler.class);
     private final JPanel breaksContainer;
     private final JLabel noBreaksLabel;
 
     public BreakHandlerPanel()
     {
-        this.breakHandler = BreakHandler.getInstance();
 
         setLayout(new BorderLayout(0, 6));
         setBackground(new Color(40, 40, 40));

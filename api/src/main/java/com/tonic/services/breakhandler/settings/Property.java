@@ -1,4 +1,4 @@
-package com.tonic.plugins.breakhandler.settings;
+package com.tonic.services.breakhandler.settings;
 
 public enum Property
 {
@@ -8,6 +8,7 @@ public enum Property
     MAX_DURATION(Settings.MAX_DURATION),
 
     ACCOUNT_MODE(Settings.ACCOUNT_MODE),
+    ACCOUNT_AUTO_LOGIN(Settings.ACCOUNT_AUTO_LOGIN),
     ACCOUNT_PROFILE(Settings.ACCOUNT_PROFILE),
     ACCOUNT_USERNAME(Settings.ACCOUNT_USERNAME),
     ACCOUNT_PASSWORD(Settings.ACCOUNT_PASSWORD),

@@ -2,7 +2,9 @@ package com.tonic.plugins.breakhandler;
 
 import com.google.inject.Inject;
 import com.tonic.api.widgets.WidgetAPI;
-import com.tonic.plugins.breakhandler.settings.Property;
+import com.tonic.services.breakhandler.Break;
+import com.tonic.services.breakhandler.BreakHandler;
+import com.tonic.services.breakhandler.settings.Property;
 import com.tonic.plugins.breakhandler.ui.BreakHandlerPanel;
 import com.tonic.plugins.profiles.data.Profile;
 import com.tonic.plugins.profiles.session.ProfilesSession;
@@ -69,16 +71,12 @@ public class BreakHandlerPlugin extends Plugin
     private NavigationButton navigationButton;
     private BreakHandlerPanel panel;
 
-    private final ScheduledExecutorService exec =
-            Executors.newSingleThreadScheduledExecutor(r -> {
-                Thread t = new Thread(r, "Vita-BreakHandler");
-                t.setDaemon(true);
-                return t;
-            });
+    private ScheduledExecutorService exec;
     private ScheduledFuture<?> updater;
 
-    private final ConfigManager configManager = BreakHandler.getInstance().getConfigManager();
-    private final BreakHandler breakHandler = BreakHandler.getInstance();
+    private ConfigManager configManager;
+    @Inject
+    private BreakHandler breakHandler;
     private State state = State.IDLE;
 
     private int logoutAttempts = 0;
@@ -86,11 +84,11 @@ public class BreakHandlerPlugin extends Plugin
     private int loginAttempts = 0;
     private int loginAttemptDelay = 0;
     private int targetWorld = -1;
+    private boolean autoLogin;
 
     @Override
     protected void startUp() throws Exception
     {
-        checkVmArgs();
         panel = new BreakHandlerPanel();
         navigationButton = NavigationButton.builder()
                 .panel(panel)
@@ -107,8 +105,15 @@ public class BreakHandlerPlugin extends Plugin
         logoutAttempts = 0;
         logoutAttemptDelay = 0;
         targetWorld = -1;
+        exec = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread t = new Thread(r, "Vita-BreakHandler");
+            t.setDaemon(true);
+            return t;
+        });
         updater = exec.scheduleAtFixedRate(() ->
                 clientThread.invoke(this::update), 1, 1, TimeUnit.SECONDS);
+        configManager = breakHandler.getConfigManager();
+        checkVmArgs();
     }
 
     @Override
@@ -119,15 +124,18 @@ public class BreakHandlerPlugin extends Plugin
         if (updater != null)
         {
             updater.cancel(true);
-            exec.shutdownNow();
+            updater = null;
         }
+
+        exec.shutdownNow();
+        exec = null;
     }
 
     private void checkVmArgs()
     {
-        String profile = System.getProperty("vProfile");
+        String profile = System.getProperty("vProfile", "");
 
-        if (profile != null && !profile.isEmpty())
+        if (!profile.isEmpty())
         {
             this.configManager.setProperty(Property.ACCOUNT_PROFILE.key(), profile);
         }
@@ -140,6 +148,9 @@ public class BreakHandlerPlugin extends Plugin
             this.configManager.setProperty(Property.ACCOUNT_USERNAME.key(), username);
             this.configManager.setProperty(Property.ACCOUNT_PASSWORD.key(), password);
         }
+
+        boolean autoLogin = System.getProperties().contains("vAutoLogin");
+        this.configManager.setProperty(Property.ACCOUNT_AUTO_LOGIN.key(), autoLogin);
     }
 
     @Subscribe
@@ -238,6 +249,14 @@ public class BreakHandlerPlugin extends Plugin
 
         if (state != State.LOGIN)
         {
+            boolean autoLogin = configManager.getBooleanOrDefault(
+                    Property.ACCOUNT_AUTO_LOGIN.key(), false);
+
+            if (autoLogin)
+            {
+                handleAutoLogin();
+            }
+
             return;
         }
 
@@ -287,6 +306,23 @@ public class BreakHandlerPlugin extends Plugin
         }
 
         state = State.IDLE;
+    }
+
+    private void handleAutoLogin()
+    {
+        GameState gameState = client.getGameState();
+
+        boolean shouldLogin = gameState == GameState.LOGIN_SCREEN
+                && !breakHandler.isReadyToLogin()
+                && !breakHandler.isReadyToBreak();
+
+        if (shouldLogin)
+        {
+            if (client.getGameState() == GameState.LOGIN_SCREEN)
+            {
+                login();
+            }
+        }
     }
 
     private void login()
@@ -340,13 +376,11 @@ public class BreakHandlerPlugin extends Plugin
         loginDefault();
     }
 
-    private void loginProfiles()
-    {
+    private void loginProfiles() {
         String profileName = configManager.getStringOrDefault(
                 Property.ACCOUNT_PROFILE.key(), "");
 
-        if (profileName.isEmpty())
-        {
+        if (profileName.isEmpty()) {
             breakHandler.log("[%s] Unable to login with empty profile, cancelling break",
                     "Break Handler");
             breakHandler.cancel();
@@ -358,8 +392,7 @@ public class BreakHandlerPlugin extends Plugin
 
         Profile profile = profilesSession.getByName(profileName);
 
-        if (profile == null)
-        {
+        if (profile == null) {
             breakHandler.log("[%s] Unable to login with null profile - %s, cancelling break",
                     "Break Handler", profileName);
             breakHandler.cancel();
