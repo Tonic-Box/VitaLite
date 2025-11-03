@@ -81,6 +81,12 @@ public class VitaLiteOptions extends OptionsParser
     )
     private boolean runInjector = false;
 
+    @CLIArgument(
+            name = "targetBootstrap",
+            description = "Bootstrap a specific runelite version"
+    )
+    private String targetBootstrap = null;
+
     public void _checkAudio()
     {
         if(!AudioDeviceChecker.hasAudioDevice())

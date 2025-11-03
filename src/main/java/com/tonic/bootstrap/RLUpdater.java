@@ -3,8 +3,13 @@ package com.tonic.bootstrap;
 import com.google.gson.Gson;
 import com.tonic.bootstrap.beans.Artifact;
 import com.tonic.bootstrap.beans.Bootstrap;
+import com.tonic.bootstrap.beans.Platform;
 import com.tonic.util.HashUtil;
+import com.tonic.util.jagex.JagConfigUtil;
+import com.tonic.util.jagex.CacheClient;
+import com.tonic.vitalite.Main;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,8 +19,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
@@ -40,7 +43,7 @@ public class RLUpdater
                 .build();
 
         HttpRequest bootstrapReq = HttpRequest.newBuilder()
-                .uri(URI.create(properties.get("runelite.bootstrap")))
+                .uri(URI.create("https://static.runelite.net/bootstrap.json"))
                 .header("User-Agent", "RuneLite/" + properties.get("runelite.launcher.version"))
                 .GET()
                 .build();
@@ -61,7 +64,57 @@ public class RLUpdater
 
         // Phase 1: Check if any artifact needs updating
         boolean needsUpdate = false;
+        boolean isForcedVersion = false;
+        String forcedVersion = Main.optionsParser.getTargetBootstrap();
+        String version = bootstrap.getVersion();
+
+        if(forcedVersion != null && !forcedVersion.isEmpty())
+        {
+            JagConfigUtil config = new JagConfigUtil(6);
+            if(CacheClient.checkForUpdate(config.getCurrentRevision()))
+            {
+                int result = JOptionPane.showConfirmDialog(
+                        null,
+                        "There has been a cache update and you are about to be loading an impossible version of runelite. Are you sure you want to proceed?",            // message
+                        "Confirmation",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (result != JOptionPane.YES_OPTION) {
+                    System.exit(0);
+                }
+            }
+
+            CacheClient.updateCache();
+
+            for (Artifact art : artifacts) {
+                if (!platformMatches(art)) {
+                    continue;
+                }
+                if(art.getName().contains(forcedVersion + ".jar"))
+                {
+                    isForcedVersion = true;
+                    break;
+                }
+            }
+
+            if(isForcedVersion)
+            {
+                System.out.println("Repository is up to date!");
+                return;
+            }
+            else
+            {
+                needsUpdate = true;
+            }
+        }
+
         for (Artifact art : artifacts) {
+            // Skip artifacts that don't match current platform
+            if (!platformMatches(art)) {
+                continue;
+            }
+
             Path localFile = REPOSITORY_DIR.resolve(art.getName());
 
             if (!Files.exists(localFile)) {
@@ -96,13 +149,28 @@ public class RLUpdater
 
             // Download all artifacts fresh
             for (Artifact art : artifacts) {
-                Path localFile = REPOSITORY_DIR.resolve(art.getName());
+                // Skip artifacts that don't match current platform
+                if (!platformMatches(art)) {
+                    System.out.println("Skipping " + art.getName() + " (platform mismatch)");
+                    continue;
+                }
 
-                System.out.println("Downloading " + art.getName());
-                downloadFile(art.getPath(), localFile);
+                String artName = art.getName();
+                String path = art.getPath();
+                if(forcedVersion != null && !forcedVersion.isEmpty())
+                {
+                    System.out.println("Forcing version " + forcedVersion + " for artifact " + art.getName());
+                    artName = artName.replace(version, forcedVersion);
+                    path = path.replace(version, forcedVersion);
+                }
+
+                Path localFile = REPOSITORY_DIR.resolve(artName);
+
+                System.out.println("Downloading " + artName);
+                downloadFile(path, localFile);
 
                 String downloadedHash = HashUtil.computeSha256(localFile);
-                if (!downloadedHash.equalsIgnoreCase(art.getHash())) {
+                if (!downloadedHash.equalsIgnoreCase(art.getHash()) && forcedVersion == null) {
                     throw new IOException("Hash mismatch for " + art.getName()
                             + " (expected " + art.getHash()
                             + ", got " + downloadedHash + ")");
@@ -136,5 +204,56 @@ public class RLUpdater
              OutputStream out = Files.newOutputStream(destination)) {
             in.transferTo(out);
         }
+    }
+
+    private static String getCurrentOS()
+    {
+        String osName = System.getProperty("os.name").toLowerCase();
+        if (osName.contains("win")) {
+            return "win";
+        } else if (osName.contains("mac")) {
+            return "macos";
+        } else if (osName.contains("linux")) {
+            return "linux";
+        }
+        return "unknown";
+    }
+
+    private static String getCurrentArch()
+    {
+        String osArch = System.getProperty("os.arch").toLowerCase();
+        if (osArch.contains("amd64") || osArch.contains("x86_64")) {
+            return "x64";
+        } else if (osArch.contains("x86")) {
+            return "x86";
+        } else if (osArch.contains("aarch64") || osArch.contains("arm64")) {
+            return "aarch64";
+        }
+        return "unknown";
+    }
+
+    private static boolean platformMatches(Artifact artifact)
+    {
+        Platform[] platforms = artifact.getPlatform();
+
+        // If no platform restrictions, artifact applies to all platforms
+        if (platforms == null || platforms.length == 0) {
+            return true;
+        }
+
+        String currentOS = getCurrentOS();
+        String currentArch = getCurrentArch();
+
+        // Check if any platform restriction matches current platform
+        for (Platform platform : platforms) {
+            boolean osMatches = platform.getName() == null || platform.getName().equalsIgnoreCase(currentOS);
+            boolean archMatches = platform.getArch() == null || platform.getArch().equalsIgnoreCase(currentArch);
+
+            if (osMatches && archMatches) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
