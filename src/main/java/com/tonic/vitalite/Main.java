@@ -58,6 +58,10 @@ public class Main {
         {
             AutoLogin.setCredentials(optionsParser.getJagexLogin());
         }
+        if(optionsParser.getTargetBootstrap() != null)
+        {
+            System.setProperty("forced.runelite.version", optionsParser.getTargetBootstrap());
+        }
         Files.createDirectories(REPOSITORY_DIR);
         JvmParams.set();
         RLUpdater.run();

@@ -7,6 +7,7 @@ import java.util.Map;
 @Data
 public class Bootstrap
 {
+    private String version;
     private Artifact[] artifacts;
 
     private String[] clientJvm9Arguments;

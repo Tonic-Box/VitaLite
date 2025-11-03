@@ -1,6 +1,8 @@
 package com.tonic.util;
 
 import com.google.gson.JsonParser;
+import com.sun.tools.javac.Main;
+
 import java.io.*;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -22,6 +24,10 @@ public class RuneliteConfigUtil
     }
 
     public static String getRuneLiteVersion() {
+        String forcedVersion = System.getProperty("forced.runelite.version");
+        if(forcedVersion != null && !forcedVersion.isEmpty()) {
+            return forcedVersion;
+        }
         try {
             URL url = new URL("https://static.runelite.net/bootstrap.json");
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
