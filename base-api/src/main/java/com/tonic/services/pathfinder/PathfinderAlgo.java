@@ -5,7 +5,8 @@ import com.tonic.Static;
 public enum PathfinderAlgo
 {
     HYBRID_BFS("com.tonic.services.pathfinder.implimentations.hybridbfs.HybridBFSAlgo"),
-
+    FLOW_FIELD("com.tonic.services.pathfinder.implimentations.flowfield.FlowFieldAlgo"),
+    ASTAR("com.tonic.services.pathfinder.implimentations.astar.AStarAlgo")
     ;
 
     private final String fqdn;
