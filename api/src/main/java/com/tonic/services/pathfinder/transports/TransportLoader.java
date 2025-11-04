@@ -124,20 +124,6 @@ public class TransportLoader
 
             int gold = InventoryAPI.getItem(995) != null ? InventoryAPI.getItem(995).getQuantity() : 0;
 
-            if (gold >= 30)
-            {
-                if (QuestAPI.isCompleted(Quest.PIRATES_TREASURE) || !filter)
-                {
-                    transports.add(npcTransport(new WorldPoint(3027, 3218, 0), new WorldPoint(2956, 3143, 1), 3644, "Pay-fare"));
-                    transports.add(npcTransport(new WorldPoint(2954, 3147, 0), new WorldPoint(3032, 3217, 1), 3648, "Pay-Fare"));
-                }
-                else
-                {
-                    transports.add(npcDialogTransport(new WorldPoint(3027, 3218, 0), new WorldPoint(2956, 3143, 1), 3644, "Yes please."));
-                    transports.add(npcDialogTransport(new WorldPoint(2954, 3147, 0), new WorldPoint(3032, 3217, 1), 3648, "Can I journey on this ship?", "Search away, I have nothing to hide.", "Ok"));
-                }
-            }
-
             if (WorldsAPI.inMembersWorld() || !filter)
             {
                 //Shamans
@@ -1192,8 +1178,20 @@ public class TransportLoader
         addObjectTransport(transports, 2, requirements2, new WorldPoint(3296, 3428, 0), new WorldPoint(3295, 3428, 0), 24561, "Open");
 
         //sarim
-        addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(3027, 3217, 0), new WorldPoint(2956, 3143, 1), "Captain Tobias", "Pay-fare", "Yes");
-        addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(2956, 3146, 0), new WorldPoint(3032, 3217, 1), "Customs officer", "Pay-fare", "Can I journey", "Search away", "Ok.");
+        if (QuestAPI.isCompleted(Quest.PIRATES_TREASURE))
+        {
+            addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(3027, 3217, 0), new WorldPoint(2956, 3143, 1),
+                    "Captain Tobias", "Pay-fare");
+            addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(2956, 3146, 0), new WorldPoint(3032, 3217, 1),
+                    "Customs officer", "Pay-fare");
+        }
+        else
+        {
+            addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(3027, 3217, 0), new WorldPoint(2956, 3143, 1),
+                    "Captain Tobias", "Pay-fare", "Yes");
+            addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(2956, 3146, 0), new WorldPoint(3032, 3217, 1),
+                    "Customs officer", "Pay-fare", "Can I journey", "Search away", "Ok");
+        }
     }
 
     private static void addNpcTransport(final TIntObjectHashMap<ArrayList<Transport>> transports, int delay, WorldPoint source, WorldPoint destination, String npcName, String option) {

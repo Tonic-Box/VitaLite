@@ -114,44 +114,47 @@ public class FlowFieldAlgo implements IPathfinder
                 cache.put(targetCompressed, field);
             }
 
+            int playerCost = field.getCost(playerStartPos);
+
+            // Check which starting point (player or valid teleport) provides best path
+            // Filter out nearby teleports (< 20 tiles from player)
+            Teleport bestTeleport = null;
+            int bestStartCost = playerCost;
+            int bestStartPos = playerStartPos;
+
+            for (Teleport tp : teleports) {
+                // Skip teleports that are too close to player (< 20 tiles)
+                if (filterTeleports(tp.getDestination())) {
+                    continue;
+                }
+
+                int tpDest = WorldPointUtil.compress(tp.getDestination());
+                int tpCost = field.getCost(tpDest);
+
+                // Only use teleport if it saves at least 20 steps
+                if (tpCost < bestStartCost && (bestStartCost - tpCost) >= 20) {
+                    bestStartCost = tpCost;
+                    bestStartPos = tpDest;
+                    bestTeleport = tp;
+                }
+            }
+
             Profiler.Start("Flow Field Follow");
-            List<FlowFieldStep> path = followField(field);
+            List<FlowFieldStep> path;
+
+            if (bestTeleport != null) {
+                // Teleport provides best path
+                teleport = bestTeleport.copy();
+                path = followFieldFrom(field, bestStartPos);
+                Logger.info("[FlowField] Using teleport (saves " + (playerCost - bestStartCost) + " tiles): " + bestTeleport);
+            } else {
+                // Walking is best
+                path = followField(field);
+            }
+
             Profiler.StopMS();
 
-            boolean playerReachable = field.isReachable(playerStartPos);
-            int playerCost = field.getCost(playerStartPos);
-            Logger.info("[FlowField] Player reachable: " + playerReachable + ", cost: " + playerCost + ", Tiles reachable: " + field.getTilesReachable());
-
-            // If no direct path, try teleports
-            if (path.isEmpty()) {
-                Logger.info("[FlowField] No direct path, checking " + teleports.size() + " teleports");
-                for (Teleport tp : teleports) {
-                    int tpDest = WorldPointUtil.compress(tp.getDestination());
-                    if (field.isReachable(tpDest)) {
-                        // Teleport destination is reachable, use it
-                        teleport = tp.copy();
-                        path = followFieldFrom(field, tpDest);
-                        Logger.info("[FlowField] Using teleport " + tp + ", path length: " + path.size());
-                        break;
-                    }
-                }
-            }
-
-            Logger.info("[FlowField] Final path length: " + path.size());
-
-            if (path.isEmpty()) {
-                return path;
-            }
-
-            // If no teleport was set yet, check if path starts with a teleport destination
-            if (teleport == null) {
-                for (Teleport tp : teleports) {
-                    if (WorldPointUtil.compress(tp.getDestination()) == path.get(0).getPackedPosition()) {
-                        teleport = tp.copy();
-                        break;
-                    }
-                }
-            }
+            Logger.info("[FlowField] Player cost: " + playerCost + ", Best start cost: " + bestStartCost + ", Path length: " + path.size() + ", Tiles reachable: " + field.getTilesReachable());
 
             return path;
 
@@ -168,8 +171,8 @@ public class FlowFieldAlgo implements IPathfinder
         TIntIntHashMap costs = new TIntIntHashMap(10_000, 0.5f, -1, Integer.MAX_VALUE);
         TIntIntHashMap parents = new TIntIntHashMap(10_000, 0.5f, -1, -1);
 
-        // Build reverse transport map once (destination -> sources)
-        TIntObjectHashMap<TIntArrayList> reverseTransports = buildReverseTransportMap();
+        // Build reverse transport map once (destination -> transports)
+        TIntObjectHashMap<ArrayList<Transport>> reverseTransports = buildReverseTransportMap();
 
         // Use dynamic queue that can grow
         TIntArrayList queue = new TIntArrayList(10_000);
@@ -373,14 +376,18 @@ public class FlowFieldAlgo implements IPathfinder
      */
     private void expandTransportsBackwards(int current, int currentCost,
                                             TIntIntHashMap costs, TIntIntHashMap parents, TIntArrayList queue,
-                                            TIntObjectHashMap<TIntArrayList> reverseTransports) {
-        // Direct lookup: what transport sources lead to current tile?
-        TIntArrayList sources = reverseTransports.get(current);
-        if (sources == null) return;
+                                            TIntObjectHashMap<ArrayList<Transport>> reverseTransports) {
+        // Direct lookup: what transports lead to current tile?
+        ArrayList<Transport> transports = reverseTransports.get(current);
+        if (transports == null) return;
 
-        for (int i = 0; i < sources.size(); i++) {
-            int source = sources.get(i);
-            int transportCost = 1;  // Can be adjusted based on transport type
+        for (Transport transport : transports) {
+            int source = transport.getSource();
+
+            // Duration-based cost: duration + 1 penalty for durations > 3
+            int duration = transport.getDuration();
+            int transportCost = (duration > 3) ? duration + 1 : duration;
+
             int existingCost = costs.get(source);
             int newCost = currentCost + transportCost;
 
@@ -393,22 +400,22 @@ public class FlowFieldAlgo implements IPathfinder
     }
 
     /**
-     * Builds a reverse transport map: destination -> list of sources.
+     * Builds a reverse transport map: destination -> list of transports leading to it.
      * Built once per flow field for O(1) lookup during expansion.
      */
-    private TIntObjectHashMap<TIntArrayList> buildReverseTransportMap() {
-        TIntObjectHashMap<TIntArrayList> reverseMap = new TIntObjectHashMap<>();
+    private TIntObjectHashMap<ArrayList<Transport>> buildReverseTransportMap() {
+        TIntObjectHashMap<ArrayList<Transport>> reverseMap = new TIntObjectHashMap<>();
 
         TransportLoader.getTransports().forEachEntry((source, transports) -> {
             if (transports != null) {
                 for (Transport transport : transports) {
                     int destination = transport.getDestination();
-                    TIntArrayList sources = reverseMap.get(destination);
-                    if (sources == null) {
-                        sources = new TIntArrayList(2);
-                        reverseMap.put(destination, sources);
+                    ArrayList<Transport> transportList = reverseMap.get(destination);
+                    if (transportList == null) {
+                        transportList = new ArrayList<>(2);
+                        reverseMap.put(destination, transportList);
                     }
-                    sources.add(source);
+                    transportList.add(transport);
                 }
             }
             return true;
