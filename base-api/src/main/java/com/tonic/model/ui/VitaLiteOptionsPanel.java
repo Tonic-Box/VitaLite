@@ -7,6 +7,7 @@ import com.tonic.events.PacketSent;
 import com.tonic.model.ui.components.*;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
+import com.tonic.services.pathfinder.PathfinderAlgo;
 import com.tonic.util.ReflectBuilder;
 import com.tonic.util.ReflectUtil;
 import com.tonic.util.RuneliteConfigUtil;
@@ -201,6 +202,17 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
         // Walker Settings
         CollapsiblePanel walkerPanel = new CollapsiblePanel("Walker");
+
+        FancyDropdown<PathfinderAlgo> pathfinderAlgo = new FancyDropdown<>("Pathfinder Algo", PathfinderAlgo.class);
+        PathfinderAlgo algo = Static.getVitaConfig().getPathfinderImpl();
+        pathfinderAlgo.setSelectedItem(algo);
+
+        pathfinderAlgo.addSelectionListener(event -> {
+            Static.getVitaConfig().setPathfinderImpl(pathfinderAlgo.getSelectedItem());
+        });
+
+        walkerPanel.addContent(pathfinderAlgo);
+        walkerPanel.addVerticalStrut(12);
 
         ToggleSlider drawPath = new ToggleSlider();
         drawPath.setSelected(Static.getVitaConfig().shouldDrawWalkerPath());

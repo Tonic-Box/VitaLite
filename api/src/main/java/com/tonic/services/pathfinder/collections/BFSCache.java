@@ -2,7 +2,7 @@ package com.tonic.services.pathfinder.collections;
 
 import com.tonic.services.pathfinder.transports.Transport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
-import com.tonic.services.pathfinder.model.Step;
+import com.tonic.services.pathfinder.implimentations.hybridbfs.HybridBFSStep;
 import gnu.trove.map.hash.TIntIntHashMap;
 
 import java.util.ArrayList;
@@ -36,18 +36,18 @@ public class BFSCache
         return cache.size();
     }
 
-    public List<Step> path(int pos)
+    public List<HybridBFSStep> path(int pos)
     {
         int parent = get(pos);
-        LinkedList<Step> path = new LinkedList<>();
+        LinkedList<HybridBFSStep> path = new LinkedList<>();
         Transport transport;
-        path.add(0, new Step(pos, null));
+        path.add(0, new HybridBFSStep(pos, null));
         while(parent != -1)
         {
             transport = getTransport(pos, parent);
             pos = parent;
             parent = get(pos);
-            path.add(0, new Step(pos, transport));
+            path.add(0, new HybridBFSStep(pos, transport));
         }
         return path;
     }

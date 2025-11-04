@@ -1,16 +1,14 @@
-package com.tonic.services.pathfinder;
+package com.tonic.services.pathfinder.implimentations.hybridbfs;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.services.pathfinder.Walker;
+import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.collections.BFSCache;
 import com.tonic.services.pathfinder.collections.HybridIntQueue;
-import com.tonic.services.pathfinder.collision.CollisionMap;
 import com.tonic.services.pathfinder.collision.Flags;
-import com.tonic.services.pathfinder.collision.GlobalCollisionMap;
 import com.tonic.services.pathfinder.collision.Properties;
 import com.tonic.services.pathfinder.local.LocalCollisionMap;
-import com.tonic.services.pathfinder.model.Step;
-import com.tonic.services.pathfinder.objects.ObjectMap;
 import com.tonic.services.pathfinder.teleports.Teleport;
 import com.tonic.services.pathfinder.transports.Transport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
@@ -24,27 +22,14 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Pathfinder class to find paths between points in the game world.
  */
-public class Pathfinder {
-    static {
-        try {
-            collisionMap = GlobalCollisionMap.load();
-            objectMap = ObjectMap.load();
-        } catch (Exception e) {
-            Logger.error(e, "[Pathfinder] Failed to load collision map: %e");
-        }
-    }
-
-    @Getter
-    private static CollisionMap collisionMap;
-    @Getter
-    private static ObjectMap objectMap;
+public class HybridBFSAlgo implements IPathfinder
+{
     private LocalCollisionMap localMap;
     @Getter
     private Teleport teleport;
@@ -59,29 +44,35 @@ public class Pathfinder {
      *
      * @param target The destination WorldPoint to find a path to.
      */
-    public Pathfinder(final WorldPoint target) {
+    @Override
+    public List<HybridBFSStep> find(final WorldPoint target) {
         TransportLoader.refreshTransports();
         this.targetWorldPoint = target;
+        return find();
     }
 
     /**
      * Initializes the pathfinder with target WorldAreas.
      * @param worldAreas The destination WorldAreas to find a path to the closest area.
      */
-    public Pathfinder(WorldArea... worldAreas)
+    @Override
+    public List<HybridBFSStep> find(WorldArea... worldAreas)
     {
         TransportLoader.refreshTransports();
         worldAreaPoints = WorldPointUtil.toCompressedPoints(worldAreas);
+        return find();
     }
 
     /**
      * Initializes the pathfinder with target WorldAreas.
      * @param worldAreas The destination WorldAreas to find a path to the closest area.
      */
-    public Pathfinder(List<WorldArea> worldAreas)
+    @Override
+    public List<HybridBFSStep> find(List<WorldArea> worldAreas)
     {
         TransportLoader.refreshTransports();
         worldAreaPoints = WorldPointUtil.toCompressedPoints(worldAreas.toArray(new WorldArea[0]));
+        return find();
     }
 
     /**
@@ -89,8 +80,8 @@ public class Pathfinder {
      *
      * @return A list of Steps representing the path, or an empty list if no path is found.
      */
-    public List<Step> find() {
-        if(collisionMap == null)
+    private List<HybridBFSStep> find() {
+        if(Walker.getCollisionMap() == null)
         {
             Logger.error("[Pathfinder] Collision map is null, cannot perform pathfinding.");
             return new ArrayList<>();
@@ -118,7 +109,7 @@ public class Pathfinder {
 
             Profiler.Start("Pathfinding");
 
-            final List<Step> path = buildPath(startPoints);
+            final List<HybridBFSStep> path = buildPath(startPoints);
 
             Profiler.StopMS();
             Logger.info("Path Length: " + path.size());
@@ -128,7 +119,7 @@ public class Pathfinder {
 
             for (final Teleport tp : teleports)
             {
-                if(WorldPointUtil.compress(tp.getDestination()) == path.get(0).position)
+                if(WorldPointUtil.compress(tp.getDestination()) == path.get(0).getPackedPosition())
                 {
                     teleport = tp.copy();
                 }
@@ -142,7 +133,7 @@ public class Pathfinder {
         }
     }
 
-    private List<Step> buildPath(final List<Integer> starts)
+    private List<HybridBFSStep> buildPath(final List<Integer> starts)
     {
         final BFSCache visited = new BFSCache();
 
@@ -168,7 +159,7 @@ public class Pathfinder {
         return new ArrayList<>();
     }
 
-    private List<Step> findAreaPoint(final BFSCache visited, final HybridIntQueue queue) {
+    private List<HybridBFSStep> findAreaPoint(final BFSCache visited, final HybridIntQueue queue) {
         int current;
         while(!queue.isEmpty())
         {
@@ -188,11 +179,11 @@ public class Pathfinder {
         return new ArrayList<>();
     }
 
-    private List<Step> findWorldPoint(final BFSCache visited, final HybridIntQueue queue) {
+    private List<HybridBFSStep> findWorldPoint(final BFSCache visited, final HybridIntQueue queue) {
         final int targetIndex = WorldPointUtil.compress(targetWorldPoint);
 
         //validate target
-        if(!collisionMap.walkable(targetIndex)) {
+        if(!Walker.getCollisionMap().walkable(targetIndex)) {
             Logger.info("Could not generate path to a blocked tile");
             return new ArrayList<>();
         }
@@ -275,7 +266,7 @@ public class Pathfinder {
             return;
         }
 
-        final byte flags = collisionMap.all(x, y, plane);
+        final byte flags = Walker.getCollisionMap().all(x, y, plane);
         switch (flags)
         {
             case Flags.ALL:
