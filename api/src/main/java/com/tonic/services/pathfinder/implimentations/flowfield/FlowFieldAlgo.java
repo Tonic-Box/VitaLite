@@ -39,7 +39,7 @@ import java.util.List;
  */
 public class FlowFieldAlgo implements IPathfinder
 {
-    private static final int MAX_NODES_EXPANDED = 500_000;  // Safety limit to prevent infinite expansion
+    private static final int MAX_NODES_EXPANDED = 500_000;
     private static final FlowFieldCache cache = new FlowFieldCache();
 
     private LocalCollisionMap localMap;
