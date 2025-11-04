@@ -45,21 +45,8 @@ public class ActorPathing
      * @param actor actor
      * @param destination the destination tile of the other actor to be targeted
      * @param blacklist tiles to avoid
-     * @return Pare.of(true destination next to target, path)
-     */
-    @Nullable
-    public static Pair<WorldPoint,List<WorldPoint>> dumbTargeting(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist)
-    {
-        return dumbTargeting(actor, destination, blacklist, null);
-    }
-
-    /**
-     * Calculates the pathing for targeting
-     * @param actor actor
-     * @param destination the destination tile of the other actor to be targeted
-     * @param blacklist tiles to avoid
-     * @param localMap collision map for inside instances
-     * @return Pare.of(true destination next to target, path)
+     * @param localMap nullable localMap
+     * @return Pair.of(true destination next to target, path)
      */
     @Nullable
     public static Pair<WorldPoint,List<WorldPoint>> dumbTargeting(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap)
@@ -68,9 +55,10 @@ public class ActorPathing
         return dumbTargetingNoNpcBlocking(actor, destination, blacklist, localMap);
     }
 
-    public static Pair<WorldPoint,List<WorldPoint>> dumbTargetingNoNpcBlocking(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist)
+    @Nullable
+    public static Pair<WorldPoint,List<WorldPoint>> dumbTargeting(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist)
     {
-        return dumbTargetingNoNpcBlocking(actor, destination, blacklist, null);
+        return dumbTargeting(actor, destination, blacklist, null);
     }
 
     public static Pair<WorldPoint,List<WorldPoint>> dumbTargetingNoNpcBlocking(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap)
@@ -78,7 +66,7 @@ public class ActorPathing
         final WorldPoint start = actor.getWorldLocation();
         int width = actor.getWorldArea().getWidth();
         int height = actor.getWorldArea().getHeight();
-        final List<WorldPoint> path = dumbPathing(start, destination, width, height, blacklist, localMap);
+        final List<WorldPoint> path = dumbTargeting(start, destination, width, height, blacklist, localMap);
         if(path.isEmpty())
             return null;
 
@@ -89,7 +77,75 @@ public class ActorPathing
             return null;
 
         final WorldPoint trueEnd = path.get(path.size() - 2);
-        return Pair.of(trueEnd,dumbPathing(start, trueEnd, width, height, blacklist, localMap));
+        path.remove(path.size() - 1); //
+        return Pair.of(trueEnd, path);
+    }
+
+    public static List<WorldPoint> dumbTargeting(final WorldPoint start, final WorldPoint destination, final int actorWidth, final int actorHeight, final List<WorldPoint> blacklist, LocalCollisionMap localMap)
+    {
+        IntArrayList blist = new IntArrayList();
+        if(blacklist != null && !blacklist.isEmpty())
+        {
+            blacklist.forEach(p -> blist.add(WorldPointUtil.compress(p)));
+        }
+        Client client = Static.getClient();
+        LocalCollisionMap localCollisionMap = null;
+
+        if (client.getTopLevelWorldView().isInstance()) {
+            localCollisionMap = localMap;
+        }
+
+        int plane = start.getPlane();
+        if (plane != destination.getPlane())
+            return new ArrayList<>();
+
+        int curX = start.getX();
+        int curY = start.getY();
+        int destX = destination.getX();
+        int destY = destination.getY();
+
+        List<WorldPoint> path = new ArrayList<>();
+
+        while (curX != destX || curY != destY)
+        {
+            int difX = destX - curX;
+            int difY = destY - curY;
+            int dx = Integer.signum(difX);
+            int dy = Integer.signum(difY);
+            // final dist = sqrt(2) case
+            if (Math.abs(difX) == 1 && Math.abs(difY) == 1)
+            {
+                // must try horizontal
+                if (canStep(localCollisionMap, curX, curY, plane, dx, 0, actorWidth, actorHeight, blist))
+                {
+                    curX += dx;
+                    path.add(new WorldPoint(curX, curY, plane));
+                    path.add(new WorldPoint(destX, destY, plane));
+                }
+                // horizontal failed? cannot path, stop here
+                break;
+            }
+            // Normal pathing logic
+            if (canStep(localCollisionMap, curX, curY, plane, dx, dy, actorWidth, actorHeight, blist))
+            {
+                curX += dx;
+                curY += dy;
+            }
+            else if (dx != 0 && canStep(localCollisionMap, curX, curY, plane, dx, 0, actorWidth, actorHeight, blist))
+            {
+                curX += dx;
+            }
+            else if (dy != 0 && canStep(localCollisionMap, curX, curY, plane, 0, dy, actorWidth, actorHeight, blist))
+            {
+                curY += dy;
+            }
+            else
+            {
+                break;
+            }
+            path.add(new WorldPoint(curX, curY, plane));
+        }
+        return path;
     }
 
     /**
