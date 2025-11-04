@@ -7,18 +7,24 @@ import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.game.ItemManager;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @RequiredArgsConstructor
 public class ItemEx {
     private final Item item;
     private final int slot;
+    private final int containerId;
     private String[] actions = null;
+
+    private static final Map<Integer, Integer> CONTAINER_WIDGETS = new HashMap<>();
 
     public int getId() {
         return item.getId();
@@ -139,14 +145,23 @@ public class ItemEx {
     }
 
     public Widget getWidget() {
-        Client client = Static.getClient();
         return Static.invoke(() -> {
-            Widget inventory = client.getWidget(InterfaceID.Inventory.ITEMS);
-            if(inventory == null)
-            {
-                return null;
+            Client client = Static.getClient();
+
+            // Make-X items come directly from widget id (slot == widgetId)
+            if (containerId == -1) {
+                return client.getWidget(slot);
             }
-            return inventory.getChild(getSlot());
+
+            Integer widgetRoot = CONTAINER_WIDGETS.get(containerId);
+            if (widgetRoot == null)
+                return null;
+
+            Widget root = client.getWidget(widgetRoot);
+            if (root == null)
+                return null;
+
+            return root.getChild(slot);
         });
     }
 
@@ -215,4 +230,21 @@ public class ItemEx {
             && this.getId() == that.getId()
             && this.getQuantity() == that.getQuantity();
     }
+
+    static {
+        // inventory
+        CONTAINER_WIDGETS.put(InventoryID.INV, InterfaceID.Inventory.ITEMS);
+
+        // bank
+        CONTAINER_WIDGETS.put(InventoryID.BANK, InterfaceID.Bankmain.ITEMS);
+
+        // equipment
+        CONTAINER_WIDGETS.put(InventoryID.WORN, InterfaceID.Wornitems.EQUIPMENT);
+
+        // shops
+        for (ShopID shop : ShopID.values()) {
+            CONTAINER_WIDGETS.put(shop.getItemContainerId(), InterfaceID.Shopmain.ITEMS);
+        }
+    }
+
 }

@@ -35,7 +35,7 @@ public class ItemContainerEx
         {
             if(container.getItems()[i] == null || container.getItems()[i].getId() < 0)
                 continue;
-            items.add(new ItemEx(container.getItems()[i], i));
+            items.add(new ItemEx(container.getItems()[i], i, containerId));
         }
     }
 
