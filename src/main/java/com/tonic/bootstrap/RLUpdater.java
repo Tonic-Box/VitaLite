@@ -5,8 +5,6 @@ import com.tonic.bootstrap.beans.Artifact;
 import com.tonic.bootstrap.beans.Bootstrap;
 import com.tonic.bootstrap.beans.Platform;
 import com.tonic.util.HashUtil;
-import com.tonic.util.jagex.JagConfigUtil;
-import com.tonic.util.jagex.CacheClient;
 import com.tonic.vitalite.Main;
 
 import javax.swing.*;
@@ -70,23 +68,6 @@ public class RLUpdater
 
         if(forcedVersion != null && !forcedVersion.isEmpty())
         {
-            JagConfigUtil config = new JagConfigUtil(6);
-            if(CacheClient.checkForUpdate(config.getCurrentRevision()))
-            {
-                int result = JOptionPane.showConfirmDialog(
-                        null,
-                        "There has been a cache update and you are about to be loading an impossible version of runelite. Are you sure you want to proceed?",            // message
-                        "Confirmation",
-                        JOptionPane.YES_NO_OPTION
-                );
-
-                if (result != JOptionPane.YES_OPTION) {
-                    System.exit(0);
-                }
-            }
-
-            CacheClient.updateCache();
-
             for (Artifact art : artifacts) {
                 if (!platformMatches(art)) {
                     continue;
