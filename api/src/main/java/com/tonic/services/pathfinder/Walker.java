@@ -565,11 +565,13 @@ public class Walker
                 return true;
 
             if (multiStepPointer >= multiSteps.size()) {
+                System.out.println("[MultiStep] Completed all steps");
                 multiSteps.clear();
                 multiStepPointer = 0;
                 justInteracted = true;
             } else {
                 multiSteps.get(multiStepPointer).run();
+                System.out.println("[MultiStep] Executed step " + (multiStepPointer + 1) + " of " + multiSteps.size());
                 multiStepPointer++;
                 return true;
             }
@@ -613,7 +615,7 @@ public class Walker
                     multiSteps.addAll(step.getTransport().getHandler());
                     multiStepPointer = 1;
                 }
-                cooldown = Math.max(step.getTransport().getDuration(), 0);
+                cooldown = Math.max(step.getTransport().getDuration(), ThreadLocalRandom.current().nextInt(4));
                 timeout = 0;
                 steps.remove(step);
                 return true;
@@ -645,6 +647,8 @@ public class Walker
             rePath(steps);
             return true;
         }
+
+        repathDelay = 0;
 
         if (last.distanceTo2D(dest) > 6 && !PlayerAPI.isIdle(local))
         {
@@ -704,7 +708,7 @@ public class Walker
                 return true;
             }
             Logger.info("[Pathfinder] Failed to find Passthrough, atempting to circumvent");
-            if(repathDelay < 5)
+            if(repathDelay < 10)
             {
                 repathDelay++;
                 return true;
