@@ -1,7 +1,7 @@
 package com.tonic.services.pathfinder.collision;
 
 import com.tonic.Logger;
-import com.tonic.services.pathfinder.Pathfinder;
+import com.tonic.services.pathfinder.Walker;
 import com.tonic.util.WorldPointUtil;
 
 import java.io.*;
@@ -60,7 +60,7 @@ public class GlobalCollisionMap implements CollisionMap {
     }
 
     public static GlobalCollisionMap load() throws IOException, ClassNotFoundException {
-        try (InputStream is = Pathfinder.class.getResourceAsStream("map.dat")) {
+        try (InputStream is = Walker.class.getResourceAsStream("map.dat")) {
             ObjectInputStream objectInputStream = new ObjectInputStream(is);
             SparseBitSet bitSet = (SparseBitSet) objectInputStream.readObject();
             objectInputStream.close();
