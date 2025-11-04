@@ -9,9 +9,9 @@ import com.tonic.data.LoginResponse;
 import com.tonic.data.TileItemEx;
 import com.tonic.data.TileObjectEx;
 import com.tonic.services.hotswapper.PluginReloader;
-import com.tonic.services.pathfinder.Pathfinder;
+import com.tonic.services.pathfinder.abstractions.IPathfinder;
+import com.tonic.services.pathfinder.abstractions.IStep;
 import com.tonic.services.pathfinder.Walker;
-import com.tonic.services.pathfinder.model.Step;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
@@ -229,7 +229,6 @@ public class GameManager extends Overlay {
                 .getEventBus()
                 .register(this);
         TransportLoader.init();
-        Pathfinder.getObjectMap();
         BankCache.init();
 
         ThreadPool.submit(() -> {
@@ -239,6 +238,7 @@ public class GameManager extends Overlay {
                 Delays.wait(1000);
                 client = Static.getClient();
             }
+            Walker.getObjectMap();
             PluginReloader.init();
             PluginReloader.forceRebuildPluginList();
 
@@ -380,11 +380,11 @@ public class GameManager extends Overlay {
                 .setIdentifier(event.getIdentifier())
                 .setType(MenuAction.RUNELITE)
                 .onClick(e -> ThreadPool.submit(() -> {
-                    Pathfinder engine = new Pathfinder(wp);
-                    List<Step> path = engine.find();
+                    final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
+                    List<? extends IStep> path = engine.find(wp);
                     if(path == null || path.isEmpty())
                         return;
-                    testPoints = Step.toWorldPoints(path);
+                    testPoints = IStep.toWorldPoints(path);
                 }));
         color = "<col=FF0000>";
         if(testPoints != null)

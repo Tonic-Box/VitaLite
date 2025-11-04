@@ -1,6 +1,6 @@
 package com.tonic.services.pathfinder.objects;
 
-import com.tonic.services.pathfinder.Pathfinder;
+import com.tonic.services.pathfinder.Walker;
 import lombok.Getter;
 
 import java.io.*;
@@ -63,7 +63,7 @@ public class ObjectMap {
      * Loads compressed object map from InputStream.
      */
     public static ObjectMap load() throws IOException {
-        InputStream inputStream = Pathfinder.class.getResourceAsStream("objects.dat");
+        InputStream inputStream = Walker.class.getResourceAsStream("objects.dat");
         if (inputStream == null) {
             System.err.println("Object map input stream is null");
             return null;

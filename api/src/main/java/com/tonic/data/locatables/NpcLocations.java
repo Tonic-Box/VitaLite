@@ -4,7 +4,6 @@ import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.queries.NpcQuery;
-import com.tonic.services.pathfinder.Pathfinder;
 import com.tonic.services.pathfinder.Walker;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

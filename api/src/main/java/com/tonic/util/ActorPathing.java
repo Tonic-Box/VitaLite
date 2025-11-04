@@ -2,7 +2,7 @@ package com.tonic.util;
 
 import com.tonic.Static;
 import com.tonic.services.GameManager;
-import com.tonic.services.pathfinder.Pathfinder;
+import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.collision.CollisionMap;
 import com.tonic.services.pathfinder.collision.Flags;
 import com.tonic.services.pathfinder.local.LocalCollisionMap;
@@ -229,7 +229,7 @@ public class ActorPathing
             return loacalCantStep(localMap, currX, currY, curZ, dx, dy);
         }
 
-        CollisionMap map = Pathfinder.getCollisionMap();
+        CollisionMap map = Walker.getCollisionMap();
 
         final short x = (short) currX;
         final short y = (short) currY;

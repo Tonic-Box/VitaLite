@@ -91,7 +91,6 @@ public class RLUpdater
         }
 
         for (Artifact art : artifacts) {
-            // Skip artifacts that don't match current platform
             if (!platformMatches(art)) {
                 continue;
             }

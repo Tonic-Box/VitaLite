@@ -19,7 +19,11 @@ import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.GameManager;
 import com.tonic.services.ClickVisualizationOverlay;
-import com.tonic.services.pathfinder.model.Step;
+import com.tonic.services.pathfinder.abstractions.IPathfinder;
+import com.tonic.services.pathfinder.abstractions.IStep;
+import com.tonic.services.pathfinder.collision.CollisionMap;
+import com.tonic.services.pathfinder.collision.GlobalCollisionMap;
+import com.tonic.services.pathfinder.objects.ObjectMap;
 import com.tonic.services.pathfinder.teleports.Teleport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.Coroutine;
@@ -49,6 +53,21 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class Walker
 {
+    static {
+        try {
+            collisionMap = GlobalCollisionMap.load();
+            objectMap = ObjectMap.load();
+        } catch (Exception e) {
+            Logger.error("[Pathfinder] Failed to load collision map: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @Getter
+    private static CollisionMap collisionMap;
+    @Getter
+    private static ObjectMap objectMap;
+
     private static final Map<WorldPoint, WorldPoint> tileRedirects = new HashMap<>();
     private static final int[] STAMINA = {ItemID._1DOSESTAMINA,ItemID._2DOSESTAMINA,ItemID._3DOSESTAMINA,ItemID._4DOSESTAMINA};
     private static final Walker instance = new Walker();
@@ -262,7 +281,7 @@ public class Walker
      * @param steps steps
      * @param teleport teleport
      */
-    public static void walkTo(List<Step> steps, Teleport teleport)
+    public static void walkTo(List<? extends IStep> steps, Teleport teleport)
     {
         instance.walk(steps, teleport);
     }
@@ -278,9 +297,9 @@ public class Walker
         reset();
         this.useTeleports = useTeleports;
         TransportLoader.refreshTransports();
-        final Pathfinder engine = new Pathfinder(targets);
+        final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
 
-        List<Step> steps = engine.find();
+        List<? extends IStep> steps = engine.find(targets);
         if(useTeleports && engine.getTeleport() != null)
             teleport = engine.getTeleport();
         walkTo(steps);
@@ -307,16 +326,16 @@ public class Walker
         reset();
         this.useTeleports = useTeleports;
         TransportLoader.refreshTransports();
-        final Pathfinder engine = new Pathfinder(target);
+        final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
 
-        List<Step> steps = engine.find();
+        List<? extends IStep> steps = engine.find(target);
         if(useTeleports && engine.getTeleport() != null)
             teleport = engine.getTeleport();
         walkTo(steps);
         running = false;
     }
 
-    public void walk(List<Step> steps, Teleport teleport)
+    public void walk(List<? extends IStep> steps, Teleport teleport)
     {
         if(running)
         {
@@ -355,13 +374,13 @@ public class Walker
      * NOTE: This CANNOT be ran on the client thread.
      * @param path path
      */
-    private void walkTo(List<Step> path)
+    private void walkTo(List<? extends IStep> path)
     {
         if(path == null || path.isEmpty())
         {
             return;
         }
-        GameManager.setPathPoints(Step.toWorldPoints(path));
+        GameManager.setPathPoints(IStep.toWorldPoints(path));
         try
         {
             timer = client.getTickCount();
@@ -396,8 +415,8 @@ public class Walker
                     timeout--;
                     if(!Location.isReachable(client.getLocalPlayer().getWorldLocation(), end))
                     {
-                        Pathfinder engine = new Pathfinder(end);
-                        List<Step> path2 =  engine.find();
+                        final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
+                        List<? extends IStep> path2 =  engine.find(end);
                         walkTo(path2);
                         GameManager.clearPathPoints();
                         return;
@@ -443,7 +462,7 @@ public class Walker
      * it will call done after its sent the final walk, not once its
      * actually at the final tile.
      */
-    public boolean traverse(List<Step> steps) {
+    public boolean traverse(List<? extends IStep> steps) {
         if(steps == null)
         {
             Logger.error("[Pathfinder] Steps are null");
@@ -495,7 +514,7 @@ public class Walker
         Player local = client.getLocalPlayer();
         WorldPoint last = local.getWorldLocation();
         Tile tile = Location.toTile(local.getWorldLocation());
-        Step step = steps.get(0);
+        IStep step = steps.get(0);
 
         if (step.hasTransport()) {
             return handleTransport(steps, local, tile, step);
@@ -506,7 +525,7 @@ public class Walker
         return handleWalking(steps, local, last, step, step.getPosition());
     }
 
-    private boolean isCancelledOrTimedOut(List<Step> steps) {
+    private boolean isCancelledOrTimedOut(List<? extends IStep> steps) {
         if (Coroutine._isCancelled()) {
             steps.clear();
             return true;
@@ -566,7 +585,7 @@ public class Walker
         return false;
     }
 
-    private boolean shouldHandleDialogue(List<Step> steps) {
+    private boolean shouldHandleDialogue(List<? extends IStep> steps) {
         return DialogueAPI.dialoguePresent() && !steps.isEmpty() && !Location.isReachable(client.getLocalPlayer().getWorldLocation(), steps.get(steps.size() - 1).getPosition());
     }
 
@@ -580,21 +599,21 @@ public class Walker
         }
     }
 
-    private boolean handleTransport(List<Step> steps, Player local, Tile tile, Step step) {
+    private boolean handleTransport(List<? extends IStep> steps, Player local, Tile tile, IStep step) {
         if (step.hasTransport()) {
             if (!PlayerAPI.isIdle(local)) {
                 return true;
             }
 
-            if (tile != null && Location.getDistance(tile, WorldPointUtil.fromCompressed(step.transport.getSource())) < 10) {
+            if (tile != null && Location.getDistance(tile, WorldPointUtil.fromCompressed(step.getTransport().getSource())) < 10) {
                 Logger.info("[Pathfinder] Interacting with transport");
 
-                step.transport.getHandler().get(0).run();
-                if (step.transport.getHandler().size() > 1) {
-                    multiSteps.addAll(step.transport.getHandler());
+                step.getTransport().getHandler().get(0).run();
+                if (step.getTransport().getHandler().size() > 1) {
+                    multiSteps.addAll(step.getTransport().getHandler());
                     multiStepPointer = 1;
                 }
-                cooldown = Math.max(step.transport.getDuration(), 0);
+                cooldown = Math.max(step.getTransport().getDuration(), 0);
                 timeout = 0;
                 steps.remove(step);
                 return true;
@@ -610,7 +629,7 @@ public class Walker
         return false;
     }
 
-    private boolean handleWalking(List<Step> steps, Player local, WorldPoint last, Step step, WorldPoint dest) {
+    private boolean handleWalking(List<? extends IStep> steps, Player local, WorldPoint last, IStep step, WorldPoint dest) {
         manageRunEnergyAndHitpoints();
 
         if(!Location.isReachable(local.getWorldLocation(), step.getPosition()))
@@ -660,7 +679,7 @@ public class Walker
         return !steps.isEmpty();
     }
 
-    private boolean handlePassThroughObjects(Player local, List<Step> steps, Step step)
+    private boolean handlePassThroughObjects(Player local, List<? extends IStep> steps, IStep step)
     {
         TileObjectEx object = new TileObjectQuery<>()
                 .withNamesContains("door", "gate", "curtain")
@@ -761,12 +780,13 @@ public class Walker
         }
     }
 
-    private void rePath(List<Step> steps)
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void rePath(List<? extends IStep> steps)
     {
         WorldPoint wp = steps.get(steps.size() - 1).getPosition();
         steps.clear();
-        Pathfinder engine = new Pathfinder(wp);
-        steps.addAll(engine.find());
+        final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
+        ((List) steps).addAll(engine.find(wp));
     }
 
     /**
