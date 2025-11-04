@@ -93,4 +93,20 @@ public class AStarCache
 
         return new ArrayList<>(path);
     }
+
+    /**
+     * Reconstructs partial path from node back to start (for bidirectional).
+     */
+    public List<AStarStep> reconstructPartialPath(int node) {
+        LinkedList<AStarStep> path = new LinkedList<>();
+        int current = node;
+
+        while (current != -1) {
+            Transport transport = transports.get(current);
+            path.addFirst(new AStarStep(current, transport));
+            current = parents.get(current);
+        }
+
+        return new ArrayList<>(path);
+    }
 }
