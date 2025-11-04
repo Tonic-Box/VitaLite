@@ -2,9 +2,12 @@ package com.tonic.util;
 
 import com.tonic.services.ClickStrategy;
 import com.tonic.services.ConfigManager;
+import com.tonic.services.pathfinder.PathfinderAlgo;
 import com.tonic.util.config.ConfigGroup;
 import com.tonic.util.config.ConfigKey;
 import com.tonic.util.config.VitaConfig;
+
+import java.nio.file.Path;
 
 @ConfigGroup("VitaLiteOptions")
 public interface ClientConfig extends VitaConfig {
@@ -38,6 +41,11 @@ public interface ClientConfig extends VitaConfig {
     boolean shouldCacheBank();
     @ConfigKey(value = "cachedBank")
     void setShouldCacheBank(boolean shouldCache);
+
+    @ConfigKey(value = "pathfinderImpl", defaultValue = "HYBRID_BFS")
+    PathfinderAlgo getPathfinderImpl();
+    @ConfigKey(value = "pathfinderImpl")
+    void setPathfinderImpl(PathfinderAlgo impl);
 
     @ConfigKey(value = "drawWalkerPath", defaultValue = "true")
     boolean shouldDrawWalkerPath();

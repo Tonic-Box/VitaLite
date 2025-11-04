@@ -2,17 +2,14 @@ package com.tonic.services.pathfinder.local;
 
 import com.tonic.Static;
 import com.tonic.services.GameManager;
-import com.tonic.services.pathfinder.Pathfinder;
-import com.tonic.services.pathfinder.collision.Flags;
+import com.tonic.services.pathfinder.Walker;
 import com.tonic.util.WorldPointUtil;
 import gnu.trove.map.hash.TIntIntHashMap;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import net.runelite.api.Client;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 
-import java.awt.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +37,7 @@ public class LocalCollisionMap
     {
         if(x < 6000)
         {
-            return Pathfinder.getCollisionMap().all(x, y, z);
+            return Walker.getCollisionMap().all(x, y, z);
         }
 
         byte n = (byte) (n(x,y,z) ? 0 : 1);

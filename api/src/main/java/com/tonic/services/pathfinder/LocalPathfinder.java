@@ -3,10 +3,9 @@ package com.tonic.services.pathfinder;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.services.pathfinder.collections.BFSCache;
-import com.tonic.services.pathfinder.collections.HybridIntQueue;
 import com.tonic.services.pathfinder.collections.IntQueue;
 import com.tonic.services.pathfinder.local.CollisionUtil;
-import com.tonic.services.pathfinder.model.Step;
+import com.tonic.services.pathfinder.implimentations.hybridbfs.HybridBFSStep;
 import com.tonic.util.WorldPointUtil;
 import gnu.trove.map.hash.TIntIntHashMap;
 import net.runelite.api.Client;
@@ -31,7 +30,7 @@ public class LocalPathfinder
     {
     }
 
-    public List<Step> findPath(WorldPoint start, WorldPoint end)
+    public List<HybridBFSStep> findPath(WorldPoint start, WorldPoint end)
     {
         collisionUtil = new CollisionUtil(getCollision());
 
@@ -43,7 +42,7 @@ public class LocalPathfinder
         return bfs();
     }
 
-    private List<Step> bfs()
+    private List<HybridBFSStep> bfs()
     {
         int current;
         while(!queue.isEmpty())
