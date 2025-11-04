@@ -7,6 +7,7 @@ import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
+import com.tonic.api.widgets.MagicAPI;
 import com.tonic.data.ItemEx;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.PacketInteractionType;
@@ -36,8 +37,8 @@ public class TeleportLoader {
             //if (client.getVarbitValue(VarbitID.TELEBLOCK_CYCLES) > 0)
             //  return teleports;
 
-            //var spellTeles = getTeleportSpells();
-            //teleports.addAll(spellTeles);
+			var spellTeles = getTeleportSpells();
+			teleports.addAll(spellTeles);
 
             if (InventoryAPI.isEmpty() && EquipmentAPI.getAll().isEmpty()) {
                 return teleports;
@@ -250,33 +251,35 @@ public class TeleportLoader {
     public static List<Teleport> getTeleportSpells() {
         var teleports = new ArrayList<Teleport>();
 
-//        if(GameAPI.getWildyLevel(client) > 20)
-//        {
-//            return teleports;
-//        }
-//
-//        var canCastAnything = Inventory.contains(client, ItemID.LAW_RUNE)
-//                || RunePouch.getRunePouch(client) != null;
-//
-//        if(!canCastAnything){
-//            // only home teleport can be used
-//            var homeTeleport = TeleportSpell.getHomeTeleport(client);
-//            if(homeTeleport.canCast(client) && homeTeleport.distanceFromPoint(client) > 50)
-//            {
-//                teleports.add(Teleport.fromSpell(homeTeleport));
-//            }
-//            return teleports;
-//        }
-//
-//        for (TeleportSpell teleportSpell : TeleportSpell.values()) {
-//            if (teleportSpell.canCast(client) && teleportSpell.distanceFromPoint(client) > 50)
-//            {
-//                teleports.add(Teleport.fromSpell(teleportSpell));
-//            }
-//        }
+		if (GameAPI.getWildyLevel() > 20)
+		{
+			return teleports;
+		}
 
-        return teleports;
-    }
+		for (TeleportSpell teleportSpell : TeleportSpell.values())
+		{
+			if (teleportSpell.getSpell().canCast())
+			{
+				teleports.add(spellTeleport(teleportSpell));
+			}
+		}
+		return teleports;
+	}
+
+
+	public static Teleport spellTeleport(TeleportSpell teleportSpell)
+	{
+		return new Teleport(teleportSpell.getPoint(), 5, new ArrayList<>()
+		{{
+			add(() ->
+			{
+				if (teleportSpell.getSpell().canCast())
+				{
+					MagicAPI.cast(teleportSpell.getSpell());
+				}
+			});
+		}});
+	}
 
     public static Teleport itemTeleport(TeleportItem teleportItem) {
         return new Teleport(teleportItem.getDestination(), 5, new ArrayList<>() {{
