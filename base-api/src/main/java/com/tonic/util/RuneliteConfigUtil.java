@@ -1,8 +1,8 @@
 package com.tonic.util;
 
 import com.google.gson.JsonParser;
-import com.sun.tools.javac.Main;
-
+import com.tonic.util.jagex.CacheClient;
+import javax.swing.*;
 import java.io.*;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -46,5 +46,26 @@ public class RuneliteConfigUtil
             e.printStackTrace();
         }
         return "unknown";
+    }
+
+    public static void verifyCacheAndVersion(int revision)
+    {
+        if(System.getProperty("forced.runelite.version") != null)
+        {
+            if(CacheClient.checkForUpdate(revision))
+            {
+                int result = JOptionPane.showConfirmDialog(
+                        null,
+                        "There has been a cache update and you are about to be loading an impossible version of runelite. Are you sure you want to proceed? (" + revision + ")",            // message
+                        "Confirmation",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (result != JOptionPane.YES_OPTION) {
+                    System.exit(0);
+                }
+            }
+        }
+        CacheClient.updateCache();
     }
 }

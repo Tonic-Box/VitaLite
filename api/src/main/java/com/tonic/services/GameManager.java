@@ -13,6 +13,7 @@ import com.tonic.services.pathfinder.Pathfinder;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.Step;
 import com.tonic.services.pathfinder.transports.TransportLoader;
+import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
 import lombok.Getter;
 import net.runelite.api.*;
@@ -51,6 +52,7 @@ public class GameManager extends Overlay {
     private static final List<TileObjectEx> tileObjects = new ArrayList<>();
     private static final List<NPC> npcs = new ArrayList<>();
     private static final List<Player> players = new ArrayList<>();
+    private static boolean shouldRun = false;
 
     public static Stream<Player> playerStream()
     {
@@ -239,6 +241,30 @@ public class GameManager extends Overlay {
             }
             PluginReloader.init();
             PluginReloader.forceRebuildPluginList();
+
+            RuneliteConfigUtil.verifyCacheAndVersion(client.getRevision());
+            shouldRun = true;
+
+            if(AutoLogin.getCredentials() != null)
+            {
+                try
+                {
+                    String[] parts = AutoLogin.getCredentials().split(":");
+                    AutoLogin.setCredentials(null);
+                    if(parts.length == 2)
+                    {
+                        LoginService.login(parts[0], parts[1], true);
+                    }
+                    else if(parts.length == 3)
+                    {
+                        LoginService.login(parts[0], parts[1], parts[2], true);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.error("AutoLogin failed: " + e.getMessage());
+                }
+            }
         });
 
         System.out.println("GameCache initialized!");
@@ -274,37 +300,6 @@ public class GameManager extends Overlay {
     {
         if(event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
             tickCount = 0;
-
-        if(event.getGameState() == GameState.LOGIN_SCREEN)
-        {
-            if(AutoLogin.getCredentials() != null)
-            {
-                ThreadPool.submit(() ->{
-                    try
-                    {
-                        String[] parts = AutoLogin.getCredentials().split(":");
-                        AutoLogin.setCredentials(null);
-                        while(Static.getClient() == null)
-                        {
-                            Delays.wait(100);
-                        }
-                        Delays.wait(3000);
-                        if(parts.length == 2)
-                        {
-                            LoginService.login(parts[0], parts[1], true);
-                        }
-                        else if(parts.length == 3)
-                        {
-                            LoginService.login(parts[0], parts[1], parts[2], true);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.error("AutoLogin failed: " + e.getMessage());
-                    }
-                });
-            }
-        }
     }
 
     @Subscribe
