@@ -292,8 +292,9 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         contentPanel.add(Box.createVerticalStrut(15));
 
         // Now set the proper dimensions after all components are added
-        contentPanel.setPreferredSize(new Dimension(PANEL_WIDTH, contentPanel.getPreferredSize().height));
         contentPanel.setMaximumSize(new Dimension(PANEL_WIDTH, Integer.MAX_VALUE));
+        contentPanel.revalidate();
+        contentPanel.repaint();
 
         // Create custom styled scroll pane
         JScrollPane scrollPane = new JScrollPane(contentPanel);
@@ -308,7 +309,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setBorder(null);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
         // Style the vertical scrollbar
         scrollPane.getVerticalScrollBar().setOpaque(false);
