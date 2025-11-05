@@ -626,20 +626,20 @@ public class TransportLoader
                     NPC npc = new NpcQuery().withName("Trader Crewmember").sortNearest().first();
                     NpcAPI.interact(npc, "Charter");
                     Client client = Static.getClient();
-                    Delays.waitUntil(() -> client.getWidget(57999364) != null);
-                    WidgetAPI.interact(0, 57999364, destination.getIndex(), -1);
+                    Delays.waitUntil(() -> client.getWidget(InterfaceID.SailingMenu.UNIVERSE) != null);
+                    WidgetAPI.interact(1, InterfaceID.CharteringMenuSide.LIST_CONTENT, destination.getIndex(), -1);
                     Delays.tick();
                     if(DialogueAPI.dialoguePresent())
                     {
                         DialogueNode.get()
-                                .node("Okay, don't")
+                                .node("Yes, and don't")
                                 .process();
                     }
                 });
                 Transport transport = new Transport(
                         WorldPointUtil.compress(charterShip.getLocation()),
                         WorldPointUtil.compress(destination.getArival()),
-                        6, 1, 4,
+                        6, 1, 5,
                         actions,
                         destination.getRequirements(),
                         -1
@@ -1180,17 +1180,17 @@ public class TransportLoader
         //sarim
         if (QuestAPI.isCompleted(Quest.PIRATES_TREASURE))
         {
-            addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(3027, 3217, 0), new WorldPoint(2956, 3143, 1),
-                    "Captain Tobias", "Pay-fare");
-            addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(2956, 3146, 0), new WorldPoint(3032, 3217, 1),
-                    "Customs officer", "Pay-fare");
+            addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(3027, 3217, 0), new WorldPoint(2956, 3146, 0),
+                    "Captain Tobias", "Travel");
+            addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(2956, 3146, 0), new WorldPoint(3029, 3217, 0),
+                    "Customs officer", "Travel");
         }
         else
         {
-            addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(3027, 3217, 0), new WorldPoint(2956, 3143, 1),
-                    "Captain Tobias", "Pay-fare", "Yes");
-            addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(2956, 3146, 0), new WorldPoint(3032, 3217, 1),
-                    "Customs officer", "Pay-fare", "Can I journey", "Search away", "Ok");
+            addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(3027, 3217, 0), new WorldPoint(2956, 3146, 0),
+                    "Captain Tobias", "Travel", "Yes");
+            addNpcTransport(transports, 10, getGoldReq(30), new WorldPoint(2956, 3146, 0), new WorldPoint(3029, 3217, 0),
+                    "Customs officer", "Travel", "Can I journey", "Search away", "Ok");
         }
     }
 
