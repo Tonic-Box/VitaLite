@@ -1,9 +1,18 @@
 package com.tonic.services.pathfinder.implimentations.jpsplus;
 
-import com.tonic.services.pathfinder.CollisionMap;
+import com.tonic.Logger;
+import com.tonic.Static;
+import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
+import com.tonic.services.pathfinder.teleports.Teleport;
 import com.tonic.services.pathfinder.transports.Transport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
+import com.tonic.util.Profiler;
+import com.tonic.util.WorldPointUtil;
+import lombok.Getter;
+import net.runelite.api.Client;
+import net.runelite.api.coords.WorldArea;
+import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +24,9 @@ import java.util.PriorityQueue;
  */
 public class JPSPlusAlgo implements IPathfinder
 {
-    private final CollisionMap collisionMap;
     private final JPSPlusPreprocessor preprocessor;
+    @Getter
+    private Teleport teleport;
 
     // Direction constants matching preprocessor
     private static final int[][] DIRECTIONS = {
@@ -30,41 +40,136 @@ public class JPSPlusAlgo implements IPathfinder
         {-1, -1}  // SW
     };
 
-    public JPSPlusAlgo(CollisionMap collisionMap) {
-        this.collisionMap = collisionMap;
-        this.preprocessor = new JPSPlusPreprocessor(collisionMap);
+    // Target state cached as primitives
+    private int targetCompressed;
+    private short targetX;
+    private short targetY;
+    private byte targetPlane;
+    private int[] worldAreaPoints;
+    private int playerStartPos;
+
+    public JPSPlusAlgo() {
+        this.preprocessor = new JPSPlusPreprocessor();
     }
 
     @Override
-    public List<JPSPlusStep> findPath(int playerStart, int targetEnd)
-    {
-        JPSPlusCache cache = new JPSPlusCache(10000);
+    public List<JPSPlusStep> find(WorldPoint target) {
+        TransportLoader.refreshTransports();
+        this.targetCompressed = WorldPointUtil.compress(target);
+        this.targetX = (short) target.getX();
+        this.targetY = (short) target.getY();
+        this.targetPlane = (byte) target.getPlane();
+        this.worldAreaPoints = null;
+        return find();
+    }
+
+    @Override
+    public List<JPSPlusStep> find(WorldArea... worldAreas) {
+        TransportLoader.refreshTransports();
+        this.targetCompressed = -1;
+        this.worldAreaPoints = WorldPointUtil.toCompressedPoints(worldAreas);
+
+        // Use first area point as heuristic target approximation
+        if (worldAreaPoints != null && worldAreaPoints.length > 0) {
+            int firstPoint = worldAreaPoints[0];
+            this.targetX = WorldPointUtil.getCompressedX(firstPoint);
+            this.targetY = WorldPointUtil.getCompressedY(firstPoint);
+            this.targetPlane = WorldPointUtil.getCompressedPlane(firstPoint);
+        }
+
+        return find();
+    }
+
+    @Override
+    public List<JPSPlusStep> find(List<WorldArea> worldAreas) {
+        TransportLoader.refreshTransports();
+        this.targetCompressed = -1;
+        this.worldAreaPoints = WorldPointUtil.toCompressedPoints(worldAreas.toArray(new WorldArea[0]));
+
+        // Use first area point as heuristic target approximation
+        if (worldAreaPoints != null && worldAreaPoints.length > 0) {
+            int firstPoint = worldAreaPoints[0];
+            this.targetX = WorldPointUtil.getCompressedX(firstPoint);
+            this.targetY = WorldPointUtil.getCompressedY(firstPoint);
+            this.targetPlane = WorldPointUtil.getCompressedPlane(firstPoint);
+        }
+
+        return find();
+    }
+
+    private List<JPSPlusStep> find() {
+        if (Walker.getCollisionMap() == null) {
+            Logger.error("[JPS+] Collision map is null");
+            return new ArrayList<>();
+        }
+
+        try {
+            Client client = Static.getClient();
+            playerStartPos = WorldPointUtil.compress(client.getLocalPlayer().getWorldLocation());
+
+            List<Teleport> teleports = Teleport.buildTeleportLinks();
+            List<Integer> startPoints = new ArrayList<>();
+            startPoints.add(playerStartPos);
+
+            for (Teleport tp : teleports) {
+                startPoints.add(WorldPointUtil.compress(tp.getDestination()));
+            }
+
+            Profiler.Start("JPS+ Pathfinding");
+            List<JPSPlusStep> path = buildPath(startPoints);
+            Profiler.StopMS();
+
+            Logger.info("[JPS+] Path Length: " + path.size());
+
+            if (path.isEmpty())
+                return path;
+
+            // Set teleport if path starts with one
+            for (Teleport tp : teleports) {
+                if (WorldPointUtil.compress(tp.getDestination()) == path.get(0).getPackedPosition()) {
+                    teleport = tp.copy();
+                    break;
+                }
+            }
+
+            return path;
+
+        } catch (Exception e) {
+            Logger.error(e, "[JPS+] %e");
+            return new ArrayList<>();
+        }
+    }
+
+    private List<JPSPlusStep> buildPath(List<Integer> starts) {
+        JPSPlusCache cache = new JPSPlusCache(10_000);
         PriorityQueue<JPSPlusNode> openSet = new PriorityQueue<>((a, b) ->
             Integer.compare(a.fScore, b.fScore));
 
-        // Initialize start node
-        int startH = heuristic(playerStart, targetEnd);
-        openSet.add(new JPSPlusNode(playerStart, 0, startH, -1, null));
-        cache.putIfBetter(playerStart, 0, -1);
+        // Initialize start nodes
+        for (int start : starts) {
+            cache.putIfBetter(start, 0, -1);
+            int h = heuristic(start);
+            openSet.add(new JPSPlusNode(start, 0, h, -1, null));
+        }
 
         while (!openSet.isEmpty()) {
             JPSPlusNode current = openSet.poll();
-
-            // Goal reached
-            if (current.position == targetEnd) {
-                return cache.reconstructPath(targetEnd, playerStart);
-            }
 
             // Skip if we've found a better path to this node
             if (current.gScore > cache.getGScore(current.position)) {
                 continue;
             }
 
+            // Goal reached
+            if (isGoal(current.position)) {
+                return cache.reconstructPath(current.position, playerStartPos);
+            }
+
             // Expand jump point successors
-            expandJumpSuccessors(current, targetEnd, cache, openSet);
+            expandJumpSuccessors(current, cache, openSet);
 
             // Expand transport edges
-            expandTransports(current, targetEnd, cache, openSet);
+            expandTransports(current, cache, openSet);
         }
 
         // No path found
@@ -72,11 +177,24 @@ public class JPSPlusAlgo implements IPathfinder
     }
 
     /**
+     * Checks if position is the goal.
+     */
+    private boolean isGoal(int position) {
+        if (targetCompressed != -1) {
+            return position == targetCompressed;
+        }
+        if (worldAreaPoints != null) {
+            for (int areaPoint : worldAreaPoints) {
+                if (position == areaPoint) return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Expands all jump point successors from current node.
      */
-    private void expandJumpSuccessors(JPSPlusNode current, int target,
-                                     JPSPlusCache cache, PriorityQueue<JPSPlusNode> openSet)
-    {
+    private void expandJumpSuccessors(JPSPlusNode current, JPSPlusCache cache, PriorityQueue<JPSPlusNode> openSet) {
         int[] successors = preprocessor.getJumpSuccessors(current.position);
 
         for (int dir = 0; dir < 8; dir++) {
@@ -96,7 +214,7 @@ public class JPSPlusAlgo implements IPathfinder
 
             // Update if better path
             if (cache.putIfBetter(successor, tentativeG, current.position)) {
-                int h = heuristic(successor, target);
+                int h = heuristic(successor);
                 openSet.add(new JPSPlusNode(successor, tentativeG, h, current.position, null));
             }
         }
@@ -105,9 +223,7 @@ public class JPSPlusAlgo implements IPathfinder
     /**
      * Expands all transport edges from current node.
      */
-    private void expandTransports(JPSPlusNode current, int target,
-                                  JPSPlusCache cache, PriorityQueue<JPSPlusNode> openSet)
-    {
+    private void expandTransports(JPSPlusNode current, JPSPlusCache cache, PriorityQueue<JPSPlusNode> openSet) {
         ArrayList<Transport> transports = TransportLoader.getTransports().get(current.position);
         if (transports == null) return;
 
@@ -122,7 +238,7 @@ public class JPSPlusAlgo implements IPathfinder
 
             // Update if better path
             if (cache.putIfBetter(destination, tentativeG, current.position, transport)) {
-                int h = heuristic(destination, target);
+                int h = heuristic(destination);
                 openSet.add(new JPSPlusNode(destination, tentativeG, h, current.position, transport));
             }
         }
@@ -132,36 +248,45 @@ public class JPSPlusAlgo implements IPathfinder
      * Gets position at offset from current position.
      */
     private int getPositionAt(int position, int dx, int dy) {
-        int current = position;
-        int absDx = Math.abs(dx);
-        int absDy = Math.abs(dy);
-        int signX = Integer.signum(dx);
-        int signY = Integer.signum(dy);
+        short x = WorldPointUtil.getCompressedX(position);
+        short y = WorldPointUtil.getCompressedY(position);
+        byte plane = WorldPointUtil.getCompressedPlane(position);
 
-        // Move in steps to reach target offset
-        for (int i = 0; i < Math.max(absDx, absDy); i++) {
-            int stepX = (i < absDx) ? signX : 0;
-            int stepY = (i < absDy) ? signY : 0;
-            current = collisionMap.getNeighbor(current, stepX, stepY);
-            if (current == -1) return -1;
-        }
-
-        return current;
+        return WorldPointUtil.compress((short)(x + dx), (short)(y + dy), plane);
     }
 
     /**
      * Octile distance heuristic (supports diagonal movement).
      */
-    private int heuristic(int from, int to) {
-        int[] fromCoords = collisionMap.unpack(from);
-        int[] toCoords = collisionMap.unpack(to);
+    private int heuristic(int from) {
+        short sx = WorldPointUtil.getCompressedX(from);
+        short sy = WorldPointUtil.getCompressedY(from);
+        byte sp = WorldPointUtil.getCompressedPlane(from);
 
-        int dx = Math.abs(fromCoords[0] - toCoords[0]);
-        int dy = Math.abs(fromCoords[1] - toCoords[1]);
+        if (targetCompressed != -1 || worldAreaPoints == null) {
+            int dx = sx > targetX ? sx - targetX : targetX - sx;
+            int dy = sy > targetY ? sy - targetY : targetY - sy;
+            int dz = sp > targetPlane ? sp - targetPlane : targetPlane - sp;
+            return Math.max(dx, dy) + (dz * 100);
+        } else {
+            // Area heuristic - find minimum distance to any area point
+            int minDist = Integer.MAX_VALUE;
+            for (int areaPoint : worldAreaPoints) {
+                short ax = WorldPointUtil.getCompressedX(areaPoint);
+                short ay = WorldPointUtil.getCompressedY(areaPoint);
+                byte ap = WorldPointUtil.getCompressedPlane(areaPoint);
 
-        // Octile: D * (dx + dy) + (D2 - 2*D) * min(dx, dy)
-        // Where D=1 for cardinal, D2=1 for diagonal (since we allow diagonal)
-        return Math.max(dx, dy);
+                int dx = sx > ax ? sx - ax : ax - sx;
+                int dy = sy > ay ? sy - ay : ay - sy;
+                int dz = sp > ap ? sp - ap : ap - sp;
+
+                int dist = Math.max(dx, dy) + (dz * 100);
+                if (dist < minDist) {
+                    minDist = dist;
+                }
+            }
+            return minDist;
+        }
     }
 
     /**

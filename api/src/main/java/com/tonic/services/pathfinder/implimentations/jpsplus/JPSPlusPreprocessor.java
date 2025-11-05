@@ -1,10 +1,9 @@
 package com.tonic.services.pathfinder.implimentations.jpsplus;
 
-import com.tonic.services.pathfinder.CollisionMap;
+import com.tonic.services.pathfinder.Walker;
+import com.tonic.services.pathfinder.collision.Flags;
+import com.tonic.util.WorldPointUtil;
 import gnu.trove.map.hash.TIntObjectHashMap;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Preprocesses the static grid to build jump point successor database.
@@ -12,7 +11,6 @@ import java.util.List;
  */
 public class JPSPlusPreprocessor
 {
-    private final CollisionMap collisionMap;
     private final TIntObjectHashMap<int[]> jumpSuccessors;
 
     // Direction constants: N, S, E, W, NE, NW, SE, SW
@@ -27,19 +25,8 @@ public class JPSPlusPreprocessor
         {-1, -1}  // SW
     };
 
-    public JPSPlusPreprocessor(CollisionMap collisionMap) {
-        this.collisionMap = collisionMap;
+    public JPSPlusPreprocessor() {
         this.jumpSuccessors = new TIntObjectHashMap<>(100000);
-    }
-
-    /**
-     * Preprocesses the entire map to compute jump point successors.
-     * For each walkable tile and each direction, stores the jump point distance.
-     */
-    public void preprocess() {
-        // Iterate over all positions in the collision map
-        // For simplicity, we'll process on-demand during first query
-        // Full preprocessing would require map bounds knowledge
     }
 
     /**
@@ -80,78 +67,89 @@ public class JPSPlusPreprocessor
         int distance = 0;
         int current = position;
 
-        while (true) {
+        while (distance < 1000) {
             distance++;
-            current = collisionMap.getNeighbor(current, dx, dy);
 
-            // Hit obstacle or invalid position
-            if (current == -1) {
+            // Try to move in the direction
+            short x = WorldPointUtil.getCompressedX(current);
+            short y = WorldPointUtil.getCompressedY(current);
+            byte plane = WorldPointUtil.getCompressedPlane(current);
+
+            short newX = (short)(x + dx);
+            short newY = (short)(y + dy);
+            int next = WorldPointUtil.compress(newX, newY, plane);
+
+            // Check if walkable using collision map
+            if (!Walker.getCollisionMap().walkable(next)) {
                 return -1;
             }
+
+            current = next;
 
             // Check if this is a jump point
             if (isJumpPoint(current, dx, dy)) {
                 return distance;
             }
-
-            // Prevent infinite loops
-            if (distance > 1000) {
-                return -1;
-            }
         }
+
+        return -1;
     }
 
     /**
      * Determines if a position is a jump point when approached from a direction.
      */
     private boolean isJumpPoint(int position, int dx, int dy) {
+        short x = WorldPointUtil.getCompressedX(position);
+        short y = WorldPointUtil.getCompressedY(position);
+        byte plane = WorldPointUtil.getCompressedPlane(position);
+
         // Cardinal directions
         if (dx == 0 || dy == 0) {
-            return hasCardinalForcedNeighbor(position, dx, dy);
+            return hasCardinalForcedNeighbor(x, y, plane, dx, dy);
         }
 
         // Diagonal directions
-        return hasDiagonalForcedNeighbor(position, dx, dy) ||
+        return hasDiagonalForcedNeighbor(x, y, plane, dx, dy) ||
                hasCardinalJumpPoint(position, dx, dy);
     }
 
     /**
      * Checks for forced neighbors in cardinal direction movement.
      */
-    private boolean hasCardinalForcedNeighbor(int position, int dx, int dy) {
+    private boolean hasCardinalForcedNeighbor(short x, short y, byte plane, int dx, int dy) {
         if (dx != 0) { // Horizontal movement
             // Check above and below
-            int above = collisionMap.getNeighbor(position, 0, 1);
-            int below = collisionMap.getNeighbor(position, 0, -1);
-            int aboveBlocked = collisionMap.getNeighbor(position, -dx, 1);
-            int belowBlocked = collisionMap.getNeighbor(position, -dx, -1);
+            int above = WorldPointUtil.compress(x, (short)(y + 1), plane);
+            int below = WorldPointUtil.compress(x, (short)(y - 1), plane);
+            int aboveBlocked = WorldPointUtil.compress((short)(x - dx), (short)(y + 1), plane);
+            int belowBlocked = WorldPointUtil.compress((short)(x - dx), (short)(y - 1), plane);
 
-            return (above != -1 && aboveBlocked == -1) ||
-                   (below != -1 && belowBlocked == -1);
+            return (Walker.getCollisionMap().walkable(above) && !Walker.getCollisionMap().walkable(aboveBlocked)) ||
+                   (Walker.getCollisionMap().walkable(below) && !Walker.getCollisionMap().walkable(belowBlocked));
         } else { // Vertical movement
             // Check left and right
-            int left = collisionMap.getNeighbor(position, -1, 0);
-            int right = collisionMap.getNeighbor(position, 1, 0);
-            int leftBlocked = collisionMap.getNeighbor(position, -1, -dy);
-            int rightBlocked = collisionMap.getNeighbor(position, 1, -dy);
+            int left = WorldPointUtil.compress((short)(x - 1), y, plane);
+            int right = WorldPointUtil.compress((short)(x + 1), y, plane);
+            int leftBlocked = WorldPointUtil.compress((short)(x - 1), (short)(y - dy), plane);
+            int rightBlocked = WorldPointUtil.compress((short)(x + 1), (short)(y - dy), plane);
 
-            return (left != -1 && leftBlocked == -1) ||
-                   (right != -1 && rightBlocked == -1);
+            return (Walker.getCollisionMap().walkable(left) && !Walker.getCollisionMap().walkable(leftBlocked)) ||
+                   (Walker.getCollisionMap().walkable(right) && !Walker.getCollisionMap().walkable(rightBlocked));
         }
     }
 
     /**
      * Checks for forced neighbors in diagonal direction movement.
      */
-    private boolean hasDiagonalForcedNeighbor(int position, int dx, int dy) {
+    private boolean hasDiagonalForcedNeighbor(short x, short y, byte plane, int dx, int dy) {
         // Check horizontal and vertical blocked neighbors
-        int hBlocked = collisionMap.getNeighbor(position, -dx, 0);
-        int vBlocked = collisionMap.getNeighbor(position, 0, -dy);
-        int hNext = collisionMap.getNeighbor(position, -dx, dy);
-        int vNext = collisionMap.getNeighbor(position, dx, -dy);
+        int hBlocked = WorldPointUtil.compress((short)(x - dx), y, plane);
+        int vBlocked = WorldPointUtil.compress(x, (short)(y - dy), plane);
+        int hNext = WorldPointUtil.compress((short)(x - dx), (short)(y + dy), plane);
+        int vNext = WorldPointUtil.compress((short)(x + dx), (short)(y - dy), plane);
 
-        return (hBlocked == -1 && hNext != -1) ||
-               (vBlocked == -1 && vNext != -1);
+        return (!Walker.getCollisionMap().walkable(hBlocked) && Walker.getCollisionMap().walkable(hNext)) ||
+               (!Walker.getCollisionMap().walkable(vBlocked) && Walker.getCollisionMap().walkable(vNext));
     }
 
     /**
