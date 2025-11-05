@@ -53154,7 +53154,17 @@
       "plane": 0
     },
     "action": "Pass-through",
-    "objectId": 3443
+    "objectId": 3443,
+    "requirements": {
+      "varRequirements": [
+        {
+          "comparison": "GREATER_THAN_EQUAL",
+          "type": "VARP",
+          "var": 302,
+          "value": 61
+        }
+      ]
+    }
   },
   {
     "source": {
@@ -76942,18 +76952,18 @@
     "objectId": 2584
   },
   {
-  "source": {
-  "x": 2824,
-  "y": 3117,
-  "plane": 0
-},
-  "destination": {
-  "x": 2830,
-  "y": 9520,
-  "plane": 0
-},
-  "action": "Search",
-  "objectId": 2584
+    "source": {
+      "x": 2824,
+      "y": 3117,
+      "plane": 0
+    },
+    "destination": {
+      "x": 2830,
+      "y": 9520,
+      "plane": 0
+    },
+    "action": "Search",
+    "objectId": 2584
   },
   {
     "source": {
