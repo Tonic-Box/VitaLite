@@ -292,7 +292,7 @@ public class Cannon
      */
     public static boolean ensureBalls()
     {
-        return InventoryAPI.contains(ItemID.CANNONBALL);
+        return InventoryAPI.containsAny(ItemID.BRONZE_CANNONBALL , ItemID.IRON_CANNONBALL, ItemID.STEEL_CANNONBALL, ItemID.MITHRIL_CANNONBALL, ItemID.ADAMANT_CANNONBALL, ItemID.RUNE_CANNONBALL, ItemID.DRAGON_CANNONBALL);
     }
 
     public static void reclaimCannon()

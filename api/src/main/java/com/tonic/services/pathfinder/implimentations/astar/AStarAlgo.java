@@ -808,16 +808,7 @@ public class AStarAlgo implements IPathfinder
             forwardTransportsUsed++;
 
             int duration = t.getDuration();
-            int cost;
-            if (duration <= 0) {
-                cost = 2;
-            } else {
-                int incrementValue = 6 * (1 + forwardTransportsUsed);
-                int part1 = openSet.size() * duration;
-                int part2 = incrementValue * (duration * (duration + 1) >> 1);
-                int calculated = part1 + part2;
-                cost = calculated < 0 ? Integer.MAX_VALUE : (calculated < 1 ? 1 : calculated);
-            }
+            int cost = duration + 1;
 
             int dest = t.getDestination();
             int tentativeG = currentG + cost;
@@ -846,16 +837,7 @@ public class AStarAlgo implements IPathfinder
             backwardTransportsUsed++;
 
             int duration = t.getDuration();
-            int cost;
-            if (duration <= 0) {
-                cost = 2;
-            } else {
-                int incrementValue = 6 * (1 + backwardTransportsUsed);
-                int part1 = openSet.size() * duration;
-                int part2 = incrementValue * (duration * (duration + 1) >> 1);
-                int calculated = part1 + part2;
-                cost = calculated < 0 ? Integer.MAX_VALUE : (calculated < 1 ? 1 : calculated);
-            }
+            int cost = duration + 1;
 
             int dest = t.getDestination();
             int tentativeG = currentG + cost;
