@@ -1,4 +1,4 @@
-package com.tonic.services.pathfinder.implimentations.jpsplus;
+package com.tonic.services.pathfinder.implimentations.jps;
 
 import com.tonic.services.pathfinder.abstractions.IStep;
 import com.tonic.services.pathfinder.transports.Transport;
@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 /**
  * Represents a single step in a JPS+ pathfinding result.
  */
-public class JPSPlusStep implements IStep
+public class JPSStep implements IStep
 {
     private final int position;
     private final Transport transport;
 
-    public JPSPlusStep(int position, Transport transport) {
+    public JPSStep(int position, Transport transport) {
         this.position = position;
         this.transport = transport;
     }
@@ -48,8 +48,8 @@ public class JPSPlusStep implements IStep
         return transport != null;
     }
 
-    public static List<WorldPoint> toWorldPoints(List<JPSPlusStep> steps)
+    public static List<WorldPoint> toWorldPoints(List<JPSStep> steps)
     {
-        return steps.stream().map(JPSPlusStep::getPosition).collect(Collectors.toList());
+        return steps.stream().map(JPSStep::getPosition).collect(Collectors.toList());
     }
 }
