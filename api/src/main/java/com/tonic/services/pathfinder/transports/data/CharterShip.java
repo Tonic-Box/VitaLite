@@ -9,6 +9,7 @@ import net.runelite.api.ItemID;
 import net.runelite.api.Quest;
 import net.runelite.api.QuestState;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 
@@ -79,7 +80,7 @@ public enum CharterShip
     private final WorldPoint location;
     private final WorldPoint arival;
     private final Requirements requirements;
-    private final int widgetId = 57999364;
+    private final int widgetId = InterfaceID.CharteringMenuSide.LIST_CONTENT;
     public int getIndex()
     {
         return Static.invoke(() -> {
