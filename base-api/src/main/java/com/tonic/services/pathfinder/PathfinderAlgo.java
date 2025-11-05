@@ -7,7 +7,8 @@ public enum PathfinderAlgo
     HYBRID_BFS("com.tonic.services.pathfinder.implimentations.hybridbfs.HybridBFSAlgo"),
     BI_DIR_BFS("com.tonic.services.pathfinder.implimentations.bidirbfs.BiDirBFSAlgo"),
     FLOW_FIELD("com.tonic.services.pathfinder.implimentations.flowfield.FlowFieldAlgo"),
-    ASTAR("com.tonic.services.pathfinder.implimentations.astar.AStarAlgo")
+    ASTAR("com.tonic.services.pathfinder.implimentations.astar.AStarAlgo"),
+    JPS("com.tonic.services.pathfinder.implimentations.jps.JPSAlgo")
     ;
 
     private final String fqdn;
