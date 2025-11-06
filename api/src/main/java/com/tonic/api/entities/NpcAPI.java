@@ -5,6 +5,7 @@ import com.tonic.api.TClient;
 import com.tonic.queries.NpcQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.PacketInteractionType;
+import net.runelite.api.HeadIcon;
 import net.runelite.api.NPC;
 import net.runelite.api.NPCComposition;
 import net.runelite.client.game.NPCManager;
@@ -140,5 +141,24 @@ public class NpcAPI extends ActorAPI
             }
             return composition;
         });
+    }
+
+    /**
+     * Gets the head icon of an npc
+     *  Note: This might not work for the newer head icons
+     *  from the Yama update.
+     * @param npc
+     * @return HeadIcon
+     */
+
+    public static HeadIcon getHeadIcon(NPC npc)
+    {
+        short[] spriteIds = npc.getOverheadSpriteIds();
+        if (spriteIds == null)
+        {
+            return null;
+        }
+
+        return HeadIcon.values()[spriteIds[0]];
     }
 }
