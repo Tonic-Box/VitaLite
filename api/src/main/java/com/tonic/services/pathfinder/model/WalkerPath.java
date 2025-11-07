@@ -1,0 +1,365 @@
+package com.tonic.services.pathfinder.model;
+
+import com.tonic.Logger;
+import com.tonic.Static;
+import com.tonic.api.entities.PlayerAPI;
+import com.tonic.api.entities.TileObjectAPI;
+import com.tonic.api.game.MovementAPI;
+import com.tonic.api.widgets.DialogueAPI;
+import com.tonic.api.widgets.InventoryAPI;
+import com.tonic.api.widgets.PrayerAPI;
+import com.tonic.api.widgets.WidgetAPI;
+import com.tonic.data.ItemConstants;
+import com.tonic.data.ItemEx;
+import com.tonic.data.StrongholdSecurityQuestion;
+import com.tonic.data.TileObjectEx;
+import com.tonic.queries.InventoryQuery;
+import com.tonic.queries.TileObjectQuery;
+import com.tonic.services.ClickManager;
+import com.tonic.services.ClickVisualizationOverlay;
+import static com.tonic.services.pathfinder.Walker.*;
+import com.tonic.services.pathfinder.abstractions.IPathfinder;
+import com.tonic.services.pathfinder.abstractions.IStep;
+import com.tonic.services.pathfinder.teleports.Teleport;
+import com.tonic.util.IntPair;
+import com.tonic.util.Location;
+import lombok.Getter;
+import lombok.Setter;
+import net.runelite.api.*;
+import net.runelite.api.coords.WorldArea;
+import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.gameval.ItemID;
+import net.runelite.api.widgets.WidgetInfo;
+import org.apache.commons.lang3.ArrayUtils;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
+
+public class WalkerPath
+{
+    private static final int[] STAMINA = {net.runelite.api.gameval.ItemID._1DOSESTAMINA, net.runelite.api.gameval.ItemID._2DOSESTAMINA, net.runelite.api.gameval.ItemID._3DOSESTAMINA, ItemID._4DOSESTAMINA};
+
+    private final Client client;
+    @Getter
+    private final List<IStep> steps;
+
+    @Setter
+    @Getter
+    private boolean canceled = false;
+    @Setter
+    private Teleport teleport;
+    @Setter
+    private int healthHandler = 0;
+    @Setter
+    private PrayerAPI[] prayers = null;
+    private final int prayerDangerZone;
+    private WorldPoint destination;
+    private boolean ranInit = false;
+
+    /**
+     * Get a WalkerPath to a single target
+     * @param target The target WorldPoint
+     * @return The WalkerPath
+     */
+    public static WalkerPath get(WorldPoint target)
+    {
+        final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
+        List<? extends IStep> path = engine.find(target);
+        return new WalkerPath(path, engine.getTeleport());
+    }
+
+    /**
+     * Get a WalkerPath to the closest of multiple targets
+     * @param targets The target WorldAreas
+     * @return The WalkerPath
+     */
+    public static WalkerPath get(List<WorldArea> targets)
+    {
+        final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
+        List<? extends IStep> path = engine.find(targets);
+        return new WalkerPath(path, engine.getTeleport());
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    WalkerPath(List<? extends IStep> steps, Teleport teleport) {
+        this.client = Static.getClient();
+        this.steps = (List) steps;
+        this.teleport = teleport;
+        prayerDangerZone = client.getRealSkillLevel(Skill.PRAYER) / 2;
+        if(!steps.isEmpty()) {
+            destination = steps.get(steps.size() - 1).getPosition();
+        }
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void repath()
+    {
+        steps.clear();
+        final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
+        ((List) steps).addAll(engine.find(destination));
+    }
+
+    /**
+     * Initialize the WalkerPath (handles initial prayer setup)
+     */
+    public void init()
+    {
+        if(ranInit)
+        {
+            return;
+        }
+
+        if(prayers != null)
+        {
+            PrayerAPI.setQuickPrayer(prayers);
+        }
+        ranInit = true;
+    }
+
+    /**
+     * Shutdown the WalkerPath (handles prayer cleanup)
+     */
+    public void shutdown()
+    {
+        if(prayers != null)
+        {
+            PrayerAPI.turnOffQuickPrayers();
+        }
+    }
+
+    /**
+     * Perform a single step of the WalkerPath
+     * @return true if there are more steps to perform, false otherwise
+     */
+    public boolean step()
+    {
+        init();
+
+        if(canceled)
+        {
+            return false;
+        }
+
+        if(steps == null)
+        {
+            return false;
+        }
+
+        if(!client.getGameState().equals(GameState.LOGGED_IN))
+        {
+            return !steps.isEmpty();
+        }
+
+        if(handleTeleport())
+        {
+            return !steps.isEmpty();
+        }
+
+        if(handleTransports())
+        {
+            return !steps.isEmpty();
+        }
+
+        if (shouldHandleDialogue(steps)) {
+            handleDialogue();
+            return !steps.isEmpty();
+        }
+
+        if (steps.isEmpty()) {
+            return false;
+        }
+
+        handlePrayer();
+        manageRunEnergyAndHitpoints();
+
+        Player local = client.getLocalPlayer();
+        WorldPoint last = local.getWorldLocation();
+        IStep step = steps.get(0);
+        return handleWalking(local, last, step, step.getPosition());
+    }
+
+    private boolean handleWalking(Player local, WorldPoint last, IStep step, WorldPoint dest) {
+        if(!Location.isReachable(local.getWorldLocation(), step.getPosition())) {
+            if (MovementAPI.isMoving()) {
+                return true;
+            }
+            if (handlePassThroughObjects(local, steps, step) || !PlayerAPI.isIdle(local)) {
+                return !steps.isEmpty();
+            }
+            repath();
+            return true;
+        }
+
+        int rand = ThreadLocalRandom.current().nextInt(4, 8);
+        if (last.distanceTo2D(dest) > rand && !PlayerAPI.isIdle(local))
+        {
+            return true;
+        }
+
+        int s = 0;
+        rand = ThreadLocalRandom.current().nextInt(5, 16);
+        while(s <= rand && s < steps.size() && !steps.get(s).hasTransport())
+        {
+            if(!Location.isReachable(local.getWorldLocation(), steps.get(s).getPosition()))
+            {
+                break;
+            }
+            s++;
+        }
+        if(s > 0)
+        {
+            s--;
+            steps.subList(0, s).clear();
+        }
+        if(steps.size() > 1 && steps.get(1).hasTransport())
+        {
+            steps.remove(0);
+        }
+        step = steps.get(0);
+        ClickVisualizationOverlay.recordWalkClick(step.getPosition());
+        MovementAPI.walkTowards(step.getPosition());
+        if(!step.hasTransport())
+            steps.remove(step);
+        return !steps.isEmpty();
+    }
+
+    private boolean handlePassThroughObjects(Player local, List<? extends IStep> steps, IStep step)
+    {
+        TileObjectEx object = new TileObjectQuery<>()
+                .withNamesContains("door", "gate", "curtain")
+                .keepIf(o -> (o.getWorldLocation().equals(local.getWorldLocation()) || o.getWorldLocation().equals(step.getPosition())))
+                .sortNearest()
+                .first();
+
+        if(StrongholdSecurityQuestion.process(object))
+        {
+            return true;
+        }
+
+        if(object != null)
+        {
+            TileObjectAPI.interact(object, 0);
+            Logger.info("[Pathfinder] Interacting with '" + object.getName() + "'");
+            return true;
+        }
+        else {
+            if (!PlayerAPI.isIdle(local))
+            {
+                return true;
+            }
+            Logger.info("[Pathfinder] Failed to find Passthrough, atempting to circumvent");
+            repath();
+            return true;
+        }
+    }
+
+    private boolean handleTransports() {
+        if(!PlayerAPI.isIdle(client.getLocalPlayer()) && !MovementAPI.isMoving())
+        {
+            return true;
+        }
+        IStep step = steps.get(0);
+        if(!step.hasTransport())
+        {
+            return false;
+        }
+        boolean value = step.getTransport().getHandler().step();
+        if(!value)
+        {
+            steps.remove(step);
+        }
+        return value;
+    }
+
+    private boolean handleTeleport() {
+        if (teleport != null) {
+            boolean state = teleport.getHandlers().step();
+            if(!state) {
+                teleport = null;
+            }
+            return state;
+        }
+        return false;
+    }
+
+    private boolean shouldHandleDialogue(List<? extends IStep> steps) {
+        return DialogueAPI.dialoguePresent() && !steps.isEmpty() && !Location.isReachable(client.getLocalPlayer().getWorldLocation(), steps.get(steps.size() - 1).getPosition());
+    }
+
+    private void handleDialogue() {
+        if(!DialogueAPI.continueDialogue())
+        {
+            if(!DialogueAPI.selectOption("Yes") && !DialogueAPI.selectOption("Okay") && !DialogueAPI.selectOption("Don't ask again"))
+            {
+                DialogueAPI.selectOption(1);
+            }
+        }
+    }
+
+    private void handlePrayer()
+    {
+        if(prayers != null)
+        {
+            PrayerAPI.flickQuickPrayer();
+            if(client.getBoostedSkillLevel(Skill.PRAYER) < prayerDangerZone)
+            {
+                ItemEx pot = InventoryAPI.getItem(i -> ArrayUtils.contains(ItemConstants.PRAYER_POTION, i.getId()));
+                if(pot != null)
+                {
+                    InventoryAPI.interact(pot, 1);
+                }
+            }
+        }
+    }
+
+    private void manageRunEnergyAndHitpoints()
+    {
+        if(DialogueAPI.dialoguePresent())
+        {
+            return;
+        }
+
+        int energy = client.getEnergy() / 100;
+
+        if(!MovementAPI.isRunEnabled() && energy > Setting.toggleRunThreshold)
+        {
+            WidgetAPI.interact(1, WidgetInfo.MINIMAP_TOGGLE_RUN_ORB, -1, -1);
+            Setting.toggleRunThreshold = Setting.toggleRunRange.randomEnclosed();
+        }
+
+        if(energy < Setting.consumeStaminaThreshold && !MovementAPI.staminaInEffect())
+        {
+            ItemEx stam = InventoryAPI.getItem(i -> ArrayUtils.contains(STAMINA, i.getId()));
+
+            if(stam != null)
+            {
+                InventoryAPI.interact(stam, 2);
+                Setting.consumeStaminaThreshold = Setting.consumeStaminaRange.randomEnclosed();
+            }
+        }
+
+        if(energy <= Setting.toggleRunThreshold)
+        {
+            ItemEx stam = InventoryAPI.getItem(i -> ArrayUtils.contains(STAMINA, i.getId()));
+
+            if(stam != null)
+            {
+                InventoryAPI.interact(stam, 2);
+                Setting.toggleRunThreshold = Setting.toggleRunRange.randomEnclosed();
+            }
+        }
+
+        int threshold = healthHandler;
+        int hitpoints = Static.invoke(() -> client.getBoostedSkillLevel(Skill.HITPOINTS));
+
+        if(threshold != 0 && hitpoints <= threshold)
+        {
+            ItemEx item = InventoryQuery.fromInventoryId(InventoryID.INV)
+                    .removeIf(i -> i.getName().contains("Banana") || i.getName().contains("Cabbage"))
+                    .withAction("Eat")
+                    .first();
+            if(item != null)
+                InventoryAPI.interact(item, 1);
+        }
+    }
+}

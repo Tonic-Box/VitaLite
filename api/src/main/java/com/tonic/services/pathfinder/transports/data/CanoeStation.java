@@ -1,10 +1,11 @@
 package com.tonic.services.pathfinder.transports.data;
 
 import com.tonic.api.entities.TileObjectAPI;
-import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.TileObjectQuery;
+import com.tonic.services.pathfinder.model.TransportHandler;
+import com.tonic.services.pathfinder.model.HandlerBuilder;
 import com.tonic.services.pathfinder.transports.Transport;
 import com.tonic.util.WorldPointUtil;
 import lombok.AllArgsConstructor;
@@ -28,52 +29,46 @@ public enum CanoeStation
     private final WorldPoint location;
     private final int WidgetId;
 
-    public void travelTo(CanoeStation destination, Canoe canoe)
+    public TransportHandler travelTo(CanoeStation destination, Canoe canoe)
     {
-        TileObjectEx station = new TileObjectQuery<>()
-                .withName("Canoe Station")
-                .sortNearest()
-                .first();
-        TileObjectAPI.interact(station, "Chop-down");
-        Delays.tick();
-
-        station = new TileObjectQuery<>()
-                .withAction("Shape-Canoe")
-                .sortNearest()
-                .first();
-
-        while(station == null)
-        {
-            Delays.tick();
-            station = new TileObjectQuery<>()
-                    .withAction("Shape-Canoe")
-                    .sortNearest()
-                    .first();
-        }
-
-        TileObjectAPI.interact(station, "Shape-Canoe");
-        Delays.waitUntil(() -> WidgetAPI.get(416, 3) != null);
-        WidgetAPI.interact(1, canoe.getWidgetId(), 0);
-
-        station = new TileObjectQuery<>()
-                .withPartialAction("Float ")
-                .sortNearest()
-                .first();
-
-        while(station == null)
-        {
-            Delays.tick();
-            station = new TileObjectQuery<>()
-                    .withPartialAction("Float ")
-                    .sortNearest()
-                    .first();
-        }
-        TileObjectAPI.interact(station, "Float ");
-        Delays.tick(3);
-
-        TileObjectAPI.interact(station, "Paddle Canoe");
-        Delays.waitUntil(() -> WidgetAPI.get(647, 13) != null);
-        WidgetAPI.interact(1, destination.getWidgetId(), 0);
+        return HandlerBuilder.get()
+                .add(0, () -> {
+                    TileObjectEx station = new TileObjectQuery<>()
+                            .withName("Canoe Station")
+                            .sortNearest()
+                            .first();
+                    TileObjectAPI.interact(station, "Chop-down");
+                })
+                .add(2, () -> {
+                    TileObjectEx station = new TileObjectQuery<>()
+                            .withAction("Shape-Canoe")
+                            .sortNearest()
+                            .first();
+                    if(station != null)
+                    {
+                        TileObjectAPI.interact(station, "Shape-Canoe");
+                        return 3;
+                    }
+                    return 2;
+                })
+                .addDelayUntil(3, () -> WidgetAPI.get(416, 3) != null)
+                .add(4, () -> WidgetAPI.interact(1, canoe.getWidgetId(), 0))
+                .add(5, () -> {
+                    TileObjectEx station = new TileObjectQuery<>()
+                            .withPartialAction("Float ")
+                            .sortNearest()
+                            .first();
+                    if(station != null)
+                    {
+                        TileObjectAPI.interact(station, "Paddle Canoe");
+                        return 6;
+                    }
+                    return 5;
+                })
+                .addDelayUntil(6, () -> WidgetAPI.get(647, 13) != null)
+                .add(7, () -> WidgetAPI.interact(1, destination.getWidgetId(), 0))
+                .addDelay(8, 29)
+                .build();
     }
 
     public static List<Transport> getTravelMatrix()
@@ -99,8 +94,6 @@ public enum CanoeStation
                     int ordinalDiff = Math.abs(endOrdinal - startOrdinal);
                     if (ordinalDiff <= distance)
                     {
-                        List<Runnable> actions = new ArrayList<>();
-                        actions.add(() -> start.travelTo(end, canoe));
                         transports.add(
                                 new Transport(
                                         WorldPointUtil.compress(start.getLocation()),
@@ -108,7 +101,7 @@ public enum CanoeStation
                                         6,
                                         10,
                                         29,
-                                        actions,
+                                        start.travelTo(end, canoe),
                                         canoe.getRequirements(),
                                         -1
                                 )

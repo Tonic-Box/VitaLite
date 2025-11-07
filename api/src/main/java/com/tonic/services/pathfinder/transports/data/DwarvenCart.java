@@ -9,6 +9,8 @@ import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
+import com.tonic.services.pathfinder.model.TransportHandler;
+import com.tonic.services.pathfinder.model.HandlerBuilder;
 import com.tonic.services.pathfinder.requirements.*;
 import lombok.Getter;
 import net.runelite.api.ItemID;
@@ -16,8 +18,6 @@ import net.runelite.api.NPC;
 import net.runelite.api.Quest;
 import net.runelite.api.QuestState;
 import net.runelite.api.coords.WorldPoint;
-
-import java.util.Arrays;
 
 @Getter
 public enum DwarvenCart
@@ -50,53 +50,73 @@ public enum DwarvenCart
 
     public final static WorldPoint KELDEGRIM_WORLDPOINT = new WorldPoint(2906, 10173, 0);
 
-    public void rideBack()
+    public TransportHandler rideBack()
     {
-        if(npcName == null)
-        {
-            TileObjectEx object = new TileObjectQuery<>()
-                    .withNameContains("Trapdoor")
-                    .first();
-            TileObjectAPI.interact(object, "Travel");
-            return;
-        }
+        DialogueNode node = DialogueNode.get()
+                .node("Keldagrim");
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    if(npcName == null)
+                    {
+                        TileObjectEx object = new TileObjectQuery<>()
+                                .withNameContains("Trapdoor")
+                                .first();
+                        TileObjectAPI.interact(object, "Travel");
+                        return 1;
+                    }
 
-        NPC npc = new NpcQuery().withName(npcName).nearest();
-        NpcAPI.interact(npc, "Tickets");
-        while (!DialogueAPI.dialoguePresent())
-        {
-            Delays.tick();
-        }
-        DialogueNode.get()
-                .node("Keldagrim")
-                .process();
-        TileObjectEx object = new TileObjectQuery<>()
-                .withNameContains("Train cart")
-                .first();
-        TileObjectAPI.interact(object, "Ride");
+                    NPC npc = new NpcQuery().withName(npcName).nearest();
+                    NpcAPI.interact(npc, "Tickets");
+                    return 1;
+                })
+                .add(1, () -> DialogueAPI.dialoguePresent() ? 2 : 1)
+                .add(2, () -> node.processStep() ? 2 : 3)
+                .add(3, () -> {
+                    TileObjectEx object = new TileObjectQuery<>()
+                            .withNameContains("Train cart")
+                            .first();
+                    TileObjectAPI.interact(object, "Ride");
+                    return 4;
+                })
+                .addDelay(5, 22);
+        return builder.build();
     }
 
-    public void rideThere()
+    public TransportHandler rideThere()
     {
-        if(npcName != null)
-        {
-            NPC npc = new NpcQuery().withName("Cart conductor").nearest();
-            NpcAPI.interact(npc, "Tickets");
-            while (!DialogueAPI.dialoguePresent())
-            {
-                Delays.tick();
-            }
-            DialogueNode.get()
-                    .node(destinationName)
-                    .process();
-        }
+        DialogueNode node = DialogueNode.get()
+                .node(destinationName);
 
-        MovementAPI.walkToWorldPoint(keldegrimLocation);
-        Delays.tick();
-        Delays.waitUntil(() -> !MovementAPI.isMoving());
-        TileObjectEx object = new TileObjectQuery<>()
-                .withNameContains("Train cart")
-                .first();
-        TileObjectAPI.interact(object, "Ride");
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    if(npcName != null)
+                    {
+                        NPC npc = new NpcQuery().withName("Cart conductor").nearest();
+                        NpcAPI.interact(npc, "Tickets");
+                        while (!DialogueAPI.dialoguePresent())
+                        {
+                            Delays.tick();
+                        }
+                        return 1;
+                    }
+                    return 3;
+                })
+                .add(1, () -> DialogueAPI.dialoguePresent() ? 2 : 1)
+                .add(2, () -> node.processStep() ? 2 : 3)
+                .add(3, () -> {
+                    MovementAPI.walkToWorldPoint(keldegrimLocation);
+                    return 4;
+                })
+                .add(4, () -> MovementAPI.isMoving() ? 4 : 5)
+                .add(5, () -> {
+                    TileObjectEx object = new TileObjectQuery<>()
+                            .withNameContains("Train cart")
+                            .first();
+                    TileObjectAPI.interact(object, "Ride");
+                    return 6;
+                })
+                .addDelay(6, 22);
+
+        return builder.build();
     }
 }

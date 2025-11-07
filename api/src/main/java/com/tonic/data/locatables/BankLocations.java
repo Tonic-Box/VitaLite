@@ -118,6 +118,6 @@ public enum BankLocations {
     public static void walkToNearest()
     {
         List<WorldArea> areas = Arrays.stream(BankLocations.values()).filter(BankLocations::test).map(BankLocations::getArea).collect(Collectors.toList());
-        Walker.walkTo(areas, true);
+        Walker.walkTo(areas);
     }
 }
