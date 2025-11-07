@@ -87,7 +87,6 @@ public class Walker
     private static void walk(WalkerPath walkerPath)
     {
         Client client = Static.getClient();
-        GameManager.setPathPoints(IStep.toWorldPoints(walkerPath.getSteps()));
         try
         {
             WorldPoint end = walkerPath.getSteps().get(walkerPath.getSteps().size() - 1).getPosition();

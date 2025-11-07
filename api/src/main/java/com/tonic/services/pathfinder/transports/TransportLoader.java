@@ -702,7 +702,15 @@ public class TransportLoader
                 .node("take me", " Port ");
 
         HandlerBuilder builder = HandlerBuilder.get()
-                .add(0, () -> NpcLocations.VEOS_PORT_SARIM.interact("Talk-to"))
+                .add(0, () -> {
+                    NPC npc = new NpcQuery().withName(NpcLocations.VEOS_PORT_SARIM.getName()).first();
+                    if(npc == null)
+                    {
+                        return 0;
+                    }
+                    NpcAPI.interact(npc, "Talk-to");
+                    return 1;
+                })
                 .addDelayUntil(1, DialogueAPI::dialoguePresent)
                 .addDelayUntil(2, () -> !node.processStep())
                 .addDelay(3, 4);
