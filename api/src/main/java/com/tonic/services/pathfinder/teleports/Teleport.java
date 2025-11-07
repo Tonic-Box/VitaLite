@@ -1,7 +1,7 @@
 package com.tonic.services.pathfinder.teleports;
 
-import com.tonic.services.pathfinder.model.TransportHandler;
-import com.tonic.services.pathfinder.model.HandlerBuilder;
+import com.tonic.util.handler.StepHandler;
+import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.util.WorldPointUtil;
 import lombok.Value;
 import net.runelite.api.coords.WorldPoint;
@@ -14,7 +14,7 @@ public class Teleport
 {
     WorldPoint destination;
     int radius;
-    TransportHandler handlers;
+    StepHandler handlers;
 
     public Teleport(WorldPoint destination, int radius, List<Runnable> handlers){
         this.destination = destination;
@@ -37,7 +37,7 @@ public class Teleport
         this.handlers = builder.build();
     }
 
-    public Teleport(WorldPoint destination, int radius, TransportHandler handler){
+    public Teleport(WorldPoint destination, int radius, StepHandler handler){
         this.destination = destination;
         this.radius = radius;
         this.handlers = handler;

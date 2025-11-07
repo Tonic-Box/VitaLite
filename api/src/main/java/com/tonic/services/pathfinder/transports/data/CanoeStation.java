@@ -3,9 +3,9 @@ package com.tonic.services.pathfinder.transports.data;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.TileObjectEx;
+import com.tonic.util.handler.StepHandler;
 import com.tonic.queries.TileObjectQuery;
-import com.tonic.services.pathfinder.model.TransportHandler;
-import com.tonic.services.pathfinder.model.HandlerBuilder;
+import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.services.pathfinder.transports.Transport;
 import com.tonic.util.WorldPointUtil;
 import lombok.AllArgsConstructor;
@@ -29,7 +29,7 @@ public enum CanoeStation
     private final WorldPoint location;
     private final int WidgetId;
 
-    public TransportHandler travelTo(CanoeStation destination, Canoe canoe)
+    public StepHandler travelTo(CanoeStation destination, Canoe canoe)
     {
         return HandlerBuilder.get()
                 .add(0, () -> {

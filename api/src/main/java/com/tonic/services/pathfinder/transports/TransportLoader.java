@@ -7,19 +7,18 @@ import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.*;
-import com.tonic.api.threaded.DialogueNode;
+import com.tonic.util.DialogueNode;
 import com.tonic.api.threaded.WorldsAPI;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.ItemEx;
-import com.tonic.data.locatables.NpcLocations;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.pathfinder.Walker;
-import com.tonic.services.pathfinder.model.HandlerBuilder;
+import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.services.pathfinder.model.TransportDto;
 import com.tonic.services.pathfinder.requirements.*;
 import com.tonic.services.pathfinder.teleports.MovementConstants;
@@ -154,33 +153,33 @@ public class TransportLoader
                 {
                     if (VarAPI.getVar(VarbitID.CLUEQUEST) >= 7 || !filter)
                     {
-                        transports.add(npcDialogTransport(new WorldPoint(3054, 3245, 0),
+                        transports.add(npcDialogTransport(new WorldPoint(3055, 3245, 0),
                                 new WorldPoint(1824, 3691, 0),
                                 8484,
                                 "Can you take me to Great Kourend?"));
                     }
                     else
                     {
-                        transports.add(npcDialogTransport(new WorldPoint(3054, 3245, 0),
-                                new WorldPoint(1824, 3691, 0),
+                        transports.add(npcDialogTransport(new WorldPoint(3055, 3245, 0),
+                                new WorldPoint(3055, 3245, 0),
                                 8484,
                                 "That's great, can you take me there please?"));
                     }
                 }
-                else if (QuestAPI.isInProgress(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
+                else if (QuestAPI.hasState(Quest.A_KINGDOM_DIVIDED, QuestState.IN_PROGRESS, QuestState.FINISHED) || !filter) // Veos is replaced during/after quest
                 {
-                    transports.add(npcTransport(new WorldPoint(3053, 3245, 0),
-                            new WorldPoint(1824, 3695, 1),
+                    transports.add(npcBoatTransport(new WorldPoint(3055, 3245, 0),
+                            new WorldPoint(1824, 3691, 0),
                             "Cabin Boy Herbert",
-                            "Port Piscarilius"));
-                    transports.add(npcTransport(new WorldPoint(3053, 3245, 0),
-                            new WorldPoint(1504, 3395, 1),
+                            "Port Piscarilius", 4));
+                    transports.add(npcBoatTransport(new WorldPoint(3055, 3245, 0),
+                            new WorldPoint(1504, 3399, 0),
                             "Cabin Boy Herbert",
-                            "Land's End"));
+                            "Land's End", 4));
                 }
                 else // Has talked to Veos before
                 {
-                    transports.add(npcTransport(new WorldPoint(3054, 3245, 0),
+                    transports.add(npcTransport(new WorldPoint(3055, 3245, 0),
                             new WorldPoint(1824, 3695, 1),
                             "Veos",
                             "Port Piscarilius"));
@@ -310,17 +309,17 @@ public class TransportLoader
                 // Port Piscarilius
                 if (QuestAPI.isCompleted(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
                 {
-                    transports.add(npcTransport(new WorldPoint(1826, 3691, 0), new WorldPoint(3055, 3242, 1), 10932, "Port Sarim"));
-                    transports.add(npcTransport(new WorldPoint(1826, 3691, 0), new WorldPoint(1504, 3395, 1), 10932, "Land's End"));
+                    transports.add(npcBoatTransport(new WorldPoint(1824, 3691, 0), new WorldPoint(3055, 3245, 0), 10932, "Port Sarim", 4));
+                    transports.add(npcBoatTransport(new WorldPoint(1824, 3691, 0), new WorldPoint(1504, 3399, 0), 10932, "Land's End", 4));
                 }
                 else
                 {
-                    transports.add(npcTransport(new WorldPoint(1824, 3691, 0), new WorldPoint(3055, 3242, 1), 10727, "Port Sarim"));
+                    transports.add(npcBoatTransport(new WorldPoint(1824, 3691, 0), new WorldPoint(3055, 3245, 0), 10727, "Port Sarim", 4));
                 }
 
                 // Land's End
-                transports.add(npcTransport(new WorldPoint(1504, 3401, 0), new WorldPoint(3055, 3242, 1), 7471, "Port Sarim"));
-                transports.add(npcTransport(new WorldPoint(1504, 3401, 0), new WorldPoint(1824, 3695, 1), 7471, "Port Piscarilius"));
+                transports.add(npcBoatTransport(new WorldPoint(1504, 3399, 0), new WorldPoint(3055, 3245, 0), 7471, "Port Sarim", 4));
+                transports.add(npcBoatTransport(new WorldPoint(1504, 3399, 0), new WorldPoint(1824, 3691, 0), 7471, "Port Piscarilius", 4));
 
                 // Glarial's tomb
                 transports.add(itemUseTransport(new WorldPoint(2557, 3444, 0), new WorldPoint(2555, 9844, 0), 294, 1992));
@@ -656,7 +655,26 @@ public class TransportLoader
                         })
                         .add(3, () -> 4)
                         .addDelayUntil(4, () -> !node.processStep())
-                        .addDelay(5, 5);
+                        .addDelay(5, 5)
+                        .add(3, () -> {
+                            Client client = Static.getClient();
+                            WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                            if(worldPoint.getPlane() != 1)
+                            {
+                                return 99;
+                            }
+                            TileObjectEx plank = new TileObjectQuery<>()
+                                    .withAction("Cross")
+                                    .nearest();
+
+                            if(plank == null)
+                            {
+                                return 99;
+                            }
+                            TileObjectAPI.interact(plank, "Cross");
+                            return 4;
+                        })
+                        .addDelay(4, 1);
 
                 Transport transport = new Transport(
                         WorldPointUtil.compress(charterShip.getLocation()),
@@ -902,6 +920,96 @@ public class TransportLoader
                 NpcAPI.interact(npc, action);
             }
         }, -1);
+    }
+
+    public static Transport npcBoatTransport(
+            WorldPoint source,
+            WorldPoint destination,
+            int npcId,
+            String action,
+            int delay
+    )
+    {
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    NPC npc = new NpcQuery()
+                            .withIds(npcId)
+                            .within(source, 10)
+                            .first();
+                    if (npc != null)
+                    {
+                        NpcAPI.interact(npc, action);
+                        return 1;
+                    }
+                    return 0;
+                })
+                .addDelayUntil(1, () -> !MovementAPI.isMoving())
+                .addDelay(2, delay)
+                .add(3, () -> {
+                    Client client = Static.getClient();
+                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    if(worldPoint.getPlane() != 1)
+                    {
+                        return 99;
+                    }
+                    TileObjectEx plank = new TileObjectQuery<>()
+                            .withAction("Cross")
+                            .nearest();
+
+                    if(plank == null)
+                    {
+                        return 99;
+                    }
+                    TileObjectAPI.interact(plank, "Cross");
+                    return 4;
+                })
+                .addDelay(4, 1);
+        return new LongTransport(source, destination, 10, 0, builder.build());
+    }
+
+    public static Transport npcBoatTransport(
+            WorldPoint source,
+            WorldPoint destination,
+            String npcName,
+            String action,
+            int delay
+    )
+    {
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    NPC npc = new NpcQuery()
+                            .withName(npcName)
+                            .within(source, 10)
+                            .first();
+                    if (npc != null)
+                    {
+                        NpcAPI.interact(npc, action);
+                        return 1;
+                    }
+                    return 0;
+                })
+                .addDelayUntil(1, () -> !MovementAPI.isMoving())
+                .addDelay(2, delay)
+                .add(3, () -> {
+                    Client client = Static.getClient();
+                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    if(worldPoint.getPlane() != 1)
+                    {
+                        return 99;
+                    }
+                    TileObjectEx plank = new TileObjectQuery<>()
+                            .withAction("Cross")
+                            .nearest();
+
+                    if(plank == null)
+                    {
+                        return 99;
+                    }
+                    TileObjectAPI.interact(plank, "Cross");
+                    return 4;
+                })
+                .addDelay(4, 1);
+        return new LongTransport(source, destination, 10, 0, builder.build());
     }
 
     public static Transport npcDialogTransport(

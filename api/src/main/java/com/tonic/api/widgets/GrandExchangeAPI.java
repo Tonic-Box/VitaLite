@@ -4,11 +4,13 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.game.ClientScriptAPI;
+import com.tonic.api.handlers.GrandExchangeHandler;
 import com.tonic.api.threaded.Delays;
 import com.tonic.data.GrandExchangeSlot;
 import com.tonic.data.ItemEx;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.PacketInteractionType;
+import com.tonic.util.handler.StepHandler;
 import net.runelite.api.Client;
 import net.runelite.api.GrandExchangeOffer;
 import net.runelite.api.GrandExchangeOfferState;
@@ -236,6 +238,22 @@ public class GrandExchangeAPI
             WidgetAPI.interact(1, slot.getId(), 2, -1);
             WidgetAPI.interact(n, InterfaceID.GeOffers.DETAILS_COLLECT, 2, itemId);
             WidgetAPI.interact(1, InterfaceID.GeOffers.DETAILS_COLLECT, 3, ItemID.COINS);
+        });
+    }
+
+    /**
+     * Collects gold from from a specified Grand Exchange slot (fromm sell offer).
+     * @param slotNumber The slot number (1-8) to collect from.
+     */
+    public static void collectFromSlot(int slotNumber)
+    {
+        GrandExchangeSlot slot = GrandExchangeSlot.getBySlot(slotNumber);
+        if(slot == null)
+            return;
+        Static.invoke(() -> {
+            int itemId = slot.getItemId();
+            WidgetAPI.interact(1, slot.getId(), 2, -1);
+            WidgetAPI.interact(2, InterfaceID.GeOffers.DETAILS_COLLECT, 2, itemId);
         });
     }
 

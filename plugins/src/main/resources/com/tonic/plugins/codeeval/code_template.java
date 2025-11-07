@@ -35,6 +35,9 @@ import com.tonic.queries.*;
 import com.tonic.util.*;
 import com.tonic.data.*;
 
+import com.tonic.util.handler.*;
+import com.tonic.api.handlers.*;
+
 // VitaLite classes (should be available since they're compiled)
 import com.tonic.services.GameManager;
 

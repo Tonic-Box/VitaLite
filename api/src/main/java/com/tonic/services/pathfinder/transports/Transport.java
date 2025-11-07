@@ -1,6 +1,6 @@
 package com.tonic.services.pathfinder.transports;
 
-import com.tonic.services.pathfinder.model.TransportHandler;
+import com.tonic.util.handler.StepHandler;
 import com.tonic.services.pathfinder.requirements.Requirements;
 import com.tonic.util.WorldPointUtil;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ public class Transport
     int sourceRadius;
     int destinationRadius;
     int duration;
-    TransportHandler handler;
+    StepHandler handler;
     Requirements requirements;
     int id;
 
@@ -32,7 +32,7 @@ public class Transport
         this.destination = WorldPointUtil.compress(destination);
         this.sourceRadius = sourceRadius;
         this.destinationRadius = destinationRadius;
-        this.handler = TransportHandler.simple(handler, 1);
+        this.handler = StepHandler.simple(handler, 1);
         this.requirements = new Requirements();
         this.duration = 1;
         this.id = id;
@@ -51,7 +51,7 @@ public class Transport
         this.destination = WorldPointUtil.compress(destination);
         this.sourceRadius = sourceRadius;
         this.destinationRadius = destinationRadius;
-        this.handler = TransportHandler.simple(handler, 1);
+        this.handler = StepHandler.simple(handler, 1);
         this.requirements = requirements;
         this.duration = 1;
         this.id = id;
@@ -69,7 +69,7 @@ public class Transport
         this.destination = destination;
         this.sourceRadius = sourceRadius;
         this.destinationRadius = destinationRadius;
-        this.handler = TransportHandler.simple(handler, 1);
+        this.handler = StepHandler.simple(handler, 1);
         this.requirements = new Requirements();
         this.duration = 1;
         this.id = id;
@@ -88,7 +88,7 @@ public class Transport
         this.destination = destination;
         this.sourceRadius = sourceRadius;
         this.destinationRadius = destinationRadius;
-        this.handler = TransportHandler.simple(handler, 1);
+        this.handler = StepHandler.simple(handler, 1);
         this.requirements = new Requirements();
         this.duration = duration;
         this.id = id;
@@ -107,7 +107,7 @@ public class Transport
         this.destination = destination;
         this.sourceRadius = sourceRadius;
         this.destinationRadius = destinationRadius;
-        this.handler = TransportHandler.simple(handler, 1);
+        this.handler = StepHandler.simple(handler, 1);
         this.requirements = requirements;
         this.duration = 1;
         this.id = id;
@@ -117,7 +117,7 @@ public class Transport
                      WorldPoint destination,
                      int sourceRadius,
                      int destinationRadius,
-                     TransportHandler handler,
+                     StepHandler handler,
                      int delayAfter,
                      int id
     )

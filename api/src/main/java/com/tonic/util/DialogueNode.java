@@ -1,7 +1,7 @@
-package com.tonic.api.threaded;
+package com.tonic.util;
 
+import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.DialogueAPI;
-import com.tonic.util.TextUtil;
 
 import java.util.Arrays;
 import java.util.HashMap;

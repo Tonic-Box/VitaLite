@@ -10,6 +10,7 @@ import com.tonic.data.TileObjectEx;
 import com.tonic.data.locatables.NpcLocations;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.pathfinder.Walker;
+import com.tonic.util.DialogueNode;
 import com.tonic.util.WorldPointUtil;
 import lombok.Setter;
 import net.runelite.api.Client;

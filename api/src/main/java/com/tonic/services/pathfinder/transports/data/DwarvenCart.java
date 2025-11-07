@@ -4,13 +4,13 @@ import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.threaded.Delays;
-import com.tonic.api.threaded.DialogueNode;
+import com.tonic.util.DialogueNode;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.data.TileObjectEx;
+import com.tonic.util.handler.StepHandler;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
-import com.tonic.services.pathfinder.model.TransportHandler;
-import com.tonic.services.pathfinder.model.HandlerBuilder;
+import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.services.pathfinder.requirements.*;
 import lombok.Getter;
 import net.runelite.api.ItemID;
@@ -50,7 +50,7 @@ public enum DwarvenCart
 
     public final static WorldPoint KELDEGRIM_WORLDPOINT = new WorldPoint(2906, 10173, 0);
 
-    public TransportHandler rideBack()
+    public StepHandler rideBack()
     {
         DialogueNode node = DialogueNode.get()
                 .node("Keldagrim");
@@ -82,7 +82,7 @@ public enum DwarvenCart
         return builder.build();
     }
 
-    public TransportHandler rideThere()
+    public StepHandler rideThere()
     {
         DialogueNode node = DialogueNode.get()
                 .node(destinationName);
