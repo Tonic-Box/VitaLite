@@ -163,7 +163,7 @@ public class TransportEditorFrame extends JFrame {
         });
 
         cancel = new JMenuItem("Cancel Test");
-        cancel.addActionListener(e -> Walker.cancelWalk());
+        cancel.addActionListener(e -> Walker.cancel());
         testsMenu.add(cancel);
         JMenuItem bankMenuItem = new JMenuItem("Bank");
         bankMenuItem.addActionListener(e -> ThreadPool.submit(BankLocations::walkToNearest));

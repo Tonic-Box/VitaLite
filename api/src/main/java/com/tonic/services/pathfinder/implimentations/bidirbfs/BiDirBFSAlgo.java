@@ -311,6 +311,9 @@ public class BiDirBFSAlgo implements IPathfinder
         // Reverse backward path since it was built from goal to meeting point
         Collections.reverse(backwardPath);
 
+        // Fix transports in reversed backward path - they now point in wrong direction
+        reverseTransports(backwardPath);
+
         // Remove the duplicate meeting point from one of the paths
         if(!backwardPath.isEmpty())
         {
@@ -321,6 +324,53 @@ public class BiDirBFSAlgo implements IPathfinder
         forwardPath.addAll(backwardPath);
 
         return forwardPath;
+    }
+
+    /**
+     * Reverses transports in a reversed path so they point in the correct direction.
+     * After reversing a path, transports point backward - this fixes them to point forward.
+     */
+    private void reverseTransports(List<BiDirBFSStep> path)
+    {
+        // For each step with a transport, find its reverse
+        for (int i = 0; i < path.size(); i++)
+        {
+            BiDirBFSStep step = path.get(i);
+            Transport currentTransport = step.getTransport();
+
+            if (currentTransport != null)
+            {
+                // Current transport goes from step position to some destination
+                // We need the reverse: from destination back to step position
+                int currentPos = step.getPackedPosition();
+                int transportDest = currentTransport.getDestination();
+
+                // Look at destination for transport going back to source
+                Transport reverseTransport = findTransport(transportDest, currentPos);
+
+                // Replace step with reversed transport
+                path.set(i, new BiDirBFSStep(currentPos, reverseTransport));
+            }
+        }
+    }
+
+    /**
+     * Finds a transport from source position to destination position.
+     */
+    private Transport findTransport(int source, int destination)
+    {
+        ArrayList<Transport> transports = TransportLoader.getTransports().get(source);
+        if (transports != null)
+        {
+            for (Transport t : transports)
+            {
+                if (t.getDestination() == destination)
+                {
+                    return t;
+                }
+            }
+        }
+        return null;
     }
 
     private void addNeighborsLocal(final int node, final HybridIntQueue queue, final BiDirBFSCache visited, boolean isForward)

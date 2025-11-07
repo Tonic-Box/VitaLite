@@ -1,7 +1,11 @@
 package com.tonic.services;
 
+import com.tonic.Static;
 import net.runelite.api.Client;
+import net.runelite.api.Perspective;
 import net.runelite.api.Point;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -165,6 +169,73 @@ public class ClickVisualizationOverlay extends Overlay {
 
         public Color getColor() {
             return color;
+        }
+    }
+
+    /**
+     * Record a click visualization for walking to a destination
+     * @param destination The destination WorldPoint
+     */
+    public static void recordWalkClick(WorldPoint destination) {
+        if (destination == null) {
+            return;
+        }
+
+        Client client = Static.getClient();
+
+        try {
+            LocalPoint localPoint = LocalPoint.fromWorld(client, destination);
+            if (localPoint != null) {
+                Point screenPoint = Perspective.localToCanvas(client, localPoint, client.getPlane());
+
+                boolean isValidScreenPoint = false;
+                if (screenPoint != null) {
+                    java.awt.Rectangle viewport = client.getCanvas().getBounds();
+                    isValidScreenPoint = screenPoint.getX() >= 0 &&
+                            screenPoint.getX() <= viewport.width &&
+                            screenPoint.getY() >= 0 &&
+                            screenPoint.getY() <= viewport.height;
+                }
+
+                if (screenPoint != null && isValidScreenPoint) {
+                    Polygon tilePoly = Perspective.getCanvasTilePoly(client, localPoint);
+                    if (tilePoly != null) {
+                        ClickManager.queueClickBox(tilePoly);
+                    } else {
+                        ClickManager.setPoint(screenPoint.getX(), screenPoint.getY());
+                    }
+
+                    ClickVisualizationOverlay.recordClick(
+                            screenPoint.getX(),
+                            screenPoint.getY(),
+                            ClickVisualizationOverlay.ClickType.MOVEMENT,
+                            "Walk"
+                    );
+                } else {
+                    Point minimapPoint = Static.invoke(() -> Perspective.localToMinimap(client, localPoint));
+                    if (minimapPoint != null) {
+                        int radius = 3;
+                        int[] xPoints = new int[8];
+                        int[] yPoints = new int[8];
+                        for (int i = 0; i < 8; i++) {
+                            double angle = 2 * Math.PI * i / 8;
+                            xPoints[i] = minimapPoint.getX() + (int)(radius * Math.cos(angle));
+                            yPoints[i] = minimapPoint.getY() + (int)(radius * Math.sin(angle));
+                        }
+                        Polygon minimapClickBox = new Polygon(xPoints, yPoints, 8);
+
+                        ClickManager.queueClickBox(minimapClickBox);
+
+                        ClickVisualizationOverlay.recordClick(
+                                minimapPoint.getX(),
+                                minimapPoint.getY(),
+                                ClickVisualizationOverlay.ClickType.MOVEMENT,
+                                "Walk (Minimap)"
+                        );
+                    }
+                }
+            }
+        } catch (Exception e) {
         }
     }
 }

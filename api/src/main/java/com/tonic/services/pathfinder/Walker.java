@@ -3,50 +3,23 @@ package com.tonic.services.pathfinder;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.entities.PlayerAPI;
-import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.threaded.Delays;
-import com.tonic.api.widgets.DialogueAPI;
-import com.tonic.api.widgets.InventoryAPI;
-import com.tonic.api.widgets.PrayerAPI;
-import com.tonic.api.widgets.WidgetAPI;
-import com.tonic.data.ItemConstants;
-import com.tonic.data.ItemEx;
-import com.tonic.data.StrongholdSecurityQuestion;
-import com.tonic.data.TileObjectEx;
-import com.tonic.queries.InventoryQuery;
-import com.tonic.queries.TileObjectQuery;
-import com.tonic.services.ClickManager;
-import com.tonic.services.GameManager;
 import com.tonic.services.ClickVisualizationOverlay;
+import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.abstractions.IStep;
 import com.tonic.services.pathfinder.collision.CollisionMap;
 import com.tonic.services.pathfinder.collision.GlobalCollisionMap;
+import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.services.pathfinder.objects.ObjectMap;
-import com.tonic.services.pathfinder.teleports.Teleport;
-import com.tonic.services.pathfinder.transports.TransportLoader;
-import com.tonic.util.Coroutine;
 import com.tonic.util.IntPair;
 import com.tonic.util.Location;
-import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
-import lombok.Setter;
-import net.runelite.api.*;
-import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.Client;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.InventoryID;
-import net.runelite.api.gameval.ItemID;
-import net.runelite.api.widgets.WidgetInfo;
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.awt.Polygon;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * A worldWalker
@@ -67,171 +40,20 @@ public class Walker
     private static CollisionMap collisionMap;
     @Getter
     private static ObjectMap objectMap;
-
-    private static final Map<WorldPoint, WorldPoint> tileRedirects = new HashMap<>();
-    private static final int[] STAMINA = {ItemID._1DOSESTAMINA,ItemID._2DOSESTAMINA,ItemID._3DOSESTAMINA,ItemID._4DOSESTAMINA};
-    private static final Walker instance = new Walker();
-
-    private final Client client;
-
-    private boolean running = false;
-    private int cooldown = 0;
-    private int timeout = 0;
-    private int recalcs = 0;
-    @Setter
-    private int healthHandler = 0;
-    @Setter
-    private PrayerAPI[] prayers = null;
-    private final int prayerDangerZone;
-    private int timer;
-    private Teleport teleport;
-    private final List<Runnable> multiSteps = new ArrayList<>();
-    private int multiStepPointer = 0;
-    @Getter
-    @Setter
-    private boolean useTeleports = true;
-    private boolean justInteracted = false;
-    private int repathDelay = 0;
+    private static boolean running = false;
 
     private Walker()
     {
-        this.client = Static.getClient();
-        prayerDangerZone = client.getRealSkillLevel(Skill.PRAYER) / 2;
+
     }
 
     public static class Setting
     {
-        private static IntPair toggleRunRange = new IntPair(25, 35);
-        private static IntPair consumeStaminaRange = new IntPair(50, 60);
+        public static IntPair toggleRunRange = new IntPair(25, 35);
+        public static IntPair consumeStaminaRange = new IntPair(50, 60);
 
-        private static int toggleRunThreshold = toggleRunRange.randomEnclosed();
-        private static int consumeStaminaThreshold = consumeStaminaRange.randomEnclosed();
-    }
-
-    /**
-     * Add a tile redirect - when trying to walk to the 'from' tile, walk to the 'to' tile instead
-     * @param from The blocked/problematic tile
-     * @param to The alternative tile to walk to instead
-     */
-    public static void addTileRedirect(WorldPoint from, WorldPoint to)
-    {
-        tileRedirects.put(from, to);
-        Logger.info("[Walker] Added tile redirect: " + from + " -> " + to);
-    }
-
-    /**
-     * Remove a specific tile redirect
-     * @param from The tile to remove the redirect for
-     */
-    public static void removeTileRedirect(WorldPoint from)
-    {
-        WorldPoint removed = tileRedirects.remove(from);
-        if (removed != null)
-        {
-            Logger.info("[Walker] Removed tile redirect: " + from + " -> " + removed);
-        }
-    }
-
-    /**
-     * Clear all tile redirects
-     */
-    public static void clearTileRedirects()
-    {
-        int count = tileRedirects.size();
-        tileRedirects.clear();
-        Logger.info("[Walker] Cleared " + count + " tile redirects");
-    }
-
-    /**
-     * Check if a tile has a redirect configured
-     * @param tile The tile to check
-     * @return true if a redirect exists, false otherwise
-     */
-    public static boolean hasTileRedirect(WorldPoint tile)
-    {
-        return tileRedirects.containsKey(tile);
-    }
-
-    /**
-     * Get the redirect for a tile, or the original tile if no redirect exists
-     * @param tile The tile to get the redirect for
-     * @return The redirect tile if one exists, otherwise the original tile
-     */
-    public static WorldPoint getTileRedirect(WorldPoint tile)
-    {
-        WorldPoint redirect = tileRedirects.get(tile);
-        return redirect != null ? redirect : tile;
-    }
-
-    /**
-     * Apply tile redirects to a target WorldPoint before walking
-     * @param target The target WorldPoint
-     * @return The redirected WorldPoint if a redirect exists, otherwise the original
-     */
-    private WorldPoint applyRedirect(WorldPoint target)
-    {
-        if (target == null)
-        {
-            return null;
-        }
-
-        WorldPoint redirect = tileRedirects.get(target);
-        if (redirect != null)
-        {
-            Logger.info("[Walker] Applying tile redirect: " + target + " -> " + redirect);
-            return redirect;
-        }
-
-        return target;
-    }
-
-    public static void cancelWalk()
-    {
-        instance.cancel();
-    }
-
-    /**
-     * Check if the walker is currently walking
-     * @return true if walking, false if not
-     */
-    public static boolean isWalking()
-    {
-        return instance.running;
-    }
-
-    /**
-     * Walk to a target point, eating at the specified hitpoints
-     * @param target target point
-     * @param eatAtHp hitpoints to eat at
-     */
-    public static void walkTo(WorldPoint target, int eatAtHp)
-    {
-        instance.setHealthHandler(eatAtHp);
-        walkTo(target, true);
-    }
-
-    /**
-     * Walk to a target point, using the specified prayers
-     * @param target target point
-     * @param prayers prayers to use
-     */
-    public static void walkTo(WorldPoint target, PrayerAPI... prayers)
-    {
-        instance.setPrayers(prayers);
-        walkTo(target, true);
-    }
-
-    /**
-     * Walk to a target point, eating at the specified hitpoints and using the specified prayers
-     * @param target target point
-     * @param eatAtHp hitpoints to eat at
-     * @param prayers prayers to use
-     */
-    public static void walkTo(WorldPoint target, int eatAtHp, PrayerAPI... prayers)
-    {
-        instance.setHealthHandler(eatAtHp);
-        instance.setPrayers(prayers);
-        walkTo(target, true);
+        public static int toggleRunThreshold = toggleRunRange.randomEnclosed();
+        public static int consumeStaminaThreshold = consumeStaminaRange.randomEnclosed();
     }
 
     /**
@@ -240,165 +62,40 @@ public class Walker
      */
     public static void walkTo(WorldPoint target)
     {
-        walkTo(target, true);
-    }
-
-    /**
-     * Walk to a target point, optionally using teleports
-     * @param target target point
-     * @param useTeleports true to use teleports, false to not
-     */
-    public static void walkTo(WorldPoint target, boolean useTeleports)
-    {
-        instance.walk(target, useTeleports);
-    }
-
-    /**
-     * Walk to one of the specified areas (closest), eating at the specified hitpoints
-     * @param areas target areas
-     * @param eatAtHp hitpoints to eat at
-     * @param useTeleports true to use teleports, false to not
-     */
-    public static void walkTo(List<WorldArea> areas, int eatAtHp, boolean useTeleports, PrayerAPI... prayers)
-    {
-        instance.setHealthHandler(eatAtHp);
-        instance.setPrayers(prayers);
-        instance.walk(areas, useTeleports);
+        walk(target);
     }
 
     /**
      * Walk to one of the specified areas (closest)
      * @param areas target areas
-     * @param useTeleports true to use teleports, false to not
      */
-    public static void walkTo(List<WorldArea> areas, boolean useTeleports)
+    public static void walkTo(List<WorldArea> areas)
     {
-        instance.walk(areas, useTeleports);
+        walk(areas);
     }
 
-    /**
-     * Walk the specified steps, using the specified teleport
-     * @param steps steps
-     * @param teleport teleport
-     */
-    public static void walkTo(List<? extends IStep> steps, Teleport teleport)
-    {
-        instance.walk(steps, teleport);
+    private static void walk(WorldPoint target) {
+        WalkerPath walkerPath = WalkerPath.get(target);
+        walk(walkerPath);
     }
 
-    public void walk(List<WorldArea> targets, boolean useTeleports)
-    {
-        if(running)
-        {
-            return;
-        }
-        running = true;
-
-        reset();
-        this.useTeleports = useTeleports;
-        TransportLoader.refreshTransports();
-        final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
-
-        List<? extends IStep> steps = engine.find(targets);
-        if(useTeleports && engine.getTeleport() != null)
-            teleport = engine.getTeleport();
-        walkTo(steps);
-        running = false;
+    private static void walk(List<WorldArea> targets) {
+        WalkerPath walkerPath = WalkerPath.get(targets);
+        walk(walkerPath);
     }
 
-    public void walk(WorldPoint target, boolean useTeleports)
+    private static void walk(WalkerPath walkerPath)
     {
-        if(running)
-        {
-            return;
-        }
-        running = true;
-
-        target = applyRedirect(target);
-
-        WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
-        if (playerLocation.equals(target))
-        {
-            running = false;
-            return;
-        }
-
-        reset();
-        this.useTeleports = useTeleports;
-        TransportLoader.refreshTransports();
-        final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
-
-        List<? extends IStep> steps = engine.find(target);
-        if(useTeleports && engine.getTeleport() != null)
-            teleport = engine.getTeleport();
-        walkTo(steps);
-        running = false;
-    }
-
-    public void walk(List<? extends IStep> steps, Teleport teleport)
-    {
-        if(running)
-        {
-            return;
-        }
-        running = true;
-
-        reset();
-        this.useTeleports = true;
-        if(teleport != null)
-            this.teleport = teleport;
-        walkTo(steps);
-        running = false;
-    }
-
-    private void reset()
-    {
-        repathDelay = 0;
-        teleport = null;
-        cooldown = 0;
-        timeout = 0;
-        recalcs = 0;
-        timer = 0;
-        multiSteps.clear();
-        multiStepPointer = 0;
-        this.useTeleports = true;
-
-        if(healthHandler == 0)
-        {
-            healthHandler = (int) (Static.invoke(() -> client.getRealSkillLevel(Skill.HITPOINTS))* 0.8);
-        }
-    }
-
-    /**
-     * Traverses the supplied path.
-     * NOTE: This CANNOT be ran on the client thread.
-     * @param path path
-     */
-    private void walkTo(List<? extends IStep> path)
-    {
-        if(path == null || path.isEmpty())
-        {
-            return;
-        }
-        GameManager.setPathPoints(IStep.toWorldPoints(path));
+        Client client = Static.getClient();
+        GameManager.setPathPoints(IStep.toWorldPoints(walkerPath.getSteps()));
         try
         {
-            timer = client.getTickCount();
-            Delays.tick();
-            if(prayers != null)
-            {
-                PrayerAPI.setQuickPrayer(prayers);
-            }
-            handlePrayer();
-            WorldPoint end = path.get(path.size() - 1).getPosition();
-            while(traverse(path))
+            WorldPoint end = walkerPath.getSteps().get(walkerPath.getSteps().size() - 1).getPosition();
+            running = true;
+            while(walkerPath.step())
             {
                 if(!running)
                 {
-                    prayers = null;
-                    healthHandler = 0;
-                    System.out.println("Pathfinder took: " + (client.getTickCount() - timer) + " ticks");
-                    timer = 0;
                     GameManager.clearPathPoints();
                     return;
                 }
@@ -408,453 +105,44 @@ public class Walker
             WorldPoint worldPoint = Static.invoke(() -> client.getLocalPlayer().getWorldLocation());
             while(!worldPoint.equals(end) && timeout > 0)
             {
-                handlePrayer();
                 Delays.tick();
                 if(PlayerAPI.isIdle(client.getLocalPlayer()))
                 {
                     timeout--;
                     if(!Location.isReachable(client.getLocalPlayer().getWorldLocation(), end))
                     {
-                        final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
-                        List<? extends IStep> path2 =  engine.find(end);
-                        walkTo(path2);
+                        walkTo(end);
                         GameManager.clearPathPoints();
                         return;
                     }
-                    recordWalkClick(end);
+                    ClickVisualizationOverlay.recordWalkClick(end);
                     MovementAPI.walkToWorldPoint(end);
-                    handlePrayer();
                     Delays.tick();
                 }
                 worldPoint = Static.invoke(() -> client.getLocalPlayer().getWorldLocation());
                 if(!running)
                 {
-                    prayers = null;
-                    healthHandler = 0;
-                    System.out.println("Pathfinder took: " + (client.getTickCount() - timer) + " ticks");
-                    timer = 0;
+                    walkerPath.shutdown();
                     GameManager.clearPathPoints();
                     return;
                 }
             }
         }
         finally {
-            prayers = null;
-            healthHandler = 0;
-            running = false;
-            System.out.println("Pathfinder took: " + (client.getTickCount() - timer) + " ticks");
-            timer = 0;
+            walkerPath.shutdown();
             GameManager.clearPathPoints();
+            running = false;
         }
     }
 
-    private void cancel()
+    public static void cancel()
     {
         running = false;
         GameManager.clearPathPoints();
     }
 
-    /**
-     * Traverse a step map from the pathfinder. Call this method from the
-     * GameTick event until it returns false.
-     * @param steps step map
-     * @return true if there's more to process, false if it's done. Note,
-     * it will call done after its sent the final walk, not once its
-     * actually at the final tile.
-     */
-    public boolean traverse(List<? extends IStep> steps) {
-        if(steps == null)
-        {
-            Logger.error("[Pathfinder] Steps are null");
-            return false;
-        }
-
-        if (isCancelledOrTimedOut(steps)) {
-            return false;
-        }
-
-        if(!client.getGameState().equals(GameState.LOGGED_IN))
-        {
-            return !steps.isEmpty();
-        }
-
-        if(handleTeleport())
-        {
-            return !steps.isEmpty();
-        }
-
-        if(justInteracted)
-        {
-            if(!PlayerAPI.isIdle(client.getLocalPlayer()) && !MovementAPI.isMoving())
-            {
-                return !steps.isEmpty();
-            }
-            justInteracted = false;
-        }
-
-        if(handleMultiSteps())
-        {
-            return !steps.isEmpty();
-        }
-
-        if(applyCooldown())
-        {
-            return !steps.isEmpty();
-        }
-
-        if (shouldHandleDialogue(steps)) {
-            handleDialogue();
-            return true;
-        }
-
-        if (steps.isEmpty()) {
-            return false;
-        }
-
-        Player local = client.getLocalPlayer();
-        WorldPoint last = local.getWorldLocation();
-        Tile tile = Location.toTile(local.getWorldLocation());
-        IStep step = steps.get(0);
-
-        if (step.hasTransport()) {
-            return handleTransport(steps, local, tile, step);
-        }
-
-        handlePrayer();
-
-        return handleWalking(steps, local, last, step, step.getPosition());
-    }
-
-    private boolean isCancelledOrTimedOut(List<? extends IStep> steps) {
-        if (Coroutine._isCancelled()) {
-            steps.clear();
-            return true;
-        }
-        if (timeout > 5) {
-            if (recalcs < 6) {
-                recalcs++;
-                timeout = 0;
-                if(steps.isEmpty())
-                    return true;
-                rePath(steps);
-                return !steps.isEmpty();
-            }
-            recalcs = 0;
-            timeout = 0;
-            Logger.consoleErrorOutput("Pathfinder", "Unable to pass tile");
-            steps.clear();
-            return true;
-        }
-        return false;
-    }
-
-    private boolean handleTeleport() {
-        if (teleport != null) {
-            multiSteps.addAll(teleport.getHandlers());
-            multiStepPointer = 0;
-            cooldown = 0;
-            teleport = null;
-            return true;
-        }
-        return false;
-    }
-
-    private boolean handleMultiSteps() {
-        if (!multiSteps.isEmpty()) {
-            if (!PlayerAPI.isIdle(client.getLocalPlayer()))
-                return true;
-
-            if (multiStepPointer >= multiSteps.size()) {
-                System.out.println("[MultiStep] Completed all steps");
-                multiSteps.clear();
-                multiStepPointer = 0;
-                justInteracted = true;
-            } else {
-                multiSteps.get(multiStepPointer).run();
-                System.out.println("[MultiStep] Executed step " + (multiStepPointer + 1) + " of " + multiSteps.size());
-                multiStepPointer++;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean applyCooldown() {
-        if (cooldown > 0) {
-            cooldown--;
-            return true;
-        }
-        return false;
-    }
-
-    private boolean shouldHandleDialogue(List<? extends IStep> steps) {
-        return DialogueAPI.dialoguePresent() && !steps.isEmpty() && !Location.isReachable(client.getLocalPlayer().getWorldLocation(), steps.get(steps.size() - 1).getPosition());
-    }
-
-    private void handleDialogue() {
-        if(!DialogueAPI.continueDialogue())
-        {
-            if(!DialogueAPI.selectOption("Yes") && !DialogueAPI.selectOption("Okay") && !DialogueAPI.selectOption("okay"))
-            {
-                DialogueAPI.selectOption(1);
-            }
-        }
-    }
-
-    private boolean handleTransport(List<? extends IStep> steps, Player local, Tile tile, IStep step) {
-        if (step.hasTransport()) {
-            if (!PlayerAPI.isIdle(local)) {
-                return true;
-            }
-
-            if (tile != null && Location.getDistance(tile, WorldPointUtil.fromCompressed(step.getTransport().getSource())) < 10) {
-                Logger.info("[Pathfinder] Interacting with transport");
-
-                step.getTransport().getHandler().get(0).run();
-                if (step.getTransport().getHandler().size() > 1) {
-                    multiSteps.addAll(step.getTransport().getHandler());
-                    multiStepPointer = 1;
-                }
-                cooldown = Math.max(step.getTransport().getDuration(), ThreadLocalRandom.current().nextInt(4));
-                timeout = 0;
-                steps.remove(step);
-                return true;
-            }
-
-            if (cooldown > 0) {
-                return true;
-            }
-
-            timeout++;
-            return true;
-        }
-        return false;
-    }
-
-    private boolean handleWalking(List<? extends IStep> steps, Player local, WorldPoint last, IStep step, WorldPoint dest) {
-        manageRunEnergyAndHitpoints();
-
-        if(!Location.isReachable(local.getWorldLocation(), step.getPosition()))
-        {
-            if(MovementAPI.isMoving())
-            {
-                return true;
-            }
-            if(handlePassThroughObjects(local, steps, step) || !PlayerAPI.isIdle(local))
-            {
-                return !steps.isEmpty();
-            }
-            rePath(steps);
-            return true;
-        }
-
-        repathDelay = 0;
-
-        if (last.distanceTo2D(dest) > 6 && !PlayerAPI.isIdle(local))
-        {
-            return true;
-        }
-
-        int s = 0;
-        int rand = ThreadLocalRandom.current().nextInt(5, 16);
-        while(s <= rand && s < steps.size() && !steps.get(s).hasTransport())
-        {
-            if(!Location.isReachable(local.getWorldLocation(), steps.get(s).getPosition()))
-            {
-                break;
-            }
-            s++;
-        }
-        if(s > 0)
-        {
-            s--;
-            steps.subList(0, s).clear();
-        }
-        if(steps.size() > 1 && steps.get(1).hasTransport())
-        {
-            steps.remove(0);
-        }
-        step = steps.get(0);
-        recordWalkClick(step.getPosition());
-        MovementAPI.walkTowards(step.getPosition());
-        if(!step.hasTransport())
-            steps.remove(step);
-        timeout = 0;
-        return !steps.isEmpty();
-    }
-
-    private boolean handlePassThroughObjects(Player local, List<? extends IStep> steps, IStep step)
+    public static boolean isWalking()
     {
-        TileObjectEx object = new TileObjectQuery<>()
-                .withNamesContains("door", "gate", "curtain")
-                .keepIf(o -> (o.getWorldLocation().equals(local.getWorldLocation()) || o.getWorldLocation().equals(step.getPosition())))
-                .sortNearest()
-                .first();
-
-        if(StrongholdSecurityQuestion.process(object))
-        {
-            return true;
-        }
-
-        if(object != null)
-        {
-            TileObjectAPI.interact(object, 0);
-            Logger.info("[Pathfinder] Interacting with '" + object.getName() + "'");
-            return true;
-        }
-        else {
-            if (!PlayerAPI.isIdle(local))
-            {
-                return true;
-            }
-            Logger.info("[Pathfinder] Failed to find Passthrough, atempting to circumvent");
-            if(repathDelay < 10)
-            {
-                repathDelay++;
-                return true;
-            }
-            rePath(steps);
-            return true;
-        }
-    }
-
-    private void manageRunEnergyAndHitpoints()
-    {
-        if(DialogueAPI.dialoguePresent())
-        {
-            return;
-        }
-        int energy = client.getEnergy() / 100;
-
-        if(!MovementAPI.isRunEnabled() && energy > Setting.toggleRunThreshold)
-        {
-            WidgetAPI.interact(1, WidgetInfo.MINIMAP_TOGGLE_RUN_ORB, -1, -1);
-            Setting.toggleRunThreshold = Setting.toggleRunRange.randomEnclosed();
-        }
-
-        if(energy < Setting.consumeStaminaThreshold && !MovementAPI.staminaInEffect())
-        {
-            ItemEx stam = InventoryAPI.getItem(i -> ArrayUtils.contains(STAMINA, i.getId()));
-
-            if(stam != null)
-            {
-                InventoryAPI.interact(stam, 2);
-                Setting.consumeStaminaThreshold = Setting.consumeStaminaRange.randomEnclosed();
-            }
-        }
-
-        if(energy <= Setting.toggleRunThreshold)
-        {
-            ItemEx stam = InventoryAPI.getItem(i -> ArrayUtils.contains(STAMINA, i.getId()));
-
-            if(stam != null)
-            {
-                InventoryAPI.interact(stam, 2);
-                Setting.toggleRunThreshold = Setting.toggleRunRange.randomEnclosed();
-            }
-        }
-
-        int threshold = healthHandler;
-        int hitpoints = Static.invoke(() -> client.getBoostedSkillLevel(Skill.HITPOINTS));
-
-        if(threshold != 0 && hitpoints <= threshold)
-        {
-            ItemEx item = InventoryQuery.fromInventoryId(InventoryID.INV)
-                    .removeIf(i -> i.getName().contains("Banana") || i.getName().contains("Cabbage"))
-                    .withAction("Eat")
-                    .first();
-            if(item != null)
-                InventoryAPI.interact(item, 1);
-        }
-    }
-
-    private void handlePrayer()
-    {
-        if(prayers != null)
-        {
-            PrayerAPI.flickQuickPrayer();
-            if(client.getBoostedSkillLevel(Skill.PRAYER) < prayerDangerZone)
-            {
-                ItemEx pot = InventoryAPI.getItem(i -> ArrayUtils.contains(ItemConstants.PRAYER_POTION, i.getId()));
-                if(pot != null)
-                {
-                    InventoryAPI.interact(pot, 1);
-                }
-            }
-        }
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private void rePath(List<? extends IStep> steps)
-    {
-        WorldPoint wp = steps.get(steps.size() - 1).getPosition();
-        steps.clear();
-        final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
-        ((List) steps).addAll(engine.find(wp));
-    }
-
-    /**
-     * Record a click visualization for walking to a destination
-     * @param destination The destination WorldPoint
-     */
-    private void recordWalkClick(WorldPoint destination) {
-        if (destination == null) {
-            return;
-        }
-
-        try {
-            LocalPoint localPoint = LocalPoint.fromWorld(client, destination);
-            if (localPoint != null) {
-                Point screenPoint = Perspective.localToCanvas(client, localPoint, client.getPlane());
-
-                boolean isValidScreenPoint = false;
-                if (screenPoint != null) {
-                    java.awt.Rectangle viewport = client.getCanvas().getBounds();
-                    isValidScreenPoint = screenPoint.getX() >= 0 &&
-                                        screenPoint.getX() <= viewport.width &&
-                                        screenPoint.getY() >= 0 &&
-                                        screenPoint.getY() <= viewport.height;
-                }
-
-                if (screenPoint != null && isValidScreenPoint) {
-                    Polygon tilePoly = Perspective.getCanvasTilePoly(client, localPoint);
-                    if (tilePoly != null) {
-                        ClickManager.queueClickBox(tilePoly);
-                    } else {
-                        ClickManager.setPoint(screenPoint.getX(), screenPoint.getY());
-                    }
-
-                    ClickVisualizationOverlay.recordClick(
-                        screenPoint.getX(),
-                        screenPoint.getY(),
-                        ClickVisualizationOverlay.ClickType.MOVEMENT,
-                        "Walk"
-                    );
-                } else {
-                    Point minimapPoint = Static.invoke(() -> Perspective.localToMinimap(client, localPoint));
-                    if (minimapPoint != null) {
-                        int radius = 3;
-                        int[] xPoints = new int[8];
-                        int[] yPoints = new int[8];
-                        for (int i = 0; i < 8; i++) {
-                            double angle = 2 * Math.PI * i / 8;
-                            xPoints[i] = minimapPoint.getX() + (int)(radius * Math.cos(angle));
-                            yPoints[i] = minimapPoint.getY() + (int)(radius * Math.sin(angle));
-                        }
-                        Polygon minimapClickBox = new Polygon(xPoints, yPoints, 8);
-
-                        ClickManager.queueClickBox(minimapClickBox);
-
-                        ClickVisualizationOverlay.recordClick(
-                            minimapPoint.getX(),
-                            minimapPoint.getY(),
-                            ClickVisualizationOverlay.ClickType.MOVEMENT,
-                            "Walk (Minimap)"
-                        );
-                    }
-                }
-            }
-        } catch (Exception e) {
-        }
+        return running;
     }
 }

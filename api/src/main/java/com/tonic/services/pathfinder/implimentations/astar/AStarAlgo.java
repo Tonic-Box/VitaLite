@@ -352,6 +352,9 @@ public class AStarAlgo implements IPathfinder
         // Reverse backward path since it was built from goal to meeting point
         java.util.Collections.reverse(backwardPath);
 
+        // Fix transports in reversed backward path - they now point in wrong direction
+        reverseTransports(backwardPath);
+
         // Remove the duplicate meeting point from one of the paths
         if (!backwardPath.isEmpty()) {
             backwardPath.remove(0);
@@ -366,6 +369,56 @@ public class AStarAlgo implements IPathfinder
         forwardPath.addAll(backwardPath);
 
         return forwardPath;
+    }
+
+    /**
+     * Reverses transports in a reversed path so they point in the correct direction.
+     * After reversing a path, transports point backward - this fixes them to point forward.
+     *
+     * In A*, transports are stored as "how we arrived at this position".
+     * After reversing, we need to shift transports to represent "transport to reach next position".
+     */
+    private void reverseTransports(List<AStarStep> path) {
+        if (path.size() <= 1) {
+            return;
+        }
+
+        // Build new path with corrected transports
+        // Transport at position X means "use this transport to reach next position"
+        List<AStarStep> corrected = new ArrayList<>(path.size());
+
+        // For each position except last, find transport to next position
+        for (int i = 0; i < path.size() - 1; i++) {
+            int currentPos = path.get(i).getPackedPosition();
+            int nextPos = path.get(i + 1).getPackedPosition();
+
+            // Find transport from current position to next position
+            Transport forwardTransport = findTransport(currentPos, nextPos);
+
+            corrected.add(new AStarStep(currentPos, forwardTransport));
+        }
+
+        // Last position has no transport (destination)
+        corrected.add(new AStarStep(path.get(path.size() - 1).getPackedPosition(), null));
+
+        // Replace path contents
+        path.clear();
+        path.addAll(corrected);
+    }
+
+    /**
+     * Finds a transport from source position to destination position.
+     */
+    private Transport findTransport(int source, int destination) {
+        ArrayList<Transport> transports = TransportLoader.getTransports().get(source);
+        if (transports != null) {
+            for (Transport t : transports) {
+                if (t.getDestination() == destination) {
+                    return t;
+                }
+            }
+        }
+        return null;
     }
 
     private void expandNodeForward(int current, AStarCache cache, AStarPriorityQueue openSet, gnu.trove.set.hash.TIntHashSet closedSet) {

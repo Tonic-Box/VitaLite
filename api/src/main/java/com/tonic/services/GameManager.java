@@ -367,7 +367,7 @@ public class GameManager extends Overlay {
                     .setParam1(event.getActionParam1())
                     .setIdentifier(event.getIdentifier())
                     .setType(MenuAction.RUNELITE)
-                    .onClick(e -> Walker.cancelWalk());
+                    .onClick(e -> Walker.cancel());
         }
 
 

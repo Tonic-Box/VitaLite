@@ -7,7 +7,6 @@ import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.*;
-import com.tonic.api.threaded.Delays;
 import com.tonic.api.threaded.DialogueNode;
 import com.tonic.api.threaded.WorldsAPI;
 import com.tonic.api.widgets.DialogueAPI;
@@ -20,6 +19,7 @@ import com.tonic.data.TileObjectEx;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.pathfinder.Walker;
+import com.tonic.services.pathfinder.model.HandlerBuilder;
 import com.tonic.services.pathfinder.model.TransportDto;
 import com.tonic.services.pathfinder.requirements.*;
 import com.tonic.services.pathfinder.teleports.MovementConstants;
@@ -455,19 +455,15 @@ public class TransportLoader
     {
         for(DwarvenCart cart : DwarvenCart.values())
         {
-            List<Runnable> consumers = new ArrayList<>();
-            consumers.add(cart::rideBack);
-
-            Transport transport = new Transport(WorldPointUtil.compress(cart.getLocation()), WorldPointUtil.compress(cart.getDestination()), 6, 1, 22, consumers, cart.getRequirements(), -1);
+            var handler = cart.rideBack();
+            Transport transport = new Transport(WorldPointUtil.compress(cart.getLocation()), WorldPointUtil.compress(cart.getDestination()), 6, 1, 22, handler, cart.getRequirements(), -1);
             computeIfAbsent(transports, WorldPointUtil.compress(cart.getLocation()), transport);
         }
 
         for(DwarvenCart cart : DwarvenCart.values())
         {
-            List<Runnable> consumers = new ArrayList<>();
-            consumers.add(cart::rideThere);
-
-            Transport transport = new Transport(WorldPointUtil.compress(DwarvenCart.KELDEGRIM_WORLDPOINT), WorldPointUtil.compress(cart.getLocation()), 6, 1, 21, consumers, cart.getRequirements(), -1);
+            var handler = cart.rideThere();
+            Transport transport = new Transport(WorldPointUtil.compress(DwarvenCart.KELDEGRIM_WORLDPOINT), WorldPointUtil.compress(cart.getLocation()), 6, 1, 21, handler, cart.getRequirements(), -1);
             computeIfAbsent(transports, WorldPointUtil.compress(DwarvenCart.KELDEGRIM_WORLDPOINT), transport);
         }
     }
@@ -485,41 +481,42 @@ public class TransportLoader
 
                 if (destination == FairyRing.ZANARIS)
                 {
-                    List<Runnable> consumers = new ArrayList<>();
-                    consumers.add(() -> {
-                        TileObjectEx current = new TileObjectQuery<>()
-                                .withName("Fairy ring")
-                                .first();
-                        TileObjectAPI.interact(current, "Zanaris");
-                    });
+                    HandlerBuilder builder = HandlerBuilder.get()
+                            .add(0, () -> {
+                                TileObjectEx current = new TileObjectQuery<>()
+                                        .withName("Fairy ring")
+                                        .first();
+                                TileObjectAPI.interact(current, "Zanaris");
+                                return 1;
+                            })
+                            .addDelay(1, 7);
 
                     Requirements merged = new Requirements();
                     merged.addRequirements(ring.getRequirements().getAll());
                     merged.addRequirements(destination.getRequirements().getAll());
 
-                    Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, consumers, merged, -1);
+                    Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, builder.build(), merged, -1);
                     computeIfAbsent(transports, WorldPointUtil.compress(ring.getLocation()), transport);
                     continue;
                 }
 
-                List<Runnable> consumers = new ArrayList<>();
-                consumers.add(() -> {
-                    TileObjectEx current = new TileObjectQuery<>()
-                            .withName("Fairy ring")
-                            .nearest();
-                    TileObjectAPI.interact(current, "Configure");
-                    Delays.waitUntil(() -> WidgetAPI.get(InterfaceID.Fairyrings.CONFIRM) != null);
-                    while(!destination.travel())
-                    {
-                        Delays.tick();
-                    }
-                });
+                HandlerBuilder builder = HandlerBuilder.get()
+                        .add(0, () -> {
+                            TileObjectEx current = new TileObjectQuery<>()
+                                    .withName("Fairy ring")
+                                    .nearest();
+                            TileObjectAPI.interact(current, "Configure");
+                            return 1;
+                        })
+                        .addDelayUntil(2, () -> WidgetAPI.get(InterfaceID.Fairyrings.CONFIRM) != null)
+                        .addDelayUntil(3, () -> !destination.travel())
+                        .addDelay(4, 7);
 
                 Requirements merged = new Requirements();
                 merged.addRequirements(ring.getRequirements().getAll());
                 merged.addRequirements(destination.getRequirements().getAll());
 
-                Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, consumers, merged, -1);
+                Transport transport = new Transport(WorldPointUtil.compress(ring.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 7, builder.build(), merged, -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(ring.getLocation()), transport);
             }
         }
@@ -540,14 +537,20 @@ public class TransportLoader
                     continue;
                 }
 
-                List<Runnable> consumers = new ArrayList<>();
-                consumers.add(() -> {
-                    NPC npc = new NpcQuery().withName(glider.getNpcName()).first();
-                    NpcAPI.interact(npc, "Glider");
-                    Delays.waitUntil(() -> WidgetAPI.get(138, 0) != null);
-                    WidgetAPI.interact(1, destination.getIndex(), -1, -1);
-                });
-                Transport transport = new Transport(WorldPointUtil.compress(glider.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 4, consumers, destination.getRequirements(), -1);
+                HandlerBuilder builder = HandlerBuilder.get()
+                        .add(0, () -> {
+                            NPC npc = new NpcQuery().withName(glider.getNpcName()).first();
+                            NpcAPI.interact(npc, "Glider");
+                            return 1;
+                        })
+                        .addDelayUntil(1, () -> WidgetAPI.get(138, 0) != null)
+                        .add(2, () -> {
+                            WidgetAPI.interact(1, destination.getIndex(), -1, -1);
+                            return 3;
+                        })
+                        .addDelay(3, 4);
+
+                Transport transport = new Transport(WorldPointUtil.compress(glider.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 4, builder.build(), destination.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(glider.getLocation()), transport);
             }
         }
@@ -564,16 +567,24 @@ public class TransportLoader
                     continue;
                 }
 
-                List<Runnable> consumers = new ArrayList<>();
-                consumers.add(() -> {
-                    Client client = Static.getClient();
-                    NPC npc = new NpcQuery().withName(minecart.getNpcName()).first();
-                    NpcAPI.interact(npc, "Travel");
-                    Delays.waitUntil(() -> PlayerAPI.isIdle(client.getLocalPlayer()));
-                    Delays.tick();
-                    DialogueAPI.resumePause(12255235, destination.getIndex());
-                });
-                Transport transport = new Transport(WorldPointUtil.compress(minecart.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 5, consumers, MinecartNetwork.getRequirements(), -1);
+                HandlerBuilder builder = HandlerBuilder.get()
+                        .add(0, () -> {
+                            NPC npc = new NpcQuery().withName(minecart.getNpcName()).first();
+                            NpcAPI.interact(npc, "Travel");
+                            return 1;
+                        })
+                        .addDelayUntil(1, () -> {
+                            Client client = Static.getClient();
+                            return PlayerAPI.isIdle(client.getLocalPlayer());
+                        })
+                        .add(2, () -> 3)
+                        .add(3, () -> {
+                            DialogueAPI.resumePause(12255235, destination.getIndex());
+                            return 4;
+                        })
+                        .addDelay(4, 5);
+
+                Transport transport = new Transport(WorldPointUtil.compress(minecart.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 5, builder.build(), MinecartNetwork.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(minecart.getLocation()), transport);
             }
         }
@@ -599,16 +610,22 @@ public class TransportLoader
                     req.addRequirement(new QuestRequirement(Quest.THE_GRAND_TREE, QuestState.FINISHED));
                 }
 
-                List<Runnable> consumers = new ArrayList<>();
-                consumers.add(() -> {
-                    TileObjectEx current = new TileObjectQuery<>()
-                            .withName("Spirit tree")
-                            .first();
-                    TileObjectAPI.interact(current, "Travel");
-                    Delays.waitUntil(() -> WidgetAPI.get(12255235) != null);
-                    DialogueAPI.resumePause(12255235, destination.getIndex());
-                });
-                Transport transport = new Transport(WorldPointUtil.compress(tree.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 3, consumers, req, -1);
+                HandlerBuilder builder = HandlerBuilder.get()
+                        .add(0, () -> {
+                            TileObjectEx current = new TileObjectQuery<>()
+                                    .withName("Spirit tree")
+                                    .first();
+                            TileObjectAPI.interact(current, "Travel");
+                            return 1;
+                        })
+                        .addDelayUntil(1, () -> WidgetAPI.get(12255235) != null)
+                        .add(2, () -> {
+                            DialogueAPI.resumePause(12255235, destination.getIndex());
+                            return 3;
+                        })
+                        .addDelay(3, 4);
+
+                Transport transport = new Transport(WorldPointUtil.compress(tree.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 3, builder.build(), req, -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(tree.getLocation()), transport);
             }
         }
@@ -616,31 +633,36 @@ public class TransportLoader
 
     private static void charterShip(final TIntObjectHashMap<ArrayList<Transport>> transports)
     {
+        DialogueNode node = DialogueNode.get()
+                .node("Yes, and don't");
         CharterShip charterShip;
         for(CharterMap map : CharterMap.values())
         {
             charterShip = map.getCharterShip();
             for(CharterShip destination : map.getDestinations()) {
-                List<Runnable> actions = new ArrayList<>();
-                actions.add(() -> {
-                    NPC npc = new NpcQuery().withName("Trader Crewmember").sortNearest().first();
-                    NpcAPI.interact(npc, "Charter");
-                    Client client = Static.getClient();
-                    Delays.waitUntil(() -> client.getWidget(InterfaceID.SailingMenu.UNIVERSE) != null);
-                    WidgetAPI.interact(1, InterfaceID.CharteringMenuSide.LIST_CONTENT, destination.getIndex(), -1);
-                    Delays.tick();
-                    if(DialogueAPI.dialoguePresent())
-                    {
-                        DialogueNode.get()
-                                .node("Yes, and don't")
-                                .process();
-                    }
-                });
+                HandlerBuilder builder = HandlerBuilder.get()
+                        .add(0, () -> {
+                            NPC npc = new NpcQuery().withName("Trader Crewmember").sortNearest().first();
+                            NpcAPI.interact(npc, "Charter");
+                            return 1;
+                        })
+                        .addDelayUntil(1, () -> {
+                            Client client = Static.getClient();
+                            return client.getWidget(InterfaceID.SailingMenu.UNIVERSE) != null;
+                        })
+                        .add(2, () -> {
+                            WidgetAPI.interact(1, InterfaceID.CharteringMenuSide.LIST_CONTENT, destination.getIndex(), -1);
+                            return 3;
+                        })
+                        .add(3, () -> 4)
+                        .addDelayUntil(4, () -> !node.processStep())
+                        .addDelay(5, 5);
+
                 Transport transport = new Transport(
                         WorldPointUtil.compress(charterShip.getLocation()),
                         WorldPointUtil.compress(destination.getArival()),
                         6, 1, 5,
-                        actions,
+                        builder.build(),
                         destination.getRequirements(),
                         -1
                 );
@@ -656,13 +678,14 @@ public class TransportLoader
         {
             barnabyShip = map.getBarnabyShip();
             for(BarnabyShip destination : map.getDestinations()) {
-                List<Runnable> consumers = new ArrayList<>();
-                consumers.add(() -> {
-                    NPC npc = new NpcQuery().withName("Captain Barnaby").first();
-                    NpcAPI.interact(npc, destination.getOption());
-                    Delays.waitUntil(() -> !MovementAPI.isMoving());
-                });
-                Transport transport = new Transport(WorldPointUtil.compress(barnabyShip.getLocation()), WorldPointUtil.compress(destination.getArival()), 6, 1, 7, consumers, map.getRequirements(), -1);
+                HandlerBuilder builder = HandlerBuilder.get()
+                        .add(0, () -> {
+                            NPC npc = new NpcQuery().withName("Captain Barnaby").first();
+                            NpcAPI.interact(npc, destination.getOption());
+                        })
+                        .addDelayUntil(1, () -> !MovementAPI.isMoving())
+                        .addDelay(2, 7);
+                Transport transport = new Transport(WorldPointUtil.compress(barnabyShip.getLocation()), WorldPointUtil.compress(destination.getArival()), 6, 1, 7, builder.build(), map.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(barnabyShip.getLocation()), transport);
             }
         }
@@ -673,34 +696,38 @@ public class TransportLoader
         //sarim -> Port Piscarilius
         WorldPoint source = new WorldPoint(3054, 3246, 0);
         WorldPoint destination = new WorldPoint(1824, 3695, 1);
-        List<Runnable> consumers = new ArrayList<>();
-        consumers.add(() -> {
-            NpcLocations.VEOS_PORT_SARIM.talkTo();
-            DialogueNode.get()
-                    .node("Take me there please")
-                    .node("take me", " Port ")
-                    .process();
-        });
-        Transport transport = new Transport(source, destination, 2, 2, consumers, 4, -1);
+
+        DialogueNode node = DialogueNode.get()
+                .node("Take me there please")
+                .node("take me", " Port ");
+
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> NpcLocations.VEOS_PORT_SARIM.interact("Talk-to"))
+                .addDelayUntil(1, DialogueAPI::dialoguePresent)
+                .addDelayUntil(2, () -> !node.processStep())
+                .addDelay(3, 4);
+
+        Transport transport = new Transport(source, destination, 2, 2, builder.build(), 4, -1);
         computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
 
         //sarim -> Lands End
         WorldPoint source2 = new WorldPoint(3054, 3246, 0);
         WorldPoint destination2 = new WorldPoint(1504, 3395, 1);
-        List<Runnable> consumers2 = new ArrayList<>();
-        consumers2.add(() -> {
-            NpcLocations.VEOS_PORT_SARIM.talkTo();
-            DialogueNode.get()
-                    .node("Take me there please")
-                    .node("take me", " Land")
-                    .process();
-            Delays.tick(4);
-            if(VarAPI.getVar(VarbitID.ZEAH_PLAYERHASVISITED) != 1)
-            {
-                Walker.walkTo(destination2);
-            }
-        });
-        Transport transport2 = new Transport(source2, destination2, 2, 2, consumers2, 0, -1);
+
+        DialogueNode node2 = DialogueNode.get()
+                .node("Take me there please")
+                .node("take me", " Land");
+
+        HandlerBuilder builder2 = HandlerBuilder.get()
+                .add(0, () -> NpcLocations.VEOS_PORT_SARIM.interact("Talk-to"))
+                .addDelayUntil(1, DialogueAPI::dialoguePresent)
+                .addDelayUntil(2, () -> !node2.processStep())
+                .addDelay(3, 4);
+
+        Requirements requirements = new Requirements();
+        requirements.addRequirement(new VarRequirement(Comparison.EQUAL, VarType.VARBIT, VarbitID.ZEAH_PLAYERHASVISITED, 1));
+
+        Transport transport2 = new Transport(WorldPointUtil.compress(source2), WorldPointUtil.compress(destination2), 2, 2, 4, builder2.build(), requirements, -1);
         computeIfAbsent(transports, WorldPointUtil.compress(source2), transport2);
     }
 
@@ -708,21 +735,29 @@ public class TransportLoader
     {
         WorldPoint source = WorldPointUtil.fromCompressed(51924097);
         WorldPoint destination = WorldPointUtil.fromCompressed(73255316);
-        List<Runnable> consumers = new ArrayList<>();
-        consumers.add(() -> {
-            TileObjectEx object = new TileObjectQuery<>()
-                    .withId(2406)
-                    .sortNearest()
-                    .first();
-            if(object != null)
-            {
-                TileObjectAPI.interact(object, "Open");
-            }
-        });
-        consumers.add(() -> {});
-        consumers.add(() -> MovementAPI.walkToWorldPoint(WorldPointUtil.fromCompressed(73255316)));
 
-        LongTransport transport = new LongTransport(source, destination, 2, 2, consumers, new Requirements(), 0);
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    TileObjectEx object = new TileObjectQuery<>()
+                            .withId(2406)
+                            .sortNearest()
+                            .first();
+                    if(object != null)
+                    {
+                        TileObjectAPI.interact(object, "Open");
+                        return 1;
+                    }
+                    return 2;
+                })
+                .add(1, () -> 2)
+                .add(2, () -> 3)
+                .add(3, () -> 4)
+                .add(4, () -> {
+                    MovementAPI.walkToWorldPoint(WorldPointUtil.fromCompressed(73255316));
+                    return 5;
+                });
+
+        LongTransport transport = new LongTransport(source, destination, 2, 2, builder.build(), new Requirements(), 0);
 
         computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
     }
@@ -863,24 +898,25 @@ public class TransportLoader
             String... chatOptions
     )
     {
-        List<Runnable> actions = new ArrayList<>();
-        actions.add(() -> {
-            NPC npc = new NpcQuery()
-                    .withIds(npcId)
-                    .within(source, 10)
-                    .first();
-            if (npc != null)
-            {
-                NpcAPI.interact(npc, 0);
-            }
-        });
-        for(String option : chatOptions)
-        {
-            actions.add(() -> {
-                while(DialogueAPI.continueDialogue()) Delays.tick(); DialogueAPI.selectOption(option);
-            });
-        }
-        return new LongTransport(source, destination, 10, 0, actions);
+        DialogueNode node = DialogueNode.get()
+                .node((Object[])chatOptions);
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    NPC npc = new NpcQuery()
+                            .withIds(npcId)
+                            .within(source, 10)
+                            .first();
+                    if (npc != null)
+                    {
+                        NpcAPI.interact(npc, 0);
+                        return chatOptions != null && chatOptions.length > 0 ? 1 : 3;
+                    }
+                    return 0;
+                })
+                .addDelayUntil(1, DialogueAPI::dialoguePresent)
+                .addDelayUntil(2, () -> !node.processStep())
+                .addDelay(3, 1);
+        return new LongTransport(source, destination, 10, 0, builder.build());
     }
 
     public static Transport objectTransport(
@@ -954,27 +990,27 @@ public class TransportLoader
             String... chatOptions
     )
     {
-        List<Runnable> actions = new ArrayList<>();
-        actions.add(() -> {
-            TileObjectEx obj = new TileObjectQuery<>()
-                    .withId(objId)
-                    .within(source, 5)
-                    .sortNearest()
-                    .first();
-            if (obj != null)
-            {
-                TileObjectAPI.interact(obj, action);
-            }
-        });
+        DialogueNode node = DialogueNode.get()
+                .node((Object[])chatOptions);
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    TileObjectEx obj = new TileObjectQuery<>()
+                            .withId(objId)
+                            .within(source, 5)
+                            .sortNearest()
+                            .first();
+                    if (obj != null)
+                    {
+                        TileObjectAPI.interact(obj, action);
+                        return chatOptions != null && chatOptions.length > 0 ? 1 : 3;
+                    }
+                    return 0;
+                })
+                .addDelayUntil(1, DialogueAPI::dialoguePresent)
+                .addDelayUntil(2, () -> !node.processStep())
+                .addDelay(3, 1);
 
-        for(String option : chatOptions)
-        {
-            actions.add(() -> {
-                while(DialogueAPI.continueDialogue()) Delays.tick(); DialogueAPI.selectOption(option);
-            });
-        }
-
-        return new LongTransport(source, destination, Integer.MAX_VALUE, 0, actions);
+        return new LongTransport(source, destination, Integer.MAX_VALUE, 0, builder.build());
     }
 
     public static Transport slashWebTransport(
@@ -1027,26 +1063,36 @@ public class TransportLoader
 
     private static void manhole(final TIntObjectHashMap<ArrayList<Transport>> transports, WorldPoint source, WorldPoint destination, int objectIdOpen, int objectIdClosed)
     {
-        List<Runnable> consumers = new ArrayList<>();
-        consumers.add(() -> {
-            TileObjectEx object = new TileObjectQuery<>()
-                    .withId(objectIdClosed)
-                    .within(source, 5)
-                    .first();
-            if(object != null)
-            {
-                TileObjectAPI.interact(object, "Open");
-            }
-        });
-        consumers.add(() -> {
-            TileObjectEx object = new TileObjectQuery<>()
-                    .withId(objectIdOpen)
-                    .within(source, 5)
-                    .first();
-            TileObjectAPI.interact(object, "Climb");
-        });
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    TileObjectEx object = new TileObjectQuery<>()
+                            .withId(objectIdClosed)
+                            .within(source, 5)
+                            .first();
+                    if(object != null)
+                    {
+                        TileObjectAPI.interact(object, "Open");
+                        return 1;
+                    }
 
-        LongTransport transport = new LongTransport(source, destination, 2, 2, consumers, new Requirements(), 0);
+                    TileObjectEx object2 = new TileObjectQuery<>()
+                            .withId(objectIdOpen)
+                            .within(source, 5)
+                            .first();
+                    TileObjectAPI.interact(object2, "Climb");
+                    return 2;
+                })
+                .add(1, () -> {
+                    TileObjectEx object2 = new TileObjectQuery<>()
+                            .withId(objectIdOpen)
+                            .within(source, 5)
+                            .first();
+                    TileObjectAPI.interact(object2, "Climb");
+                    return 2;
+                })
+                .addDelay(2, 1);
+
+        LongTransport transport = new LongTransport(source, destination, 2, 2, builder.build(), new Requirements(), 0);
 
         computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
     }
@@ -1055,35 +1101,37 @@ public class TransportLoader
         WorldPoint source = new WorldPoint(3303, 3124, 0);
         WorldPoint destination = new WorldPoint(3303, 3115, 0);
 
-        List<Runnable> consumers = new ArrayList<>();
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    if (!InventoryAPI.contains(ItemID.SHANTAY_PASS)) {
+                        NPC npc = new NpcQuery()
+                                .withIds(NpcID.SHANTAY)
+                                .within(source, 10)
+                                .first();
+                        NpcAPI.interact(npc, "Buy-pass");
+                        return 1;
+                    }
+                    TileObjectEx object = new TileObjectQuery<>()
+                            .withId(ObjectID.SHANTAY_PASS)
+                            .first();
+                    TileObjectAPI.interact(object, 0);
+                    return 2;
+                })
+                .add(1, () -> {
+                    TileObjectEx object = new TileObjectQuery<>()
+                            .withId(ObjectID.SHANTAY_PASS)
+                            .first();
+                    TileObjectAPI.interact(object, 0);
+                })
+                .add(2, () -> {
+                    if(WidgetAPI.isVisible(InterfaceID.CwsWarning10.WARN1) && WidgetAPI.getText(InterfaceID.CwsWarning10.WARN1).equalsIgnoreCase("Proceed regardless"))
+                    {
+                        WidgetAPI.interact(1, InterfaceID.CwsWarning10.WARN1, -1, -1);
+                    }
+                })
+                .addDelay(3, 2);
 
-        consumers.add(() -> {
-            if (!InventoryAPI.contains(ItemID.SHANTAY_PASS)) {
-                NPC npc = new NpcQuery()
-                        .withIds(NpcID.SHANTAY)
-                        .within(source, 10)
-                        .first();
-                NpcAPI.interact(npc, "Buy-pass");
-            } else {
-                TileObjectEx object = new TileObjectQuery<>()
-                        .withId(ObjectID.SHANTAY_PASS)
-                        .first();
-                TileObjectAPI.interact(object, 0);
-            }
-        });
-        consumers.add(() -> {
-            TileObjectEx object = new TileObjectQuery<>()
-                    .withId(ObjectID.SHANTAY_PASS)
-                    .first();
-            TileObjectAPI.interact(object, 0);
-        });
-        consumers.add(() -> {
-            if(WidgetAPI.isVisible(InterfaceID.CwsWarning10.WARN1) && WidgetAPI.getText(InterfaceID.CwsWarning10.WARN1).equalsIgnoreCase("Proceed regardless"))
-            {
-                WidgetAPI.interact(1, InterfaceID.CwsWarning10.WARN1, -1, -1);
-            }
-        });
-        return new LongTransport(source, destination, 2, 2, consumers, new Requirements(), 2);
+        return new LongTransport(source, destination, 2, 2, builder.build(), new Requirements(), 2);
     }
 
     private static LongTransport lumbyCave()
@@ -1091,26 +1139,32 @@ public class TransportLoader
         WorldPoint source = new WorldPoint(3169, 3173, 0);
         WorldPoint destination = new WorldPoint(3167, 9573, 0);
 
-        List<Runnable> consumers = new ArrayList<>();
-
-        consumers.add(() -> {
-            if(VarAPI.getVar(279) != 1 && InventoryAPI.contains(ItemID.ROPE))
-            {
-                ItemEx rope = InventoryAPI.getItem(ItemID.ROPE);
-                TileObjectEx object = new TileObjectQuery<>()
-                        .withId(ObjectID.DARK_HOLE)
-                        .first();
-                InventoryAPI.useOn(rope, object);
-            }
-        });
-        consumers.add(() -> {
-            TileObjectEx object = new TileObjectQuery<>()
-                    .withId(ObjectID.DARK_HOLE)
-                    .first();
-            TileObjectAPI.interact(object, 0);
-        });
-
-        return new LongTransport(source, destination, 2, 2, consumers, new Requirements(), 1);
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    if(VarAPI.getVar(279) != 1 && InventoryAPI.contains(ItemID.ROPE))
+                    {
+                        ItemEx rope = InventoryAPI.getItem(ItemID.ROPE);
+                        TileObjectEx object = new TileObjectQuery<>()
+                                .withId(ObjectID.DARK_HOLE)
+                                .first();
+                        InventoryAPI.useOn(rope, object);
+                        return 1;
+                    }
+                    TileObjectEx object = new TileObjectQuery<>()
+                            .withId(ObjectID.DARK_HOLE)
+                            .first();
+                    TileObjectAPI.interact(object, 0);
+                    return 2;
+                })
+                .add(1, () -> {
+                    TileObjectEx object = new TileObjectQuery<>()
+                            .withId(ObjectID.DARK_HOLE)
+                            .first();
+                    TileObjectAPI.interact(object, 0);
+                    return 2;
+                })
+                .addDelay(2, 2);
+        return new LongTransport(source, destination, 2, 2, builder.build(), new Requirements(), 1);
     }
 
     private static Requirements getGoldReq(int amount) {
