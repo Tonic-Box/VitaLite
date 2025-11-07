@@ -197,6 +197,7 @@ public enum NpcLocations {
 
     //port sarim
     VEOS_PORT_SARIM("Veos", new WorldPoint(3054, 3246, 0)),
+    CABIN_BOY_HERBERT("Cabin Boy Herbert", new WorldPoint(3054, 3246, 0)),
     REDBEARD_FRANK("Redbeard Frank", new WorldPoint(3054, 3252, 0)),
     WYDIN("Wydin", new WorldPoint(3015, 3206, 0)),
     CAPTAIN_TOCK_PRE_QUEST("Captain Tock", new WorldPoint(3031, 3273, 0)),

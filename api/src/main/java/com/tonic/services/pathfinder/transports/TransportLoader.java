@@ -167,7 +167,7 @@ public class TransportLoader
                                 "That's great, can you take me there please?"));
                     }
                 }
-                else if (QuestAPI.isCompleted(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
+                else if (QuestAPI.isInProgress(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
                 {
                     transports.add(npcTransport(new WorldPoint(3053, 3245, 0),
                             new WorldPoint(1824, 3695, 1),
@@ -402,7 +402,7 @@ public class TransportLoader
             if(WorldsAPI.inMembersWorld() || !filter)
             {
                 zannerisDoor(LAST_TRANSPORT_LIST);
-                veos(LAST_TRANSPORT_LIST);
+                //veos(LAST_TRANSPORT_LIST);
                 barnaby(LAST_TRANSPORT_LIST);
                 charterShip(LAST_TRANSPORT_LIST);
                 spiritTrees(LAST_TRANSPORT_LIST);
@@ -691,53 +691,58 @@ public class TransportLoader
         }
     }
 
-    private static void veos(final TIntObjectHashMap<ArrayList<Transport>> transports)
-    {
-        //sarim -> Port Piscarilius
-        WorldPoint source = new WorldPoint(3054, 3246, 0);
-        WorldPoint destination = new WorldPoint(1824, 3695, 1);
-
-        DialogueNode node = DialogueNode.get()
-                .node("Take me there please")
-                .node("take me", " Port ");
-
-        HandlerBuilder builder = HandlerBuilder.get()
-                .add(0, () -> {
-                    NPC npc = new NpcQuery().withName(NpcLocations.VEOS_PORT_SARIM.getName()).first();
-                    if(npc == null)
-                    {
-                        return 0;
-                    }
-                    NpcAPI.interact(npc, "Talk-to");
-                    return 1;
-                })
-                .addDelayUntil(1, DialogueAPI::dialoguePresent)
-                .addDelayUntil(2, () -> !node.processStep())
-                .addDelay(3, 4);
-
-        Transport transport = new Transport(source, destination, 2, 2, builder.build(), 4, -1);
-        computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
-
-        //sarim -> Lands End
-        WorldPoint source2 = new WorldPoint(3054, 3246, 0);
-        WorldPoint destination2 = new WorldPoint(1504, 3395, 1);
-
-        DialogueNode node2 = DialogueNode.get()
-                .node("Take me there please")
-                .node("take me", " Land");
-
-        HandlerBuilder builder2 = HandlerBuilder.get()
-                .add(0, () -> NpcLocations.VEOS_PORT_SARIM.interact("Talk-to"))
-                .addDelayUntil(1, DialogueAPI::dialoguePresent)
-                .addDelayUntil(2, () -> !node2.processStep())
-                .addDelay(3, 4);
-
-        Requirements requirements = new Requirements();
-        requirements.addRequirement(new VarRequirement(Comparison.EQUAL, VarType.VARBIT, VarbitID.ZEAH_PLAYERHASVISITED, 1));
-
-        Transport transport2 = new Transport(WorldPointUtil.compress(source2), WorldPointUtil.compress(destination2), 2, 2, 4, builder2.build(), requirements, -1);
-        computeIfAbsent(transports, WorldPointUtil.compress(source2), transport2);
-    }
+//    private static void veos(final TIntObjectHashMap<ArrayList<Transport>> transports)
+//    {
+//        //sarim -> Port Piscarilius
+//        WorldPoint source = new WorldPoint(3054, 3246, 0);
+//        WorldPoint destination = new WorldPoint(1824, 3695, 1);
+//
+//        DialogueNode node = DialogueNode.get()
+//                .node("Take me there please")
+//                .node("take me", " Port ");
+//
+//        HandlerBuilder builder = HandlerBuilder.get()
+//                .add(0, () -> {
+//                    NPC npc = new NpcQuery()
+//                            .withNames(
+//                                    NpcLocations.VEOS_PORT_SARIM.getName(),
+//                                    NpcLocations.CABIN_BOY_HERBERT.getName()
+//                            )
+//                            .first();
+//                    if(npc == null)
+//                    {
+//                        return 0;
+//                    }
+//                    NpcAPI.interact(npc, "Talk-to");
+//                    return 1;
+//                })
+//                .addDelayUntil(1, DialogueAPI::dialoguePresent)
+//                .addDelayUntil(2, () -> !node.processStep())
+//                .addDelay(3, 4);
+//
+//        Transport transport = new Transport(source, destination, 2, 2, builder.build(), 4, -1);
+//        computeIfAbsent(transports, WorldPointUtil.compress(source), transport);
+//
+//        //sarim -> Lands End
+//        WorldPoint source2 = new WorldPoint(3054, 3246, 0);
+//        WorldPoint destination2 = new WorldPoint(1504, 3395, 1);
+//
+//        DialogueNode node2 = DialogueNode.get()
+//                .node("Take me there please")
+//                .node("take me", " Land");
+//
+//        HandlerBuilder builder2 = HandlerBuilder.get()
+//                .add(0, () -> NpcLocations.VEOS_PORT_SARIM.interact("Talk-to"))
+//                .addDelayUntil(1, DialogueAPI::dialoguePresent)
+//                .addDelayUntil(2, () -> !node2.processStep())
+//                .addDelay(3, 4);
+//
+//        Requirements requirements = new Requirements();
+//        requirements.addRequirement(new VarRequirement(Comparison.EQUAL, VarType.VARBIT, VarbitID.ZEAH_PLAYERHASVISITED, 1));
+//
+//        Transport transport2 = new Transport(WorldPointUtil.compress(source2), WorldPointUtil.compress(destination2), 2, 2, 4, builder2.build(), requirements, -1);
+//        computeIfAbsent(transports, WorldPointUtil.compress(source2), transport2);
+//    }
 
     private static void zannerisDoor(final TIntObjectHashMap<ArrayList<Transport>> transports)
     {
