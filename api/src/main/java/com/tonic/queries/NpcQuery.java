@@ -93,6 +93,21 @@ public class NpcQuery extends AbstractActorQuery<NPC, NpcQuery>
         });
     }
 
+    public NpcQuery withNames(String... names)
+    {
+        return removeIf(o -> {
+            NPCComposition composition = getComposition(o);
+            if (composition == null || composition.getName() == null)
+                return true;
+            for(String name : names)
+            {
+                if(name.equalsIgnoreCase(TextUtil.sanitize(composition.getName())))
+                    return false;
+            }
+            return true;
+        });
+    }
+
     /**
      * Filters NPCs whose names contain the specified substring.
      *
