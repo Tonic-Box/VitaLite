@@ -39,6 +39,7 @@ public enum CanoeStation
                             .first();
                     TileObjectAPI.interact(station, "Chop-down");
                 })
+                .add(1, () -> 2)
                 .add(2, () -> {
                     TileObjectEx station = new TileObjectQuery<>()
                             .withAction("Shape-Canoe")
@@ -60,14 +61,26 @@ public enum CanoeStation
                             .first();
                     if(station != null)
                     {
-                        TileObjectAPI.interact(station, "Paddle Canoe");
+                        TileObjectAPI.interact(station, "Float ");
                         return 6;
                     }
                     return 5;
                 })
-                .addDelayUntil(6, () -> WidgetAPI.get(647, 13) != null)
-                .add(7, () -> WidgetAPI.interact(1, destination.getWidgetId(), 0))
-                .addDelay(8, 29)
+                .add(6, () -> {
+                    TileObjectEx station = new TileObjectQuery<>()
+                            .withPartialAction("Paddle ")
+                            .sortNearest()
+                            .first();
+                    if(station != null)
+                    {
+                        TileObjectAPI.interact(station, "Paddle ");
+                        return 7;
+                    }
+                    return 6;
+                })
+                .addDelayUntil(7, () -> WidgetAPI.get(647, 13) != null)
+                .add(8, () -> WidgetAPI.interact(1, destination.getWidgetId(), 0))
+                .addDelay(9, 29)
                 .build();
     }
 

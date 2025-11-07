@@ -12,6 +12,7 @@ import com.tonic.services.hotswapper.PluginReloader;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.abstractions.IStep;
 import com.tonic.services.pathfinder.Walker;
+import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
@@ -52,8 +53,6 @@ public class GameManager extends Overlay {
     private static final List<TileObjectEx> tileObjects = new ArrayList<>();
     private static final List<NPC> npcs = new ArrayList<>();
     private static final List<Player> players = new ArrayList<>();
-    private static boolean shouldRun = false;
-
     public static Stream<Player> playerStream()
     {
         return  playerList().stream();
@@ -63,6 +62,7 @@ public class GameManager extends Overlay {
     {
         return npcList().stream();
     }
+    private static WalkerPath walkerPath;
 
     public static List<Player> playerList()
     {
@@ -243,7 +243,6 @@ public class GameManager extends Overlay {
             PluginReloader.forceRebuildPluginList();
 
             RuneliteConfigUtil.verifyCacheAndVersion(client.getRevision());
-            shouldRun = true;
 
             if(AutoLogin.getCredentials() != null)
             {
@@ -293,6 +292,10 @@ public class GameManager extends Overlay {
     protected void onGameTick(GameTick event)
     {
         tickCount++;
+        if(walkerPath != null && !walkerPath.step())
+        {
+            walkerPath = null;
+        }
     }
 
     @Subscribe
@@ -347,7 +350,7 @@ public class GameManager extends Overlay {
         }
 
         String color = "<col=00ff00>";
-        if(!Walker.isWalking())
+        if(walkerPath == null)
         {
             client.getMenu().createMenuEntry(0)
                     .setOption("Walk ")
@@ -356,7 +359,7 @@ public class GameManager extends Overlay {
                     .setParam1(event.getActionParam1())
                     .setIdentifier(event.getIdentifier())
                     .setType(MenuAction.RUNELITE)
-                    .onClick(e -> ThreadPool.submit(() -> Walker.walkTo(wp)));
+                    .onClick(e -> walkerPath = WalkerPath.get(wp));
         }
         else
         {
@@ -367,7 +370,7 @@ public class GameManager extends Overlay {
                     .setParam1(event.getActionParam1())
                     .setIdentifier(event.getIdentifier())
                     .setType(MenuAction.RUNELITE)
-                    .onClick(e -> Walker.cancel());
+                    .onClick(e -> walkerPath.cancel());
         }
 
 

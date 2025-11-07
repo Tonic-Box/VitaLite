@@ -15,13 +15,12 @@ import com.tonic.data.StrongholdSecurityQuestion;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.queries.TileObjectQuery;
-import com.tonic.services.ClickManager;
 import com.tonic.services.ClickVisualizationOverlay;
 import static com.tonic.services.pathfinder.Walker.*;
+import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.abstractions.IStep;
 import com.tonic.services.pathfinder.teleports.Teleport;
-import com.tonic.util.IntPair;
 import com.tonic.util.Location;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,8 +41,6 @@ public class WalkerPath
     private final Client client;
     @Getter
     private final List<IStep> steps;
-
-    @Setter
     @Getter
     private boolean canceled = false;
     @Setter
@@ -91,6 +88,11 @@ public class WalkerPath
         }
     }
 
+    public void cancel()
+    {
+        this.canceled = true;
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void repath()
     {
@@ -100,14 +102,16 @@ public class WalkerPath
     }
 
     /**
-     * Initialize the WalkerPath (handles initial prayer setup)
+     * Initialize the WalkerPath
      */
-    public void init()
+    private void init()
     {
         if(ranInit)
         {
             return;
         }
+
+        GameManager.setPathPoints(IStep.toWorldPoints(steps));
 
         if(prayers != null)
         {
@@ -125,6 +129,17 @@ public class WalkerPath
         {
             PrayerAPI.turnOffQuickPrayers();
         }
+        GameManager.clearPathPoints();
+    }
+
+    private boolean isDone()
+    {
+        boolean value = steps.isEmpty();
+        if(value)
+        {
+            shutdown();
+        }
+        return value;
     }
 
     /**
@@ -137,35 +152,38 @@ public class WalkerPath
 
         if(canceled)
         {
+            shutdown();
             return false;
         }
 
-        if(steps == null)
+        if(steps == null || steps.isEmpty())
         {
+            shutdown();
             return false;
         }
 
         if(!client.getGameState().equals(GameState.LOGGED_IN))
         {
-            return !steps.isEmpty();
+            return !isDone();
         }
 
         if(handleTeleport())
         {
-            return !steps.isEmpty();
+            return !isDone();
         }
 
         if(handleTransports())
         {
-            return !steps.isEmpty();
+            return !isDone();
         }
 
         if (shouldHandleDialogue(steps)) {
             handleDialogue();
-            return !steps.isEmpty();
+            return !isDone();
         }
 
         if (steps.isEmpty()) {
+            shutdown();
             return false;
         }
 
@@ -184,7 +202,7 @@ public class WalkerPath
                 return true;
             }
             if (handlePassThroughObjects(local, steps, step) || !PlayerAPI.isIdle(local)) {
-                return !steps.isEmpty();
+                return !isDone();
             }
             repath();
             return true;
@@ -220,7 +238,7 @@ public class WalkerPath
         MovementAPI.walkTowards(step.getPosition());
         if(!step.hasTransport())
             steps.remove(step);
-        return !steps.isEmpty();
+        return !isDone();
     }
 
     private boolean handlePassThroughObjects(Player local, List<? extends IStep> steps, IStep step)

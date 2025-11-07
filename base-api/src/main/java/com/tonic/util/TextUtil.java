@@ -186,6 +186,16 @@ public class TextUtil
         return false;
     }
 
+    public static boolean containsIgnoreCaseInverse(String target, String... names) {
+        for (String name : names) {
+            if( name == null ) continue;
+            if (sanitize(name).toLowerCase().contains(target.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String sanitize(String text)
     {
         if(text == null)

@@ -94,7 +94,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      */
     public TileObjectQuery<T> withAction(String action)
     {
-        return keepIf(o -> o.getActions() != null && TextUtil.containsIgnoreCase(action, o.getActions()));
+        return keepIf(o -> o.getActions() != null && TextUtil.containsIgnoreCaseInverse(action, o.getActions()));
     }
 
     /**
@@ -232,7 +232,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @return TileObjectQuery
      */
     public TileObjectQuery<T> withPartialAction(String partial) {
-        return keepIf(o -> o.getActions() != null && TextUtil.containsIgnoreCase(partial, o.getActions()));
+        return keepIf(o -> o.getActions() != null && TextUtil.containsIgnoreCaseInverse(partial, o.getActions()));
     }
 
     /**
