@@ -2,7 +2,7 @@ package com.tonic.api.threaded;
 
 import com.tonic.Static;
 import com.tonic.api.entities.PlayerAPI;
-import com.tonic.util.Coroutine;
+import com.tonic.util.AsyncTask;
 import com.tonic.services.GameManager;
 import net.runelite.api.Client;
 import net.runelite.api.Player;
@@ -31,7 +31,7 @@ public class Delays
         int start = GameManager.getTickCount();
         while(GameManager.getTickCount() < tick && GameManager.getTickCount() >= start)
         {
-            if(Thread.currentThread().isInterrupted() || Coroutine._isCancelled())
+            if(Thread.currentThread().isInterrupted() || AsyncTask._isCancelled())
             {
                 throw new RuntimeException();
             }
@@ -59,7 +59,7 @@ public class Delays
     {
         while(!condition.get())
         {
-            if(Thread.currentThread().isInterrupted() || Coroutine._isCancelled())
+            if(Thread.currentThread().isInterrupted() || AsyncTask._isCancelled())
             {
                 throw new RuntimeException();
             }
@@ -82,7 +82,7 @@ public class Delays
             {
                 return false;
             }
-            if(Thread.currentThread().isInterrupted() || Coroutine._isCancelled())
+            if(Thread.currentThread().isInterrupted() || AsyncTask._isCancelled())
             {
                 throw new RuntimeException();
             }
@@ -107,7 +107,7 @@ public class Delays
             {
                 return false;
             }
-            if(Thread.currentThread().isInterrupted() || Coroutine._isCancelled())
+            if(Thread.currentThread().isInterrupted() || AsyncTask._isCancelled())
             {
                 throw new RuntimeException();
             }

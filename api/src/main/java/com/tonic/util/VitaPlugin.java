@@ -35,7 +35,7 @@ public class VitaPlugin extends Plugin
         if(loopFuture != null && !loopFuture.isDone())
             return;
 
-        loopFuture = ThreadPool.submit(new Coroutine(() -> {
+        loopFuture = ThreadPool.submit(new AsyncTask(() -> {
             try
             {
                 loop();
@@ -51,7 +51,7 @@ public class VitaPlugin extends Plugin
             }
             finally
             {
-                Coroutine.dispose();
+                AsyncTask.dispose();
             }
         }));
     }
@@ -65,7 +65,7 @@ public class VitaPlugin extends Plugin
         if(loopFuture == null || loopFuture.isDone())
             callback.run();
         System.out.println("Halting " + getName() + " loop...");
-        Coroutine._cancel();
+        AsyncTask._cancel();
         ThreadPool.submit(() -> {
             while(!loopFuture.isDone())
             {

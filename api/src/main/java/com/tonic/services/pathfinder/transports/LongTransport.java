@@ -3,12 +3,12 @@ package com.tonic.services.pathfinder.transports;
 import com.tonic.Static;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.TileObjectAPI;
-import com.tonic.api.threaded.DialogueNode;
+import com.tonic.util.DialogueNode;
 import com.tonic.data.TileObjectEx;
+import com.tonic.util.handler.StepHandler;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
-import com.tonic.services.pathfinder.model.TransportHandler;
-import com.tonic.services.pathfinder.model.HandlerBuilder;
+import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.services.pathfinder.requirements.Requirements;
 import com.tonic.util.WorldPointUtil;
 import net.runelite.api.Client;
@@ -19,13 +19,13 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 public class LongTransport extends Transport
 {
-    public LongTransport(WorldPoint source, WorldPoint destination, int sourceRadius, int destinationRadius, TransportHandler handler) {
+    public LongTransport(WorldPoint source, WorldPoint destination, int sourceRadius, int destinationRadius, StepHandler handler) {
         super(source, destination, sourceRadius, destinationRadius, null, -1);
         this.handler = handler;
         this.duration = handler.size();
     }
 
-    public LongTransport(WorldPoint source, WorldPoint destination, int sourceRadius, int destinationRadius, TransportHandler handler, Requirements requirements, int delay) {
+    public LongTransport(WorldPoint source, WorldPoint destination, int sourceRadius, int destinationRadius, StepHandler handler, Requirements requirements, int delay) {
         super(WorldPointUtil.compress(source), WorldPointUtil.compress(destination), sourceRadius, destinationRadius, delay, handler, requirements, -1);
         this.source = WorldPointUtil.compress(source);
         this.destination = WorldPointUtil.compress(destination);

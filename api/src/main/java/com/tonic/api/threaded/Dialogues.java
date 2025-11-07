@@ -1,5 +1,7 @@
 package com.tonic.api.threaded;
 
+import com.tonic.util.DialogueNode;
+
 import static com.tonic.api.widgets.DialogueAPI.*;
 
 /**

@@ -8,12 +8,12 @@ import lombok.Setter;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * A class representing a coroutine that can be cancelled.
- * The coroutine is created from a given Runnable
+ * A class representing a AsyncTask that can be cancelled.
+ * The AsyncTask is created from a given Runnable
  */
-public class Coroutine implements Runnable {
+public class AsyncTask implements Runnable {
     private static volatile boolean canceled = false;
-    private static volatile Coroutine live = null;
+    private static volatile AsyncTask live = null;
     private final Runnable runnable;
     @Setter
     @Getter
@@ -26,7 +26,7 @@ public class Coroutine implements Runnable {
     @Getter
     private long threadId = 0L;
 
-    public Coroutine(@NonNull Runnable runnable) {
+    public AsyncTask(@NonNull Runnable runnable) {
         super();
         this.runnable = runnable;
     }
