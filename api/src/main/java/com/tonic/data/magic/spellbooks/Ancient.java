@@ -5,6 +5,7 @@ import com.tonic.data.magic.Rune;
 import com.tonic.data.magic.RuneRequirement;
 import com.tonic.data.magic.Spell;
 import com.tonic.data.magic.spellbooks.SpellbookEnums.AncientSpell;
+import lombok.Getter;
 import net.runelite.api.gameval.InterfaceID;
 
 public enum Ancient implements Spell
@@ -137,6 +138,7 @@ public enum Ancient implements Spell
     private final int level;
     private final int interfaceId;
     private final int autoCastWidgetIndex;
+    @Getter
     private final RuneRequirement[] requirements;
     private final int spellIndex;
 
