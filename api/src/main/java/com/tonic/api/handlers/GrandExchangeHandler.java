@@ -4,23 +4,33 @@ import com.tonic.Logger;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.widgets.GrandExchangeAPI;
 import com.tonic.data.GrandExchangeSlot;
-import com.tonic.data.WorldLocation;
 import com.tonic.queries.NpcQuery;
-import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.util.handler.AbstractHandlerBuilder;
-import com.tonic.util.handler.HandlerBuilder;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
-
 import static com.tonic.api.widgets.GrandExchangeAPI.*;
 
+/**
+ * Handler builder for interacting with the Grand Exchange.
+ */
 public class GrandExchangeHandler extends AbstractHandlerBuilder {
+
+    /**
+     * Creates a new instance of the GrandExchangeHandler.
+     *
+     * @return A new GrandExchangeHandler instance.
+     */
     public static GrandExchangeHandler get()
     {
         return new GrandExchangeHandler();
     }
     private static final WorldPoint location = new WorldPoint(3164, 3487, 0);
 
+    /**
+     * Opens the Grand Exchange interface by walking to the location and interacting with the clerk.
+     *
+     * @return GrandExchangeHandler instance
+     */
     public GrandExchangeHandler open()
     {
         walkTo(location);
@@ -34,6 +44,11 @@ public class GrandExchangeHandler extends AbstractHandlerBuilder {
         return this;
     }
 
+    /**
+     * Collects all items from the Grand Exchange.
+     *
+     * @return GrandExchangeHandler instance
+     */
     public GrandExchangeHandler collectAll()
     {
         add(GrandExchangeAPI::collectAll);
@@ -41,6 +56,15 @@ public class GrandExchangeHandler extends AbstractHandlerBuilder {
         return this;
     }
 
+    /**
+     * Buys an item from the Grand Exchange.
+     *
+     * @param itemId      The ID of the item to buy.
+     * @param quantity    The quantity of the item to buy.
+     * @param pricePerItem The price per item.
+     * @param noted       Whether to collect the item as noted.
+     * @return GrandExchangeHandler instance
+     */
     public GrandExchangeHandler buy(int itemId, int quantity, int pricePerItem, boolean noted)
     {
         buyOffer(itemId, quantity, pricePerItem);
@@ -56,6 +80,14 @@ public class GrandExchangeHandler extends AbstractHandlerBuilder {
         return this;
     }
 
+    /**
+     * Sells an item to the Grand Exchange.
+     *
+     * @param itemId      The ID of the item to sell.
+     * @param quantity    The quantity of the item to sell.
+     * @param pricePerItem The price per item.
+     * @return GrandExchangeHandler instance
+     */
     public GrandExchangeHandler sell(int itemId, int quantity, int pricePerItem)
     {
         sellOffer(itemId, quantity, pricePerItem);
@@ -70,6 +102,14 @@ public class GrandExchangeHandler extends AbstractHandlerBuilder {
         return this;
     }
 
+    /**
+     * Initiates a buy offer on the Grand Exchange.
+     *
+     * @param itemId      The ID of the item to buy.
+     * @param quantity    The quantity of the item to buy.
+     * @param pricePerItem The price per item.
+     * @return GrandExchangeHandler instance
+     */
     public GrandExchangeHandler buyOffer(int itemId, int quantity, int pricePerItem)
     {
         int step = currentStep + 1;
@@ -86,6 +126,14 @@ public class GrandExchangeHandler extends AbstractHandlerBuilder {
         return this;
     }
 
+    /**
+     * Initiates a sell offer on the Grand Exchange.
+     *
+     * @param itemId      The ID of the item to sell.
+     * @param quantity    The quantity of the item to sell.
+     * @param pricePerItem The price per item.
+     * @return GrandExchangeHandler instance
+     */
     public GrandExchangeHandler sellOffer(int itemId, int quantity, int pricePerItem)
     {
         int step = currentStep + 1;
