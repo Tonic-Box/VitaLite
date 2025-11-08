@@ -186,6 +186,7 @@ public class BreakHandlerPlugin extends Plugin
 
         if (gameState == GameState.LOGIN_SCREEN && state == State.LOGOUT)
         {
+            logoutAttempts = 0;
             state = State.IDLE;
         }
     }
