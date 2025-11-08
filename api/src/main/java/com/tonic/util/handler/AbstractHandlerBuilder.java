@@ -1,5 +1,7 @@
 package com.tonic.util.handler;
 
+import com.tonic.data.WorldLocation;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import java.util.function.*;
 
@@ -124,6 +126,11 @@ public abstract class AbstractHandlerBuilder extends HandlerBuilder
     }
 
     public HandlerBuilder walkTo(WorldPoint location)
+    {
+        return walkTo(currentStep++, location);
+    }
+
+    public HandlerBuilder walkTo(WorldArea location)
     {
         return walkTo(currentStep++, location);
     }

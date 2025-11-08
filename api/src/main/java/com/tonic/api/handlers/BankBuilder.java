@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.ItemID;
 
 /**
  * A handler builder for banking actions.
@@ -52,13 +53,12 @@ public class BankBuilder extends AbstractHandlerBuilder
      */
     public BankBuilder open(BankLocations bankLocation)
     {
-        WalkerPath pathToBank = bankLocation.pathTo();
-        addDelayUntil(() -> !pathToBank.step());
+        walkTo(bankLocation.getArea());
         int step = currentStep;
         add(context -> {
             if(BankAPI.isOpen())
             {
-                return END_EXECUTION;
+                return step + 1;
             }
             NPC banker = new NpcQuery()
                     .withNameContains("Banker")
@@ -66,10 +66,8 @@ public class BankBuilder extends AbstractHandlerBuilder
                     .nearest();
             if(banker != null)
             {
-                WorldPoint dest = Location.losTileNextTo(banker.getWorldLocation());
-                Walker.walkTo(dest);
                 NpcAPI.interact(banker, 2);
-                return step;
+                return step + 2;
             }
 
             TileObjectEx bank = new TileObjectQuery<>()
@@ -79,15 +77,14 @@ public class BankBuilder extends AbstractHandlerBuilder
             Client client = Static.getClient();
             if(bank != null && bank.getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation())  < 10)
             {
-                context.put("bankObject", bank);
-                MovementAPI.walkToWorldPoint(bank.getWorldLocation());
                 return step + 1;
             }
             return step;
         });
-        addDelayUntil(() -> !MovementAPI.isMoving());
         add(context -> {
             TileObjectEx bank = context.get("bankObject");
+            if(bank == null)
+                return;
             if(bank.getName().contains("Bank booth"))
                 TileObjectAPI.interact(bank, 1);
             else

@@ -1,8 +1,14 @@
 package com.tonic.util.handler;
 
+import com.tonic.Static;
+import com.tonic.api.game.MovementAPI;
 import com.tonic.services.pathfinder.model.WalkerPath;
+import net.runelite.api.Client;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
 
@@ -203,7 +209,35 @@ public class HandlerBuilder
                         context.remove("PATH");
                     }
                     return value;
-                });
+                })
+                .addDelayUntil(1, () -> !MovementAPI.isMoving());
+        return append(step, builder);
+    }
+
+    public HandlerBuilder walkTo(int step, WorldArea location)
+    {
+        HandlerBuilder builder = HandlerBuilder.get()
+                .addDelayUntil(0, context -> {
+                    Client client = Static.getClient();
+                    if(location.contains(client.getLocalPlayer().getWorldLocation()))
+                    {
+                        context.remove("PATH");
+                        return true;
+                    }
+                    WalkerPath path = context.get("PATH");
+                    if(path == null)
+                    {
+                        path = WalkerPath.get(List.of(location));
+                        context.put("PATH", path);
+                    }
+                    boolean value = !path.step();
+                    if(value)
+                    {
+                        context.remove("PATH");
+                    }
+                    return value;
+                })
+                .addDelayUntil(1, () -> !MovementAPI.isMoving());
         return append(step, builder);
     }
 
