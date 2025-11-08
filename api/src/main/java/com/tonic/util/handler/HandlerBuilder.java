@@ -1,5 +1,8 @@
 package com.tonic.util.handler;
 
+import com.tonic.services.pathfinder.model.WalkerPath;
+import net.runelite.api.coords.WorldPoint;
+
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
 
@@ -174,33 +177,6 @@ public class HandlerBuilder
         );
     }
 
-    public HandlerBuilder addWhileLoop(int step, int exit, Predicate<StepContext> condition, Consumer<HandlerBuilder> body)
-    {
-        handler.add(step, context -> {
-            if(condition.test(context))
-            {
-                return exit + 1;
-            }
-            else
-            {
-                return step + 1;
-            }
-        });
-        body.accept(this);
-        handler.add(exit, context -> step);
-        return this;
-    }
-
-    public HandlerBuilder addWhileLoop(int step, int exit, BooleanSupplier condition, Consumer<HandlerBuilder> body)
-    {
-        return addWhileLoop(
-                step,
-                exit,
-                context -> condition.getAsBoolean(),
-                body
-        );
-    }
-
     public HandlerBuilder append(int step, StepHandler handler)
     {
         return addDelayUntil(step, () -> !handler.step());
@@ -210,6 +186,26 @@ public class HandlerBuilder
     {
         StepHandler handler = builder.build();
         return addDelayUntil(step, () -> !handler.step());
+    }
+
+    public HandlerBuilder walkTo(int step, WorldPoint location)
+    {
+        HandlerBuilder builder = HandlerBuilder.get()
+                .addDelayUntil(0, context -> {
+                    WalkerPath path = context.get("PATH");
+                    if(path == null)
+                    {
+                        path = WalkerPath.get(location);
+                        context.put("PATH", path);
+                    }
+                    boolean value = !path.step();
+                    if(value)
+                    {
+                        context.remove("PATH");
+                    }
+                    return value;
+                });
+        return append(step, builder);
     }
 
     /**

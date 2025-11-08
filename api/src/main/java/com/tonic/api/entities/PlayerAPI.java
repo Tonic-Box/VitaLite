@@ -77,4 +77,15 @@ public class PlayerAPI extends ActorAPI
         Client client = Static.getClient();
         return client.getLocalPlayer();
     }
+
+    /**
+     * check if the local player is idle
+     * @return true if idle
+     */
+    public static boolean isIdle()
+    {
+        Client client = Static.getClient();
+        Player player = client.getLocalPlayer();
+        return (player.getIdlePoseAnimation() == player.getPoseAnimation() && player.getAnimation() == -1);
+    }
 }

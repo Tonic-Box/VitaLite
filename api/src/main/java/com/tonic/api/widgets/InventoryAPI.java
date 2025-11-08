@@ -139,6 +139,18 @@ public class InventoryAPI
     }
 
     /**
+     * interact with an item in your inventory by name and action index
+     * @param itemName item name
+     * @param action action
+     */
+    public static void interact(String itemName, String action) {
+        ItemEx item = getItem(itemName);
+        if(item != null) {
+            itemAction(item.getSlot(), item.getId(), getAction(item, action));
+        }
+    }
+
+    /**
      * interact with an item in your inventory by subOp and action
      * @param item item
      * @param menu menu (Eg. "Rub")
@@ -252,6 +264,21 @@ public class InventoryAPI
 
     /**
      * drop all items from your inventory by list of ids
+     * @param names items to drop
+     * @return number of ticks it will take
+     */
+    public static int dropAll(String... names)
+    {
+        int count = 0;
+        for(String name : names)
+        {
+            count = dropAll(name);
+        }
+        return (int) Math.ceil((double) count / 10);
+    }
+
+    /**
+     * drop all items from your inventory by list of ids
      * @param id item id to drop
      * @return number of ticks it will take
      */
@@ -262,6 +289,26 @@ public class InventoryAPI
         for(ItemEx item : inventory.getItems())
         {
             if(item.getId() == id)
+            {
+                count++;
+                InventoryAPI.interact(item, 7);
+            }
+        }
+        return (int) Math.ceil((double) count / 10);
+    }
+
+    /**
+     * drop all items from your inventory by list of ids
+     * @param name item to drop
+     * @return number of ticks it will take
+     */
+    public static int dropAll(String name)
+    {
+        ItemContainerEx inventory = new ItemContainerEx(InventoryID.INV);
+        int count = 0;
+        for(ItemEx item : inventory.getItems())
+        {
+            if(item.getName().toLowerCase().contains(name.toLowerCase()))
             {
                 count++;
                 InventoryAPI.interact(item, 7);

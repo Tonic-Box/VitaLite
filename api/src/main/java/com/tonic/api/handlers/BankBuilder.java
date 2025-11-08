@@ -12,20 +12,18 @@ import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.util.Location;
-import com.tonic.util.handler.HandlerBuilder;
+import com.tonic.util.handler.AbstractHandlerBuilder;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
 
-public class BankBuilder extends HandlerBuilder
+public class BankBuilder extends AbstractHandlerBuilder
 {
     public static DialogueBuilder get()
     {
         return new DialogueBuilder();
     }
-
-    private int currentStep = 0;
 
     public BankBuilder open()
     {
@@ -35,9 +33,9 @@ public class BankBuilder extends HandlerBuilder
     public BankBuilder open(BankLocations bankLocation)
     {
         WalkerPath pathToBank = bankLocation.pathTo();
-        addDelayUntil(currentStep++, () -> !pathToBank.step());
+        addDelayUntil(() -> !pathToBank.step());
         int step = currentStep;
-        add(currentStep++, context -> {
+        add(context -> {
             if(BankAPI.isOpen())
             {
                 return END_EXECUTION;
@@ -67,33 +65,33 @@ public class BankBuilder extends HandlerBuilder
             }
             return step;
         });
-        addDelayUntil(currentStep++, () -> !MovementAPI.isMoving());
-        add(currentStep++, context -> {
+        addDelayUntil(() -> !MovementAPI.isMoving());
+        add(context -> {
             TileObjectEx bank = context.get("bankObject");
             if(bank.getName().contains("Bank booth"))
                 TileObjectAPI.interact(bank, 1);
             else
                 TileObjectAPI.interact(bank, 0);
         });
-        addDelayUntil(currentStep++, BankAPI::isOpen);
+        addDelayUntil(BankAPI::isOpen);
         return this;
     }
 
     public BankBuilder depositInventory()
     {
-        add(currentStep++, BankAPI::depositAll);
+        add(BankAPI::depositAll);
         return this;
     }
 
     public BankBuilder depositEquipment()
     {
-        add(currentStep++, BankAPI::depositEquipment);
+        add(BankAPI::depositEquipment);
         return this;
     }
 
     public BankBuilder withdraw(boolean noted, BankItem... items)
     {
-        add(currentStep++, () -> {
+        add(() -> {
             for(BankItem item : items)
             {
                 BankAPI.withdraw(item.itemId, item.amount, noted);
@@ -104,7 +102,7 @@ public class BankBuilder extends HandlerBuilder
 
     public BankBuilder deposit(BankItem... items)
     {
-        add(currentStep++, () -> {
+        add(() -> {
             for(BankItem item : items)
             {
                 BankAPI.deposit(item.itemId, item.amount);
@@ -115,13 +113,13 @@ public class BankBuilder extends HandlerBuilder
 
     public BankBuilder use(int itemId)
     {
-        add(currentStep++, () -> BankAPI.use(itemId));
+        add(() -> BankAPI.use(itemId));
         return this;
     }
 
     public BankBuilder useGuessNextSlot(int itemId)
     {
-        add(currentStep++, () -> BankAPI.useGuessNextSlot(itemId));
+        add(() -> BankAPI.useGuessNextSlot(itemId));
         return this;
     }
 
