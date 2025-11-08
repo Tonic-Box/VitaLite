@@ -149,7 +149,7 @@ public class BreakHandlerPlugin extends Plugin
             this.configManager.setProperty(Property.ACCOUNT_PASSWORD.key(), password);
         }
 
-        boolean autoLogin = System.getProperties().contains("vAutoLogin");
+        boolean autoLogin = System.getProperty("vAutoLogin") != null;
         this.configManager.setProperty(Property.ACCOUNT_AUTO_LOGIN.key(), autoLogin);
     }
 
