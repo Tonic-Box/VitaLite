@@ -4,39 +4,39 @@ import com.tonic.Logger;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.widgets.GrandExchangeAPI;
 import com.tonic.data.GrandExchangeSlot;
+import com.tonic.data.WorldLocation;
 import com.tonic.queries.NpcQuery;
 import com.tonic.services.pathfinder.model.WalkerPath;
+import com.tonic.util.handler.AbstractHandlerBuilder;
 import com.tonic.util.handler.HandlerBuilder;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
 
 import static com.tonic.api.widgets.GrandExchangeAPI.*;
 
-public class GrandExchangeHandler extends HandlerBuilder {
+public class GrandExchangeHandler extends AbstractHandlerBuilder {
     public static GrandExchangeHandler get()
     {
         return new GrandExchangeHandler();
     }
-
-    private int currentStep = 0;
+    private static final WorldPoint location = new WorldPoint(3164, 3487, 0);
 
     public GrandExchangeHandler open()
     {
-        WalkerPath path = WalkerPath.get(new WorldPoint(3164, 3487, 0));
-        addDelayUntil(currentStep++, () -> !path.step());
-        add(currentStep++, () -> {
+        walkTo(location);
+        add(() -> {
             NPC clerk = new NpcQuery()
                     .withNameContains("Clerk")
                     .nearest();
             NpcAPI.interact(clerk, 2);
         });
-        addDelayUntil(currentStep++, GrandExchangeAPI::isOpen);
+        addDelayUntil(GrandExchangeAPI::isOpen);
         return this;
     }
 
     public GrandExchangeHandler collectAll()
     {
-        add(currentStep++, GrandExchangeAPI::collectAll);
+        add(GrandExchangeAPI::collectAll);
 
         return this;
     }
@@ -44,12 +44,12 @@ public class GrandExchangeHandler extends HandlerBuilder {
     public GrandExchangeHandler buy(int itemId, int quantity, int pricePerItem, boolean noted)
     {
         buyOffer(itemId, quantity, pricePerItem);
-        addDelayUntil(currentStep++, context -> {
+        addDelayUntil(context -> {
             GrandExchangeSlot slot = context.get("ge_slot_buy");
             return slot.isDone();
         });
-        addDelay(currentStep++, 1);
-        add(currentStep++, context -> {
+        addDelay(1);
+        add(context -> {
             GrandExchangeSlot slot = context.get("ge_slot_buy");
             collectFromSlot(slot.getSlot(), noted, quantity);
         });
@@ -59,11 +59,11 @@ public class GrandExchangeHandler extends HandlerBuilder {
     public GrandExchangeHandler sell(int itemId, int quantity, int pricePerItem)
     {
         sellOffer(itemId, quantity, pricePerItem);
-        addDelayUntil(currentStep++, context -> {
+        addDelayUntil(context -> {
             GrandExchangeSlot slot = context.get("ge_slot_sell");
             return slot.isDone();
         });
-        add(currentStep++, context -> {
+        add(context -> {
             GrandExchangeSlot slot = context.get("ge_slot_sell");
             collectFromSlot(slot.getSlot());
         });
@@ -73,7 +73,7 @@ public class GrandExchangeHandler extends HandlerBuilder {
     public GrandExchangeHandler buyOffer(int itemId, int quantity, int pricePerItem)
     {
         int step = currentStep + 1;
-        add(currentStep++, context -> {
+        add(context -> {
             GrandExchangeSlot slot = startBuyOffer(itemId, quantity, pricePerItem);
             if(slot == null)
             {
@@ -89,7 +89,7 @@ public class GrandExchangeHandler extends HandlerBuilder {
     public GrandExchangeHandler sellOffer(int itemId, int quantity, int pricePerItem)
     {
         int step = currentStep + 1;
-        add(currentStep++, context -> {
+        add(context -> {
             GrandExchangeSlot slot = startSellOffer(itemId, quantity, pricePerItem);
             if(slot == null)
             {

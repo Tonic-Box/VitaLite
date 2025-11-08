@@ -7,6 +7,7 @@ import static com.tonic.api.widgets.TradeAPI.*;
 
 import com.tonic.data.ItemEx;
 import com.tonic.queries.PlayerQuery;
+import com.tonic.util.handler.AbstractHandlerBuilder;
 import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.util.handler.StepContext;
 import lombok.RequiredArgsConstructor;
@@ -17,19 +18,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TradeBuilder extends HandlerBuilder
+public class TradeBuilder extends AbstractHandlerBuilder
 {
     public static DialogueBuilder get()
     {
         return new DialogueBuilder();
     }
 
-    private int currentStep = 0;
-
-    public TradeBuilder tradePlayer(String name, TradeItem... items)
+    public TradeBuilder tradePlayer(String name, int timeout, TradeItem... items)
     {
         int step = currentStep;
-        add(currentStep++, context -> {
+        add(context -> {
             context.put("ORIGINAL", TradeItem.of(InventoryAPI.getItems(), false));
             Player player = new PlayerQuery()
                     .withName(name)
@@ -41,19 +40,29 @@ public class TradeBuilder extends HandlerBuilder
             PlayerAPI.interact(player, "Trade");
             return step + 1;
         });
-        addDelayUntil(currentStep++, TradeAPI::isOnMainScreen);
-        add(currentStep++, () -> {
+        addDelayUntil(timeout, TradeAPI::isOnMainScreen, () -> {});
+        int step2 = currentStep + 1;
+        add(() -> {
+            if(!isOpen())
+            {
+                return END_EXECUTION;
+            }
             if(items == null)
             {
-                return;
+                return step2;
             }
             for(TradeItem item : items)
             {
                 TradeAPI.offer(item.itemId, item.amount);
             }
+            return step2;
         });
-        addDelayUntil(currentStep++, TradeAPI::isAcceptedByOther);
-        addDelayUntil(currentStep++, context -> {
+        addDelayUntil(TradeAPI::isAcceptedByOther);
+        addDelayUntil(context -> {
+            if(!isOpen())
+            {
+                return true;
+            }
             if(!isAcceptedByPlayer())
             {
                 context.put("RECEIVED", TradeItem.of(getReceivingItems(), false));
@@ -62,7 +71,7 @@ public class TradeBuilder extends HandlerBuilder
             }
             return !isOnConfirmationScreen();
         });
-        addDelayUntil(currentStep++, context -> {
+        addDelayUntil(context -> {
             if(!isAcceptedByPlayer())
             {
                 accept();
@@ -82,6 +91,11 @@ public class TradeBuilder extends HandlerBuilder
         List<TradeItem> original = consolidate(context.get("ORIGINAL"));
         List<TradeItem> received = consolidate(context.get("RECEIVED"));
         List<TradeItem> offered = consolidate(context.get("OFFERED"));
+
+        if(original == null || received == null || offered == null)
+        {
+            return false;
+        }
 
         List<TradeItem> shift = new ArrayList<>();
         shift.addAll(received);

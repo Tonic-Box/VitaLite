@@ -12,10 +12,20 @@ public class StepContext
     }
 
     public <T> T get(String key) {
+        if(!contextMap.containsKey(key)) {
+            return null;
+        }
         return (T) contextMap.get(key);
     }
 
     public <T> T get(String key, Class<T> clazz) {
+        if(!contextMap.containsKey(key)) {
+            return null;
+        }
         return clazz.cast(contextMap.get(key));
+    }
+
+    public void remove(String key) {
+        contextMap.remove(key);
     }
 }
