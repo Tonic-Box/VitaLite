@@ -8,7 +8,6 @@ import static com.tonic.api.widgets.TradeAPI.*;
 import com.tonic.data.ItemEx;
 import com.tonic.queries.PlayerQuery;
 import com.tonic.util.handler.AbstractHandlerBuilder;
-import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.util.handler.StepContext;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.Player;
@@ -18,13 +17,35 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Builder for handling player trades.
+ */
 public class TradeBuilder extends AbstractHandlerBuilder
 {
-    public static DialogueBuilder get()
+    /**
+     * Creates a new instance of TradeBuilder.
+     *
+     * @return A new TradeBuilder instance.
+     */
+    public static TradeBuilder get()
     {
-        return new DialogueBuilder();
+        return new TradeBuilder();
     }
 
+    /**
+     * Trades with a player by name, offering specified items.
+     *
+     * CONTEXT:
+     * - "ORIGINAL": List of TradeItem representing the original inventory before trade.
+     * - "RECEIVED": List of TradeItem representing the items received from the trade.
+     * - "OFFERED": List of TradeItem representing the items offered in the trade.
+     * - "RESULT": String indicating "SUCCESS" or "FAILURE" based on trade validation.
+     *
+     * @param name    The name of the player to trade with.
+     * @param timeout The timeout in milliseconds to wait for the trade screen to open.
+     * @param items   The items to offer in the trade.
+     * @return The current TradeBuilder instance for chaining.
+     */
     public TradeBuilder tradePlayer(String name, int timeout, TradeItem... items)
     {
         int step = currentStep;
@@ -129,9 +150,18 @@ public class TradeBuilder extends AbstractHandlerBuilder
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Represents an item involved in a trade, including its ID and amount.
+     */
     @RequiredArgsConstructor
     public static class TradeItem
     {
+        /**
+         * Creates an array of TradeItem from pairs of item IDs and quantities.
+         *
+         * @param itemIdQuantityPairs Pairs of item IDs and quantities.
+         * @return An array of TradeItem.
+         */
         public static TradeItem[] of(int... itemIdQuantityPairs)
         {
             if(itemIdQuantityPairs.length % 2 != 0)

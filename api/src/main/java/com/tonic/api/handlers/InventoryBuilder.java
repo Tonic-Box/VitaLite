@@ -9,41 +9,79 @@ import com.tonic.data.ItemEx;
 import com.tonic.data.TileItemEx;
 import com.tonic.data.TileObjectEx;
 import com.tonic.util.handler.AbstractHandlerBuilder;
-import com.tonic.util.handler.HandlerBuilder;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 
+/**
+ * Builder for creating inventory-related handlers.
+ */
 public class InventoryBuilder extends AbstractHandlerBuilder
 {
-    public static HandlerBuilder get()
+    /**
+     * Creates a new InventoryBuilder instance.
+     *
+     * @return A new InventoryBuilder.
+     */
+    public static InventoryBuilder get()
     {
-        return new HandlerBuilder();
+        return new InventoryBuilder();
     }
 
+    /**
+     * Interacts with an item in the inventory.
+     * @param itemId item ID
+     * @param action action to perform
+     * @return InventoryBuilder instance
+     */
     public InventoryBuilder interact(int itemId, String action)
     {
         add(() -> InventoryAPI.interact(itemId, action));
         return this;
     }
 
+    /**
+     * Interacts with an item in the inventory.
+     * @param itemName item name
+     * @param action action to perform
+     * @return InventoryBuilder instance
+     */
     public InventoryBuilder interact(String itemName, String action)
     {
         add(() -> InventoryAPI.interact(itemName, action));
         return this;
     }
 
+    /**
+     * Interacts with a sub-option of an item in the inventory.
+     * @param itemId item ID
+     * @param menu menu option
+     * @param action action to perform
+     * @return InventoryBuilder instance
+     */
     public InventoryBuilder interact(int itemId, String menu, String action)
     {
         add(() -> InventoryAPI.interactSubOp(itemId, menu, action));
         return this;
     }
 
+    /**
+     * Interacts with a sub-option of an item in the inventory.
+     * @param itemName item name
+     * @param menu menu option
+     * @param action action to perform
+     * @return InventoryBuilder instance
+     */
     public InventoryBuilder interact(String itemName, String menu, String action)
     {
         add(() -> InventoryAPI.interactSubOp(itemName, menu, action));
         return this;
     }
 
+    /**
+     * Drops specified items from the inventory.
+     * @param itemNames Names of the items to drop.
+     * @return InventoryBuilder instance.
+     */
     public InventoryBuilder drop(String... itemNames)
     {
 
@@ -59,6 +97,13 @@ public class InventoryBuilder extends AbstractHandlerBuilder
         return this;
     }
 
+    /**
+     * Uses one item on another in the inventory.
+     * @param delay Delay after the action.
+     * @param itemName1 Name of the first item.
+     * @param itemName2 Name of the second item.
+     * @return InventoryBuilder instance.
+     */
     public InventoryBuilder useOnItem(int delay, String itemName1, String itemName2)
     {
         ItemEx item1 = InventoryAPI.getItem(itemName1);
@@ -72,6 +117,13 @@ public class InventoryBuilder extends AbstractHandlerBuilder
         return this;
     }
 
+    /**
+     * Uses an item on a tile item.
+     * @param delay Delay after the action.
+     * @param itemName Name of the item in inventory.
+     * @param tileItemName Name of the tile item.
+     * @return InventoryBuilder instance.
+     */
     public InventoryBuilder useOnTileItem(int delay, String itemName, String tileItemName)
     {
         ItemEx item = InventoryAPI.getItem(itemName);
@@ -85,6 +137,13 @@ public class InventoryBuilder extends AbstractHandlerBuilder
         return this;
     }
 
+    /**
+     * Uses an item on a tile object.
+     * @param delay Delay after the action.
+     * @param itemName Name of the item in inventory.
+     * @param objectName Name of the tile object.
+     * @return InventoryBuilder instance.
+     */
     public InventoryBuilder useOnObject(int delay, String itemName, String objectName)
     {
         ItemEx item = InventoryAPI.getItem(itemName);
@@ -98,6 +157,13 @@ public class InventoryBuilder extends AbstractHandlerBuilder
         return this;
     }
 
+    /**
+     * Uses an item on an NPC.
+     * @param delay Delay after the action.
+     * @param itemName Name of the item in inventory.
+     * @param npcName Name of the NPC.
+     * @return InventoryBuilder instance.
+     */
     public InventoryBuilder useOnNpc(int delay, String itemName, String npcName)
     {
         ItemEx item = InventoryAPI.getItem(itemName);
@@ -111,6 +177,13 @@ public class InventoryBuilder extends AbstractHandlerBuilder
         return this;
     }
 
+    /**
+     * Uses an item on a player.
+     * @param delay Delay after the action.
+     * @param itemName Name of the item in inventory.
+     * @param playerName Name of the player.
+     * @return InventoryBuilder instance.
+     */
     public InventoryBuilder useOnPlayer(int delay, String itemName, String playerName)
     {
         ItemEx item = InventoryAPI.getItem(itemName);

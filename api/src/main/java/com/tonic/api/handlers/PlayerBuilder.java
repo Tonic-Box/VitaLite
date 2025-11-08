@@ -6,13 +6,28 @@ import com.tonic.queries.PlayerQuery;
 import com.tonic.util.handler.AbstractHandlerBuilder;
 import net.runelite.api.Player;
 
+/**
+ * Builder for handling player interactions.
+ */
 public class PlayerBuilder extends AbstractHandlerBuilder
 {
+    /**
+     * Creates a new PlayerBuilder instance.
+     *
+     * @return A new PlayerBuilder.
+     */
     public static PlayerBuilder get()
     {
         return new PlayerBuilder();
     }
 
+    /**
+     * Interacts with a player by name and action.
+     *
+     * @param name   The name of the player.
+     * @param action The action to perform.
+     * @return The current PlayerBuilder instance.
+     */
     public PlayerBuilder interact(String name, String action)
     {
         add(() -> {
@@ -22,6 +37,12 @@ public class PlayerBuilder extends AbstractHandlerBuilder
         return this;
     }
 
+    /**
+     * Follows a player by name.
+     *
+     * @param name The name of the player to follow.
+     * @return The current PlayerBuilder instance.
+     */
     public PlayerBuilder follow(String name)
     {
         interact(name, "Follow");
@@ -29,11 +50,23 @@ public class PlayerBuilder extends AbstractHandlerBuilder
         return this;
     }
 
+    /**
+     * Attacks a player by name.
+     *
+     * @param name The name of the player to attack.
+     * @return The current PlayerBuilder instance.
+     */
     public PlayerBuilder attack(String name)
     {
         return interact(name, "Attack");
     }
 
+    /**
+     * Trades with a player by name.
+     *
+     * @param name The name of the player to trade with.
+     * @return The current PlayerBuilder instance.
+     */
     public PlayerBuilder trade(String name)
     {
         return interact(name, "Trade");

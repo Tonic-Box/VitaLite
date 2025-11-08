@@ -18,18 +18,38 @@ import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
 
+/**
+ * A handler builder for banking actions.
+ */
 public class BankBuilder extends AbstractHandlerBuilder
 {
-    public static DialogueBuilder get()
+    /**
+     * Creates a new instance of the BankBuilder.
+     *
+     * @return A new BankBuilder instance.
+     */
+    public static BankBuilder get()
     {
-        return new DialogueBuilder();
+        return new BankBuilder();
     }
 
+    /**
+     * Walks to and opens the nearest bank.
+     *
+     * @return The current BankBuilder instance for chaining.
+     */
     public BankBuilder open()
     {
         BankLocations nearestBank = BankLocations.getNearest();
         return open(nearestBank);
     }
+
+    /**
+     * Walks to and opens the specified bank location.
+     *
+     * @param bankLocation The bank location to open.
+     * @return BankBuilder instance
+     */
     public BankBuilder open(BankLocations bankLocation)
     {
         WalkerPath pathToBank = bankLocation.pathTo();
@@ -77,18 +97,33 @@ public class BankBuilder extends AbstractHandlerBuilder
         return this;
     }
 
+    /**
+     * Deposits the entire inventory into the bank.
+     * @return BankBuilder instance
+     */
     public BankBuilder depositInventory()
     {
         add(BankAPI::depositAll);
         return this;
     }
 
+    /**
+     * Deposits all equipped items into the bank.
+     * @return BankBuilder instance
+     */
     public BankBuilder depositEquipment()
     {
         add(BankAPI::depositEquipment);
         return this;
     }
 
+    /**
+     * Withdraws the specified items from the bank.
+     *
+     * @param noted Whether to withdraw the items as notes.
+     * @param items The items to withdraw.
+     * @return BankBuilder instance
+     */
     public BankBuilder withdraw(boolean noted, BankItem... items)
     {
         add(() -> {
@@ -100,6 +135,12 @@ public class BankBuilder extends AbstractHandlerBuilder
         return this;
     }
 
+    /**
+     * Deposits the specified items into the bank.
+     *
+     * @param items The items to deposit.
+     * @return BankBuilder instance
+     */
     public BankBuilder deposit(BankItem... items)
     {
         add(() -> {
@@ -111,21 +152,42 @@ public class BankBuilder extends AbstractHandlerBuilder
         return this;
     }
 
+    /**
+     * Uses an item from the banks inventory interface.
+     *
+     * @param itemId The ID of the item to use.
+     * @return BankBuilder instance
+     */
     public BankBuilder use(int itemId)
     {
         add(() -> BankAPI.use(itemId));
         return this;
     }
 
+    /**
+     * Uses an item from the banks inventory interface, guessing the next slot.
+     *
+     * @param itemId The ID of the item to use.
+     * @return BankBuilder instance
+     */
     public BankBuilder useGuessNextSlot(int itemId)
     {
         add(() -> BankAPI.useGuessNextSlot(itemId));
         return this;
     }
 
+    /**
+     * Represents an item in the bank/bank inv with its ID and amount.
+     */
     @RequiredArgsConstructor
     public static class BankItem
     {
+        /**
+         * Creates an array of BankItem from pairs of item IDs and quantities.
+         *
+         * @param itemIdQuantityPairs Pairs of item IDs and quantities.
+         * @return An array of BankItem.
+         */
         public static BankItem[] of(int... itemIdQuantityPairs)
         {
             if(itemIdQuantityPairs.length % 2 != 0)
