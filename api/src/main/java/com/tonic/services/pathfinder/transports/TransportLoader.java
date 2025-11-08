@@ -8,7 +8,7 @@ import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.*;
 import com.tonic.util.DialogueNode;
-import com.tonic.api.threaded.WorldsAPI;
+import com.tonic.api.game.WorldsAPI;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;

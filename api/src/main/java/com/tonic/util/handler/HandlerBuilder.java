@@ -9,6 +9,7 @@ import java.util.function.*;
 public class HandlerBuilder
 {
     public static final int END_EXECUTION = Integer.MAX_VALUE;
+
     /**
      * Creates a new HandlerBuilder
      *
@@ -16,6 +17,11 @@ public class HandlerBuilder
      */
     public static HandlerBuilder get() {
         return new HandlerBuilder();
+    }
+
+    public static StepHandler blank()
+    {
+        return new HandlerBuilder().build();
     }
 
     protected final StepHandler handler;
@@ -193,6 +199,17 @@ public class HandlerBuilder
                 context -> condition.getAsBoolean(),
                 body
         );
+    }
+
+    public HandlerBuilder append(int step, StepHandler handler)
+    {
+        return addDelayUntil(step, () -> !handler.step());
+    }
+
+    public HandlerBuilder append(int step, HandlerBuilder builder)
+    {
+        StepHandler handler = builder.build();
+        return addDelayUntil(step, () -> !handler.step());
     }
 
     /**

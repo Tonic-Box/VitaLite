@@ -4,7 +4,6 @@ import com.tonic.Logger;
 import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.api.handlers.GrandExchangeHandler;
 import com.tonic.data.GrandExchangeSlot;
-import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.util.handler.StepHandler;
 import net.runelite.api.gameval.ItemID;
 
@@ -24,11 +23,6 @@ public class GrandExchange
      */
     public static void buy(int id, int quantity, boolean noted, int tries)
     {
-        StepHandler handler = GrandExchangeHandler.get()
-                .buy(ItemID.FEATHER, 10, 50, false)
-                .sell(ItemID.FEATHER, 10, 1)
-                .build();
-        handler.threaded();
         int slotNumber = freeSlot();
         if(slotNumber == -1)
             return;

@@ -15,19 +15,9 @@ public class GrandExchangeHandler extends HandlerBuilder {
 
     private int currentStep = 0;
 
-    private int getStep()
-    {
-        return currentStep;
-    }
-
-    private int getThenIncrementStep()
-    {
-        return currentStep++;
-    }
-
     public GrandExchangeHandler collectAll()
     {
-        add(getThenIncrementStep(), GrandExchangeAPI::collectAll);
+        add(currentStep++, GrandExchangeAPI::collectAll);
 
         return this;
     }
@@ -35,12 +25,12 @@ public class GrandExchangeHandler extends HandlerBuilder {
     public GrandExchangeHandler buy(int itemId, int quantity, int pricePerItem, boolean noted)
     {
         buyOffer(itemId, quantity, pricePerItem);
-        addDelayUntil(getThenIncrementStep(), context -> {
+        addDelayUntil(currentStep++, context -> {
             GrandExchangeSlot slot = context.get("ge_slot_buy");
             return slot.isDone();
         });
-        addDelay(getThenIncrementStep(), 1);
-        add(getThenIncrementStep(), context -> {
+        addDelay(currentStep++, 1);
+        add(currentStep++, context -> {
             GrandExchangeSlot slot = context.get("ge_slot_buy");
             collectFromSlot(slot.getSlot(), noted, quantity);
         });
@@ -50,11 +40,11 @@ public class GrandExchangeHandler extends HandlerBuilder {
     public GrandExchangeHandler sell(int itemId, int quantity, int pricePerItem)
     {
         sellOffer(itemId, quantity, pricePerItem);
-        addDelayUntil(getThenIncrementStep(), context -> {
+        addDelayUntil(currentStep++, context -> {
             GrandExchangeSlot slot = context.get("ge_slot_sell");
             return slot.isDone();
         });
-        add(getThenIncrementStep(), context -> {
+        add(currentStep++, context -> {
             GrandExchangeSlot slot = context.get("ge_slot_sell");
             collectFromSlot(slot.getSlot());
         });
@@ -63,8 +53,8 @@ public class GrandExchangeHandler extends HandlerBuilder {
 
     public GrandExchangeHandler buyOffer(int itemId, int quantity, int pricePerItem)
     {
-        int step = getStep() + 1;
-        add(getThenIncrementStep(), context -> {
+        int step = currentStep + 1;
+        add(currentStep++, context -> {
             GrandExchangeSlot slot = startBuyOffer(itemId, quantity, pricePerItem);
             if(slot == null)
             {
@@ -79,8 +69,8 @@ public class GrandExchangeHandler extends HandlerBuilder {
 
     public GrandExchangeHandler sellOffer(int itemId, int quantity, int pricePerItem)
     {
-        int step = getStep() + 1;
-        add(getThenIncrementStep(), context -> {
+        int step = currentStep + 1;
+        add(currentStep++, context -> {
             GrandExchangeSlot slot = startSellOffer(itemId, quantity, pricePerItem);
             if(slot == null)
             {

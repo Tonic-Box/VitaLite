@@ -1,7 +1,6 @@
 package com.tonic.queries;
 
 import com.tonic.Static;
-import com.tonic.api.threaded.WorldsAPI;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.util.TextUtil;
 import net.runelite.api.Client;
