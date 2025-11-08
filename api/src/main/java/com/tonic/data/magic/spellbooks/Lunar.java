@@ -288,6 +288,7 @@ public enum Lunar implements Spell
     private final int level;
     private final int interfaceId;
     private final int autoCastWidgetIndex;
+    @Getter
     private final RuneRequirement[] requirements;
     private final int spellIndex;
 

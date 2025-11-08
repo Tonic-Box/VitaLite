@@ -1,10 +1,13 @@
 package com.tonic.data.locatables;
 
+import com.tonic.Static;
 import com.tonic.api.game.QuestAPI;
 import com.tonic.api.game.SkillAPI;
 import com.tonic.services.pathfinder.Walker;
+import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
+import net.runelite.api.Client;
 import net.runelite.api.Quest;
 import net.runelite.api.QuestState;
 import net.runelite.api.Skill;
@@ -13,6 +16,7 @@ import net.runelite.api.coords.WorldPoint;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -95,6 +99,12 @@ public enum BankLocations {
         return ArrayUtils.contains(tiles, tileIndex);
     }
 
+    public WalkerPath pathTo()
+    {
+        List<WorldArea> areas = Collections.singletonList(getArea());
+        return WalkerPath.get(areas);
+    }
+
     public static boolean isBankTile(int tileIndex)
     {
         for(BankLocations location : values())
@@ -115,9 +125,25 @@ public enum BankLocations {
                 .orElse(null);
     }
 
+    public static BankLocations getNearest()
+    {
+        Client client = Static.getClient();
+        WorldPoint source = client.getLocalPlayer().getWorldLocation();
+        return Arrays.stream(values())
+                .filter(BankLocations::test)
+                .min(Comparator.comparingInt(x -> x.getArea().distanceTo2D(source)))
+                .orElse(null);
+    }
+
     public static void walkToNearest()
     {
         List<WorldArea> areas = Arrays.stream(BankLocations.values()).filter(BankLocations::test).map(BankLocations::getArea).collect(Collectors.toList());
         Walker.walkTo(areas);
+    }
+
+    public static WalkerPath pathToNearest()
+    {
+        List<WorldArea> areas = Arrays.stream(BankLocations.values()).filter(BankLocations::test).map(BankLocations::getArea).collect(Collectors.toList());
+        return WalkerPath.get(areas);
     }
 }

@@ -10,6 +10,7 @@ public interface Spell {
     int getWidget();
     int getAutoCastIndex();
     boolean canCast();
+    RuneRequirement[] getRequirements();
 
     default void cast()
     {

@@ -1,9 +1,14 @@
 package com.tonic.api.handlers;
 
 import com.tonic.Logger;
+import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.widgets.GrandExchangeAPI;
 import com.tonic.data.GrandExchangeSlot;
+import com.tonic.queries.NpcQuery;
+import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.util.handler.HandlerBuilder;
+import net.runelite.api.NPC;
+import net.runelite.api.coords.WorldPoint;
 
 import static com.tonic.api.widgets.GrandExchangeAPI.*;
 
@@ -14,6 +19,20 @@ public class GrandExchangeHandler extends HandlerBuilder {
     }
 
     private int currentStep = 0;
+
+    public GrandExchangeHandler open()
+    {
+        WalkerPath path = WalkerPath.get(new WorldPoint(3164, 3487, 0));
+        addDelayUntil(currentStep++, () -> !path.step());
+        add(currentStep++, () -> {
+            NPC clerk = new NpcQuery()
+                    .withNameContains("Clerk")
+                    .nearest();
+            NpcAPI.interact(clerk, 2);
+        });
+        addDelayUntil(currentStep++, GrandExchangeAPI::isOpen);
+        return this;
+    }
 
     public GrandExchangeHandler collectAll()
     {
