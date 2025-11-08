@@ -314,8 +314,7 @@ public class BreakHandlerPlugin extends Plugin
         GameState gameState = client.getGameState();
 
         boolean shouldLogin = gameState == GameState.LOGIN_SCREEN
-                && !breakHandler.isReadyToLogin()
-                && !breakHandler.isReadyToBreak();
+                && !breakHandler.isBreaking();
 
         if (shouldLogin)
         {
