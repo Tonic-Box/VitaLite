@@ -45,7 +45,7 @@ public class PlayerAPI extends ActorAPI
         {
             for(int i = 0; i < playerActions.length; i++)
             {
-                if(playerActions[i].equalsIgnoreCase(action.toLowerCase()))
+                if(playerActions[i].toLowerCase().contains(action.toLowerCase()))
                 {
                     interact(player, i);
                     return;

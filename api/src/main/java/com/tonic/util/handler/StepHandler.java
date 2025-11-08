@@ -14,6 +14,7 @@ public final class StepHandler
 {
     @Getter
     private final StepContext context = new StepContext();
+
     private final Map<Integer, Function<StepContext,Integer>> steps;
     private int STEP_POINTER = 0;
 
@@ -31,7 +32,6 @@ public final class StepHandler
      */
     public boolean step()
     {
-        System.out.println("Executing step: " + STEP_POINTER);
         if(!steps.containsKey(STEP_POINTER))
         {
             STEP_POINTER = 0;
@@ -39,7 +39,6 @@ public final class StepHandler
         }
 
         STEP_POINTER = steps.get(STEP_POINTER).apply(context);
-        System.out.println("Next step: " + STEP_POINTER);
         return true;
     }
 
@@ -76,7 +75,7 @@ public final class StepHandler
                 .build();
     }
 
-    public void threaded()
+    public void execute()
     {
         while (step())
         {

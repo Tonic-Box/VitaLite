@@ -6,7 +6,7 @@ import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.threaded.Delays;
-import com.tonic.api.threaded.WorldsAPI;
+import com.tonic.api.game.WorldsAPI;
 import com.tonic.data.TileObjectEx;
 import com.tonic.plugins.multiclientutils.model.MultiMessage;
 import com.tonic.queries.NpcQuery;
@@ -42,7 +42,7 @@ public class CommandDispatcher
                 WorldPoint dest = WorldPointUtil.fromCompressed(message.getInt(0));
                 int world = message.getInt(1);
                 ThreadPool.submit(() -> {
-                    WorldsAPI.hop(world);
+                    WorldsAPI.hop(world).execute();
                     Delays.tick();
                     Walker.walkTo(dest);
                 });
@@ -101,7 +101,7 @@ public class CommandDispatcher
                 WorldPoint dest = WorldPointUtil.fromCompressed(message.getInt(0));
                 int world = message.getInt(1);
                 ThreadPool.submit(() -> {
-                    WorldsAPI.hop(world);
+                    WorldsAPI.hop(world).execute();
                     Delays.tick();
                     Walker.walkTo(dest);
                 });

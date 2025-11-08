@@ -1,17 +1,11 @@
 package com.tonic.data.magic.spellbooks;
 
-import com.tonic.api.game.SkillAPI;
-import com.tonic.api.threaded.WorldsAPI;
-import com.tonic.api.widgets.MagicAPI;
 import com.tonic.data.magic.MagicCast;
 import com.tonic.data.magic.Rune;
 import com.tonic.data.magic.RuneRequirement;
 import com.tonic.data.magic.Spell;
 import com.tonic.data.magic.spellbooks.SpellbookEnums.AncientSpell;
-import lombok.Getter;
-import net.runelite.api.Skill;
 import net.runelite.api.gameval.InterfaceID;
-import static com.tonic.data.magic.SpellBook.*;
 
 public enum Ancient implements Spell
 {
