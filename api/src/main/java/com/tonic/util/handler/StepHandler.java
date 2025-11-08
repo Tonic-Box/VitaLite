@@ -1,5 +1,6 @@
 package com.tonic.util.handler;
 
+import com.tonic.Logger;
 import com.tonic.api.threaded.Delays;
 import lombok.Getter;
 

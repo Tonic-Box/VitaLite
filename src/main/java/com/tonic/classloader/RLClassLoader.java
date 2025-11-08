@@ -132,28 +132,19 @@ public class RLClassLoader extends URLClassLoader {
             }
 
             File jarFile = new File(jarUrl.toURI());
-            try (JarFile jar = new JarFile(jarFile, true)) {  // true = verify signatures
+            try (JarFile jar = new JarFile(jarFile, true)) {
                 String entryName = className.replace('.', '/') + ".class";
                 JarEntry entry = jar.getJarEntry(entryName);
-
                 if (entry == null) {
                     throw new ClassNotFoundException(className);
                 }
-
-                // Read and verify signature
                 byte[] classBytes;
                 try (InputStream is = jar.getInputStream(entry)) {
                     classBytes = is.readAllBytes();
                 }
-
-                // Get certificates AFTER reading (triggers verification)
                 Certificate[] certs = entry.getCertificates();
-
-                // Create ProtectionDomain with original JAR location and certificates
                 CodeSource cs = new CodeSource(jarUrl, certs);
                 ProtectionDomain pd = new ProtectionDomain(cs, null, this, null);
-
-                // Define class with proper ProtectionDomain
                 return defineClass(className, classBytes, 0, classBytes.length, pd);
             }
         } catch (Exception e) {

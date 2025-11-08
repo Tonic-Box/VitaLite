@@ -26,6 +26,9 @@ public class StepContext
     }
 
     public void remove(String key) {
+        if(!contextMap.containsKey(key)) {
+            return;
+        }
         contextMap.remove(key);
     }
 }
