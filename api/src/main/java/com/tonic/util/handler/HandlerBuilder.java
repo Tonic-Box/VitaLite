@@ -97,11 +97,10 @@ public class HandlerBuilder
     {
         AtomicInteger remaining = new AtomicInteger(delay);
         handler.add(step, context -> {
-            if (remaining.get() <= 1) {
+            if (remaining.decrementAndGet() <= 1) {
                 remaining.set(delay);
                 return step + 1;
             }
-            remaining.decrementAndGet();
             return step;
         });
         return this;

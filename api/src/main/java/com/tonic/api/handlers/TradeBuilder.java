@@ -178,8 +178,9 @@ public class TradeBuilder extends AbstractHandlerBuilder
 
         private static List<TradeItem> of(List<ItemEx> items, boolean negate)
         {
+            int state = negate ? -1 : 1;
             return items.stream()
-                    .map(item -> new TradeItem(item.getId(), -item.getQuantity()))
+                    .map(item -> new TradeItem(item.getId(), item.getQuantity() * state))
                     .collect(Collectors.toList());
         }
 
