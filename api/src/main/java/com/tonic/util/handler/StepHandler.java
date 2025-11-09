@@ -2,6 +2,7 @@ package com.tonic.util.handler;
 
 import com.tonic.Logger;
 import com.tonic.api.threaded.Delays;
+import com.tonic.services.pathfinder.model.WalkerPath;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -35,12 +36,32 @@ public final class StepHandler
     {
         if(!steps.containsKey(STEP_POINTER))
         {
-            STEP_POINTER = 0;
+            reset();
             return false;
         }
-
         STEP_POINTER = steps.get(STEP_POINTER).apply(context);
+        if(context.get("SPEED_UP") != null && steps.containsKey(STEP_POINTER))
+        {
+            context.remove("SPEED_UP");
+            return step();
+        }
         return true;
+    }
+
+    /**
+     * Resets the step handler.
+     */
+    public void reset()
+    {
+        STEP_POINTER = 0;
+        context.remove("SPEED_UP");
+        for(Object value : context.values())
+        {
+            if(value instanceof WalkerPath)
+            {
+                ((WalkerPath) value).shutdown();
+            }
+        }
     }
 
     /**

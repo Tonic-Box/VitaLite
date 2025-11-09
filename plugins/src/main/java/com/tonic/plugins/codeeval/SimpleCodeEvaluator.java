@@ -43,6 +43,12 @@ public class SimpleCodeEvaluator {
 
         } catch (Exception e) {
             System.err.println("Error evaluating code: " + e.getMessage());
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String stackTrace = sw.toString();
+            if(!stackTrace.contains("at com.tonic.plugins.codeeval.CodeEvalFrame.forceStopFuture(CodeEvalFrame.java:274)"))
+                e.printStackTrace();
             return null;
         } finally {
             // Restore original classloader context

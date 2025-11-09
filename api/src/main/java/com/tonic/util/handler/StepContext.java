@@ -1,11 +1,18 @@
 package com.tonic.util.handler;
 
+import lombok.Getter;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StepContext
 {
     private final Map<String, Object> contextMap = new HashMap<>();
+
+    public List<Object> values() {
+        return List.copyOf(contextMap.values());
+    }
 
     public void put(String key, Object value) {
         contextMap.put(key, value);
