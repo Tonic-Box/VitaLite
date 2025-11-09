@@ -42,7 +42,6 @@ public class SimpleCodeEvaluator {
             return runMethod.invoke(instance);
 
         } catch (Exception e) {
-            System.err.println("Error evaluating code: " + e.getMessage());
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
