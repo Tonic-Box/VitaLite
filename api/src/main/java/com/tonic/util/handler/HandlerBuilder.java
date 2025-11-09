@@ -105,6 +105,7 @@ public class HandlerBuilder
         handler.add(step, context -> {
             if (remaining.decrementAndGet() <= 1) {
                 remaining.set(delay);
+                context.put("SPEED_UP", true);
                 return step + 1;
             }
             return step;
@@ -126,6 +127,7 @@ public class HandlerBuilder
             boolean met = condition.test(context);
             if (met) {
                 remaining.set(timeout);
+                context.put("SPEED_UP", true);
                 return step + 1;
             }
             if (remaining.get() <= 1) {
@@ -163,7 +165,15 @@ public class HandlerBuilder
      */
     public HandlerBuilder addDelayUntil(int step, Predicate<StepContext> condition)
     {
-        handler.add(step, context -> condition.test(context) ? step + 1 : step);
+        handler.add(step, context -> {
+            if(condition.test(context))
+            {
+                context.put("SPEED_UP", true);
+                return step + 1;
+            } else {
+                return step;
+            }
+        });
         return this;
     }
 
