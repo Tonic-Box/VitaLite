@@ -161,6 +161,24 @@ public class BreakHandler
     }
 
     /**
+     * @return true if plugin taking break
+     */
+    public boolean isBreaking()
+    {
+        return sessions.entrySet().stream().anyMatch(entry ->
+        {
+            Session session = entry.getValue();
+
+            if (session.scheduledBreak == null)
+            {
+                return false;
+            }
+
+            return session.scheduledBreak.isStarted();
+        });
+    }
+
+    /**
      * Reschedules break by force.
      * @param plugin
      */
