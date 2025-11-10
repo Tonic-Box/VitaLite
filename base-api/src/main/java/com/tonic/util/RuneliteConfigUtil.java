@@ -4,9 +4,12 @@ import com.google.gson.JsonParser;
 import com.tonic.util.jagex.CacheClient;
 import javax.swing.*;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RuneliteConfigUtil
 {
@@ -67,5 +70,34 @@ public class RuneliteConfigUtil
             }
         }
         CacheClient.updateCache();
+    }
+
+    public static String getLauncherVersion() {
+        try
+        {
+            HttpURLConnection conn = (HttpURLConnection) new URL("https://runelite.net").openConnection();
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+            conn.setInstanceFollowRedirects(true);
+
+            StringBuilder html = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    html.append(line);
+                }
+            }
+            Matcher m = Pattern.compile("https?://[^\"'\\s]+\\.jar").matcher(html);
+            String data = m.find() ? m.group() : null;
+            if(data == null)
+            {
+                return "2.7.1";
+            }
+            return data.split("download/")[1].split("/")[0];
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return "2.7.1";
     }
 }

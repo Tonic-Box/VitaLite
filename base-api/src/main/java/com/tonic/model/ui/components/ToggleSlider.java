@@ -15,6 +15,8 @@ public class ToggleSlider extends JPanel {
     private static final Color TOGGLE_OFF_BG = new Color(65, 65, 70);
     private static final Color TOGGLE_ON_BG = new Color(64, 169, 211);
     private static final Color TOGGLE_KNOB = new Color(245, 245, 250);
+    private static final Color TOGGLE_DISABLED_BG = new Color(50, 50, 55);
+    private static final Color TOGGLE_DISABLED_KNOB = new Color(100, 100, 105);
     private static final int TOGGLE_WIDTH = 44;
     private static final int TOGGLE_HEIGHT = 24;
     private float animationProgress = 0f;
@@ -33,6 +35,10 @@ public class ToggleSlider extends JPanel {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                if (!isEnabled())
+                {
+                    return;
+                }
                 setSelected(!selected);
                 fireActionPerformed();
             }
@@ -42,6 +48,12 @@ public class ToggleSlider extends JPanel {
     public void setSelected(boolean selected) {
         this.selected = selected;
         animateToggle();
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        repaint();
     }
 
     public void addActionListener(ActionListener listener) {
@@ -90,7 +102,21 @@ public class ToggleSlider extends JPanel {
     protected void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        Color trackColor = mixColors(animationProgress);
+
+        Color trackColor;
+        Color knobColor;
+
+        if (!isEnabled())
+        {
+            trackColor = TOGGLE_DISABLED_BG;
+            knobColor = TOGGLE_DISABLED_KNOB;
+        }
+        else
+        {
+            trackColor = mixColors(animationProgress);
+            knobColor = TOGGLE_KNOB;
+        }
+
         g2d.setColor(trackColor);
         g2d.fillRoundRect(0, 0, TOGGLE_WIDTH, TOGGLE_HEIGHT, TOGGLE_HEIGHT, TOGGLE_HEIGHT);
         int knobSize = TOGGLE_HEIGHT - 6;
@@ -98,7 +124,7 @@ public class ToggleSlider extends JPanel {
         int knobY = 3;
         g2d.setColor(new Color(0, 0, 0, 50));
         g2d.fillOval(knobX + 1, knobY + 1, knobSize, knobSize);
-        g2d.setColor(TOGGLE_KNOB);
+        g2d.setColor(knobColor);
         g2d.fillOval(knobX, knobY, knobSize, knobSize);
     }
 

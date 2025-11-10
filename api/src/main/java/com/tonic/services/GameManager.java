@@ -9,6 +9,8 @@ import com.tonic.data.LoginResponse;
 import com.tonic.data.TileItemEx;
 import com.tonic.data.TileObjectEx;
 import com.tonic.services.hotswapper.PluginReloader;
+import com.tonic.services.mouse.ClickVisualizationOverlay;
+import com.tonic.services.mouse.MovementVisualizationOverlay;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.abstractions.IStep;
 import com.tonic.services.pathfinder.Walker;
@@ -217,6 +219,9 @@ public class GameManager extends Overlay {
 
         ClickVisualizationOverlay clickVizOverlay = Static.getInjector().getInstance(ClickVisualizationOverlay.class);
         overlayManager.add(clickVizOverlay);
+
+        MovementVisualizationOverlay moveVizOverlay = Static.getInjector().getInstance(MovementVisualizationOverlay.class);
+        overlayManager.add(moveVizOverlay);
 
         setPosition(OverlayPosition.DYNAMIC);
         setPriority(PRIORITY_LOW);

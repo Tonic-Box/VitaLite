@@ -12,4 +12,7 @@ public interface TMouseHandler {
      * @param millis The last time a mouse button was pressed, in milliseconds.
      */
     void setMouseLastPressedMillis(long millis);
+
+    int getMouseX();
+    int getMouseY();
 }
