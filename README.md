@@ -51,6 +51,7 @@ VitaLite is a launcher for RuneLite that offers additional features and customiz
 | `--legacyLogin` | String | details for logging int (user:pass)                                                               |
 | `--jagexLogin` | String | details for logging int (sessionID:characterID:displayName)  or path to runelite credentials file |
 | `--proxy`      | String  | Set a proxy server to use (e.g., ip:port or ip:port:username:password)                            |
+| `-disableMouseHook` | Boolean | Disable RuneLite's mousehook rlicn DLL from being loaded or called |
 
 
 ## Disclaimer
