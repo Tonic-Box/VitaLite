@@ -5,6 +5,7 @@ import com.tonic.Static;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
+import com.tonic.api.game.SceneAPI;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.PrayerAPI;
@@ -236,7 +237,7 @@ public class WalkerPath
         step = steps.get(0);
         ClickVisualizationOverlay.recordWalkClick(step.getPosition());
         MovementAPI.walkTowards(step.getPosition());
-        if(!step.hasTransport())
+        if(!step.hasTransport() && MovementAPI.isMoving())
             steps.remove(step);
         return !isDone();
     }
