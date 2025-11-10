@@ -5,15 +5,13 @@ import com.tonic.services.pathfinder.requirements.*;
 import com.tonic.util.TextUtil;
 import lombok.Getter;
 import net.runelite.api.Client;
-import net.runelite.api.ItemID;
 import net.runelite.api.Quest;
 import net.runelite.api.QuestState;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
-
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
 
@@ -63,8 +61,11 @@ public enum CharterShip
     PRIFDDINAS(
             new WorldPoint(2160, 3329, 0), new WorldPoint(2157, 3333, 1),
             new QuestRequirement(Quest.SONG_OF_THE_ELVES, QuestState.FINISHED)
+    ),
+    KARAMJA_SHIPYARD(
+            new WorldPoint(3001, 3034, 0), new WorldPoint(2998, 3032, 1),
+            new QuestRequirement(Quest.MONKEY_MADNESS_I, QuestState.FINISHED)
     )
-
     ;
 
     CharterShip(WorldPoint location, WorldPoint arival, Requirement... requirements)
@@ -73,7 +74,7 @@ public enum CharterShip
         this.arival = arival;
         this.requirements = new Requirements();
         this.requirements.addRequirements(requirements);
-        this.requirements.addRequirement(new ItemRequirement(false, 8000, ItemID.COINS_995));
+        this.requirements.addRequirement(new ItemRequirement(false, 8000, ItemID.COINS));
         this.requirements.addRequirement(new WorldRequirement(true));
     }
 

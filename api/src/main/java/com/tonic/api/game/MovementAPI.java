@@ -252,7 +252,7 @@ public class MovementAPI {
      */
     public static boolean canPathTo(WorldPoint current, WorldPoint target)
     {
-        List<WorldPoint> pathTo = SceneAPI.pathTo(current, target);
+        List<WorldPoint> pathTo = SceneAPI.checkPointsTo(current, target);
         return pathTo != null && pathTo.contains(target);
     }
 

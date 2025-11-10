@@ -1,5 +1,6 @@
 package com.tonic.queries;
 
+import com.tonic.api.game.SceneAPI;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.services.GameManager;
 import com.tonic.data.TileItemEx;
@@ -261,8 +262,8 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
     public TileItemQuery sortShortestPath(WorldPoint center)
     {
         return sort((o1, o2) -> {
-            List<WorldPoint> path1 = Location.fullPathTo(center, o1.getWorldLocation());
-            List<WorldPoint> path2 = Location.fullPathTo(center, o2.getWorldLocation());
+            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getWorldLocation());
+            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getWorldLocation());
             int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
             int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
             return Integer.compare(len1, len2);
@@ -286,8 +287,8 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
     public TileItemQuery sortLongestPath(WorldPoint center)
     {
         return sort((o1, o2) -> {
-            List<WorldPoint> path1 = Location.fullPathTo(center, o1.getWorldLocation());
-            List<WorldPoint> path2 = Location.fullPathTo(center, o2.getWorldLocation());
+            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getWorldLocation());
+            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getWorldLocation());
             int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
             int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
             return Integer.compare(len2, len1);

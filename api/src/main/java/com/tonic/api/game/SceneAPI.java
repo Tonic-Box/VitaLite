@@ -203,6 +203,77 @@ public class SceneAPI {
      */
     public static List<WorldPoint> pathTo(WorldPoint from, WorldPoint to)
     {
+        List<WorldPoint> waypoints = checkPointsTo(from, to);
+        if (waypoints == null || waypoints.isEmpty())
+        {
+            return null;
+        }
+
+        if (!waypoints.get(waypoints.size() - 1).equals(to))
+        {
+            return null;
+        }
+
+        List<WorldPoint> fullPath = new ArrayList<>();
+        for(int i = 0; i < waypoints.size() - 1; i++)
+        {
+            WorldPoint start = waypoints.get(i);
+            WorldPoint end = waypoints.get(i + 1);
+            int dx = Integer.signum(end.getX() - start.getX());
+            int dy = Integer.signum(end.getY() - start.getY());
+            WorldPoint current = start;
+            fullPath.add(current);
+            while (!current.equals(end))
+            {
+                current = current.dx(dx).dy(dy);
+                fullPath.add(current);
+            }
+        }
+        return fullPath;
+    }
+
+    public static List<Tile> pathTo(Tile from, Tile to)
+    {
+        List<Tile> waypoints = checkPointsTo(from, to);
+        if (waypoints == null || waypoints.isEmpty())
+        {
+            return null;
+        }
+        if (waypoints.get(waypoints.size() - 1) != to)
+        {
+            return null;
+        }
+        Client client = Static.getClient();
+        WorldView worldView = client.getTopLevelWorldView();
+        List<Tile> fullPath = new ArrayList<>();
+        for(int i = 0; i < waypoints.size() - 1; i++)
+        {
+            Tile start = waypoints.get(i);
+            Tile end = waypoints.get(i + 1);
+            Point startPoint = start.getSceneLocation();
+            Point endPoint = end.getSceneLocation();
+            int dx = Integer.signum(endPoint.getX() - startPoint.getX());
+            int dy = Integer.signum(endPoint.getY() - startPoint.getY());
+            Tile current = start;
+            fullPath.add(current);
+            while (current != end)
+            {
+                LocalPoint lp = LocalPoint.fromScene(current.getSceneLocation().getX() + dx, current.getSceneLocation().getY() + dy, worldView);
+                current = getAt(lp);
+                fullPath.add(current);
+            }
+        }
+        return fullPath;
+    }
+
+    /**
+     * Finds a path from one world point to another and returns a list of waypoints (WorldPoints) along the path.
+     * @param from The starting WorldPoint.
+     * @param to The destination WorldPoint.
+     * @return A list of WorldPoints representing the path, or null if no path is found or if the points are on different planes.
+     */
+    public static List<WorldPoint> checkPointsTo(WorldPoint from, WorldPoint to)
+    {
         if (from.getPlane() != to.getPlane())
         {
             return null;
@@ -233,7 +304,7 @@ public class SceneAPI {
         if(sourceTile == null || targetTile == null)
             return new ArrayList<>();
 
-        List<Tile> checkpointTiles = pathTo(sourceTile, targetTile);
+        List<Tile> checkpointTiles = checkPointsTo(sourceTile, targetTile);
         if (checkpointTiles == null)
         {
             return null;
@@ -251,12 +322,12 @@ public class SceneAPI {
     }
 
     /**
-     * Finds a path from one tile to another and returns a list of tiles along the path.
+     * Finds a path from one tile to another and returns a list of waypoints along the path.
      * @param from The starting tile.
      * @param to The destination tile.
      * @return A list of tiles representing the path, or null if no path is found or if the tiles are on different planes.
      */
-    public static List<Tile> pathTo(Tile from, Tile to)
+    public static List<Tile> checkPointsTo(Tile from, Tile to)
     {
         int z = from.getPlane();
         if (z != to.getPlane())
@@ -513,7 +584,7 @@ public class SceneAPI {
      * @return True if the destination tile is reachable, false otherwise.
      */
     public static boolean isReachable(Tile from, Tile to) {
-        List<Tile> path  = pathTo(from, to);
+        List<Tile> path  = checkPointsTo(from, to);
         if(path == null || path.isEmpty())
             return false;
         return (path.get(path.size()-1) == to);
@@ -540,7 +611,7 @@ public class SceneAPI {
         {
             Tile tile_from = tiles[from.getPlane()][lp_from.getSceneX()][lp_from.getSceneY()];
             Tile tile_to = tiles[to.getPlane()][lp.getSceneX()][lp.getSceneY()];
-            List<Tile> path  = pathTo(tile_from, tile_to);
+            List<Tile> path  = checkPointsTo(tile_from, tile_to);
             return path != null && (path.get(path.size()-1) == tile_to);
         }
         catch (Exception ignored)

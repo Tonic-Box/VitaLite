@@ -2,6 +2,7 @@ package com.tonic.services.pathfinder.implimentations.flowfield;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.api.game.SceneAPI;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.collision.Flags;
@@ -547,7 +548,7 @@ public class FlowFieldAlgo implements IPathfinder
         return Static.invoke(() -> {
             Client client = Static.getClient();
             WorldPoint local = client.getLocalPlayer().getWorldLocation();
-            List<Tile> path = Location.pathTo(local, dest);
+            List<WorldPoint> path = SceneAPI.pathTo(local, dest);
             return path != null && path.size() < 20 && Location.isReachable(local, dest);
         });
     }
