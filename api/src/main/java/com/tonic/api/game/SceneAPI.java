@@ -222,7 +222,9 @@ public class SceneAPI {
             int dx = Integer.signum(end.getX() - start.getX());
             int dy = Integer.signum(end.getY() - start.getY());
             WorldPoint current = start;
-            fullPath.add(current);
+            if (i == 0) {
+                fullPath.add(current);
+            }
             while (!current.equals(end))
             {
                 current = current.dx(dx).dy(dy);
@@ -255,7 +257,9 @@ public class SceneAPI {
             int dx = Integer.signum(endPoint.getX() - startPoint.getX());
             int dy = Integer.signum(endPoint.getY() - startPoint.getY());
             Tile current = start;
-            fullPath.add(current);
+            if (i == 0) {
+                fullPath.add(current);
+            }
             while (current != end)
             {
                 LocalPoint lp = LocalPoint.fromScene(current.getSceneLocation().getX() + dx, current.getSceneLocation().getY() + dy, worldView);
