@@ -45,6 +45,15 @@ public abstract class AbstractActorQuery<T extends Actor, Q extends AbstractActo
     }
 
     /**
+     * filter actors that are already interacting
+     * @return ActorQuery
+     */
+    public Q free()
+    {
+        return keepIf(o -> !o.isInteracting());
+    }
+
+    /**
      * filter by distance
      * @param distance distance
      * @return ActorQuery
