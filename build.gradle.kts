@@ -8,8 +8,12 @@ plugins {
     id("maven-publish")
 }
 
+val vitaVersion = "0"
+val runeliteVersion = "1.12.3.1"
+//https://repo.runelite.net/net/runelite/runelite-api/1.12.3.1/runelite-api-1.12.3.1.jar
+
 group = "com.tonic"
-version = "1.12.3.1_0"
+version = runeliteVersion + "_" + vitaVersion
 
 repositories {
     mavenCentral()
@@ -172,7 +176,7 @@ fun getRuneLiteArtifacts(): Map<String, String> {
 val runeliteVersions by lazy { getRuneLiteArtifacts() }
 
 dependencies {
-    compileOnly("net.runelite:api:latest.release")
+    compileOnly("net.runelite:runelite-api:$runeliteVersion")
 
     implementation("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
