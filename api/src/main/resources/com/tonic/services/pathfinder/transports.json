@@ -71068,7 +71068,7 @@
           "comparison": "LESS_THAN",
           "type": "VARBIT",
           "var": 4470,
-          "value": 16
+          "value": 1
         }
       ]
     }
