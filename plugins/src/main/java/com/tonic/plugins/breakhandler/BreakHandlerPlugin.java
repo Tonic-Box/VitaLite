@@ -149,7 +149,7 @@ public class BreakHandlerPlugin extends Plugin
             this.configManager.setProperty(Property.ACCOUNT_PASSWORD.key(), password);
         }
 
-        boolean autoLogin = System.getProperties().contains("vAutoLogin");
+        boolean autoLogin = System.getProperty("vAutoLogin") != null;
         this.configManager.setProperty(Property.ACCOUNT_AUTO_LOGIN.key(), autoLogin);
     }
 
@@ -181,11 +181,13 @@ public class BreakHandlerPlugin extends Plugin
 
         if (gameState == GameState.LOGGED_IN)
         {
+            loginAttempts = 0;
             targetWorld = -1;
         }
 
         if (gameState == GameState.LOGIN_SCREEN && state == State.LOGOUT)
         {
+            logoutAttempts = 0;
             state = State.IDLE;
         }
     }
@@ -313,8 +315,7 @@ public class BreakHandlerPlugin extends Plugin
         GameState gameState = client.getGameState();
 
         boolean shouldLogin = gameState == GameState.LOGIN_SCREEN
-                && !breakHandler.isReadyToLogin()
-                && !breakHandler.isReadyToBreak();
+                && !breakHandler.isBreaking();
 
         if (shouldLogin)
         {
