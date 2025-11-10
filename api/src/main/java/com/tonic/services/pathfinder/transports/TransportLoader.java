@@ -36,6 +36,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.jar.JarFile;
+import java.util.logging.Handler;
 import java.util.stream.Collectors;
 
 import static com.tonic.services.pathfinder.teleports.MovementConstants.SLASH_ITEMS;
@@ -792,18 +794,27 @@ public class TransportLoader
             int openDoorId
     )
     {
-        return new Transport(source, destination, 0, 0, () ->
-        {
-            TileObjectEx openDoor = new TileObjectQuery<>()
-                    .withId(openDoorId)
-                    .within(source, 1)
-                    .first();
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    TileObjectEx openDoor = new TileObjectQuery<>()
+                            .withId(openDoorId)
+                            .within(source, 1)
+                            .first();
 
-            if (openDoor != null)
-            {
-                TileObjectAPI.interact(openDoor, "Open");
-            }
-        }, -1);
+                    if (openDoor != null)
+                    {
+                        TileObjectAPI.interact(openDoor, "Open");
+                        return 1;
+                    }
+                    return 0;
+                })
+                .addDelayUntil(1, () -> {
+                    Client client = Static.getClient();
+                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    return SceneAPI.pathDistanceTo(worldPoint, destination) < 5;
+                });
+
+        return new Transport(source, destination, 0, 0, builder.build(), -1);
     }
 
     public static Transport trapDoorTransport(
@@ -813,28 +824,43 @@ public class TransportLoader
             int openedId
     )
     {
-        return new Transport(source, destination, Integer.MAX_VALUE, 0, () ->
-        {
-            TileObjectEx closedTrapDoor = new TileObjectQuery<>()
-                    .withId(closedId)
-                    .within(source, 5)
-                    .first();
-            if (closedTrapDoor != null)
-            {
-                TileObjectAPI.interact(closedTrapDoor, 0);
-                return;
-            }
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    TileObjectEx closedTrapDoor = new TileObjectQuery<>()
+                            .withId(closedId)
+                            .within(source, 5)
+                            .first();
+                    if (closedTrapDoor != null)
+                    {
+                        TileObjectAPI.interact(closedTrapDoor, 0);
+                        return 1;
+                    }
 
-            TileObjectEx openedTrapdoor = new TileObjectQuery<>()
-                    .withId(openedId)
-                    .within(source, 5)
-                    .first();
-            if (openedTrapdoor != null)
-            {
-                TileObjectAPI.interact(openedTrapdoor, 0);
-                return;
-            }
-        }, -1);
+                    TileObjectEx openedTrapdoor = new TileObjectQuery<>()
+                            .withId(openedId)
+                            .within(source, 5)
+                            .first();
+                    if (openedTrapdoor != null)
+                    {
+                        TileObjectAPI.interact(openedTrapdoor, 0);
+                        return 2;
+                    }
+                    return 0;
+                })
+                .add(1, () -> {
+                    TileObjectEx openedTrapdoor = new TileObjectQuery<>()
+                            .withId(openedId)
+                            .within(source, 5)
+                            .first();
+                    if (openedTrapdoor != null)
+                    {
+                        TileObjectAPI.interact(openedTrapdoor, 0);
+                        return 2;
+                    }
+                    return 0;
+                })
+                .addDelay(2, 1);
+        return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), -1);
     }
 
     public static Transport itemUseTransport(
@@ -844,23 +870,27 @@ public class TransportLoader
             int objId
     )
     {
-        return new Transport(source, destination, Integer.MAX_VALUE, 0, () ->
-        {
-            ItemEx item = InventoryAPI.getItem(itemId);
-            if (item == null)
-            {
-                return;
-            }
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    ItemEx item = InventoryAPI.getItem(itemId);
+                    if (item == null)
+                    {
+                        return 0;
+                    }
 
-            TileObjectEx transport = new TileObjectQuery<>()
-                    .withId(objId)
-                    .within(source, 8)
-                    .first();
-            if (transport != null)
-            {
-                InventoryAPI.useOn(item, transport);
-            }
-        }, -1);
+                    TileObjectEx transport = new TileObjectQuery<>()
+                            .withId(objId)
+                            .within(source, 8)
+                            .first();
+                    if (transport != null)
+                    {
+                        InventoryAPI.useOn(item, transport);
+                        return 1;
+                    }
+                    return 0;
+                })
+                .addDelay(1, 1);
+        return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), -1);
     }
 
     public static Transport npcTransport(
@@ -870,17 +900,25 @@ public class TransportLoader
             String action
     )
     {
-        return new Transport(source, destination, 10, 0, () ->
-        {
-            NPC npc = new NpcQuery()
-                    .withIds(npcId)
-                    .within(source, 10)
-                    .first();
-            if (npc != null)
-            {
-                NpcAPI.interact(npc, action);
-            }
-        }, -1);
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    NPC npc = new NpcQuery()
+                            .withIds(npcId)
+                            .within(source, 10)
+                            .first();
+                    if (npc != null)
+                    {
+                        NpcAPI.interact(npc, action);
+                        return 1;
+                    }
+                    return 0;
+                })
+                .addDelayUntil(1, () -> {
+                    Client client = Static.getClient();
+                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    return SceneAPI.pathDistanceTo(worldPoint, destination) < 5;
+                });
+        return new Transport(source, destination, 10, 0, builder.build(), -1);
     }
 
     public static Transport npcTransport(
@@ -890,17 +928,25 @@ public class TransportLoader
             String action
     )
     {
-        return new Transport(source, destination, 10, 0, () ->
-        {
-            NPC npc = new NpcQuery()
-                    .withName(npcName)
-                    .within(source, 10)
-                    .first();
-            if (npc != null)
-            {
-                NpcAPI.interact(npc, action);
-            }
-        }, -1);
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    NPC npc = new NpcQuery()
+                            .withName(npcName)
+                            .within(source, 10)
+                            .first();
+                    if (npc != null)
+                    {
+                        NpcAPI.interact(npc, action);
+                        return 1;
+                    }
+                    return 0;
+                })
+                .addDelayUntil(1, () -> {
+                    Client client = Static.getClient();
+                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    return SceneAPI.pathDistanceTo(worldPoint, destination) < 5;
+                });
+        return new Transport(source, destination, 10, 0, builder.build(), -1);
     }
 
     public static Transport npcBoatTransport(
@@ -1028,28 +1074,35 @@ public class TransportLoader
             String actions
     )
     {
-        return new Transport(source, destination, Integer.MAX_VALUE, 0, () ->
-        {
-            TileObjectEx first = new TileObjectQuery<>()
-                    .atLocation(source)
-                    .withId(objId)
-                    .first();
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    TileObjectEx first = new TileObjectQuery<>()
+                            .atLocation(source)
+                            .withId(objId)
+                            .first();
 
-            if (first == null)
-            {
-                first = new TileObjectQuery<>()
-                        .within(source, 5)
-                        .withId(objId)
-                        .first();
-            }
+                    if (first == null)
+                    {
+                        first = new TileObjectQuery<>()
+                                .within(source, 5)
+                                .withId(objId)
+                                .first();
+                    }
 
-            if (first == null)
-            {
-                return;
-            }
+                    if (first == null)
+                    {
+                        return 2;
+                    }
 
-            TileObjectAPI.interact(first, actions);
-        }, -1);
+                    TileObjectAPI.interact(first, actions);
+                    return  1;
+                })
+                .addDelayUntil(1, () -> {
+                    Client client = Static.getClient();
+                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    return SceneAPI.pathDistanceTo(worldPoint, destination) < 5;
+                });
+        return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), -1);
     }
 
     public static Transport objectTransport(
@@ -1060,28 +1113,36 @@ public class TransportLoader
             Requirements requirements
     )
     {
-        return new Transport(source, destination, Integer.MAX_VALUE, 0, () ->
-        {
-            Client client = Static.getClient();
-            WorldView wv = client.getTopLevelWorldView();
-            WorldPoint localSource =
-                    WorldPoint.toLocalInstance(wv, source).stream().findFirst().orElse(source);
-            TileObjectEx first = new TileObjectQuery<>().atLocation(localSource).withId(objId).first();
-            if (first != null)
-            {
-                TileObjectAPI.interact(first, action);
-                return;
-            }
-            TileObjectEx obj = new TileObjectQuery<>()
-                    .withId(objId)
-                    .within(localSource, 5)
-                    .sortNearest()
-                    .first();
-            if (obj != null)
-            {
-                TileObjectAPI.interact(obj, action);
-            }
-        }, requirements, objId);
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    Client client = Static.getClient();
+                    WorldView wv = client.getTopLevelWorldView();
+                    WorldPoint localSource =
+                            WorldPoint.toLocalInstance(wv, source).stream().findFirst().orElse(source);
+                    TileObjectEx first = new TileObjectQuery<>().atLocation(localSource).withId(objId).first();
+                    if (first != null)
+                    {
+                        TileObjectAPI.interact(first, action);
+                        return 1;
+                    }
+                    TileObjectEx obj = new TileObjectQuery<>()
+                            .withId(objId)
+                            .within(localSource, 5)
+                            .sortNearest()
+                            .first();
+                    if (obj != null)
+                    {
+                        TileObjectAPI.interact(obj, action);
+                        return 1;
+                    }
+                    return 2;
+                })
+                .addDelayUntil(1, () -> {
+                    Client client = Static.getClient();
+                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    return SceneAPI.pathDistanceTo(worldPoint, destination) < 5;
+                });
+        return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), requirements, objId);
     }
 
     public static Transport objectDialogTransport(
@@ -1120,18 +1181,26 @@ public class TransportLoader
             WorldPoint destination
     )
     {
-        return new Transport(source, destination, Integer.MAX_VALUE, 0, () ->
-        {
-            TileObjectEx web = new TileObjectQuery<>()
-                    .withNameContains("Web")
-                    .within(source, 5)
-                    .withAction("Slash")
-                    .first();
-            if (web != null)
-            {
-                TileObjectAPI.interact(web, "Slash");
-            }
-        }, -1);
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    TileObjectEx web = new TileObjectQuery<>()
+                            .withNameContains("Web")
+                            .within(source, 5)
+                            .withAction("Slash")
+                            .first();
+                    if (web != null)
+                    {
+                        TileObjectAPI.interact(web, "Slash");
+                        return 1;
+                    }
+                    return 2;
+                })
+                .addDelayUntil(1, () -> {
+                    Client client = Static.getClient();
+                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    return SceneAPI.pathDistanceTo(worldPoint, destination) < 3;
+                });
+        return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), -1);
     }
 
     private static void addManholes(final TIntObjectHashMap<ArrayList<Transport>> transports)

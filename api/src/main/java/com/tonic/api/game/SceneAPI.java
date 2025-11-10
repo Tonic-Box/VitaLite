@@ -195,6 +195,20 @@ public class SceneAPI {
         return worldView.getSelectedSceneTile();
     }
 
+    public static int pathDistanceTo(WorldPoint from, WorldPoint to)
+    {
+        if(from.equals(to))
+            return 0;
+        return Static.invoke(() -> {
+            List<WorldPoint> path = pathTo(from, to);
+            if (path == null || path.isEmpty())
+            {
+                return Integer.MAX_VALUE;
+            }
+            return path.size() - 1;
+        });
+    }
+
     /**
      * Finds a path from one world point to another and returns a list of waypoints (WorldPoints) along the path.
      * @param from The starting WorldPoint.
@@ -214,6 +228,7 @@ public class SceneAPI {
             return null;
         }
 
+        waypoints.add(0, from);
         List<WorldPoint> fullPath = new ArrayList<>();
         for(int i = 0; i < waypoints.size() - 1; i++)
         {
@@ -245,6 +260,7 @@ public class SceneAPI {
         {
             return null;
         }
+        waypoints.add(0, from);
         Client client = Static.getClient();
         WorldView worldView = client.getTopLevelWorldView();
         List<Tile> fullPath = new ArrayList<>();
