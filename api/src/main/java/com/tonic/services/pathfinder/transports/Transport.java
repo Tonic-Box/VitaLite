@@ -24,7 +24,7 @@ public class Transport
                      WorldPoint destination,
                      int sourceRadius,
                      int destinationRadius,
-                     Runnable handler,
+                     StepHandler handler,
                      int id
     )
     {
@@ -32,7 +32,7 @@ public class Transport
         this.destination = WorldPointUtil.compress(destination);
         this.sourceRadius = sourceRadius;
         this.destinationRadius = destinationRadius;
-        this.handler = StepHandler.simple(handler, 1);
+        this.handler = handler;
         this.requirements = new Requirements();
         this.duration = 1;
         this.id = id;
@@ -42,7 +42,7 @@ public class Transport
                      WorldPoint destination,
                      int sourceRadius,
                      int destinationRadius,
-                     Runnable handler,
+                     StepHandler handler,
                      Requirements requirements,
                      int id
     )
@@ -51,7 +51,7 @@ public class Transport
         this.destination = WorldPointUtil.compress(destination);
         this.sourceRadius = sourceRadius;
         this.destinationRadius = destinationRadius;
-        this.handler = StepHandler.simple(handler, 1);
+        this.handler = handler;
         this.requirements = requirements;
         this.duration = 1;
         this.id = id;
@@ -61,7 +61,7 @@ public class Transport
                      int destination,
                      int sourceRadius,
                      int destinationRadius,
-                     Runnable handler,
+                     StepHandler handler,
                      int id
     )
     {
@@ -69,7 +69,7 @@ public class Transport
         this.destination = destination;
         this.sourceRadius = sourceRadius;
         this.destinationRadius = destinationRadius;
-        this.handler = StepHandler.simple(handler, 1);
+        this.handler = handler;
         this.requirements = new Requirements();
         this.duration = 1;
         this.id = id;
@@ -79,7 +79,7 @@ public class Transport
                      int destination,
                      int sourceRadius,
                      int destinationRadius,
-                     Runnable handler,
+                     StepHandler handler,
                      int id,
                      int duration
     )
@@ -88,7 +88,7 @@ public class Transport
         this.destination = destination;
         this.sourceRadius = sourceRadius;
         this.destinationRadius = destinationRadius;
-        this.handler = StepHandler.simple(handler, 1);
+        this.handler = handler;
         this.requirements = new Requirements();
         this.duration = duration;
         this.id = id;
@@ -98,7 +98,7 @@ public class Transport
                      int destination,
                      int sourceRadius,
                      int destinationRadius,
-                     Runnable handler,
+                     StepHandler handler,
                      Requirements requirements,
                      int id
     )
@@ -107,7 +107,7 @@ public class Transport
         this.destination = destination;
         this.sourceRadius = sourceRadius;
         this.destinationRadius = destinationRadius;
-        this.handler = StepHandler.simple(handler, 1);
+        this.handler = handler;
         this.requirements = requirements;
         this.duration = 1;
         this.id = id;

@@ -1,11 +1,17 @@
 package com.tonic.util.handler;
 
 import com.tonic.Logger;
+import com.tonic.Static;
+import com.tonic.api.entities.PlayerAPI;
+import com.tonic.api.game.SceneAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import lombok.Getter;
+import net.runelite.api.Client;
+import net.runelite.api.coords.WorldPoint;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -81,20 +87,6 @@ public final class StepHandler
     public void add(int step, Function<StepContext,Integer> function)
     {
         steps.put(step, function);
-    }
-
-    /**
-     * Creates a simple transport handler that runs a single step followed by a delay.
-     * @param runnable the action to perform.
-     * @param delay the number of delay steps after the action.
-     * @return the transport handler.
-     */
-    public static StepHandler simple(Runnable runnable, int delay)
-    {
-        return HandlerBuilder.get()
-                .add(0, runnable)
-                .addDelay(1, delay)
-                .build();
     }
 
     public void execute()
