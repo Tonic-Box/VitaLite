@@ -2,6 +2,12 @@ package com.tonic.data.magic;
 
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.ItemEx;
+import com.tonic.data.TileItemEx;
+import com.tonic.data.TileObjectEx;
+import com.tonic.data.WorldLocation;
+import net.runelite.api.NPC;
+import net.runelite.api.Player;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 
 public interface Spell {
@@ -15,6 +21,33 @@ public interface Spell {
     default void cast()
     {
         WidgetAPI.interact(getAction(), getWidget(), -1, -1);
+    }
+
+    default void castOn(ItemEx item)
+    {
+        WidgetAPI.onWidget(getWidget(), -1, -1, InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot());
+    }
+
+    default void castOn(NPC npc)
+    {
+        WidgetAPI.onNpc(getWidget(), -1, -1, npc.getIndex(), false);
+    }
+
+    default void castOn(Player player)
+    {
+        WidgetAPI.onNpc(getWidget(), -1, -1, player.getId(), false);
+    }
+
+    default void castOn(TileObjectEx tileObject)
+    {
+        WorldPoint loc = tileObject.getWorldLocation();
+        WidgetAPI.onTileObject(getWidget(), -1, -1, tileObject.getId(), loc.getX(), loc.getY(), false);
+    }
+
+    default void castOn(TileItemEx tileItem)
+    {
+        WorldPoint loc = tileItem.getWorldLocation();
+        WidgetAPI.onGroundItem(getWidget(), -1, -1, tileItem.getId(), loc.getX(), loc.getY(), false);
     }
 
     default void setAutoCast()
