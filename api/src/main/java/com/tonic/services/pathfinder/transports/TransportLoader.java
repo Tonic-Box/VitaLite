@@ -655,31 +655,12 @@ public class TransportLoader
                         })
                         .add(3, () -> 4)
                         .addDelayUntil(4, () -> !node.processStep())
-                        .addDelay(5, 5)
-                        .add(3, () -> {
-                            Client client = Static.getClient();
-                            WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
-                            if(worldPoint.getPlane() != 1)
-                            {
-                                return 99;
-                            }
-                            TileObjectEx plank = new TileObjectQuery<>()
-                                    .withAction("Cross")
-                                    .nearest();
-
-                            if(plank == null)
-                            {
-                                return 99;
-                            }
-                            TileObjectAPI.interact(plank, "Cross");
-                            return 4;
-                        })
-                        .addDelay(4, 1);
+                        .addDelay(5, 8);
 
                 Transport transport = new Transport(
                         WorldPointUtil.compress(charterShip.getLocation()),
                         WorldPointUtil.compress(destination.getArival()),
-                        6, 1, 5,
+                        6, 1, 8,
                         builder.build(),
                         destination.getRequirements(),
                         -1

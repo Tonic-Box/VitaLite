@@ -158,35 +158,8 @@ public class Location {
         return HybridBFSStep.toWorldPoints(steps);
     }
 
-    public static List<Tile> pathTo(WorldPoint start, WorldPoint end) {
-        if (start.getPlane() != end.getPlane()) {
-            return new ArrayList<>();
-        }
-
-        Client client = Static.getClient();
-        LocalPoint sourceLp = LocalPoint.fromWorld(client, start.getX(), start.getY());
-        LocalPoint targetLp = LocalPoint.fromWorld(client, end.getX(), end.getY());
-        if (sourceLp == null || targetLp == null) {
-            return new ArrayList<>();
-        }
-
-        int thisX = sourceLp.getSceneX();
-        int thisY = sourceLp.getSceneY();
-        int otherX = targetLp.getSceneX();
-        int otherY = targetLp.getSceneY();
-
-        try {
-            Tile[][][] tiles = client.getScene().getTiles();
-            Tile source = tiles[start.getPlane()][thisX][thisY];
-            Tile dest = tiles[end.getPlane()][otherX][otherY];
-            return SceneAPI.pathTo(source, dest);
-        } catch (Exception ignored) {
-            return new ArrayList<>();
-        }
-    }
-
     public static  boolean isReachable(Tile source, Tile dest) {
-        List<Tile> path  = SceneAPI.pathTo(source, dest);
+        List<Tile> path  = SceneAPI.checkPointsTo(source, dest);
         return path != null && path.get(path.size()-1) == dest;
     }
 
