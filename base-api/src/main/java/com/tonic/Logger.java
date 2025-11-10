@@ -22,6 +22,7 @@ public class Logger {
     private static Container wrapper;            // the panel that holds the logger (BorderLayout)
     private static JFrame clientFrame;           // the top level window
     private static int loggerHeight = 150;         // height of the logger component
+    private static int maxMessages = 50;           // maximum number of messages to keep in console
 
     static
     {
@@ -187,6 +188,35 @@ public class Logger {
     }
 
     /**
+     * Sets the maximum number of messages to keep in the console.
+     * Older messages will be removed when this limit is exceeded.
+     * @param max Maximum message count (must be > 0)
+     */
+    public static void setMaxMessages(int max)
+    {
+        if (max <= 0)
+        {
+            throw new IllegalArgumentException("Max messages must be greater than 0");
+        }
+        maxMessages = max;
+
+        // Trim existing messages if new limit is lower
+        if (INSTANCE != null)
+        {
+            INSTANCE.trimToMaxMessages();
+        }
+    }
+
+    /**
+     * Gets the current maximum message count limit.
+     * @return Current max messages
+     */
+    public static int getMaxMessages()
+    {
+        return maxMessages;
+    }
+
+    /**
      * Initial binding for statically stored instance
      */
     public static void setInstance()
@@ -200,6 +230,7 @@ public class Logger {
     private boolean normal = true;
     private boolean warning = true;
     private boolean error = true;
+    private int currentMessageCount = 0;
     private final SimpleAttributeSet CONSOLE;
     private final SimpleAttributeSet NORM;
     private final SimpleAttributeSet INFO;
@@ -241,7 +272,10 @@ public class Logger {
         JPopupMenu popupMenu = new JPopupMenu();
 
         JMenuItem clearItem = new JMenuItem("Clear");
-        clearItem.addActionListener(e -> textPane.setText(""));
+        clearItem.addActionListener(e -> {
+            textPane.setText("");
+            currentMessageCount = 0;  // Reset counter when clearing console
+        });
 
         JMenuItem copyItem = new JMenuItem("Copy");
         copyItem.addActionListener(e -> textPane.copy());
@@ -291,6 +325,10 @@ public class Logger {
             public void run() {
                 StyleConstants.setLineSpacing(style,SPACING);
                 console.getStyledDocument().insertString(console.getStyledDocument().getLength(), timestamp + data + "\n", style);
+                currentMessageCount++;
+
+                // Remove oldest messages if we exceed the limit
+                trimToMaxMessages();
             }
         });
     }
@@ -306,6 +344,10 @@ public class Logger {
                 StyleConstants.setLineSpacing(CONSOLE,SPACING);
                 console.getStyledDocument().insertString(console.getStyledDocument().getLength(), "$ ", NORM);
                 console.getStyledDocument().insertString(console.getStyledDocument().getLength(), data + "\n", CONSOLE);
+                currentMessageCount++;
+
+                // Remove oldest messages if we exceed the limit
+                trimToMaxMessages();
             }
         });
     }
@@ -321,6 +363,10 @@ public class Logger {
                 StyleConstants.setLineSpacing(CONSOLE,SPACING);
                 console.getStyledDocument().insertString(console.getStyledDocument().getLength(), head, INFO);
                 console.getStyledDocument().insertString(console.getStyledDocument().getLength(), body + "\n", CONSOLE);
+                currentMessageCount++;
+
+                // Remove oldest messages if we exceed the limit
+                trimToMaxMessages();
             }
         });
     }
@@ -336,6 +382,10 @@ public class Logger {
                 StyleConstants.setLineSpacing(CONSOLE,SPACING);
                 console.getStyledDocument().insertString(console.getStyledDocument().getLength(), head, INFO);
                 console.getStyledDocument().insertString(console.getStyledDocument().getLength(), body + "\n", ERROR);
+                currentMessageCount++;
+
+                // Remove oldest messages if we exceed the limit
+                trimToMaxMessages();
             }
         });
     }
@@ -431,5 +481,33 @@ public class Logger {
             return;
 
         stream(data, ERROR);
+    }
+
+    /**
+     * Trims the console to keep only the most recent maxMessages.
+     * Removes oldest messages from the beginning of the document.
+     */
+    @SneakyThrows
+    private void trimToMaxMessages()
+    {
+        // Only trim if we exceed the limit
+        while (currentMessageCount > maxMessages)
+        {
+            // Find the first newline (end of first message)
+            String text = console.getStyledDocument().getText(0, console.getStyledDocument().getLength());
+            int firstNewline = text.indexOf('\n');
+
+            if (firstNewline >= 0)
+            {
+                // Remove from start to first newline (inclusive)
+                console.getStyledDocument().remove(0, firstNewline + 1);
+                currentMessageCount--;
+            }
+            else
+            {
+                // No newline found, shouldn't happen but break to prevent infinite loop
+                break;
+            }
+        }
     }
 }
