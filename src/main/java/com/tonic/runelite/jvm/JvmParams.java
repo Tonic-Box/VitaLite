@@ -1,5 +1,7 @@
 package com.tonic.runelite.jvm;
 
+import com.tonic.util.LauncherVersionUtil;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -16,7 +18,7 @@ public class JvmParams
             jvmProps.put("apple.awt.application.appearance", "system");
         }
 
-        jvmProps.put("runelite.launcher.version", "2.7.1");
+        jvmProps.put("runelite.launcher.version", LauncherVersionUtil.getLauncherVersion());
         setJvmParams(jvmProps);
     }
     private static void setJvmParams(final Map<String, String> params)

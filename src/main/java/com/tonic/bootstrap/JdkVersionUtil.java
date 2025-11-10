@@ -1,5 +1,7 @@
 package com.tonic.bootstrap;
 
+import lombok.Getter;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,12 +17,16 @@ public class JdkVersionUtil {
 
     private static final String JDK_URL = "https://raw.githubusercontent.com/runelite/launcher/master/.jdk-versions.sh";
     private static final Path JRE_PATH = Path.of(System.getProperty("user.home"), "AppData", "Local", "RuneLite", "jre");
+    private static final Path MAC_JRE_PATH = Path.of("Applications", "RuneLite.app", "Contents", "Resources", "jre");
 
     public static String calculateJreVersion() {
         Path releaseFile = JRE_PATH.resolve("release");
 
         if (!Files.exists(releaseFile)) {
-            return extractJavaVersionForCurrentSystem();
+            releaseFile = MAC_JRE_PATH.resolve("release");
+            if(!Files.exists(releaseFile)) {
+                return extractJavaVersionForCurrentSystem();
+            }
         }
 
         try (Stream<String> lines = Files.lines(releaseFile)) {
@@ -34,6 +40,7 @@ public class JdkVersionUtil {
         }
     }
 
+    @Getter
     public enum Platform {
         WIN64("WIN64_VERSION"),
         WIN32("WIN32_VERSION"),
@@ -49,9 +56,6 @@ public class JdkVersionUtil {
             this.versionKey = versionKey;
         }
 
-        public String getVersionKey() {
-            return versionKey;
-        }
     }
 
     /**

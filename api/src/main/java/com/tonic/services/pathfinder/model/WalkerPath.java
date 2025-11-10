@@ -15,7 +15,7 @@ import com.tonic.data.StrongholdSecurityQuestion;
 import com.tonic.data.TileObjectEx;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.queries.TileObjectQuery;
-import com.tonic.services.ClickVisualizationOverlay;
+import com.tonic.services.mouse.ClickVisualizationOverlay;
 import static com.tonic.services.pathfinder.Walker.*;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;

@@ -1,6 +1,7 @@
-package com.tonic.services;
+package com.tonic.services.mouse;
 
 import com.tonic.Static;
+import com.tonic.services.ClickManager;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;

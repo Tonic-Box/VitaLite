@@ -31,6 +31,7 @@ dependencies {
     implementation(group = "com.fifesoft", name = "autocomplete", version = "3.1.1")
     implementation("org.antlr:antlr4:4.13.1")
     implementation("com.github.vlsi.mxgraph:jgraphx:4.2.2")
+    implementation("org.jfree:jfreechart:1.5.4")
 }
 
 val apiFilePatterns = mapOf(

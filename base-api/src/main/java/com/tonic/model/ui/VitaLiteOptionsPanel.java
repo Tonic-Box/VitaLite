@@ -7,16 +7,13 @@ import com.tonic.events.PacketSent;
 import com.tonic.model.ui.components.*;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
+import com.tonic.services.mouserecorder.markov.MarkovService;
 import com.tonic.services.pathfinder.PathfinderAlgo;
+import com.tonic.services.mouserecorder.MovementVisualization;
 import com.tonic.util.ReflectBuilder;
-import com.tonic.util.ReflectUtil;
-import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 
 public class VitaLiteOptionsPanel extends VPluginPanel {
 
@@ -44,6 +41,10 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ToggleSlider hideLoggerToggle;
     private final ToggleSlider bankCacheToggle;
     private JFrame transportsEditor;
+
+    private ToggleSlider sendMouseMovement;
+    private ToggleSlider idleJitters;
+    private Timer qualityCheckTimer;
 
     private VitaLiteOptionsPanel() {
         super(false); // Don't use default wrapping, we'll handle scrolling ourselves
@@ -247,6 +248,85 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         // Input Settings
         CollapsiblePanel inputPanel = new CollapsiblePanel("Input");
 
+        sendMouseMovement = new ToggleSlider();
+        sendMouseMovement.setSelected(Static.getVitaConfig().shouldSpoofMouseMovemnt());
+        inputPanel.addContent(createToggleOption(
+                "Spoof Mouse Movement",
+                "Spoof mouse movement data.",
+                sendMouseMovement,
+                () -> {
+                    if(!Static.getVitaConfig().getHasAcceptedWarning())
+                    {
+                        int result = JOptionPane.showConfirmDialog(
+                                this,
+                                "Spoofing mouse movements is experimental and not guaranteed currently to be safe. Use at your own risk. Do you wish to proceed?",
+                                "Warning",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                        if (result != JOptionPane.YES_OPTION) {
+                            sendMouseMovement.setSelected(false);
+                            return;
+                        }
+                        Static.getVitaConfig().setHasAcceptedWarning(true);
+                    }
+                    Static.getVitaConfig().setSpoofMouseMovement(sendMouseMovement.isSelected());
+                    idleJitters.setEnabled(sendMouseMovement.isSelected());
+                }
+        ));
+        inputPanel.addVerticalStrut(12);
+
+        idleJitters = new ToggleSlider();
+        idleJitters.setEnabled(Static.getVitaConfig().shouldIdleJitter());
+        inputPanel.addContent(createToggleOption(
+                "Idle Jitters",
+                "Add small random jitters to mouse when idle.",
+                idleJitters,
+                () -> Static.getVitaConfig().setIdleJitter(idleJitters.isSelected())
+        ));
+        if(!Static.getVitaConfig().shouldSpoofMouseMovemnt())
+        {
+            idleJitters.setEnabled(false);
+        }
+        inputPanel.addVerticalStrut(12);
+
+        ToggleSlider recordMarkov = new ToggleSlider();
+        recordMarkov.setSelected(Static.getVitaConfig().shouldTrainMarkov());
+        if(Static.getVitaConfig().shouldTrainMarkov())
+        {
+            MarkovService.start();
+        }
+        inputPanel.addContent(createToggleOption(
+                "Train Mouse Data",
+                "Train a data set on your manual play for use in automated mouse movements.",
+                recordMarkov,
+                () -> {
+                    Static.getVitaConfig().setTrainMarkov(recordMarkov.isSelected());
+                    MarkovService.toggle(recordMarkov.isSelected());
+                }
+        ));
+        inputPanel.addVerticalStrut(12);
+
+        FancyButton monitor = new FancyButton("Training Monitor");
+        monitor.addActionListener(e -> MarkovService.toggleMonitor());
+        inputPanel.addContent(monitor);
+        inputPanel.addVerticalStrut(12);
+
+        ToggleSlider visualizeMovements = new ToggleSlider();
+        visualizeMovements.setSelected(Static.getVitaConfig().shouldVisualizeMovements());
+        // Sync initial state
+        MovementVisualization.setEnabled(Static.getVitaConfig().shouldVisualizeMovements());
+        inputPanel.addContent(createToggleOption(
+                "Visualize Movements",
+                "Show generated mouse movement paths on the game canvas.",
+                visualizeMovements,
+                () -> {
+                    Static.getVitaConfig().setVisualizeMovements(visualizeMovements.isSelected());
+                    MovementVisualization.setEnabled(visualizeMovements.isSelected());
+                }
+        ));
+        inputPanel.addVerticalStrut(12);
+
         FancyDropdown<ClickStrategy> clickStrategyDropdown = new FancyDropdown<>("Click Strategy", ClickStrategy.class);
         ClickStrategy strat = Static.getVitaConfig().getClickStrategy();
         clickStrategyDropdown.setSelectedItem(strat);
@@ -301,6 +381,10 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         customizeScrollPane(scrollPane);
 
         add(scrollPane, BorderLayout.CENTER);
+
+        // Start quality check timer for mouse movement features
+        startQualityCheckTimer();
+        updateMarkovQualityState();
     }
 
     private void customizeScrollPane(JScrollPane scrollPane) {
@@ -481,5 +565,65 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         int id = event.getId();
         int len = event.getLength();
         Logger.info("[ServerPacket(" + id + ":" + len + ")] " + packetInfo);
+    }
+
+    private void startQualityCheckTimer()
+    {
+        if (qualityCheckTimer != null)
+        {
+            qualityCheckTimer.stop();
+        }
+
+        qualityCheckTimer = new Timer(5000, e -> updateMarkovQualityState());
+        qualityCheckTimer.setRepeats(true);
+        qualityCheckTimer.start();
+    }
+
+    private void updateMarkovQualityState()
+    {
+        SwingUtilities.invokeLater(() -> {
+            try
+            {
+                double quality = MarkovService.getQualityScore();
+                int percentage = (int) (quality * 100);
+                boolean shouldEnable = quality >= 0.5;
+
+                if (sendMouseMovement != null)
+                {
+                    sendMouseMovement.setEnabled(shouldEnable);
+                    if (!shouldEnable)
+                    {
+                        sendMouseMovement.setToolTipText(String.format(
+                            "Training quality too low: %d%% (requires 50%%)", percentage));
+                        sendMouseMovement.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    }
+                    else
+                    {
+                        sendMouseMovement.setToolTipText("Spoof mouse movement data.");
+                        sendMouseMovement.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    }
+                }
+
+                if (idleJitters != null)
+                {
+                    idleJitters.setEnabled(shouldEnable && Static.getVitaConfig().shouldSpoofMouseMovemnt());
+                    if (!shouldEnable)
+                    {
+                        idleJitters.setToolTipText(String.format(
+                            "Training quality too low: %d%% (requires 50%%)", percentage));
+                        idleJitters.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    }
+                    else
+                    {
+                        idleJitters.setToolTipText("Add small random jitters to mouse when idle.");
+                        idleJitters.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.warn("Failed to update Markov quality state: " + ex.getMessage());
+            }
+        });
     }
 }
