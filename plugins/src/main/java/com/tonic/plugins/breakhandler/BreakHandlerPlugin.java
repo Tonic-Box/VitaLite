@@ -181,6 +181,7 @@ public class BreakHandlerPlugin extends Plugin
 
         if (gameState == GameState.LOGGED_IN)
         {
+            loginAttempts = 0;
             targetWorld = -1;
         }
 
