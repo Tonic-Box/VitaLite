@@ -91,4 +91,9 @@ public interface ClientConfig extends VitaConfig {
     boolean shouldVisualizeMovements();
     @ConfigKey(value = "visualizeMovements")
     void setVisualizeMovements(boolean visualize);
+
+    @ConfigKey(value = "logHistoryLimit", defaultValue = "50")
+    int getLogHistoryLimit();
+    @ConfigKey(value = "logHistoryLimit")
+    void setLogHistoryLimit(int limit);
 }

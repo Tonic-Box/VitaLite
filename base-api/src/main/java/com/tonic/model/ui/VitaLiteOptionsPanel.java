@@ -162,6 +162,22 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 hideLoggerToggle,
                 () -> Logger.setLoggerVisible(!hideLoggerToggle.isSelected())
         ));
+        loggingPanel.addVerticalStrut(12);
+
+        // Log history limit spinner
+        FancySpinner logHistorySpinner = new FancySpinner(
+                "Log History Limit",
+                1, 1000, Static.getVitaConfig().getLogHistoryLimit()
+        );
+        // Set initial Logger max messages from config
+        Logger.setMaxMessages(Static.getVitaConfig().getLogHistoryLimit());
+        Static.getVitaConfig().setLogHistoryLimit(Static.getVitaConfig().getLogHistoryLimit());
+        logHistorySpinner.addChangeListener(e -> {
+            int limit = logHistorySpinner.getValue().intValue();
+            Static.getVitaConfig().setLogHistoryLimit(limit);
+            Logger.setMaxMessages(limit);
+        });
+        loggingPanel.addContent(logHistorySpinner);
 
         contentPanel.add(loggingPanel);
         contentPanel.add(Box.createVerticalStrut(10));
