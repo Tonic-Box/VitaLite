@@ -19,6 +19,13 @@ import java.util.function.Predicate;
 public class EquipmentAPI
 {
     /**
+     * Creates an instance of InventoryQuery from equipment
+     * @return InventoryQuery
+     */
+    public static InventoryQuery search() {
+        return InventoryQuery.fromInventoryId(InventoryID.WORN);
+    }
+    /**
      * check if an item is equipped
      * @param itemId item id
      * @return bool
