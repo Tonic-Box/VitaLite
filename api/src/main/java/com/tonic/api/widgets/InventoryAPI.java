@@ -22,6 +22,13 @@ import java.util.function.Predicate;
 public class InventoryAPI
 {
     /**
+     * Creates an instance of InventoryQuery from the Inventory
+     * @return InventoryQuery
+     */
+    public static InventoryQuery search() {
+        return InventoryQuery.fromInventoryId(InventoryID.INV);
+    }
+    /**
      * get all items in your inventory
      * @return List<ItemEx>
      */
