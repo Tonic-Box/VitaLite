@@ -47,7 +47,7 @@ public class InventoryAPI
      */
     public static ItemEx getItem(String itemName)
     {
-        return Static.invoke(() -> InventoryQuery.fromInventoryId(InventoryID.INV).withName(itemName).first());
+        return Static.invoke(() -> InventoryQuery.fromInventoryId(InventoryID.INV).withNameContains(itemName).first());
     }
 
     /**

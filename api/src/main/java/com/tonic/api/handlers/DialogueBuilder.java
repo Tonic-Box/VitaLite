@@ -8,7 +8,7 @@ import com.tonic.util.handler.AbstractHandlerBuilder;
 /**
  * A builder for handling in-game dialogues.
  */
-public class DialogueBuilder extends AbstractHandlerBuilder
+public class DialogueBuilder extends AbstractHandlerBuilder<DialogueBuilder>
 {
     /**
      * Creates a new instance of DialogueBuilder.

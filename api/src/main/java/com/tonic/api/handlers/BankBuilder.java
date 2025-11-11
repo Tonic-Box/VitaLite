@@ -5,6 +5,7 @@ import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.widgets.BankAPI;
+import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.data.TileObjectEx;
 import com.tonic.data.locatables.BankLocations;
 import com.tonic.queries.NpcQuery;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
 
 import javax.annotation.Nullable;
@@ -24,7 +26,7 @@ import javax.annotation.Nullable;
 /**
  * A handler builder for banking actions.
  */
-public class BankBuilder extends AbstractHandlerBuilder
+public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
 {
     /**
      * Creates a new instance of the BankBuilder.
@@ -65,6 +67,7 @@ public class BankBuilder extends AbstractHandlerBuilder
                 NpcAPI.interact(banker, 2);
                 return step2 + 3;
             }
+            DialogueAPI.resumePause(InterfaceID.TutorialPlayerExperience.CONTENT, 3);
             TileObjectEx bank = new TileObjectQuery<>()
                     .withNamesContains("Bank booth", "Bank chest")
                     .sortNearest()
@@ -111,10 +114,7 @@ public class BankBuilder extends AbstractHandlerBuilder
             }
             return step;
         });
-        addDelayUntil(() -> {
-            System.out.println("Step: " + currentStep + "Cond: " + BankAPI.isOpen());
-            return BankAPI.isOpen();
-        });
+        addDelayUntil(BankAPI::isOpen);
         return this;
     }
 

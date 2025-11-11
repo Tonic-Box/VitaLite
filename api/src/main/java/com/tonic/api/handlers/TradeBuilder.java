@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * Builder for handling player trades.
  */
-public class TradeBuilder extends AbstractHandlerBuilder
+public class TradeBuilder extends AbstractHandlerBuilder<TradeBuilder>
 {
     /**
      * Creates a new instance of TradeBuilder.

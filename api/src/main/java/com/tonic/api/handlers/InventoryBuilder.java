@@ -15,7 +15,7 @@ import net.runelite.api.Player;
 /**
  * Builder for creating inventory-related handlers.
  */
-public class InventoryBuilder extends AbstractHandlerBuilder
+public class InventoryBuilder extends AbstractHandlerBuilder<InventoryBuilder>
 {
     /**
      * Creates a new InventoryBuilder instance.

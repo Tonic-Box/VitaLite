@@ -5,9 +5,14 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import java.util.function.*;
 
-public abstract class AbstractHandlerBuilder extends HandlerBuilder
+public abstract class AbstractHandlerBuilder<Q> extends HandlerBuilder
 {
     protected int currentStep = 0;
+
+    @SuppressWarnings("unchecked")
+    protected final Q self() {
+        return (Q) this;
+    }
 
     /**
      * Adds a step to the handler
@@ -15,8 +20,9 @@ public abstract class AbstractHandlerBuilder extends HandlerBuilder
      * @param function the function that returns the next step number
      * @return the HandlerBuilder
      */
-    public HandlerBuilder add(Function<StepContext,Integer> function) {
-        return add(currentStep++, function);
+    public Q add(Function<StepContext,Integer> function) {
+        add(currentStep++, function);
+        return self();
     }
 
     /**
@@ -25,8 +31,9 @@ public abstract class AbstractHandlerBuilder extends HandlerBuilder
      * @param supplier the supplier that returns the next step number
      * @return the HandlerBuilder
      */
-    public HandlerBuilder add(Supplier<Integer> supplier) {
-        return add(currentStep++, supplier);
+    public Q add(Supplier<Integer> supplier) {
+        add(currentStep++, supplier);
+        return self();
     }
 
     /**
@@ -35,8 +42,9 @@ public abstract class AbstractHandlerBuilder extends HandlerBuilder
      * @param consumer the runnable to run
      * @return the HandlerBuilder
      */
-    public HandlerBuilder add(Consumer<StepContext> consumer) {
-        return add(currentStep++, consumer);
+    public Q add(Consumer<StepContext> consumer) {
+        add(currentStep++, consumer);
+        return self();
     }
 
     /**
@@ -45,8 +53,9 @@ public abstract class AbstractHandlerBuilder extends HandlerBuilder
      * @param runnable the runnable to run
      * @return the HandlerBuilder
      */
-    public HandlerBuilder add(Runnable runnable) {
-        return add(currentStep++, runnable);
+    public Q add(Runnable runnable) {
+        add(currentStep++, runnable);
+        return self();
     }
 
     /**
@@ -55,9 +64,10 @@ public abstract class AbstractHandlerBuilder extends HandlerBuilder
      * @param delay the delay in steps
      * @return the HandlerBuilder
      */
-    public HandlerBuilder addDelay(int delay)
+    public Q addDelay(int delay)
     {
-        return addDelay(currentStep++, delay);
+        addDelay(currentStep++, delay);
+        return self();
     }
 
     /**
@@ -66,9 +76,10 @@ public abstract class AbstractHandlerBuilder extends HandlerBuilder
      * @param condition the condition to meet
      * @return the HandlerBuilder
      */
-    public HandlerBuilder addDelayUntil(int timeout, Predicate<StepContext> condition, Consumer<StepContext> onTimeout)
+    public Q addDelayUntil(int timeout, Predicate<StepContext> condition, Consumer<StepContext> onTimeout)
     {
-        return addDelayUntil(currentStep++, timeout, condition, onTimeout);
+        addDelayUntil(currentStep++, timeout, condition, onTimeout);
+        return self();
     }
 
     /**
@@ -77,14 +88,15 @@ public abstract class AbstractHandlerBuilder extends HandlerBuilder
      * @param condition the condition to meet
      * @return the HandlerBuilder
      */
-    public HandlerBuilder addDelayUntil(int timeout, BooleanSupplier condition, Runnable onTimeout)
+    public Q addDelayUntil(int timeout, BooleanSupplier condition, Runnable onTimeout)
     {
-        return addDelayUntil(
+        addDelayUntil(
                 currentStep++,
                 timeout,
                 condition,
                 onTimeout
         );
+        return self();
     }
 
     /**
@@ -93,12 +105,13 @@ public abstract class AbstractHandlerBuilder extends HandlerBuilder
      * @param condition the condition to meet
      * @return the HandlerBuilder
      */
-    public HandlerBuilder addDelayUntil(Predicate<StepContext> condition)
+    public Q addDelayUntil(Predicate<StepContext> condition)
     {
-        return addDelayUntil(
+        addDelayUntil(
                 currentStep++,
                 condition
         );
+        return self();
     }
 
     /**
@@ -107,41 +120,48 @@ public abstract class AbstractHandlerBuilder extends HandlerBuilder
      * @param condition the condition to meet
      * @return the HandlerBuilder
      */
-    public HandlerBuilder addDelayUntil(BooleanSupplier condition)
+    public Q addDelayUntil(BooleanSupplier condition)
     {
-        return addDelayUntil(
+        addDelayUntil(
                 currentStep++,
                 condition
         );
+        return self();
     }
 
-    public HandlerBuilder append(StepHandler handler)
+    public Q append(StepHandler handler)
     {
-        return append(currentStep++, handler);
+        append(currentStep++, handler);
+        return self();
     }
 
-    public HandlerBuilder append(HandlerBuilder builder)
+    public Q append(HandlerBuilder builder)
     {
-        return append(currentStep++, builder);
+        append(currentStep++, builder);
+        return self();
     }
 
-    public HandlerBuilder walkTo(WorldPoint location)
+    public Q walkTo(WorldPoint location)
     {
-        return walkTo(currentStep++, location);
+        walkTo(currentStep++, location);
+        return self();
     }
 
-    public HandlerBuilder walkTo(WorldArea location)
+    public Q walkTo(WorldArea location)
     {
-        return walkTo(currentStep++, location);
+        walkTo(currentStep++, location);
+        return self();
     }
 
-    public HandlerBuilder walkToWorldAreaSupplier(Supplier<WorldArea> location)
+    public Q walkToWorldAreaSupplier(Supplier<WorldArea> location)
     {
-        return walkToWorldAreaSupplier(currentStep++, location);
+        walkToWorldAreaSupplier(currentStep++, location);
+        return self();
     }
 
-    public HandlerBuilder walkToWorldPointSupplier(Supplier<WorldPoint> location)
+    public Q walkToWorldPointSupplier(Supplier<WorldPoint> location)
     {
-        return walkToWorldPointSupplier(currentStep++, location);
+        walkToWorldPointSupplier(currentStep++, location);
+        return self();
     }
 }

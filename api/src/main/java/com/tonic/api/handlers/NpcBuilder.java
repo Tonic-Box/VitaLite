@@ -11,7 +11,7 @@ import net.runelite.api.NPC;
 /**
  * A builder for creating NPC interaction handlers.
  */
-public class NpcBuilder extends AbstractHandlerBuilder
+public class NpcBuilder extends AbstractHandlerBuilder<NpcBuilder>
 {
     /**
      * Creates a new instance of NpcBuilder.

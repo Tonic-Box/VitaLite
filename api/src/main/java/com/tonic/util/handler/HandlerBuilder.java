@@ -39,6 +39,11 @@ public class HandlerBuilder
         handler = new StepHandler();
     }
 
+    public static void speedUp(StepContext context)
+    {
+        context.put("SPEED_UP", true);
+    }
+
     /**
      * Adds a step to the handler
      *
