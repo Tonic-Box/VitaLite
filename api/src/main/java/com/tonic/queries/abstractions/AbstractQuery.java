@@ -138,6 +138,30 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
     }
 
     /**
+     * Executes filters and performs an action on each result.
+     */
+    public void forEach(Consumer<T> action) {
+        Static.invoke(() -> {
+            Stream<T> stream = dataSource.get().stream();
+
+            // Apply all filters
+            for (Predicate<T> filter : filters) {
+                stream = stream.filter(filter);
+            }
+
+            // Apply sorting if it exists, as forEach is terminal
+            if (!sorters.isEmpty()) {
+                Comparator<T> combined = sorters.stream()
+                        .reduce(Comparator::thenComparing)
+                        .orElse(null);
+                stream = stream.sorted(combined);
+            }
+
+            stream.forEach(action);
+        });
+    }
+
+    /**
      * Get count of filtered results
      */
     public int count() {
