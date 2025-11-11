@@ -245,6 +245,9 @@ public class WidgetAPI
      * */
     public static void onTileObject(Widget source, TileObject dest, boolean ctrl)
     {
+        if (source == null || dest == null) {
+            return;
+        }
         onTileObject(source.getId(), source.getItemId(), source.getIndex(), dest.getId(), dest.getWorldLocation().getX(), dest.getWorldLocation().getY(), ctrl);
     }
 
@@ -306,6 +309,9 @@ public class WidgetAPI
      */
     public static void onNpc(Widget source, NPC dest, boolean ctrl)
     {
+        if (source == null || dest == null) {
+            return;
+        }
         onNpc(source.getId(), source.getItemId(), source.getIndex(), dest.getIndex(), ctrl);
     }
 
@@ -347,6 +353,9 @@ public class WidgetAPI
      */
     public static void onPlayer(Widget source, Player dest, boolean ctrl)
     {
+        if (source == null || dest == null) {
+            return;
+        }
         onPlayer(source.getId(), source.getItemId(), source.getIndex(), dest.getId(), ctrl);
     }
 
@@ -387,6 +396,9 @@ public class WidgetAPI
      */
     public static void onWidget(Widget source, Widget dest)
     {
+        if (source == null || dest == null) {
+            return;
+        }
         onWidget(source.getId(), source.getItemId(), source.getIndex(), dest.getId(), dest.getItemId(), dest.getIndex());
     }
 
