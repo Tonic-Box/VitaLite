@@ -14,6 +14,7 @@ import net.runelite.api.widgets.Widget;
 @Getter
 public enum LayoutView
 {
+    MAINMODEL(InterfaceID.Toplevel.MAINMODAL, InterfaceID.ToplevelOsrsStretch.MAINMODAL, InterfaceID.ToplevelPreEoc.MAINMODAL),
     VIEWPORT(InterfaceID.Toplevel.GAMEFRAME, InterfaceID.ToplevelOsrsStretch.GAMEFRAME, InterfaceID.ToplevelPreEoc.GAMEFRAME),
     WORLD(InterfaceID.Toplevel.OVERLAY_HUD, InterfaceID.ToplevelOsrsStretch.HUD_CONTAINER_FRONT, InterfaceID.ToplevelPreEoc.HUD_CONTAINER_FRONT),
     WORLD_MAP(InterfaceID.Toplevel.MINIMAP, InterfaceID.ToplevelOsrsStretch.MINIMAP, InterfaceID.ToplevelPreEoc.MINIMAP),
@@ -32,6 +33,14 @@ public enum LayoutView
             Client client = Static.getClient();
             int widgetId = client.isResized() ? (client.getVarbitValue(VarbitID.RESIZABLE_STONE_ARRANGEMENT) == 1 ? MODERN_STRETCH : CLASSIC_STRETCH) : CLASSIC_FIXED;
             return WidgetAPI.get(widgetId);
+        });
+    }
+
+    public int getCurrentID()
+    {
+        return Static.invoke(() -> {
+            Client client = Static.getClient();
+            return client.isResized() ? (client.getVarbitValue(VarbitID.RESIZABLE_STONE_ARRANGEMENT) == 1 ? MODERN_STRETCH : CLASSIC_STRETCH) : CLASSIC_FIXED;
         });
     }
 

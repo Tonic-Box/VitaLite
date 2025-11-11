@@ -5,17 +5,14 @@ import com.tonic.Static;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
-import com.tonic.api.game.SceneAPI;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.PrayerAPI;
 import com.tonic.api.widgets.WidgetAPI;
-import com.tonic.data.ItemConstants;
-import com.tonic.data.ItemEx;
-import com.tonic.data.StrongholdSecurityQuestion;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.*;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.queries.TileObjectQuery;
+import com.tonic.queries.WidgetQuery;
 import com.tonic.services.mouse.ClickVisualizationOverlay;
 import static com.tonic.services.pathfinder.Walker.*;
 import com.tonic.services.GameManager;
@@ -23,13 +20,16 @@ import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.abstractions.IStep;
 import com.tonic.services.pathfinder.teleports.Teleport;
 import com.tonic.util.Location;
+import com.tonic.util.StaticIntFinder;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 import org.apache.commons.lang3.ArrayUtils;
 import java.util.List;
@@ -234,10 +234,12 @@ public class WalkerPath
         {
             steps.remove(0);
         }
-        step = steps.get(0);
+        step = steps.get(0); //Walker.walkTo(new WorldPoint(2575,3268,1));
+        IStep nextStep = steps.size() > 1 ? steps.get(1) : null;
+        boolean nextBlocked = nextStep != null && !Location.isReachable(step.getPosition(), nextStep.getPosition());
         ClickVisualizationOverlay.recordWalkClick(step.getPosition());
         MovementAPI.walkTowards(step.getPosition());
-        if(!step.hasTransport() && MovementAPI.isMoving())
+        if((!step.hasTransport() && MovementAPI.isMoving()) || nextBlocked || (steps.size() == 1 && local.getWorldLocation().equals(step.getPosition())))
             steps.remove(step);
         return !isDone();
     }
@@ -277,6 +279,22 @@ public class WalkerPath
         {
             return true;
         }
+
+        //HACK to handle warnings dynamically
+        Widget widget = new WidgetQuery(LayoutView.MAINMODEL.getCurrentID())
+                .withTextContains("WARNING")
+                .first();
+        if(widget != null)
+        {
+            Widget universe = widget.getParent();
+            int id = universe.getId();
+            String name = StaticIntFinder.find(InterfaceID.class, id);
+            if(name != null && name.toLowerCase().contains("universe"))
+            {
+                DialogueAPI.resumePause(id, 1);
+            }
+        }
+
         IStep step = steps.get(0);
         if(!step.hasTransport())
         {

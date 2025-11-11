@@ -21,20 +21,20 @@ public class WidgetQuery extends AbstractQuery<Widget, WidgetQuery>
         super(GameManager.widgetList());
     }
 
+    public WidgetQuery(Widget... roots) {
+        super(GameManager.widgetList(roots));
+    }
+
+    public WidgetQuery(int... roots) {
+        super(GameManager.widgetList(roots));
+    }
+
     /**
      * Initializes the query with a provided collection of widgets.
      * @param cache A collection of widgets to initialize the query with.
      */
     public WidgetQuery(List<Widget> cache) {
         super(new ArrayList<>(cache));
-    }
-
-    /**
-     * Initializes the query with a provided array of widgets.
-     * @param cache An array of widgets to initialize the query with.
-     */
-    public WidgetQuery(Widget[] cache) {
-        super(Arrays.asList(cache));
     }
 
     /**

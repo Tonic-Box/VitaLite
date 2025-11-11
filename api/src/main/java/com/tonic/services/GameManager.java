@@ -4,6 +4,7 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.MiniMapAPI;
+import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.api.widgets.WorldMapAPI;
 import com.tonic.data.LoginResponse;
 import com.tonic.data.TileItemEx;
@@ -167,6 +168,60 @@ public class GameManager extends Overlay {
         return Static.invoke(() -> {
             Widget[] roots = ((Client) Static.getClient()).getWidgetRoots();
 
+            List<Widget> result = new ArrayList<>(256);
+            Set<Widget> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+            Deque<Widget> toProcess = new ArrayDeque<>();
+            addNonNull(toProcess, roots);
+            while (!toProcess.isEmpty()) {
+                Widget widget = toProcess.pop();
+
+                if (!visited.add(widget)) {
+                    continue;
+                }
+
+                result.add(widget);
+                addNonNull(toProcess, widget.getChildren());
+                addNonNull(toProcess, widget.getStaticChildren());
+                addNonNull(toProcess, widget.getDynamicChildren());
+                addNonNull(toProcess, widget.getNestedChildren());
+            }
+
+            return result;
+        });
+    }
+
+    public static List<Widget> widgetList(Widget... roots) {
+        return Static.invoke(() -> {
+            List<Widget> result = new ArrayList<>(256);
+            Set<Widget> visited = Collections.newSetFromMap(new IdentityHashMap<>());
+            Deque<Widget> toProcess = new ArrayDeque<>();
+            addNonNull(toProcess, roots);
+            while (!toProcess.isEmpty()) {
+                Widget widget = toProcess.pop();
+
+                if (!visited.add(widget)) {
+                    continue;
+                }
+
+                result.add(widget);
+                addNonNull(toProcess, widget.getChildren());
+                addNonNull(toProcess, widget.getStaticChildren());
+                addNonNull(toProcess, widget.getDynamicChildren());
+                addNonNull(toProcess, widget.getNestedChildren());
+            }
+
+            return result;
+        });
+    }
+
+    public static List<Widget> widgetList(int... rootIds) {
+        Widget[] roots = new Widget[rootIds.length];
+        for(int i = 0; i < rootIds.length; i++)
+        {
+            roots[i] = WidgetAPI.get(rootIds[i]);
+        }
+
+        return Static.invoke(() -> {
             List<Widget> result = new ArrayList<>(256);
             Set<Widget> visited = Collections.newSetFromMap(new IdentityHashMap<>());
             Deque<Widget> toProcess = new ArrayDeque<>();
