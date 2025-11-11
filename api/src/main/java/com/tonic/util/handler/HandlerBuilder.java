@@ -224,6 +224,34 @@ public class HandlerBuilder
         return append(step, builder);
     }
 
+    public HandlerBuilder walkToWorldPointSupplier(int step, Supplier<WorldPoint> locationSupplier)
+    {
+        HandlerBuilder builder = HandlerBuilder.get()
+                .addDelayUntil(0, context -> {
+                    WorldPoint location = context.get("TARGET_AREA");
+                    if(location == null)
+                    {
+                        location = locationSupplier.get();
+                        context.put("TARGET_AREA", location);
+                    }
+                    WalkerPath path = context.get("PATH");
+                    if(path == null)
+                    {
+                        path = WalkerPath.get(location);
+                        context.put("PATH", path);
+                    }
+                    boolean value = !path.step();
+                    if(value)
+                    {
+                        context.remove("TARGET_AREA");
+                        context.remove("PATH");
+                    }
+                    return value;
+                })
+                .addDelayUntil(1, () -> !MovementAPI.isMoving());
+        return append(step, builder);
+    }
+
     public HandlerBuilder walkTo(int step, WorldArea location)
     {
         HandlerBuilder builder = HandlerBuilder.get()
@@ -243,6 +271,41 @@ public class HandlerBuilder
                     boolean value = !path.step();
                     if(value)
                     {
+                        context.remove("PATH");
+                    }
+                    return value;
+                })
+                .addDelayUntil(1, () -> !MovementAPI.isMoving());
+        return append(step, builder);
+    }
+
+    public HandlerBuilder walkToWorldAreaSupplier(int step, Supplier<WorldArea> locationSupplier)
+    {
+        HandlerBuilder builder = HandlerBuilder.get()
+                .addDelayUntil(0, context -> {
+                    WorldArea location = context.get("TARGET_AREA");
+                    if(location == null)
+                    {
+                        location = locationSupplier.get();
+                        context.put("TARGET_AREA", location);
+                    }
+                    Client client = Static.getClient();
+                    if(location.contains(client.getLocalPlayer().getWorldLocation()))
+                    {
+                        context.remove("TARGET_AREA");
+                        context.remove("PATH");
+                        return true;
+                    }
+                    WalkerPath path = context.get("PATH");
+                    if(path == null)
+                    {
+                        path = WalkerPath.get(List.of(location));
+                        context.put("PATH", path);
+                    }
+                    boolean value = !path.step();
+                    if(value)
+                    {
+                        context.remove("TARGET_AREA");
                         context.remove("PATH");
                     }
                     return value;

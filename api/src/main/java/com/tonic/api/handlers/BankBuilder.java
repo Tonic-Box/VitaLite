@@ -19,6 +19,8 @@ import net.runelite.api.NPC;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
 
+import javax.annotation.Nullable;
+
 /**
  * A handler builder for banking actions.
  */
@@ -41,8 +43,7 @@ public class BankBuilder extends AbstractHandlerBuilder
      */
     public BankBuilder open()
     {
-        BankLocations nearestBank = BankLocations.getNearest();
-        return open(nearestBank);
+        return open(null);
     }
 
     /**
@@ -51,9 +52,34 @@ public class BankBuilder extends AbstractHandlerBuilder
      * @param bankLocation The bank location to open.
      * @return BankBuilder instance
      */
-    public BankBuilder open(BankLocations bankLocation)
+    public BankBuilder open(@Nullable BankLocations bankLocation)
     {
-        walkTo(bankLocation.getArea());
+        int step2 = currentStep;
+        add(context -> {
+            NPC banker = new NpcQuery()
+                    .withNameContains("Banker")
+                    .keepIf(n -> Location.losTileNextTo(n.getWorldLocation()) != null)
+                    .nearest();
+            if(banker != null)
+            {
+                NpcAPI.interact(banker, 2);
+                return step2 + 3;
+            }
+            TileObjectEx bank = new TileObjectQuery<>()
+                    .withNamesContains("Bank booth", "Bank chest")
+                    .sortNearest()
+                    .first();
+            if(bank != null && Location.losTileNextTo(bank.getWorldLocation()) != null)
+            {
+                if(bank.getName().contains("Bank booth"))
+                    TileObjectAPI.interact(bank, 1);
+                else
+                    TileObjectAPI.interact(bank, 0);
+                return step2 + 3;
+            }
+            return step2 + 1;
+        });
+        walkToWorldAreaSupplier(() -> bankLocation != null ? bankLocation.getArea() : BankLocations.getNearest().getArea());
         int step = currentStep;
         add(context -> {
             if(BankAPI.isOpen())
@@ -67,7 +93,7 @@ public class BankBuilder extends AbstractHandlerBuilder
             if(banker != null)
             {
                 NpcAPI.interact(banker, 2);
-                return step + 2;
+                return step + 1;
             }
 
             TileObjectEx bank = new TileObjectQuery<>()
@@ -77,20 +103,18 @@ public class BankBuilder extends AbstractHandlerBuilder
             Client client = Static.getClient();
             if(bank != null && bank.getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation())  < 10)
             {
+                if(bank.getName().contains("Bank booth"))
+                    TileObjectAPI.interact(bank, 1);
+                else
+                    TileObjectAPI.interact(bank, 0);
                 return step + 1;
             }
             return step;
         });
-        add(context -> {
-            TileObjectEx bank = context.get("bankObject");
-            if(bank == null)
-                return;
-            if(bank.getName().contains("Bank booth"))
-                TileObjectAPI.interact(bank, 1);
-            else
-                TileObjectAPI.interact(bank, 0);
+        addDelayUntil(() -> {
+            System.out.println("Step: " + currentStep + "Cond: " + BankAPI.isOpen());
+            return BankAPI.isOpen();
         });
-        addDelayUntil(BankAPI::isOpen);
         return this;
     }
 

@@ -134,4 +134,14 @@ public abstract class AbstractHandlerBuilder extends HandlerBuilder
     {
         return walkTo(currentStep++, location);
     }
+
+    public HandlerBuilder walkToWorldAreaSupplier(Supplier<WorldArea> location)
+    {
+        return walkToWorldAreaSupplier(currentStep++, location);
+    }
+
+    public HandlerBuilder walkToWorldPointSupplier(Supplier<WorldPoint> location)
+    {
+        return walkToWorldPointSupplier(currentStep++, location);
+    }
 }
