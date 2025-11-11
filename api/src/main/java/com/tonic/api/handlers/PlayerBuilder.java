@@ -9,7 +9,7 @@ import net.runelite.api.Player;
 /**
  * Builder for handling player interactions.
  */
-public class PlayerBuilder extends AbstractHandlerBuilder
+public class PlayerBuilder extends AbstractHandlerBuilder<PlayerBuilder>
 {
     /**
      * Creates a new PlayerBuilder instance.

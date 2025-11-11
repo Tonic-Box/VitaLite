@@ -13,7 +13,7 @@ import static com.tonic.api.widgets.GrandExchangeAPI.*;
 /**
  * Handler builder for interacting with the Grand Exchange.
  */
-public class GrandExchangeHandler extends AbstractHandlerBuilder {
+public class GrandExchangeHandler extends AbstractHandlerBuilder<GrandExchangeHandler> {
 
     /**
      * Creates a new instance of the GrandExchangeHandler.

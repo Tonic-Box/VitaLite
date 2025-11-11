@@ -10,7 +10,7 @@ import net.runelite.api.coords.WorldPoint;
 /**
  * Builder for handling interactions with tile objects in the game world.
  */
-public class TileObjectBuilder extends AbstractHandlerBuilder
+public class TileObjectBuilder extends AbstractHandlerBuilder<TileObjectBuilder>
 {
     /**
      * Creates a new instance of TileObjectBuilder.
