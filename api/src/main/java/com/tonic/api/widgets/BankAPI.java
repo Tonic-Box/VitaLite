@@ -36,6 +36,14 @@ public class BankAPI
         private static int tick = -1;
     }
 
+    /**
+     * Creates an instance of InventoryQuery from the Bank
+     * @return InventoryQuery
+     */
+    public static InventoryQuery search() {
+        return InventoryQuery.fromInventoryId(InventoryID.BANK);
+    }
+
     public static int getX()
     {
         if (GameManager.getTickCount() == XSnapshot.tick)
@@ -288,6 +296,21 @@ public class BankAPI
         ItemEx item = Static.invoke(() ->
                 InventoryQuery.fromInventoryId(InventoryID.BANK).withName(name).first()
         );
+
+        if(item == null)
+            return;
+
+        withdrawAction(item.getId(), amount, item.getSlot());
+    }
+
+    /**
+     * Withdraws the specified amount of the item with the given name from the bank.
+     * @param item The ItemEx to withdraw.
+     * @param amount The amount to withdraw. Use -1 for "all" option.
+     * @param noted True to withdraw as noted, false to withdraw as unnoted.
+     */
+    public static void withdraw(ItemEx item, int amount, boolean noted) {
+        setWithdrawMode(noted);
 
         if(item == null)
             return;
