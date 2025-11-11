@@ -27,7 +27,7 @@ repositories {
 ```
 
 ### Plugin Structure
-Plgins can be written in the normal way extending runelites Plugin class and so on. However there is another enanced Plugin supertype that VitaLite supports `VitaPlugin`. 
+Plugins can be written in the normal way extending runelites Plugin class and so on. However there is another enhanced Plugin supertype that VitaLite supports `VitaPlugin`. 
 
 Sample:
 ```java
