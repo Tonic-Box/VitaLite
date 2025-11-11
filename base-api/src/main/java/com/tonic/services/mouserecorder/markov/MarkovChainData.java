@@ -217,6 +217,24 @@ public class MarkovChainData
         return totalSamples.get();
     }
 
+    /**
+     * Restores total transitions count (package-private for persistence layer).
+     * Used during deserialization to efficiently restore saved state.
+     */
+    void setTotalTransitions(long value)
+    {
+        totalTransitions.set(value);
+    }
+
+    /**
+     * Restores total samples count (package-private for persistence layer).
+     * Used during deserialization to efficiently restore saved state.
+     */
+    void setTotalSamples(long value)
+    {
+        totalSamples.set(value);
+    }
+
     public int getStateCount()
     {
         return transitionCounts.size();

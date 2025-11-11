@@ -30,6 +30,7 @@ public class IncrementalPersistenceManager
     private final AtomicBoolean running;
     private final AtomicLong lastSavedTransitionCount;
     private final AtomicLong lastSaveTime;
+    private final AtomicLong totalSaveCount;
     private ScheduledExecutorService saveExecutor;
 
     /**
@@ -48,6 +49,7 @@ public class IncrementalPersistenceManager
         this.running = new AtomicBoolean(false);
         this.lastSavedTransitionCount = new AtomicLong(0);
         this.lastSaveTime = new AtomicLong(0);
+        this.totalSaveCount = new AtomicLong(0);
     }
 
     /**
@@ -61,6 +63,14 @@ public class IncrementalPersistenceManager
             try
             {
                 MarkovChainData loaded = BinaryMarkovPersistence.loadBinary(saveFilePath);
+
+                // Log format validation
+                MarkovPersistenceLogger.logFormatValidation(
+                    saveFilePath,
+                    chainData.getBinSize(), loaded.getBinSize(),
+                    chainData.getTimeBinSize(), loaded.getTimeBinSize()
+                );
+
                 if (loaded.getBinSize() != chainData.getBinSize() ||
                     loaded.getTimeBinSize() != chainData.getTimeBinSize())
                 {
@@ -69,11 +79,29 @@ public class IncrementalPersistenceManager
                         "Starting fresh training. Old file will be overwritten.",
                         loaded.getBinSize(), loaded.getTimeBinSize(),
                         chainData.getBinSize(), chainData.getTimeBinSize()));
+
+                    MarkovPersistenceLogger.logLoadFailure(
+                        saveFilePath,
+                        "Incompatible bin sizes - discarding existing data",
+                        null
+                    );
                 }
                 else
                 {
                     chainData.merge(loaded);
                     lastSavedTransitionCount.set(chainData.getTotalTransitions());
+
+                    // Set lastSaveTime to file's last modified time (or current time if unavailable)
+                    try
+                    {
+                        long fileModifiedTime = java.nio.file.Files.getLastModifiedTime(saveFilePath).toMillis();
+                        lastSaveTime.set(fileModifiedTime);
+                    }
+                    catch (IOException e)
+                    {
+                        // Fallback to current time if we can't read file modified time
+                        lastSaveTime.set(System.currentTimeMillis());
+                    }
 
                     Logger.info(String.format("Loaded existing Markov data: %s (%.2f KB)",
                         loaded.getStatistics(),
@@ -83,6 +111,7 @@ public class IncrementalPersistenceManager
             catch (IOException e)
             {
                 Logger.error("Failed to load existing Markov data: " + e.getMessage());
+                MarkovPersistenceLogger.logLoadFailure(saveFilePath, "IOException during load", e);
             }
         }
     }
@@ -107,13 +136,16 @@ public class IncrementalPersistenceManager
             return t;
         });
 
+        // Start with shorter initial delay (5s) so first save happens quickly,
+        // then continue with normal interval (30s)
         saveExecutor.scheduleAtFixedRate(
             this::trySave,
-            saveIntervalSeconds,
-            saveIntervalSeconds,
+            5,  // Initial delay: 5 seconds
+            saveIntervalSeconds,  // Period: 30 seconds
             TimeUnit.SECONDS
         );
 
+        MarkovPersistenceLogger.logPersistenceStart(saveFilePath, saveIntervalSeconds);
         Logger.info("Markov persistence started (saves every " + saveIntervalSeconds + "s to " + saveFilePath + ")");
     }
 
@@ -145,6 +177,7 @@ public class IncrementalPersistenceManager
 
         forceSave();
 
+        MarkovPersistenceLogger.logPersistenceStop(totalSaveCount.get(), lastSavedTransitionCount.get());
         Logger.info("Markov persistence stopped");
     }
 
@@ -169,8 +202,10 @@ public class IncrementalPersistenceManager
                 long elapsed = System.currentTimeMillis() - startTime;
                 long newTransitions = currentTransitions - savedTransitions;
 
-                lastSavedTransitionCount.set(currentTransitions);
+                // Update counters atomically to prevent UI from seeing inconsistent state
                 lastSaveTime.set(System.currentTimeMillis());
+                lastSavedTransitionCount.set(currentTransitions);
+                totalSaveCount.incrementAndGet();
 
                 Logger.info(String.format("Auto-saved %d new transitions in %dms (%.2f KB)",
                     newTransitions, elapsed,
@@ -194,8 +229,10 @@ public class IncrementalPersistenceManager
             BinaryMarkovPersistence.saveBinary(chainData, saveFilePath);
             long elapsed = System.currentTimeMillis() - startTime;
 
-            lastSavedTransitionCount.set(chainData.getTotalTransitions());
+            // Update counters atomically to prevent UI from seeing inconsistent state
             lastSaveTime.set(System.currentTimeMillis());
+            lastSavedTransitionCount.set(chainData.getTotalTransitions());
+            totalSaveCount.incrementAndGet();
 
             Logger.info(String.format("Force saved Markov data in %dms (%.2f KB)",
                 elapsed, BinaryMarkovPersistence.getFileSize(saveFilePath) / 1024.0));
