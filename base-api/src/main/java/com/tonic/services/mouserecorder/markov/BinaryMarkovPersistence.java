@@ -11,12 +11,16 @@ import java.util.concurrent.atomic.AtomicLong;
  * Much faster and more compact than JSON for real-time incremental saves.
  *
  * Format:
- * Header (24 bytes):
+ * Header (56 bytes):
  *   - Magic bytes: "MRKV" (4 bytes)
  *   - Version: int (4 bytes)
  *   - Bin size: int (4 bytes)
  *   - Time bin size: int (4 bytes)
  *   - Total transitions: long (8 bytes)
+ *   - Total samples: long (8 bytes)
+ *   - Created time: long (8 bytes)
+ *   - Last update time: long (8 bytes)
+ *   - State count: int (4 bytes)
  *
  * Per State:
  *   - From state: 3 ints (12 bytes)
@@ -39,6 +43,7 @@ public class BinaryMarkovPersistence
      */
     public static void saveBinary(MarkovChainData chain, Path filePath) throws IOException
     {
+        long startTime = System.currentTimeMillis();
         Files.createDirectories(filePath.getParent());
 
         try (DataOutputStream dos = new DataOutputStream(
@@ -46,6 +51,9 @@ public class BinaryMarkovPersistence
         {
             writeChain(chain, dos);
         }
+
+        long duration = System.currentTimeMillis() - startTime;
+        MarkovPersistenceLogger.logSave(filePath, chain, duration);
     }
 
     /**
@@ -57,10 +65,20 @@ public class BinaryMarkovPersistence
      */
     public static MarkovChainData loadBinary(Path filePath) throws IOException
     {
+        long startTime = System.currentTimeMillis();
+
         try (DataInputStream dis = new DataInputStream(
             new BufferedInputStream(Files.newInputStream(filePath), 65536)))
         {
-            return readChain(dis);
+            MarkovChainData chain = readChain(dis);
+            long duration = System.currentTimeMillis() - startTime;
+            MarkovPersistenceLogger.logLoad(filePath, chain, duration);
+            return chain;
+        }
+        catch (IOException e)
+        {
+            MarkovPersistenceLogger.logLoadFailure(filePath, "IO error during read", e);
+            throw e;
         }
     }
 
@@ -110,24 +128,37 @@ public class BinaryMarkovPersistence
         {
             throw new IOException("Unsupported version: " + version);
         }
+
         int binSize = dis.readInt();
         int timeBinSize = dis.readInt();
+        long totalTransitions = dis.readLong();
+        long totalSamples = dis.readLong();
+        long createdTime = dis.readLong();
+        long lastUpdateTime = dis.readLong();
+
         MarkovChainData chain = new MarkovChainData(binSize, timeBinSize);
+
         int stateCount = dis.readInt();
         for (int i = 0; i < stateCount; i++)
         {
             MovementState fromState = readState(dis);
             int transitionCount = dis.readInt();
+
             for (int j = 0; j < transitionCount; j++)
             {
                 MovementState toState = readState(dis);
                 long count = dis.readLong();
-                for (int k = 0; k < count; k++)
-                {
-                    chain.recordTransition(fromState, toState);
-                }
+
+                // Directly populate transition map (efficient restoration)
+                Map<MovementState, AtomicLong> transitions = chain.transitionCounts
+                    .computeIfAbsent(fromState, k -> new java.util.concurrent.ConcurrentHashMap<>());
+                transitions.put(toState, new AtomicLong(count));
             }
         }
+
+        // Restore saved counts directly (don't recalculate from transitions)
+        chain.setTotalTransitions(totalTransitions);
+        chain.setTotalSamples(totalSamples);
 
         return chain;
     }
