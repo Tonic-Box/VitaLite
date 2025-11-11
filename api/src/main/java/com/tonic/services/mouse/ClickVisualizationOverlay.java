@@ -202,8 +202,17 @@ public class ClickVisualizationOverlay extends Overlay {
                     Polygon tilePoly = Perspective.getCanvasTilePoly(client, localPoint);
                     if (tilePoly != null) {
                         ClickManager.queueClickBox(tilePoly);
-                    } else {
-                        ClickManager.setPoint(screenPoint.getX(), screenPoint.getY());
+                    }
+                    else {
+                        //generate 25 x 25 poly around point, setting point messes up static click
+                        Polygon clickBox = new Polygon();
+                        int boxWidth = 10;
+                        int boxHeight = 10;
+                        clickBox.addPoint(screenPoint.getX() - boxWidth / 2, screenPoint.getY() - boxHeight / 2);
+                        clickBox.addPoint(screenPoint.getX() + boxWidth / 2, screenPoint.getY() - boxHeight / 2);
+                        clickBox.addPoint(screenPoint.getX() + boxWidth / 2, screenPoint.getY() + boxHeight / 2);
+                        clickBox.addPoint(screenPoint.getX() - boxWidth / 2, screenPoint.getY() + boxHeight / 2);
+                        ClickManager.queueClickBox(clickBox);
                     }
 
                     ClickVisualizationOverlay.recordClick(
