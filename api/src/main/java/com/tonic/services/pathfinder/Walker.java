@@ -18,6 +18,7 @@ import net.runelite.api.Client;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 /**
  * A worldWalker
@@ -63,6 +64,11 @@ public class Walker
         walk(target);
     }
 
+    public static boolean walkTo(WorldPoint target, BooleanSupplier stopCondition)
+    {
+        return walk(target, stopCondition);
+    }
+
     /**
      * Walk to one of the specified areas (closest)
      * @param areas target areas
@@ -72,29 +78,57 @@ public class Walker
         walk(areas);
     }
 
+    public static boolean walkTo(List<WorldArea> areas, BooleanSupplier stopCondition)
+    {
+        return walk(areas, stopCondition);
+    }
+
     private static void walk(WorldPoint target) {
-        WalkerPath walkerPath = WalkerPath.get(target);
-        walk(walkerPath);
+        walk(target, () -> false);
     }
 
     private static void walk(List<WorldArea> targets) {
+        walk(targets, () -> false);
+    }
+
+    private static boolean walk(WorldPoint target, BooleanSupplier stopCondition) {
+        WalkerPath walkerPath = WalkerPath.get(target);
+        return walk(walkerPath, stopCondition);
+    }
+
+    private static boolean walk(List<WorldArea> targets, BooleanSupplier stopCondition) {
         WalkerPath walkerPath = WalkerPath.get(targets);
-        walk(walkerPath);
+        return walk(walkerPath, stopCondition);
     }
 
     private static void walk(WalkerPath walkerPath)
+    {
+        walk(walkerPath, () -> false);
+    }
+
+    private static boolean walk(WalkerPath walkerPath, BooleanSupplier stopCondition)
     {
         Client client = Static.getClient();
         try
         {
             WorldPoint end = walkerPath.getSteps().get(walkerPath.getSteps().size() - 1).getPosition();
             running = true;
+            if(stopCondition.getAsBoolean())
+            {
+                cancel();
+                return true;
+            }
             while(walkerPath.step())
             {
+                if(stopCondition.getAsBoolean())
+                {
+                    cancel();
+                    return true;
+                }
                 if(!running)
                 {
                     GameManager.clearPathPoints();
-                    return;
+                    return false;
                 }
                 Delays.tick();
             }
@@ -102,6 +136,11 @@ public class Walker
             WorldPoint worldPoint = Static.invoke(() -> client.getLocalPlayer().getWorldLocation());
             while(!worldPoint.equals(end) && timeout > 0)
             {
+                if(stopCondition.getAsBoolean())
+                {
+                    cancel();
+                    return true;
+                }
                 Delays.tick();
                 if(PlayerAPI.isIdle(client.getLocalPlayer()))
                 {
@@ -110,7 +149,7 @@ public class Walker
                     {
                         walkTo(end);
                         GameManager.clearPathPoints();
-                        return;
+                        return false;
                     }
                     ClickVisualizationOverlay.recordWalkClick(end);
                     MovementAPI.walkToWorldPoint(end);
@@ -121,7 +160,7 @@ public class Walker
                 {
                     walkerPath.shutdown();
                     GameManager.clearPathPoints();
-                    return;
+                    return false;
                 }
             }
         }
@@ -130,6 +169,7 @@ public class Walker
             GameManager.clearPathPoints();
             running = false;
         }
+        return false;
     }
 
     public static void cancel()
