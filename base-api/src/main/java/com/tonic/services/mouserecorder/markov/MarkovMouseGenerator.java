@@ -2,6 +2,7 @@ package com.tonic.services.mouserecorder.markov;
 
 import com.tonic.services.mouserecorder.IMouseMovementGenerator;
 import com.tonic.services.mouserecorder.MouseMovementSequence;
+import com.tonic.util.config.ConfigFactory;
 import lombok.Getter;
 
 import java.util.Random;
@@ -22,33 +23,30 @@ public class MarkovMouseGenerator implements IMouseMovementGenerator
     @Getter
     private final MarkovChainData chainData;
     private final Random random;
-    private final int maxSteps;
-    private final double targetDistanceTolerance;
+    private final MarkovGeneratorConfig config;
 
     /**
-     * Creates a Markov-based mouse generator.
+     * Creates a Markov-based mouse generator with custom config.
      *
-     * @param chainData               Trained Markov chain data
-     * @param random                  Random number generator
-     * @param maxSteps                Maximum steps to generate (prevents infinite loops)
-     * @param targetDistanceTolerance Acceptable distance from target (in pixels)
+     * @param chainData Trained Markov chain data
+     * @param random    Random number generator
+     * @param config    Generator configuration
      */
-    public MarkovMouseGenerator(MarkovChainData chainData, Random random, int maxSteps, double targetDistanceTolerance)
+    public MarkovMouseGenerator(MarkovChainData chainData, Random random, MarkovGeneratorConfig config)
     {
         this.chainData = chainData;
         this.random = random;
-        this.maxSteps = maxSteps;
-        this.targetDistanceTolerance = targetDistanceTolerance;
+        this.config = config;
     }
 
     /**
-     * Creates a generator with default settings.
+     * Creates a generator with default config.
      *
      * @param chainData Trained Markov chain data
      */
     public MarkovMouseGenerator(MarkovChainData chainData)
     {
-        this(chainData, new Random(), 200, 10.0);
+        this(chainData, new Random(), ConfigFactory.create(MarkovGeneratorConfig.class));
     }
 
     @Override
@@ -82,7 +80,7 @@ public class MarkovMouseGenerator implements IMouseMovementGenerator
         int steps = 0;
         double distanceToTarget = distance(currentX, currentY, endX, endY);
 
-        while (distanceToTarget > targetDistanceTolerance && steps < maxSteps)
+        while (distanceToTarget > config.getTargetTolerance() && steps < config.getMaxSteps())
         {
             MovementState nextState = chainData.sampleNextState(currentState, random);
 
@@ -132,8 +130,9 @@ public class MarkovMouseGenerator implements IMouseMovementGenerator
         // Calculate bias strength - balance between natural Markov curves and reaching target
         // Gentle minimum bias prevents extreme wandering while preserving natural curves
         // Gradual increase ensures smooth arrival without perfectly straight paths
-        double normalizedDistance = Math.min(1.0, distanceToTarget / 400.0);
-        double biasFactor = 0.15 + (0.60 * (1.0 - normalizedDistance));
+        double normalizedDistance = Math.min(1.0, distanceToTarget / config.getBiasDistance());
+        double biasRange = config.getBiasMaximum() - config.getBiasMinimum();
+        double biasFactor = config.getBiasMinimum() + (biasRange * (1.0 - normalizedDistance));
 
         if (directionToTarget != 0)
         {

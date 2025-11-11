@@ -260,6 +260,9 @@ public class MarkovTrainerMonitor extends VitaFrame
         stateSpacePanel = new StateSpacePanel(trainer);
         tabbedPane.addTab("State Space", stateSpacePanel);
 
+        JPanel settingsTab = new MarkovSettingsPanel();
+        tabbedPane.addTab("Settings", settingsTab);
+
         return tabbedPane;
     }
 
