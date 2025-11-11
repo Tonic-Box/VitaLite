@@ -67,7 +67,6 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
                 NpcAPI.interact(banker, 2);
                 return step2 + 3;
             }
-            DialogueAPI.resumePause(InterfaceID.TutorialPlayerExperience.CONTENT, 3);
             TileObjectEx bank = new TileObjectQuery<>()
                     .withNamesContains("Bank booth", "Bank chest")
                     .sortNearest()
