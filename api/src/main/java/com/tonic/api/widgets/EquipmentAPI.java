@@ -8,7 +8,7 @@ import com.tonic.queries.InventoryQuery;
 import com.tonic.data.EquipmentSlot;
 import com.tonic.data.ItemEx;
 import com.tonic.services.ClickManager;
-import com.tonic.services.ClickPacket.PacketInteractionType;
+import com.tonic.services.ClickPacket.ClickType;
 import net.runelite.api.gameval.InventoryID;
 import java.util.List;
 import java.util.function.Predicate;
@@ -178,7 +178,7 @@ public class EquipmentAPI
     {
         TClient client = Static.getClient();
         Static.invoke(() -> {
-            ClickManager.click(PacketInteractionType.EQUIPMENTITEM_INTERACT);
+            ClickManager.click(ClickType.WIDGET);
             client.getPacketWriter().widgetActionPacket(action, EquipmentSlot.findBySlot(slot).getWidgetInfo().getId(), -1, -1);
         });
     }

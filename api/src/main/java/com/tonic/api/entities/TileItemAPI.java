@@ -6,7 +6,7 @@ import com.tonic.api.TItemComposition;
 import com.tonic.data.TileItemEx;
 import com.tonic.queries.TileItemQuery;
 import com.tonic.services.ClickManager;
-import com.tonic.services.ClickPacket.PacketInteractionType;
+import com.tonic.services.ClickPacket.ClickType;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.TileItem;
@@ -165,7 +165,7 @@ public class TileItemAPI
         TClient tClient = Static.getClient();
         Static.invoke(() ->
         {
-            ClickManager.click(PacketInteractionType.TILEITEM_INTERACT);
+            ClickManager.click(ClickType.GROUND_ITEM);
             tClient.getPacketWriter().groundItemActionPacket(action, identifier, worldX, worldY, ctrlDown);
         });
     }

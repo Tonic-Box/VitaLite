@@ -1,6 +1,7 @@
 package com.tonic.util;
 
 import com.tonic.Static;
+import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.ItemEx;
 import com.tonic.data.TileObjectEx;
 import com.tonic.services.ClickManager;
@@ -53,6 +54,20 @@ public class ClickManagerUtil
     public static void queueClickBox(Widget widget)
     {
         Static.invoke(() -> {
+            Shape shape = widget.getBounds();
+            if(shape == null)
+            {
+                shape = Static.getRuneLite().getGameApplet().getSideMenuArea();
+            }
+            ClickManager.queueClickBox(shape);
+            return true;
+        });
+    }
+
+    public static void queueClickBoxInterface(int interfaceId)
+    {
+        Static.invoke(() -> {
+            Widget widget = WidgetAPI.get(interfaceId);
             Shape shape = widget.getBounds();
             if(shape == null)
             {

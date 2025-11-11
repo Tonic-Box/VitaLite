@@ -9,11 +9,11 @@ import java.time.ZonedDateTime;
 public class ClickPacket {
 
     private final ZonedDateTime date;
-    private final PacketInteractionType packetInteractionType;
+    private final ClickType packetInteractionType;
     private final int x;
     private final int y;
 
-    public ClickPacket(PacketInteractionType packetInteractionType, int x, int y) {
+    public ClickPacket(ClickType packetInteractionType, int x, int y) {
         this.packetInteractionType = packetInteractionType;
         this.date = ZonedDateTime.now(ZoneId.systemDefault());
         this.x = x;

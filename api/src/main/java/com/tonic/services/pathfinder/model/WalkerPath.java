@@ -19,6 +19,7 @@ import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.abstractions.IStep;
 import com.tonic.services.pathfinder.teleports.Teleport;
+import com.tonic.util.ClickManagerUtil;
 import com.tonic.util.Location;
 import com.tonic.util.StaticIntFinder;
 import lombok.Getter;
@@ -242,7 +243,6 @@ public class WalkerPath
         step = steps.get(0); //Walker.walkTo(new WorldPoint(2575,3268,1));
         IStep nextStep = steps.size() > 1 ? steps.get(1) : null;
         boolean nextBlocked = nextStep != null && !Location.isReachable(step.getPosition(), nextStep.getPosition());
-        ClickVisualizationOverlay.recordWalkClick(step.getPosition());
         MovementAPI.walkTowards(step.getPosition());
         if((!step.hasTransport() && MovementAPI.isMoving()) || nextBlocked || (steps.size() == 1 && local.getWorldLocation().equals(step.getPosition())))
             steps.remove(step);
@@ -264,6 +264,7 @@ public class WalkerPath
 
         if(object != null)
         {
+            ClickManagerUtil.queueClickBox(object);
             TileObjectAPI.interact(object, 0);
             Logger.info("[Pathfinder] Interacting with '" + object.getName() + "'");
             return true;
@@ -296,6 +297,7 @@ public class WalkerPath
             String name = StaticIntFinder.find(InterfaceID.class, id);
             if(name != null && name.toLowerCase().contains("universe"))
             {
+                ClickManagerUtil.queueClickBoxInterface(id);
                 DialogueAPI.resumePause(id, 1);
             }
         }

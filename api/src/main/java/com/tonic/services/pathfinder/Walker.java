@@ -151,7 +151,6 @@ public class Walker
                         GameManager.clearPathPoints();
                         return false;
                     }
-                    ClickVisualizationOverlay.recordWalkClick(end);
                     MovementAPI.walkToWorldPoint(end);
                     Delays.tick();
                 }

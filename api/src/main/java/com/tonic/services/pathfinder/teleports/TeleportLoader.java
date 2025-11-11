@@ -4,16 +4,14 @@ import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.game.GameAPI;
 import com.tonic.api.game.VarAPI;
-import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.data.ItemEx;
 import com.tonic.services.ClickManager;
-import com.tonic.services.ClickPacket.PacketInteractionType;
+import com.tonic.services.ClickPacket.ClickType;
 import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarPlayerID;
-import net.runelite.api.gameval.VarbitID;
 import org.apache.commons.lang3.ArrayUtils;
 import java.util.*;
 
@@ -325,14 +323,14 @@ public class TeleportLoader {
             add(() -> {
                 TClient tClient = Static.getClient();
                 Static.invoke(() -> {
-                    ClickManager.click(PacketInteractionType.UNBOUND_INTERACT);
+                    ClickManager.click(ClickType.GENERIC);
                     tClient.invokeMenuAction("", "", 0, 30, option, WidgetId, -1, -1, -1);
                 });
             });
             add(() -> {
                 TClient tClient = Static.getClient();
                 Static.invoke(() -> {
-                    tClient.getPacketWriter().clickPacket(0, -1, -1);
+                    ClickManager.click(ClickType.GENERIC);
                     tClient.invokeMenuAction("", "", 0, 30, option, WidgetId, -1, -1, -1);
                 });
             });
