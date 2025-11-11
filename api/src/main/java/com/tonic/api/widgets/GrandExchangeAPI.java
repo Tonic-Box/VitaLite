@@ -4,13 +4,11 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.game.ClientScriptAPI;
-import com.tonic.api.handlers.GrandExchangeHandler;
 import com.tonic.api.threaded.Delays;
 import com.tonic.data.GrandExchangeSlot;
 import com.tonic.data.ItemEx;
 import com.tonic.services.ClickManager;
-import com.tonic.services.ClickPacket.PacketInteractionType;
-import com.tonic.util.handler.StepHandler;
+import com.tonic.services.ClickPacket.ClickType;
 import net.runelite.api.Client;
 import net.runelite.api.GrandExchangeOffer;
 import net.runelite.api.GrandExchangeOfferState;
@@ -36,7 +34,7 @@ public class GrandExchangeAPI
             if(w == null || w.isHidden() || w.isSelfHidden())
                 return;
 
-            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
+            ClickManager.click(ClickType.WIDGET);
             tclient.getPacketWriter().resumeCountDialoguePacket(1);
         });
     }

@@ -5,7 +5,7 @@ import com.tonic.api.TClient;
 import com.tonic.data.WidgetInfoExtended;
 import com.tonic.queries.WidgetQuery;
 import com.tonic.services.ClickManager;
-import com.tonic.services.ClickPacket.PacketInteractionType;
+import com.tonic.services.ClickPacket.ClickType;
 import net.runelite.api.Client;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.NPC;
@@ -74,7 +74,7 @@ public class WidgetAPI
     {
         TClient client = Static.getClient();
         Static.invoke(() -> {
-            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
+            ClickManager.click(ClickType.WIDGET);
             client.getPacketWriter().widgetActionPacket(action, widgetId, childId, itemId);
         });
     }
@@ -90,7 +90,7 @@ public class WidgetAPI
     {
         TClient client = Static.getClient();
         Static.invoke(() -> {
-            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
+            ClickManager.click(ClickType.WIDGET);
             client.getPacketWriter().widgetActionSubOpPacket(action, subOp, widgetId, childId, itemId);
         });
     }
@@ -231,7 +231,7 @@ public class WidgetAPI
     {
         TClient client = Static.getClient();
         Static.invoke(() -> {
-            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
+            ClickManager.click(ClickType.WIDGET);
             client.getPacketWriter().widgetTargetOnGameObjectPacket(selectedWidgetId, itemId, slot, objectID, worldX, worldY, ctrl);
         });
     }
@@ -274,7 +274,7 @@ public class WidgetAPI
     {
         TClient client = Static.getClient();
         Static.invoke(() -> {
-            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
+            ClickManager.click(ClickType.WIDGET);
             client.getPacketWriter().widgetOnGroundItemPacket(selectedWidgetId, itemId, slot, groundItemID, worldX, worldY, ctrl);
         });
     }
@@ -292,7 +292,7 @@ public class WidgetAPI
     {
         TClient client = Static.getClient();
         Static.invoke(() -> {
-            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
+            ClickManager.click(ClickType.WIDGET);
             client.getPacketWriter().widgetTargetOnNpcPacket(npcIndex, selectedWidgetId, itemId, slot, ctrl);
         });
     }
@@ -333,7 +333,7 @@ public class WidgetAPI
     {
         TClient client = Static.getClient();
         Static.invoke(() -> {
-            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
+            ClickManager.click(ClickType.WIDGET);
             client.getPacketWriter().widgetTargetOnPlayerPacket(playerIndex, selectedWidgetId, itemId, slot, ctrl);
         });
     }
@@ -375,7 +375,7 @@ public class WidgetAPI
     {
         TClient client = Static.getClient();
         Static.invoke(() -> {
-            ClickManager.click(PacketInteractionType.WIDGET_INTERACT);
+            ClickManager.click(ClickType.WIDGET);
             client.getPacketWriter().widgetOnWidgetPacket(selectedWidgetId, itemId, slot, targetWidgetId, itemId2, slot2);
         });
     }

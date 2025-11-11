@@ -2,19 +2,25 @@ package com.tonic.services.mouse;
 
 import com.tonic.Static;
 import com.tonic.services.ClickManager;
+import com.tonic.services.ClickPacket.ClickPacket;
+import com.tonic.services.ClickPacket.ClickType;
+import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.ClientTick;
+import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayPriority;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -25,6 +31,11 @@ public class ClickVisualizationOverlay extends Overlay {
 
     private static final CopyOnWriteArrayList<ClickVisualization> recentClicks = new CopyOnWriteArrayList<>();
     private static final long CLICK_DISPLAY_DURATION_MS = 2000; // Show clicks for 2 seconds
+    /**
+     * -- GETTER --
+     *  Check if click visualization is enabled
+     */
+    @Getter
     private static boolean enabled = true;
 
     @Inject
@@ -34,6 +45,17 @@ public class ClickVisualizationOverlay extends Overlay {
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ALWAYS_ON_TOP);
         setPriority(OverlayPriority.HIGH);
+        EventBus eventBus = Static.getInjector().getInstance(EventBus.class);
+        eventBus.register(this);
+    }
+
+    @Subscribe
+    public void onClientTick(ClientTick event)
+    {
+        List<ClickPacket> packets = ClickManager.releaseClicks();
+        for (ClickPacket packet : packets) {
+            recordClick(packet.getX(), packet.getY(), packet.getPacketInteractionType(), packet.getDate().toString());
+        }
     }
 
     @Override
@@ -114,13 +136,6 @@ public class ClickVisualizationOverlay extends Overlay {
     }
 
     /**
-     * Check if click visualization is enabled
-     */
-    public static boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
      * Clear all click visualizations
      */
     public static void clearClicks() {
@@ -147,29 +162,6 @@ public class ClickVisualizationOverlay extends Overlay {
 
         Color getColor() {
             return type.getColor();
-        }
-    }
-
-    /**
-     * Types of clicks for different colors
-     */
-    public enum ClickType {
-        MOVEMENT(new Color(0, 255, 0)),      // Green for walking
-        NPC(new Color(255, 255, 0)),         // Yellow for NPCs
-        OBJECT(new Color(0, 255, 255)),      // Cyan for objects
-        ITEM(new Color(255, 165, 0)),        // Orange for items
-        GROUND_ITEM(new Color(255, 0, 255)), // Magenta for ground items
-        WIDGET(new Color(138, 43, 226)),     // Purple for widgets
-        GENERIC(new Color(255, 255, 255));   // White for generic
-
-        private final Color color;
-
-        ClickType(Color color) {
-            this.color = color;
-        }
-
-        public Color getColor() {
-            return color;
         }
     }
 
@@ -215,12 +207,12 @@ public class ClickVisualizationOverlay extends Overlay {
                         ClickManager.queueClickBox(clickBox);
                     }
 
-                    ClickVisualizationOverlay.recordClick(
-                            screenPoint.getX(),
-                            screenPoint.getY(),
-                            ClickVisualizationOverlay.ClickType.MOVEMENT,
-                            "Walk"
-                    );
+//                    ClickVisualizationOverlay.recordClick(
+//                            screenPoint.getX(),
+//                            screenPoint.getY(),
+//                            ClickType.MOVEMENT,
+//                            "Walk"
+//                    );
                 } else {
                     Point minimapPoint = Static.invoke(() -> Perspective.localToMinimap(client, localPoint));
                     if (minimapPoint != null) {
@@ -236,12 +228,12 @@ public class ClickVisualizationOverlay extends Overlay {
 
                         ClickManager.queueClickBox(minimapClickBox);
 
-                        ClickVisualizationOverlay.recordClick(
-                                minimapPoint.getX(),
-                                minimapPoint.getY(),
-                                ClickVisualizationOverlay.ClickType.MOVEMENT,
-                                "Walk (Minimap)"
-                        );
+//                        ClickVisualizationOverlay.recordClick(
+//                                minimapPoint.getX(),
+//                                minimapPoint.getY(),
+//                                ClickType.MOVEMENT,
+//                                "Walk (Minimap)"
+//                        );
                     }
                 }
             }

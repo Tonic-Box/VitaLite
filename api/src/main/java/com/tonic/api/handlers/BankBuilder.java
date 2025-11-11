@@ -6,12 +6,15 @@ import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.widgets.BankAPI;
 import com.tonic.api.widgets.DialogueAPI;
+import com.tonic.data.LayoutView;
 import com.tonic.data.TileObjectEx;
 import com.tonic.data.locatables.BankLocations;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
+import com.tonic.services.ClickManager;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.WalkerPath;
+import com.tonic.util.ClickManagerUtil;
 import com.tonic.util.Location;
 import com.tonic.util.handler.AbstractHandlerBuilder;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +67,9 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
                     .nearest();
             if(banker != null)
             {
+                ClickManagerUtil.queueClickBox(banker);
                 NpcAPI.interact(banker, 2);
+                ClickManager.clearClickBox();
                 return step2 + 3;
             }
             TileObjectEx bank = new TileObjectQuery<>()
@@ -73,10 +78,12 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
                     .first();
             if(bank != null && Location.losTileNextTo(bank.getWorldLocation()) != null)
             {
+                ClickManagerUtil.queueClickBox(bank);
                 if(bank.getName().contains("Bank booth"))
                     TileObjectAPI.interact(bank, 1);
                 else
                     TileObjectAPI.interact(bank, 0);
+                ClickManager.clearClickBox();
                 return step2 + 3;
             }
             return step2 + 1;
@@ -94,7 +101,9 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
                     .nearest();
             if(banker != null)
             {
+                ClickManagerUtil.queueClickBox(banker);
                 NpcAPI.interact(banker, 2);
+                ClickManager.clearClickBox();
                 return step + 1;
             }
 
@@ -105,10 +114,12 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
             Client client = Static.getClient();
             if(bank != null && bank.getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation())  < 10)
             {
+                ClickManagerUtil.queueClickBox(bank);
                 if(bank.getName().contains("Bank booth"))
                     TileObjectAPI.interact(bank, 1);
                 else
                     TileObjectAPI.interact(bank, 0);
+                ClickManager.clearClickBox();
                 return step + 1;
             }
             return step;
@@ -123,7 +134,11 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
      */
     public BankBuilder depositInventory()
     {
-        add(BankAPI::depositAll);
+        add(() -> {
+            ClickManagerUtil.queueClickBoxInterface(InterfaceID.Bankmain.DEPOSITINV);
+            BankAPI.depositAll();;
+            ClickManager.clearClickBox();
+        });
         return this;
     }
 
@@ -133,7 +148,11 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
      */
     public BankBuilder depositEquipment()
     {
-        add(BankAPI::depositEquipment);
+        add(() -> {
+            ClickManagerUtil.queueClickBoxInterface(InterfaceID.Bankmain.DEPOSITWORN);
+            BankAPI.depositEquipment();
+            ClickManager.clearClickBox();
+        });
         return this;
     }
 
@@ -147,10 +166,12 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
     public BankBuilder withdraw(boolean noted, BankItem... items)
     {
         add(() -> {
+            ClickManagerUtil.queueClickBoxInterface(InterfaceID.Bankmain.ITEMS);
             for(BankItem item : items)
             {
                 BankAPI.withdraw(item.itemId, item.amount, noted);
             }
+            ClickManager.clearClickBox();
         });
         return this;
     }
@@ -164,10 +185,12 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
     public BankBuilder deposit(BankItem... items)
     {
         add(() -> {
+            ClickManagerUtil.queueClickBox(LayoutView.SIDE_MENU.getWidget());
             for(BankItem item : items)
             {
                 BankAPI.deposit(item.itemId, item.amount);
             }
+            ClickManager.clearClickBox();
         });
         return this;
     }
@@ -180,7 +203,11 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
      */
     public BankBuilder use(int itemId)
     {
-        add(() -> BankAPI.use(itemId));
+        add(() -> {
+            ClickManagerUtil.queueClickBox(LayoutView.SIDE_MENU.getWidget());
+            BankAPI.use(itemId);
+            ClickManager.clearClickBox();
+        });
         return this;
     }
 
@@ -192,7 +219,11 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
      */
     public BankBuilder useGuessNextSlot(int itemId)
     {
-        add(() -> BankAPI.useGuessNextSlot(itemId));
+        add(() -> {
+            ClickManagerUtil.queueClickBox(LayoutView.SIDE_MENU.getWidget());
+            BankAPI.useGuessNextSlot(itemId);
+            ClickManager.clearClickBox();
+        });
         return this;
     }
 

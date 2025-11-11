@@ -1,12 +1,9 @@
 package com.tonic.api.game;
 
 import com.tonic.Static;
-import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.queries.WorldQuery;
-import com.tonic.services.ClickManager;
-import com.tonic.services.ClickPacket.PacketInteractionType;
 import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.util.handler.StepHandler;
 import net.runelite.api.Client;

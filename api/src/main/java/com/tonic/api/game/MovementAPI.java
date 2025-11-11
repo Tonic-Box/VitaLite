@@ -3,8 +3,8 @@ package com.tonic.api.game;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.services.ClickManager;
-import com.tonic.services.ClickPacket.PacketInteractionType;
-import com.tonic.services.pathfinder.Walker;
+import com.tonic.services.ClickPacket.ClickType;
+import com.tonic.services.mouse.ClickVisualizationOverlay;
 import net.runelite.api.Client;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
@@ -92,10 +92,13 @@ public class MovementAPI {
 
     public static void walkToWorldPoint(int worldX, int worldY, boolean ctrlDown)
     {
-        TClient client = Static.getClient();
+        TClient tClient = Static.getClient();
+        Client client = Static.getClient();
+        ClickVisualizationOverlay.recordWalkClick(new WorldPoint(worldX, worldY, client.getTopLevelWorldView().getPlane()));
+        ClickManager.click(ClickType.MOVEMENT);
         Static.invoke(() -> {
-            ClickManager.click(PacketInteractionType.MOVEMENT_INTERACT);
-            client.getPacketWriter().walkPacket(worldX, worldY, ctrlDown);
+            tClient.getPacketWriter().walkPacket(worldX, worldY, ctrlDown);
+            ClickManager.clearClickBox();
         });
     }
 

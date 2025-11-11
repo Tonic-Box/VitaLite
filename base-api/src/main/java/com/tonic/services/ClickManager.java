@@ -5,7 +5,7 @@ import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.TPacketBufferNode;
 import com.tonic.services.ClickPacket.ClickPacket;
-import com.tonic.services.ClickPacket.PacketInteractionType;
+import com.tonic.services.ClickPacket.ClickType;
 import com.tonic.services.mouserecorder.EncodedMousePacket;
 import com.tonic.services.mouserecorder.MouseRecorderAPI;
 import com.tonic.services.mouserecorder.markov.MarkovMouseGenerator;
@@ -30,6 +30,7 @@ public class ClickManager
     private static final AtomicReference<Point> point = new AtomicReference<>(new Point(-1, -1));
     private static volatile Shape shape = null;
     private static final List<ClickPacket> clickPackets = new ArrayList<>();
+    public static final Object LOCK = new Object();
 
     // Movement state tracking
     private static Point lastClickPosition = null;
@@ -402,12 +403,22 @@ public class ClickManager
         return movementQueue.size();
     }
 
+    public static List<ClickPacket> releaseClicks()
+    {
+        synchronized (LOCK)
+        {
+            var out = new ArrayList<>(clickPackets);
+            clickPackets.clear();
+            return out;
+        }
+    }
+
     /**
      * Sends a click packet using the current strategy.
      */
     public static void click()
     {
-        click(PacketInteractionType.UNBOUND_INTERACT);
+        click(ClickType.GENERIC);
     }
 
     /**
@@ -415,7 +426,7 @@ public class ClickManager
      * For RANDOM and CONTROLLED strategies, generates realistic mouse movement if training quality is sufficient.
      * @param packetInteractionType the type of interaction for the click packet
      */
-    public static void click(PacketInteractionType packetInteractionType)
+    public static void click(ClickType packetInteractionType)
     {
         Static.invoke(() -> {
             TClient client = Static.getClient();
@@ -425,9 +436,11 @@ public class ClickManager
             switch (strategy)
             {
                 case STATIC:
+                    clearClickBox();
                     defaultStaticClickPacket(packetInteractionType, client, px, py);
                     break;
                 case RANDOM:
+                    clearClickBox();
                     Rectangle r = Static.getRuneLite().getGameApplet().getViewportArea();
                     if(r == null)
                     {
@@ -462,7 +475,10 @@ public class ClickManager
                     }
 
                     client.getPacketWriter().clickPacket(0, rx, ry);
-                    clickPackets.add(new ClickPacket(packetInteractionType, rx, ry));
+                    synchronized(LOCK)
+                    {
+                        clickPackets.add(new ClickPacket(packetInteractionType, rx, ry));
+                    }
 
                     lastClickPosition = new Point(rx, ry);
                     lastClickTime = System.currentTimeMillis();
@@ -514,7 +530,10 @@ public class ClickManager
                     }
 
                     client.getPacketWriter().clickPacket(0, p.x, p.y);
-                    clickPackets.add(new ClickPacket(packetInteractionType, p.x, p.y));
+                    synchronized(LOCK)
+                    {
+                        clickPackets.add(new ClickPacket(packetInteractionType, p.x, p.y));
+                    }
 
                     lastClickPosition = new Point(p.x, p.y);
                     lastClickTime = System.currentTimeMillis();
@@ -537,7 +556,7 @@ public class ClickManager
         }
     }
 
-    private static void defaultStaticClickPacket(PacketInteractionType packetInteractionType, TClient client, int x, int y) {
+    private static void defaultStaticClickPacket(ClickType packetInteractionType, TClient client, int x, int y) {
         client.getPacketWriter().clickPacket(0, x, y);
         clickPackets.add(new ClickPacket(packetInteractionType, x, y));
     }
