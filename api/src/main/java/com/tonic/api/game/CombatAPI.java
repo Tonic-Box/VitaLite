@@ -200,4 +200,12 @@ public class CombatAPI
     {
         return VarAPI.getVar(VarbitID.MULTIWAY_INDICATOR) == 1;
     }
+
+    /**
+     * Checks if the player is currently in a PVP area.
+     * @return true if the player is in a PVP area, false otherwise
+     */
+    public static boolean isInPvpArea() {
+        return VarAPI.getVar(VarbitID.PVP_AREA_CLIENT) == 1 || VarAPI.getVar(VarbitID.PVP_ADJACENT_AREA_CLIENT) == 1;
+    }
 }
