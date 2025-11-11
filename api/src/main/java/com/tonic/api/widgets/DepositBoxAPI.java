@@ -5,7 +5,6 @@ import com.tonic.api.game.GameAPI;
 import com.tonic.data.EquipmentSlot;
 import com.tonic.data.ItemEx;
 import com.tonic.queries.InventoryQuery;
-import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 
@@ -24,10 +23,7 @@ public class DepositBoxAPI {
      * @return true if the deposit box interface is open, false otherwise.
      */
     public static boolean isOpen() {
-        Client client = Static.getClient();
-        return Static.invoke(() ->
-                WidgetAPI.isVisible(client.getWidget(InterfaceID.BankDepositbox.INVENTORY))
-        );
+       return WidgetAPI.isVisible(InterfaceID.BankDepositbox.INVENTORY);
     }
 
     /**
