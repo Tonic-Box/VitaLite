@@ -53,6 +53,8 @@ public class WalkerPath
     private final int prayerDangerZone;
     private WorldPoint destination;
     private boolean ranInit = false;
+    private int timesDialogueSeen = 0;
+    private String lastText = null;
 
     /**
      * Get a WalkerPath to a single target
@@ -178,6 +180,9 @@ public class WalkerPath
             return !isDone();
         }
 
+        timesDialogueSeen = 0;
+        lastText = null;
+
         if (shouldHandleDialogue(steps)) {
             handleDialogue();
             return !isDone();
@@ -300,6 +305,32 @@ public class WalkerPath
         {
             return false;
         }
+
+        //hack to handle unhandled dialogues
+        if(DialogueAPI.dialoguePresent())
+        {
+            if(lastText == null)
+            {
+                timesDialogueSeen++;
+                lastText = DialogueAPI.getDialogueText();
+            }
+            else if (DialogueAPI.getDialogueText().equals(lastText)) {
+                timesDialogueSeen++;
+                if(timesDialogueSeen > 2)
+                {
+                    if(!DialogueAPI.continueDialogue() && !DialogueAPI.selectOption("Yes") && !DialogueAPI.selectOption("Okay") && !DialogueAPI.selectOption("Don't ask again"))
+                    {
+                        DialogueAPI.selectOption(1);
+                    }
+                }
+            }
+        }
+        else
+        {
+            timesDialogueSeen = 0;
+            lastText = null;
+        }
+
         boolean value = step.getTransport().getHandler().step();
         if(!value)
         {

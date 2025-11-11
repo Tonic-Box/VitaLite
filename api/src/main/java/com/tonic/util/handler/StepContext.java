@@ -18,6 +18,10 @@ public class StepContext
         contextMap.put(key, value);
     }
 
+    public void putIfAbsent(String key, Object value) {
+        contextMap.putIfAbsent(key, value);
+    }
+
     public <T> T get(String key) {
         if(!contextMap.containsKey(key)) {
             return null;
@@ -30,6 +34,10 @@ public class StepContext
             return null;
         }
         return clazz.cast(contextMap.get(key));
+    }
+
+    public boolean contains(String key) {
+        return contextMap.containsKey(key);
     }
 
     public void remove(String key) {
