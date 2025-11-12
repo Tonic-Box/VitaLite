@@ -27,7 +27,11 @@ import net.runelite.api.events.*;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.game.WorldService;
 import net.runelite.client.ui.overlay.*;
+import net.runelite.http.api.worlds.WorldResult;
+
+import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -304,6 +308,11 @@ public class GameManager extends Overlay {
 
             RuneliteConfigUtil.verifyCacheAndVersion(client.getRevision());
 
+            if(WorldSetter.getWorld() != -1)
+            {
+                hop(WorldSetter.getWorld(), client);
+            }
+
             if(AutoLogin.getCredentials() != null)
             {
                 try
@@ -327,6 +336,29 @@ public class GameManager extends Overlay {
         });
 
         System.out.println("GameCache initialized!");
+    }
+
+    public void hop(int worldNumber, Client client)
+    {
+        WorldResult worldResult = Static.getInjector().getInstance(WorldService.class).getWorlds();
+        if(worldResult == null) return;;
+        net.runelite.http.api.worlds.World world = worldResult.findWorld(worldNumber);
+        if(world == null) return;
+        final net.runelite.api.World rsWorld = client.createWorld();
+        rsWorld.setActivity(world.getActivity());
+        rsWorld.setAddress(world.getAddress());
+        rsWorld.setId(world.getId());
+        rsWorld.setPlayerCount(world.getPlayers());
+        rsWorld.setLocation(world.getLocation());
+        rsWorld.setTypes(net.runelite.client.util.WorldUtil.toWorldTypes(world.getTypes()));
+        if(client.getGameState() == GameState.LOGIN_SCREEN)
+        {
+            client.changeWorld(rsWorld);
+            return;
+        }
+        net.runelite.api.World quickHopTargetWorld = rsWorld;
+        client.openWorldHopper();
+        client.hopToWorld(quickHopTargetWorld);
     }
 
     private final List<TileItemEx> tileItemCache = new CopyOnWriteArrayList<>();

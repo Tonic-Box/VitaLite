@@ -16,6 +16,7 @@ import com.tonic.injector.util.PatchApplier;
 import com.tonic.model.Libs;
 import com.tonic.services.AutoLogin;
 import com.tonic.services.CatFacts;
+import com.tonic.services.WorldSetter;
 import com.tonic.services.proxy.ProxyManager;
 import com.tonic.util.LauncherCom;
 
@@ -61,6 +62,10 @@ public class Main {
         if(optionsParser.getTargetBootstrap() != null)
         {
             System.setProperty("forced.runelite.version", optionsParser.getTargetBootstrap());
+        }
+        if(optionsParser.getWorld() > 0)
+        {
+            WorldSetter.setWorld(optionsParser.getWorld());
         }
         Files.createDirectories(REPOSITORY_DIR);
         JvmParams.set();
