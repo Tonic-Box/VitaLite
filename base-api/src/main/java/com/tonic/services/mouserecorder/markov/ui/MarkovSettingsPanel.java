@@ -7,7 +7,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.util.Hashtable;
 
 /**
  * Settings panel for tuning Markov mouse generator parameters.
@@ -26,26 +25,12 @@ public class MarkovSettingsPanel extends JPanel
     private JSlider maxStepsSlider;
     private JSlider targetToleranceSlider;
 
-    // Temporal jitter controls
-    private JCheckBox temporalJitterCheckbox;
-    private JSlider temporalJitterAmountSlider;
-
-    // Bezier smoothing controls
-    private JCheckBox bezierSmoothingCheckbox;
-    private JSlider bezierTensionSlider;
-
-    // Advanced options
-    private JCheckBox velocityAwareBiasingCheckbox;
-    private JCheckBox secondOrderMarkovCheckbox;
-
     // Value labels
     private JLabel biasMinValueLabel;
     private JLabel biasMaxValueLabel;
     private JLabel biasDistanceValueLabel;
     private JLabel maxStepsValueLabel;
     private JLabel targetToleranceValueLabel;
-    private JLabel temporalJitterValueLabel;
-    private JLabel bezierTensionValueLabel;
 
     public MarkovSettingsPanel()
     {
@@ -76,12 +61,6 @@ public class MarkovSettingsPanel extends JPanel
         content.add(createBiasSection());
         content.add(Box.createVerticalStrut(15));
         content.add(createGenerationSection());
-        content.add(Box.createVerticalStrut(15));
-        content.add(createTemporalJitterSection());
-        content.add(Box.createVerticalStrut(15));
-        content.add(createBezierSection());
-        content.add(Box.createVerticalStrut(15));
-        content.add(createAdvancedSection());
 
         return content;
     }
@@ -92,7 +71,7 @@ public class MarkovSettingsPanel extends JPanel
 
         panel.add(createSliderRow("Minimum Bias:", 0, 100, 15, 25, "%",
             value -> {
-                biasMinValueLabel.setText(value / 100.0 + "");
+                biasMinValueLabel.setText(value + "%");
                 config.setBiasMinimum(value / 100.0);
             },
             value -> biasMinSlider = value,
@@ -100,7 +79,7 @@ public class MarkovSettingsPanel extends JPanel
 
         panel.add(createSliderRow("Maximum Bias:", 0, 100, 75, 25, "%",
             value -> {
-                biasMaxValueLabel.setText(value / 100.0 + "");
+                biasMaxValueLabel.setText(value + "%");
                 config.setBiasMaximum(value / 100.0);
             },
             value -> biasMaxSlider = value,
@@ -136,99 +115,6 @@ public class MarkovSettingsPanel extends JPanel
             },
             value -> targetToleranceSlider = value,
             label -> targetToleranceValueLabel = label));
-
-        return panel;
-    }
-
-    private JPanel createTemporalJitterSection()
-    {
-        JPanel panel = createSectionPanel("Temporal Jitter");
-
-        temporalJitterCheckbox = new JCheckBox("Enable Temporal Jitter");
-        temporalJitterCheckbox.setForeground(Color.WHITE);
-        temporalJitterCheckbox.setBackground(new Color(40, 41, 44));
-        temporalJitterCheckbox.setFocusPainted(false);
-        temporalJitterCheckbox.addActionListener(e -> {
-            boolean enabled = temporalJitterCheckbox.isSelected();
-            temporalJitterAmountSlider.setEnabled(enabled);
-            temporalJitterValueLabel.setEnabled(enabled);
-            config.setTemporalJitterEnabled(enabled);
-        });
-        panel.add(temporalJitterCheckbox);
-
-        panel.add(createSliderRow("Jitter Amount:", 0, 100, 30, 25, "%",
-            value -> {
-                temporalJitterValueLabel.setText(value + "%");
-                config.setTemporalJitterAmount(value / 100.0);
-            },
-            value -> {
-                temporalJitterAmountSlider = value;
-                temporalJitterAmountSlider.setEnabled(temporalJitterCheckbox.isSelected());
-            },
-            label -> {
-                temporalJitterValueLabel = label;
-                temporalJitterValueLabel.setEnabled(temporalJitterCheckbox.isSelected());
-            }));
-
-        return panel;
-    }
-
-    private JPanel createBezierSection()
-    {
-        JPanel panel = createSectionPanel("Bezier Smoothing");
-
-        bezierSmoothingCheckbox = new JCheckBox("Enable Bezier Smoothing");
-        bezierSmoothingCheckbox.setForeground(Color.WHITE);
-        bezierSmoothingCheckbox.setBackground(new Color(40, 41, 44));
-        bezierSmoothingCheckbox.setFocusPainted(false);
-        bezierSmoothingCheckbox.addActionListener(e -> {
-            boolean enabled = bezierSmoothingCheckbox.isSelected();
-            bezierTensionSlider.setEnabled(enabled);
-            bezierTensionValueLabel.setEnabled(enabled);
-            config.setBezierSmoothingEnabled(enabled);
-        });
-        panel.add(bezierSmoothingCheckbox);
-
-        panel.add(createSliderRow("Smoothing Strength:", 0, 100, 50, 25, "%",
-            value -> {
-                bezierTensionValueLabel.setText(value + "%");
-                config.setBezierTension(value / 100.0);
-            },
-            value -> {
-                bezierTensionSlider = value;
-                bezierTensionSlider.setEnabled(bezierSmoothingCheckbox.isSelected());
-            },
-            label -> {
-                bezierTensionValueLabel = label;
-                bezierTensionValueLabel.setEnabled(bezierSmoothingCheckbox.isSelected());
-            }));
-
-        return panel;
-    }
-
-    private JPanel createAdvancedSection()
-    {
-        JPanel panel = createSectionPanel("Advanced Options");
-
-        velocityAwareBiasingCheckbox = new JCheckBox("Velocity-Aware Biasing (considers momentum)");
-        velocityAwareBiasingCheckbox.setForeground(Color.WHITE);
-        velocityAwareBiasingCheckbox.setBackground(new Color(40, 41, 44));
-        velocityAwareBiasingCheckbox.setFocusPainted(false);
-        velocityAwareBiasingCheckbox.addActionListener(e -> {
-            config.setVelocityAwareBiasingEnabled(velocityAwareBiasingCheckbox.isSelected());
-        });
-        panel.add(velocityAwareBiasingCheckbox);
-
-        panel.add(Box.createVerticalStrut(5));
-
-        secondOrderMarkovCheckbox = new JCheckBox("Second-Order Markov (requires more training data)");
-        secondOrderMarkovCheckbox.setForeground(Color.WHITE);
-        secondOrderMarkovCheckbox.setBackground(new Color(40, 41, 44));
-        secondOrderMarkovCheckbox.setFocusPainted(false);
-        secondOrderMarkovCheckbox.addActionListener(e -> {
-            config.setSecondOrderMarkovEnabled(secondOrderMarkovCheckbox.isSelected());
-        });
-        panel.add(secondOrderMarkovCheckbox);
 
         return panel;
     }
@@ -321,37 +207,6 @@ public class MarkovSettingsPanel extends JPanel
         biasDistanceSlider.setValue((int) config.getBiasDistance());
         maxStepsSlider.setValue(config.getMaxSteps());
         targetToleranceSlider.setValue((int) config.getTargetTolerance());
-
-        temporalJitterCheckbox.setSelected(config.isTemporalJitterEnabled());
-        temporalJitterAmountSlider.setValue((int) (config.getTemporalJitterAmount() * 100));
-        temporalJitterAmountSlider.setEnabled(config.isTemporalJitterEnabled());
-        temporalJitterValueLabel.setEnabled(config.isTemporalJitterEnabled());
-
-        bezierSmoothingCheckbox.setSelected(config.isBezierSmoothingEnabled());
-        bezierTensionSlider.setValue((int) (config.getBezierTension() * 100));
-        bezierTensionSlider.setEnabled(config.isBezierSmoothingEnabled());
-        bezierTensionValueLabel.setEnabled(config.isBezierSmoothingEnabled());
-
-        velocityAwareBiasingCheckbox.setSelected(config.isVelocityAwareBiasingEnabled());
-        secondOrderMarkovCheckbox.setSelected(config.isSecondOrderMarkovEnabled());
-    }
-
-    private void saveConfig()
-    {
-        config.setBiasMinimum(biasMinSlider.getValue() / 100.0);
-        config.setBiasMaximum(biasMaxSlider.getValue() / 100.0);
-        config.setBiasDistance(biasDistanceSlider.getValue());
-        config.setMaxSteps(maxStepsSlider.getValue());
-        config.setTargetTolerance(targetToleranceSlider.getValue());
-
-        config.setTemporalJitterEnabled(temporalJitterCheckbox.isSelected());
-        config.setTemporalJitterAmount(temporalJitterAmountSlider.getValue() / 100.0);
-
-        config.setBezierSmoothingEnabled(bezierSmoothingCheckbox.isSelected());
-        config.setBezierTension(bezierTensionSlider.getValue() / 100.0);
-
-        config.setVelocityAwareBiasingEnabled(velocityAwareBiasingCheckbox.isSelected());
-        config.setSecondOrderMarkovEnabled(secondOrderMarkovCheckbox.isSelected());
     }
 
     private void resetToDefaults()
@@ -369,15 +224,6 @@ public class MarkovSettingsPanel extends JPanel
             biasDistanceSlider.setValue(400);
             maxStepsSlider.setValue(200);
             targetToleranceSlider.setValue(10);
-
-            temporalJitterCheckbox.setSelected(false);
-            temporalJitterAmountSlider.setValue(30);
-
-            bezierSmoothingCheckbox.setSelected(false);
-            bezierTensionSlider.setValue(50);
-
-            velocityAwareBiasingCheckbox.setSelected(false);
-            secondOrderMarkovCheckbox.setSelected(false);
 
             JOptionPane.showMessageDialog(this,
                 "Settings reset to defaults!",
