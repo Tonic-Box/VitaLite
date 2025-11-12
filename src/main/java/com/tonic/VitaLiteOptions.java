@@ -87,6 +87,12 @@ public class VitaLiteOptions extends OptionsParser
     )
     private String targetBootstrap = null;
 
+    @CLIArgument(
+            name = "world",
+            description = "Set the world"
+    )
+    private int world = -1;
+
     public void _checkAudio()
     {
         if(!AudioDeviceChecker.hasAudioDevice())
