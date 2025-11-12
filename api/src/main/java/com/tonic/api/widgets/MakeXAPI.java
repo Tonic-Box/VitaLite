@@ -124,7 +124,7 @@ public class MakeXAPI
 
         Item item = new Item(part.getItemId(), part.getItemQuantity());
         //We store the interface ID as the slot, since that's what contains the action and we need it in confirm
-        items.add(new ItemEx(item, i));
+        items.add(new ItemEx(item, i, -1));
       }
     }
 
