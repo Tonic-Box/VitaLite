@@ -10,6 +10,7 @@ import com.tonic.services.mouserecorder.EncodedMousePacket;
 import com.tonic.services.mouserecorder.MouseRecorderAPI;
 import com.tonic.services.mouserecorder.markov.MarkovMouseGenerator;
 import com.tonic.services.mouserecorder.markov.MarkovService;
+import com.tonic.services.mouserecorder.alt.BezierMouseGenerator;
 import lombok.Getter;
 
 import java.awt.*;
@@ -185,8 +186,21 @@ public class ClickManager
         if (cachedGenerator == null || cachedAPI == null ||
             (now - lastGeneratorRefresh) > GENERATOR_REFRESH_INTERVAL_MS)
         {
-            cachedGenerator = MarkovService.getTrainer().createGenerator();
-            cachedAPI = new MouseRecorderAPI(cachedGenerator);
+            try
+            {
+                cachedGenerator = MarkovService.getTrainer().createGenerator();
+                cachedAPI = new MouseRecorderAPI(cachedGenerator);
+            }
+            catch (Exception ex)
+            {
+                // Fallback to Bezier generator when Markov training data is unavailable
+                cachedGenerator = null; // not used by API in this mode
+                cachedAPI = new MouseRecorderAPI(new BezierMouseGenerator());
+                if (!movementLogged)
+                {
+                    Logger.warn("Markov generator unavailable, falling back to Bezier generator.");
+                }
+            }
             lastGeneratorRefresh = now;
         }
 
