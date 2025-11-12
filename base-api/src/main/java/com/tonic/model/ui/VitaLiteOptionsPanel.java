@@ -2,17 +2,28 @@ package com.tonic.model.ui;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.api.TClient;
+import com.tonic.api.TMouseHandler;
 import com.tonic.events.PacketReceived;
 import com.tonic.events.PacketSent;
 import com.tonic.model.ui.components.*;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
-import com.tonic.services.mouserecorder.markov.MarkovService;
+import com.tonic.services.mouserecorder.DecodedMousePacket;
+import com.tonic.services.mouserecorder.ManualMouseTracker;
+import com.tonic.services.mouserecorder.MousePacketDecoder;
+import com.tonic.services.mouserecorder.trajectory.TrajectoryService;
+import com.tonic.services.mouserecorder.trajectory.ui.TrajectoryTrainerMonitor;
+import com.tonic.services.mouserecorder.trajectory.ui.TrajectorySettingsPanel;
 import com.tonic.services.pathfinder.PathfinderAlgo;
 import com.tonic.services.mouserecorder.MovementVisualization;
+import com.tonic.util.ClientConfig;
 import com.tonic.util.ReflectBuilder;
 import com.tonic.util.ThreadPool;
+
+import javax.security.sasl.SaslClient;
 import javax.swing.*;
+import java.applet.Applet;
 import java.awt.*;
 
 public class VitaLiteOptionsPanel extends VPluginPanel {
@@ -35,6 +46,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private static final Color ACCENT_COLOR = new Color(64, 169, 211);
     private final ToggleSlider headlessToggle;
     private final ToggleSlider logPacketsToggle;
+    private final ToggleSlider logMousePacketsToggle;
     private final ToggleSlider nameLogging;
     private final ToggleSlider logServerPacketsToggle;
     private final ToggleSlider logMenuActionsToggle;
@@ -43,8 +55,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private JFrame transportsEditor;
 
     private ToggleSlider sendMouseMovement;
-    private ToggleSlider idleJitters;
-    private Timer qualityCheckTimer;
+    private Timer trajectoryCheckTimer;
 
     private VitaLiteOptionsPanel() {
         super(false); // Don't use default wrapping, we'll handle scrolling ourselves
@@ -123,6 +134,15 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 "Log Packets",
                 "Enable packet logging",
                 logPacketsToggle,
+                () -> {}
+        ));
+        loggingPanel.addVerticalStrut(12);
+
+        logMousePacketsToggle = new ToggleSlider();
+        loggingPanel.addContent(createToggleOption(
+                "Log Mouse Packets",
+                "Enable mouse packet logging",
+                logMousePacketsToggle,
                 () -> {}
         ));
         loggingPanel.addVerticalStrut(12);
@@ -287,45 +307,67 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                         Static.getVitaConfig().setHasAcceptedWarning(true);
                     }
                     Static.getVitaConfig().setSpoofMouseMovement(sendMouseMovement.isSelected());
-                    idleJitters.setEnabled(sendMouseMovement.isSelected());
+
+                    // Start/stop continuous movement sampling to match client behavior
+                    if (sendMouseMovement.isSelected())
+                    {
+                        ClickManager.startMovementSampling();
+                    }
+                    else
+                    {
+                        ClickManager.stopMovementSampling();
+                    }
                 }
         ));
         inputPanel.addVerticalStrut(12);
 
-        idleJitters = new ToggleSlider();
-        idleJitters.setEnabled(Static.getVitaConfig().shouldIdleJitter());
-        inputPanel.addContent(createToggleOption(
-                "Idle Jitters",
-                "Add small random jitters to mouse when idle.",
-                idleJitters,
-                () -> Static.getVitaConfig().setIdleJitter(idleJitters.isSelected())
-        ));
-        if(!Static.getVitaConfig().shouldSpoofMouseMovemnt())
-        {
-            idleJitters.setEnabled(false);
-        }
-        inputPanel.addVerticalStrut(12);
-
-        ToggleSlider recordMarkov = new ToggleSlider();
-        recordMarkov.setSelected(Static.getVitaConfig().shouldTrainMarkov());
-        if(Static.getVitaConfig().shouldTrainMarkov())
-        {
-            MarkovService.start();
-        }
+        ToggleSlider recordTrajectory = new ToggleSlider();
         inputPanel.addContent(createToggleOption(
                 "Train Mouse Data",
                 "Train a data set on your manual play for use in automated mouse movements.",
-                recordMarkov,
+                recordTrajectory,
                 () -> {
-                    Static.getVitaConfig().setTrainMarkov(recordMarkov.isSelected());
-                    MarkovService.toggle(recordMarkov.isSelected());
+                    if (recordTrajectory.isSelected()) {
+                        TrajectoryService.startRecording();
+                        startManualMouseTracking();
+                    } else {
+                        TrajectoryService.stopRecording();
+                        stopManualMouseTracking();
+                    }
                 }
         ));
         inputPanel.addVerticalStrut(12);
 
         FancyButton monitor = new FancyButton("Training Monitor");
-        monitor.addActionListener(e -> MarkovService.toggleMonitor());
+        monitor.addActionListener(e -> {
+            TrajectoryTrainerMonitor window = TrajectoryTrainerMonitor.getInstance();
+            if (window.isVisible())
+            {
+                window.setVisible(false);
+            }
+            else
+            {
+                window.setVisible(true);
+                window.toFront();
+            }
+        });
         inputPanel.addContent(monitor);
+        inputPanel.addVerticalStrut(6);
+
+        FancyButton settings = new FancyButton("Movement Settings");
+        settings.addActionListener(e -> {
+            TrajectorySettingsPanel window = TrajectorySettingsPanel.getInstance();
+            if (window.isVisible())
+            {
+                window.setVisible(false);
+            }
+            else
+            {
+                window.setVisible(true);
+                window.toFront();
+            }
+        });
+        inputPanel.addContent(settings);
         inputPanel.addVerticalStrut(12);
 
         ToggleSlider visualizeMovements = new ToggleSlider();
@@ -398,9 +440,14 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
         add(scrollPane, BorderLayout.CENTER);
 
-        // Start quality check timer for mouse movement features
-        startQualityCheckTimer();
-        updateMarkovQualityState();
+        startTrajectoryCheckTimer();
+        updateTrajectoryQualityState();
+
+        // Auto-start movement sampling if spoofing is already enabled
+        if (Static.getVitaConfig().shouldSpoofMouseMovemnt())
+        {
+            ClickManager.startMovementSampling();
+        }
     }
 
     private void customizeScrollPane(JScrollPane scrollPane) {
@@ -561,13 +608,26 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
     public void onPacketSent(PacketSent event)
     {
-        if(!logPacketsToggle.isSelected())
+        ManualMouseTracker.onPacketSent(event);
+        if(!logPacketsToggle.isSelected() && !logMousePacketsToggle.isSelected())
             return;
+
+        if(logMousePacketsToggle.isSelected())
+        {
+            if(MousePacketDecoder.test(event.getBuffer()))
+            {
+                DecodedMousePacket decodedInfo = MousePacketDecoder.decode(event.getBuffer());
+                Logger.info("[OP_MOUSE_MOVEMENT(" + event.getId() + ")] " + decodedInfo);
+                return;
+            }
+        }
 
         String packetInfo = event.toString();
 
-        if(packetInfo.startsWith("[UNKNOWN("))
+        if(packetInfo.startsWith("[UNKNOWN(") || (packetInfo.startsWith("[OP_MOUSE_CLICK") && !logMousePacketsToggle.isSelected()))
+        {
             return;
+        }
 
         Logger.info(packetInfo);
     }
@@ -583,26 +643,25 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         Logger.info("[ServerPacket(" + id + ":" + len + ")] " + packetInfo);
     }
 
-    private void startQualityCheckTimer()
+    private void startTrajectoryCheckTimer()
     {
-        if (qualityCheckTimer != null)
+        if (trajectoryCheckTimer != null)
         {
-            qualityCheckTimer.stop();
+            trajectoryCheckTimer.stop();
         }
 
-        qualityCheckTimer = new Timer(5000, e -> updateMarkovQualityState());
-        qualityCheckTimer.setRepeats(true);
-        qualityCheckTimer.start();
+        trajectoryCheckTimer = new Timer(5000, e -> updateTrajectoryQualityState());
+        trajectoryCheckTimer.setRepeats(true);
+        trajectoryCheckTimer.start();
     }
 
-    private void updateMarkovQualityState()
+    private void updateTrajectoryQualityState()
     {
         SwingUtilities.invokeLater(() -> {
             try
             {
-                double quality = MarkovService.getQualityScore();
-                int percentage = (int) (quality * 100);
-                boolean shouldEnable = quality >= 0.5;
+                int trajectoryCount = TrajectoryService.getDatabase().getTrajectoryCount();
+                boolean shouldEnable = trajectoryCount >= 50;
 
                 if (sendMouseMovement != null)
                 {
@@ -610,7 +669,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                     if (!shouldEnable)
                     {
                         sendMouseMovement.setToolTipText(String.format(
-                            "Training quality too low: %d%% (requires 50%%)", percentage));
+                            "Training data insufficient: %d trajectories (requires 50)", trajectoryCount));
                         sendMouseMovement.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                     }
                     else
@@ -619,27 +678,62 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                         sendMouseMovement.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     }
                 }
-
-                if (idleJitters != null)
-                {
-                    idleJitters.setEnabled(shouldEnable && Static.getVitaConfig().shouldSpoofMouseMovemnt());
-                    if (!shouldEnable)
-                    {
-                        idleJitters.setToolTipText(String.format(
-                            "Training quality too low: %d%% (requires 50%%)", percentage));
-                        idleJitters.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                    }
-                    else
-                    {
-                        idleJitters.setToolTipText("Add small random jitters to mouse when idle.");
-                        idleJitters.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                    }
-                }
             }
             catch (Exception ex)
             {
-                Logger.warn("Failed to update Markov quality state: " + ex.getMessage());
+                Logger.warn("Failed to update trajectory quality state: " + ex.getMessage());
             }
         });
+    }
+
+    private void startManualMouseTracking()
+    {
+        try
+        {
+            TClient tclient = Static.getClient();
+            Canvas canvas = ReflectBuilder.of(tclient)
+                    .method("getCanvas", null, null)
+                    .get();
+
+            ManualMouseTracker.startTracking(() -> {
+                try
+                {
+                    TClient client = Static.getClient();
+                    return client.getMouseHandler().getMouseX();
+                }
+                catch (Exception e)
+                {
+                    Logger.error("Error getting mouse X: " + e.getMessage());
+                    return -1;
+                }
+            }, () -> {
+                try
+                {
+                    TClient client = Static.getClient();
+                    return client.getMouseHandler().getMouseY();
+                }
+                catch (Exception e)
+                {
+                    Logger.error("Error getting mouse Y: " + e.getMessage());
+                    return -1;
+                }
+            }, canvas);
+        }
+        catch (Exception e)
+        {
+            Logger.error("Failed to start manual mouse tracking: " + e.getMessage());
+        }
+    }
+
+    private void stopManualMouseTracking()
+    {
+        try
+        {
+            ManualMouseTracker.stopTracking();
+        }
+        catch (Exception e)
+        {
+            Logger.error("Failed to stop manual mouse tracking: " + e.getMessage());
+        }
     }
 }

@@ -109,11 +109,9 @@ public class MouseRecorderAPI
         }
         pendingSamples.addAll(sequence.getPoints());
 
-        // Visualize the movement if enabled
         if (Static.getVitaConfig().shouldVisualizeMovements())
         {
-            // Determine source by distance: short movements (< 20px) are likely idle jitter
-            MovementVisualization.MovementSource source = MovementVisualization.MovementSource.MARKOV_GENERATED;
+            MovementVisualization.MovementSource source = MovementVisualization.MovementSource.TRAJECTORY_GENERATED;
             if (!sequence.getPoints().isEmpty() && sequence.getPoints().size() >= 2)
             {
                 MouseDataPoint start = sequence.getPoints().get(0);

@@ -66,12 +66,6 @@ public interface ClientConfig extends VitaConfig {
     boolean shouldNeverLog();
     @ConfigKey(value = "neverLog")
     void setNeverLog(boolean neverLog);
-
-    @ConfigKey(value = "trainMarkov", defaultValue = "true")
-    boolean shouldTrainMarkov();
-    @ConfigKey(value = "trainMarkov")
-    void setTrainMarkov(boolean trainMarkov);
-
     @ConfigKey(value = "mouseMovements", defaultValue = "false")
     boolean shouldSpoofMouseMovemnt();
     @ConfigKey(value = "mouseMovements")
@@ -81,11 +75,6 @@ public interface ClientConfig extends VitaConfig {
     boolean getHasAcceptedWarning();
     @ConfigKey(value = "warning")
     void setHasAcceptedWarning(boolean accepted);
-
-    @ConfigKey(value = "jitters", defaultValue = "true")
-    boolean shouldIdleJitter();
-    @ConfigKey(value = "jitters")
-    void setIdleJitter(boolean jitter);
 
     @ConfigKey(value = "visualizeMovements", defaultValue = "false")
     boolean shouldVisualizeMovements();

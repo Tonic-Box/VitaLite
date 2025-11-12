@@ -1,13 +1,15 @@
 package com.tonic.services.mouserecorder;
 
 import lombok.Getter;
+import java.io.Serializable;
 
 /**
  * Represents a single mouse movement sample with coordinates and timestamp.
  */
 @Getter
-public class MouseDataPoint
+public class MouseDataPoint implements Serializable
 {
+    private static final long serialVersionUID = 1L;
     private final int x;
     private final int y;
     private final long timestampMillis;

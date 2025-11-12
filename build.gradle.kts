@@ -15,6 +15,20 @@ val runeliteVersion = "1.12.3.1"
 group = "com.tonic"
 version = runeliteVersion + "_" + vitaVersion
 
+if (JavaVersion.current() != JavaVersion.VERSION_11) {
+    throw GradleException("""
+        
+        Java 11 Required (Current: ${JavaVersion.current()})
+        
+        Fix in IntelliJ:
+        1. Ctrl+Alt+S -> Build, Execution, Deployment -> Build Tools -> Gradle
+        2. Gradle JVM -> Select JDK 11
+        3. Apply -> OK
+        4. File -> Reload Gradle Project
+        
+    """.trimIndent())
+}
+
 repositories {
     mavenCentral()
     maven {
