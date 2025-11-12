@@ -33,14 +33,32 @@ public class ReflectUtil
         Method method;
         if(argTypes.length == 0)
         {
-            method = object.getClass().getDeclaredMethod(methodName);
-            method.setAccessible(true);
-            return method.invoke(object);
+            try
+            {
+                method = object.getClass().getDeclaredMethod(methodName);
+                method.setAccessible(true);
+                return method.invoke(object);
+            }
+            catch (Exception e)
+            {
+                method = object.getClass().getMethod(methodName);
+                method.setAccessible(true);
+                return method.invoke(object);
+            }
         }
 
-        method = object.getClass().getDeclaredMethod(methodName, argTypes);
-        method.setAccessible(true);
-        return method.invoke(object, values);
+        try
+        {
+            method = object.getClass().getDeclaredMethod(methodName, argTypes);
+            method.setAccessible(true);
+            return method.invoke(object, values);
+        }
+        catch (Exception e)
+        {
+            method = object.getClass().getMethod(methodName, argTypes);
+            method.setAccessible(true);
+            return method.invoke(object, values);
+        }
     }
 
     public static Object newInstance(Class<?> clazz, Class<?>[] argTypes, Object[] values) throws Exception

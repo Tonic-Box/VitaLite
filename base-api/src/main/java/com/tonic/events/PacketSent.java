@@ -63,6 +63,7 @@ public class PacketSent {
         PacketBuffer pb = getBuffer();
         String out = PacketMapReader.prettify(pb);
         pb.dispose();
+        buffer = null;
         return out;
     }
 }

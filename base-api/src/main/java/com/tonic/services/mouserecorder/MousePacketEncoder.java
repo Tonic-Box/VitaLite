@@ -12,12 +12,18 @@ public class MousePacketEncoder
 {
     private static final int MAX_PACKET_SIZE = 246;
 
+    // Persistent last encoded position (matches client's field498/field360)
+    // Used to detect duplicates across flush cycles
+    private static int persistentLastX = -1;
+    private static int persistentLastY = -1;
+    private static long persistentLastTime = -1;
+
     /**
      * Encodes a mouse movement sequence into packet format.
      * May only encode partial sequence if it exceeds max packet size.
      *
      * @param sequence The sequence to encode
-     * @return EncodedMousePacket with encoded data and metadata
+     * @return EncodedMousePacket with encoded data and metadata, or null if all samples are duplicates
      */
     public static EncodedMousePacket encode(MouseMovementSequence sequence)
     {
@@ -36,18 +42,21 @@ public class MousePacketEncoder
         buffer.writeByte(0);
 
         int dataStartOffset = buffer.getOffset();
-        int encodedCount = 0;
-        int lastX = -1;
-        int lastY = -1;
-        long lastTime = -1;
+        int encodedCount = 0;  // Unique samples actually encoded
+        int consumedCount = 0;  // Total samples consumed (including duplicates)
+        int lastX = persistentLastX;  // Start from last encoded position
+        int lastY = persistentLastY;
+        long lastTime = persistentLastTime;
         int totalMillisDelta = 0;
 
         for (MouseDataPoint point : points)
         {
+            // Check if we've hit packet size limit BEFORE processing
             if (buffer.getOffset() - dataStartOffset >= MAX_PACKET_SIZE)
             {
                 break;
             }
+
             int x = point.getX();
             if (x < -1)
             {
@@ -68,8 +77,10 @@ public class MousePacketEncoder
                 y = 65534;
             }
 
+            // Check for duplicate - consume but don't encode
             if (x == lastX && y == lastY)
             {
+                consumedCount++;
                 continue;
             }
 
@@ -93,29 +104,52 @@ public class MousePacketEncoder
 
             if (!encodeSample(buffer, deltaX, deltaY, deltaTicks, x, y, stats))
             {
-                break;
+                break;  // Failed to encode, don't consume
             }
 
+            // Successfully encoded
+            consumedCount++;
             encodedCount++;
             lastX = x;
             lastY = y;
             lastTime = time;
         }
 
-        if (encodedCount > 0)
+        // If no unique samples were encoded, don't send a packet but still consume the duplicates
+        if (encodedCount == 0)
         {
-            int dataLength = buffer.getOffset() - dataStartOffset;
-
-            int totalLength = 2 + dataLength;
-            buffer.getPayload().setByte(0, (byte) totalLength);
-
-            int avg = totalMillisDelta / encodedCount;
-            int remainder = totalMillisDelta % encodedCount;
-            buffer.getPayload().setByte(1, (byte) avg);
-            buffer.getPayload().setByte(2, (byte) remainder);
+            // Return null with consumedCount to clear duplicates from buffer without sending
+            return null;
         }
 
-        return new EncodedMousePacket(buffer, encodedCount, stats);
+        int dataLength = buffer.getOffset() - dataStartOffset;
+
+        int totalLength = 2 + dataLength;
+        buffer.getPayload().setByte(0, (byte) totalLength);
+
+        int avg = totalMillisDelta / encodedCount;
+        int remainder = totalMillisDelta % encodedCount;
+        buffer.getPayload().setByte(1, (byte) avg);
+        buffer.getPayload().setByte(2, (byte) remainder);
+
+        // Update persistent position for next flush cycle (matches client's field498/field360 update)
+        persistentLastX = lastX;
+        persistentLastY = lastY;
+        persistentLastTime = lastTime;
+
+        // Return consumedCount so buffer knows how many samples to remove (including skipped duplicates)
+        return new EncodedMousePacket(buffer, consumedCount, stats);
+    }
+
+    /**
+     * Resets persistent encoder state.
+     * Should be called when movement spoofing is stopped/started.
+     */
+    public static void reset()
+    {
+        persistentLastX = -1;
+        persistentLastY = -1;
+        persistentLastTime = -1;
     }
 
     /**

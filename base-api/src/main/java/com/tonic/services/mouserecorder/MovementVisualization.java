@@ -176,11 +176,11 @@ public class MovementVisualization
     @Getter
     public enum MovementSource
     {
-        MARKOV_GENERATED(new Color(0, 255, 100), "Markov"),      // Bright green for Markov
-        IDLE_JITTER(new Color(100, 150, 255), "Jitter"),         // Light blue for jitter
-        MANUAL(new Color(255, 255, 255), "Manual"),              // White for manual play
-        LINEAR(new Color(255, 200, 0), "Linear"),                // Yellow for linear fallback
-        UNKNOWN(new Color(150, 150, 150), "Unknown");            // Gray for unknown
+        TRAJECTORY_GENERATED(new Color(0, 255, 100), "Generated"),   // Bright green for generated
+        IDLE_JITTER(new Color(100, 150, 255), "Jitter"),             // Light blue for jitter
+        MANUAL(new Color(255, 255, 255), "Manual"),                  // White for manual play
+        LINEAR(new Color(255, 200, 0), "Linear"),                    // Yellow for linear fallback
+        UNKNOWN(new Color(150, 150, 150), "Unknown");                // Gray for unknown
 
         private final Color color;
         private final String label;
