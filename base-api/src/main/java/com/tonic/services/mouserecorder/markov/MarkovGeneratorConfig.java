@@ -37,37 +37,4 @@ public interface MarkovGeneratorConfig extends VitaConfig
     double getTargetTolerance();
     @ConfigKey(value = "targetTolerance")
     void setTargetTolerance(double tolerance);
-
-    // Temporal Jitter
-    @ConfigKey(value = "temporalJitterEnabled", defaultValue = "false")
-    boolean isTemporalJitterEnabled();
-    @ConfigKey(value = "temporalJitterEnabled")
-    void setTemporalJitterEnabled(boolean enabled);
-
-    @ConfigKey(value = "temporalJitterAmount", defaultValue = "0.3")
-    double getTemporalJitterAmount();
-    @ConfigKey(value = "temporalJitterAmount")
-    void setTemporalJitterAmount(double amount);
-
-    // Bezier Smoothing
-    @ConfigKey(value = "bezierSmoothingEnabled", defaultValue = "false")
-    boolean isBezierSmoothingEnabled();
-    @ConfigKey(value = "bezierSmoothingEnabled")
-    void setBezierSmoothingEnabled(boolean enabled);
-
-    @ConfigKey(value = "bezierTension", defaultValue = "0.5")
-    double getBezierTension();
-    @ConfigKey(value = "bezierTension")
-    void setBezierTension(double tension);
-
-    // Advanced Options
-    @ConfigKey(value = "velocityAwareBiasing", defaultValue = "false")
-    boolean isVelocityAwareBiasingEnabled();
-    @ConfigKey(value = "velocityAwareBiasing")
-    void setVelocityAwareBiasingEnabled(boolean enabled);
-
-    @ConfigKey(value = "secondOrderMarkov", defaultValue = "false")
-    boolean isSecondOrderMarkovEnabled();
-    @ConfigKey(value = "secondOrderMarkov")
-    void setSecondOrderMarkovEnabled(boolean enabled);
 }
