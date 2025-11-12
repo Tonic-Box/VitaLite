@@ -91,17 +91,26 @@ public class MarkovSettingsPanel extends JPanel
         JPanel panel = createSectionPanel("Target Biasing");
 
         panel.add(createSliderRow("Minimum Bias:", 0, 100, 15, 25, "%",
-            value -> biasMinValueLabel.setText(value / 100.0 + ""),
+            value -> {
+                biasMinValueLabel.setText(value / 100.0 + "");
+                config.setBiasMinimum(value / 100.0);
+            },
             value -> biasMinSlider = value,
             label -> biasMinValueLabel = label));
 
         panel.add(createSliderRow("Maximum Bias:", 0, 100, 75, 25, "%",
-            value -> biasMaxValueLabel.setText(value / 100.0 + ""),
+            value -> {
+                biasMaxValueLabel.setText(value / 100.0 + "");
+                config.setBiasMaximum(value / 100.0);
+            },
             value -> biasMaxSlider = value,
             label -> biasMaxValueLabel = label));
 
         panel.add(createSliderRow("Bias Distance:", 100, 1000, 400, 100, "px",
-            value -> biasDistanceValueLabel.setText(value + " px"),
+            value -> {
+                biasDistanceValueLabel.setText(value + " px");
+                config.setBiasDistance(value);
+            },
             value -> biasDistanceSlider = value,
             label -> biasDistanceValueLabel = label));
 
@@ -113,12 +122,18 @@ public class MarkovSettingsPanel extends JPanel
         JPanel panel = createSectionPanel("Generation Parameters");
 
         panel.add(createSliderRow("Max Steps:", 50, 500, 200, 50, "",
-            value -> maxStepsValueLabel.setText(value + " steps"),
+            value -> {
+                maxStepsValueLabel.setText(value + " steps");
+                config.setMaxSteps(value);
+            },
             value -> maxStepsSlider = value,
             label -> maxStepsValueLabel = label));
 
         panel.add(createSliderRow("Target Tolerance:", 5, 20, 10, 5, "px",
-            value -> targetToleranceValueLabel.setText(value + " px"),
+            value -> {
+                targetToleranceValueLabel.setText(value + " px");
+                config.setTargetTolerance(value);
+            },
             value -> targetToleranceSlider = value,
             label -> targetToleranceValueLabel = label));
 
@@ -137,11 +152,15 @@ public class MarkovSettingsPanel extends JPanel
             boolean enabled = temporalJitterCheckbox.isSelected();
             temporalJitterAmountSlider.setEnabled(enabled);
             temporalJitterValueLabel.setEnabled(enabled);
+            config.setTemporalJitterEnabled(enabled);
         });
         panel.add(temporalJitterCheckbox);
 
         panel.add(createSliderRow("Jitter Amount:", 0, 100, 30, 25, "%",
-            value -> temporalJitterValueLabel.setText(value + "%"),
+            value -> {
+                temporalJitterValueLabel.setText(value + "%");
+                config.setTemporalJitterAmount(value / 100.0);
+            },
             value -> {
                 temporalJitterAmountSlider = value;
                 temporalJitterAmountSlider.setEnabled(temporalJitterCheckbox.isSelected());
@@ -166,11 +185,15 @@ public class MarkovSettingsPanel extends JPanel
             boolean enabled = bezierSmoothingCheckbox.isSelected();
             bezierTensionSlider.setEnabled(enabled);
             bezierTensionValueLabel.setEnabled(enabled);
+            config.setBezierSmoothingEnabled(enabled);
         });
         panel.add(bezierSmoothingCheckbox);
 
         panel.add(createSliderRow("Smoothing Strength:", 0, 100, 50, 25, "%",
-            value -> bezierTensionValueLabel.setText(value + "%"),
+            value -> {
+                bezierTensionValueLabel.setText(value + "%");
+                config.setBezierTension(value / 100.0);
+            },
             value -> {
                 bezierTensionSlider = value;
                 bezierTensionSlider.setEnabled(bezierSmoothingCheckbox.isSelected());
@@ -191,6 +214,9 @@ public class MarkovSettingsPanel extends JPanel
         velocityAwareBiasingCheckbox.setForeground(Color.WHITE);
         velocityAwareBiasingCheckbox.setBackground(new Color(40, 41, 44));
         velocityAwareBiasingCheckbox.setFocusPainted(false);
+        velocityAwareBiasingCheckbox.addActionListener(e -> {
+            config.setVelocityAwareBiasingEnabled(velocityAwareBiasingCheckbox.isSelected());
+        });
         panel.add(velocityAwareBiasingCheckbox);
 
         panel.add(Box.createVerticalStrut(5));
@@ -199,6 +225,9 @@ public class MarkovSettingsPanel extends JPanel
         secondOrderMarkovCheckbox.setForeground(Color.WHITE);
         secondOrderMarkovCheckbox.setBackground(new Color(40, 41, 44));
         secondOrderMarkovCheckbox.setFocusPainted(false);
+        secondOrderMarkovCheckbox.addActionListener(e -> {
+            config.setSecondOrderMarkovEnabled(secondOrderMarkovCheckbox.isSelected());
+        });
         panel.add(secondOrderMarkovCheckbox);
 
         return panel;
@@ -282,15 +311,6 @@ public class MarkovSettingsPanel extends JPanel
         resetButton.addActionListener(e -> resetToDefaults());
         panel.add(resetButton);
 
-        JButton applyButton = new JButton("Apply Settings");
-        applyButton.setBackground(new Color(100, 200, 100));
-        applyButton.setForeground(Color.BLACK);
-        applyButton.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        applyButton.setFocusPainted(false);
-        applyButton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
-        applyButton.addActionListener(e -> saveConfig());
-        panel.add(applyButton);
-
         return panel;
     }
 
@@ -332,11 +352,6 @@ public class MarkovSettingsPanel extends JPanel
 
         config.setVelocityAwareBiasingEnabled(velocityAwareBiasingCheckbox.isSelected());
         config.setSecondOrderMarkovEnabled(secondOrderMarkovCheckbox.isSelected());
-
-        JOptionPane.showMessageDialog(this,
-            "Settings saved successfully!\nRestart training or generate new paths to see changes.",
-            "Settings Applied",
-            JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void resetToDefaults()
@@ -364,7 +379,10 @@ public class MarkovSettingsPanel extends JPanel
             velocityAwareBiasingCheckbox.setSelected(false);
             secondOrderMarkovCheckbox.setSelected(false);
 
-            saveConfig();
+            JOptionPane.showMessageDialog(this,
+                "Settings reset to defaults!",
+                "Reset Complete",
+                JOptionPane.INFORMATION_MESSAGE);
         }
     }
 }
