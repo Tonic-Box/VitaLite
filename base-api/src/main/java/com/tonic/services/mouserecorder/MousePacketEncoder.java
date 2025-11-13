@@ -119,6 +119,7 @@ public class MousePacketEncoder
         if (encodedCount == 0)
         {
             // Return null with consumedCount to clear duplicates from buffer without sending
+            buffer.dispose();
             return null;
         }
 
