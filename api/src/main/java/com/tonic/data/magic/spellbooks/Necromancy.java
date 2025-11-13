@@ -1,5 +1,6 @@
 package com.tonic.data.magic.spellbooks;
 
+import com.tonic.Static;
 import com.tonic.data.magic.MagicCast;
 import com.tonic.data.magic.Rune;
 import com.tonic.data.magic.RuneRequirement;
@@ -282,7 +283,7 @@ public enum Necromancy implements Spell
     @Override
     public boolean canCast()
     {
-        return MagicCast.canCastNecromancy(spellIndex);
+        return Static.invoke(() -> MagicCast.canCastNecromancy(spellIndex));
     }
 
     @Override
