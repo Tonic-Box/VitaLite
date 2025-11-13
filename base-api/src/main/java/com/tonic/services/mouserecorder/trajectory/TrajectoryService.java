@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 public class TrajectoryService
 {
     private static final TrajectoryDatabase database = new TrajectoryDatabase();
+    private static final TrajectoryPacketCapture packetCapture = new TrajectoryPacketCapture(database);
     private static final ExecutorService saveExecutor = Executors.newSingleThreadExecutor();
     private static final String SAVE_PATH = Static.VITA_DIR
             .resolve("data")
@@ -39,6 +40,11 @@ public class TrajectoryService
         return database;
     }
 
+    public static TrajectoryPacketCapture getPacketCapture()
+    {
+        return packetCapture;
+    }
+
     public static int getUnsavedCount()
     {
         return database.getTrajectoryCount() - lastSavedCount;
@@ -47,12 +53,14 @@ public class TrajectoryService
     public static void startRecording()
     {
         isRecording = true;
-        Logger.info("Trajectory recording started");
+        packetCapture.startRecording();
+        Logger.info("Trajectory recording started (packet capture enabled)");
     }
 
     public static void stopRecording()
     {
         isRecording = false;
+        packetCapture.stopRecording();
         Logger.info("Trajectory recording stopped");
     }
 

@@ -16,6 +16,11 @@ public interface TrajectoryGeneratorConfig extends VitaConfig
     @ConfigKey(value = "retrievalCount")
     void setRetrievalCount(int count);
 
+    @ConfigKey(value = "variationAnalysisCount", defaultValue = "5")
+    int getVariationAnalysisCount();
+    @ConfigKey(value = "variationAnalysisCount")
+    void setVariationAnalysisCount(int count);
+
     @ConfigKey(value = "minSimilarity", defaultValue = "0.3")
     double getMinSimilarity();
     @ConfigKey(value = "minSimilarity")
@@ -45,11 +50,6 @@ public interface TrajectoryGeneratorConfig extends VitaConfig
     double getBlendRandomness();
     @ConfigKey(value = "blendRandomness")
     void setBlendRandomness(double randomness);
-
-    @ConfigKey(value = "movementTimeoutMs", defaultValue = "100")
-    int getMovementTimeoutMs();
-    @ConfigKey(value = "movementTimeoutMs")
-    void setMovementTimeoutMs(int timeoutMs);
 
     @ConfigKey(value = "visualizationHistoryCount", defaultValue = "20")
     int getVisualizationHistoryCount();
@@ -86,4 +86,34 @@ public interface TrajectoryGeneratorConfig extends VitaConfig
     boolean shouldUseAdaptiveProfiling();
     @ConfigKey(value = "useAdaptiveProfiling")
     void setUseAdaptiveProfiling(boolean enabled);
+
+    @ConfigKey(value = "rapidModeEnabled", defaultValue = "true")
+    boolean isRapidModeEnabled();
+    @ConfigKey(value = "rapidModeEnabled")
+    void setRapidModeEnabled(boolean enabled);
+
+    @ConfigKey(value = "rapidModeThresholdMs", defaultValue = "1800")
+    int getRapidModeThresholdMs();
+    @ConfigKey(value = "rapidModeThresholdMs")
+    void setRapidModeThresholdMs(int thresholdMs);
+
+    @ConfigKey(value = "rapidModeShortDistanceThreshold", defaultValue = "100")
+    int getRapidModeShortDistanceThreshold();
+    @ConfigKey(value = "rapidModeShortDistanceThreshold")
+    void setRapidModeShortDistanceThreshold(int distance);
+
+    @ConfigKey(value = "rapidModeMediumDistanceThreshold", defaultValue = "200")
+    int getRapidModeMediumDistanceThreshold();
+    @ConfigKey(value = "rapidModeMediumDistanceThreshold")
+    void setRapidModeMediumDistanceThreshold(int distance);
+
+    @ConfigKey(value = "rapidModeSampleReduction", defaultValue = "0.6")
+    double getRapidModeSampleReduction();
+    @ConfigKey(value = "rapidModeSampleReduction")
+    void setRapidModeSampleReduction(double factor);
+
+    @ConfigKey(value = "rapidModeRandomChance", defaultValue = "0.0")
+    double getRapidModeRandomChance();
+    @ConfigKey(value = "rapidModeRandomChance")
+    void setRapidModeRandomChance(double chance);
 }

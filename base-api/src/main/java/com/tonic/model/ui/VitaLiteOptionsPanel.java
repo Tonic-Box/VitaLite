@@ -2,28 +2,21 @@ package com.tonic.model.ui;
 
 import com.tonic.Logger;
 import com.tonic.Static;
-import com.tonic.api.TClient;
-import com.tonic.api.TMouseHandler;
 import com.tonic.events.PacketReceived;
 import com.tonic.events.PacketSent;
 import com.tonic.model.ui.components.*;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
 import com.tonic.services.mouserecorder.DecodedMousePacket;
-import com.tonic.services.mouserecorder.ManualMouseTracker;
 import com.tonic.services.mouserecorder.MousePacketDecoder;
 import com.tonic.services.mouserecorder.trajectory.TrajectoryService;
 import com.tonic.services.mouserecorder.trajectory.ui.TrajectoryTrainerMonitor;
 import com.tonic.services.mouserecorder.trajectory.ui.TrajectorySettingsPanel;
 import com.tonic.services.pathfinder.PathfinderAlgo;
 import com.tonic.services.mouserecorder.MovementVisualization;
-import com.tonic.util.ClientConfig;
 import com.tonic.util.ReflectBuilder;
 import com.tonic.util.ThreadPool;
-
-import javax.security.sasl.SaslClient;
 import javax.swing.*;
-import java.applet.Applet;
 import java.awt.*;
 
 public class VitaLiteOptionsPanel extends VPluginPanel {
@@ -54,13 +47,13 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ToggleSlider bankCacheToggle;
     private JFrame transportsEditor;
 
-    private ToggleSlider sendMouseMovement;
+    private final ToggleSlider sendMouseMovement;
+    private final ToggleSlider recordTrajectory;
     private Timer trajectoryCheckTimer;
 
     private VitaLiteOptionsPanel() {
-        super(false); // Don't use default wrapping, we'll handle scrolling ourselves
+        super(false);
 
-        // Set up the main panel layout
         setLayout(new BorderLayout());
         setOpaque(false);
 
@@ -321,7 +314,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         ));
         inputPanel.addVerticalStrut(12);
 
-        ToggleSlider recordTrajectory = new ToggleSlider();
+        recordTrajectory = new ToggleSlider();
         inputPanel.addContent(createToggleOption(
                 "Train Mouse Data",
                 "Train a data set on your manual play for use in automated mouse movements.",
@@ -329,10 +322,8 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 () -> {
                     if (recordTrajectory.isSelected()) {
                         TrajectoryService.startRecording();
-                        startManualMouseTracking();
                     } else {
                         TrajectoryService.stopRecording();
-                        stopManualMouseTracking();
                     }
                 }
         ));
@@ -382,6 +373,17 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                     Static.getVitaConfig().setVisualizeMovements(visualizeMovements.isSelected());
                     MovementVisualization.setEnabled(visualizeMovements.isSelected());
                 }
+        ));
+        inputPanel.addVerticalStrut(12);
+
+        ToggleSlider visualizeClicks = new ToggleSlider();
+        visualizeClicks.setSelected(Static.getVitaConfig().shouldVisualizeClicks());
+        // Sync initial state
+        inputPanel.addContent(createToggleOption(
+                "Visualize Clicks",
+                "Show generated mouse clicks on the game canvas.",
+                visualizeClicks,
+                () -> Static.getVitaConfig().setVisualizeClicks(visualizeClicks.isSelected())
         ));
         inputPanel.addVerticalStrut(12);
 
@@ -599,32 +601,38 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         Logger.info(actionInfo);
     }
 
-    private JSeparator createSeparator() {
-        JSeparator separator = new JSeparator();
-        separator.setForeground(SEPARATOR_COLOR);
-        separator.setMaximumSize(new Dimension(PANEL_WIDTH - 60, 1));
-        return separator;
-    }
-
     public void onPacketSent(PacketSent event)
     {
-        ManualMouseTracker.onPacketSent(event);
-        if(!logPacketsToggle.isSelected() && !logMousePacketsToggle.isSelected())
-            return;
-
-        if(logMousePacketsToggle.isSelected())
+        int isMouse = event.isMouse();
+        if(isMouse != 0)
         {
-            if(MousePacketDecoder.test(event.getBuffer()))
+            if(logMousePacketsToggle.isSelected() && isMouse == 1)
+            {
+                Logger.info(event.toString());
+            }
+            else if(logMousePacketsToggle.isSelected() || recordTrajectory.isSelected() && isMouse == 2)
             {
                 DecodedMousePacket decodedInfo = MousePacketDecoder.decode(event.getBuffer());
-                Logger.info("[OP_MOUSE_MOVEMENT(" + event.getId() + ")] " + decodedInfo);
-                return;
+                if(recordTrajectory.isSelected())
+                {
+                    TrajectoryService.getPacketCapture().submitDecodedPacket(decodedInfo);
+                }
+                if(logMousePacketsToggle.isSelected())
+                {
+                    Logger.info("[OP_MOUSE_MOVEMENT(" + event.getId() + ")] " + decodedInfo);
+                }
             }
+            return;
+        }
+
+        if(!logPacketsToggle.isSelected())
+        {
+            return;
         }
 
         String packetInfo = event.toString();
 
-        if(packetInfo.startsWith("[UNKNOWN(") || (packetInfo.startsWith("[OP_MOUSE_CLICK") && !logMousePacketsToggle.isSelected()))
+        if(packetInfo.startsWith("[UNKNOWN("))
         {
             return;
         }
@@ -684,56 +692,5 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 Logger.warn("Failed to update trajectory quality state: " + ex.getMessage());
             }
         });
-    }
-
-    private void startManualMouseTracking()
-    {
-        try
-        {
-            TClient tclient = Static.getClient();
-            Canvas canvas = ReflectBuilder.of(tclient)
-                    .method("getCanvas", null, null)
-                    .get();
-
-            ManualMouseTracker.startTracking(() -> {
-                try
-                {
-                    TClient client = Static.getClient();
-                    return client.getMouseHandler().getMouseX();
-                }
-                catch (Exception e)
-                {
-                    Logger.error("Error getting mouse X: " + e.getMessage());
-                    return -1;
-                }
-            }, () -> {
-                try
-                {
-                    TClient client = Static.getClient();
-                    return client.getMouseHandler().getMouseY();
-                }
-                catch (Exception e)
-                {
-                    Logger.error("Error getting mouse Y: " + e.getMessage());
-                    return -1;
-                }
-            }, canvas);
-        }
-        catch (Exception e)
-        {
-            Logger.error("Failed to start manual mouse tracking: " + e.getMessage());
-        }
-    }
-
-    private void stopManualMouseTracking()
-    {
-        try
-        {
-            ManualMouseTracker.stopTracking();
-        }
-        catch (Exception e)
-        {
-            Logger.error("Failed to stop manual mouse tracking: " + e.getMessage());
-        }
     }
 }

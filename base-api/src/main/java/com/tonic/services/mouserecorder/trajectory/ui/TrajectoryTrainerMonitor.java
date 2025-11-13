@@ -181,44 +181,6 @@ public class TrajectoryTrainerMonitor extends VitaFrame
 
         TrajectoryGeneratorConfig config = ConfigFactory.create(TrajectoryGeneratorConfig.class);
 
-        // Movement Timeout Slider
-        JPanel timeoutPanel = new JPanel(new BorderLayout(10, 0));
-        timeoutPanel.setBackground(new Color(40, 41, 44));
-        timeoutPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-
-        JLabel timeoutLabel = new JLabel("Movement Timeout:");
-        timeoutLabel.setForeground(Color.WHITE);
-        timeoutLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        timeoutLabel.setToolTipText("How long to wait (ms) after mouse stops before ending a path");
-
-        JSlider timeoutSlider = new JSlider(10, 500, config.getMovementTimeoutMs());
-        timeoutSlider.setBackground(new Color(40, 41, 44));
-        timeoutSlider.setForeground(new Color(100, 200, 100));
-        timeoutSlider.setMajorTickSpacing(100);
-        timeoutSlider.setMinorTickSpacing(50);
-        timeoutSlider.setPaintTicks(true);
-        timeoutSlider.setPaintLabels(false);
-
-        JLabel timeoutValue = new JLabel(config.getMovementTimeoutMs() + " ms");
-        timeoutValue.setForeground(new Color(100, 200, 100));
-        timeoutValue.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        timeoutValue.setPreferredSize(new Dimension(60, 20));
-        timeoutValue.setHorizontalAlignment(SwingConstants.RIGHT);
-
-        timeoutSlider.addChangeListener(e -> {
-            int value = timeoutSlider.getValue();
-            timeoutValue.setText(value + " ms");
-            config.setMovementTimeoutMs(value);
-        });
-
-        JPanel timeoutSliderPanel = new JPanel(new BorderLayout());
-        timeoutSliderPanel.setBackground(new Color(40, 41, 44));
-        timeoutSliderPanel.add(timeoutSlider, BorderLayout.CENTER);
-        timeoutSliderPanel.add(timeoutValue, BorderLayout.EAST);
-
-        timeoutPanel.add(timeoutLabel, BorderLayout.WEST);
-        timeoutPanel.add(timeoutSliderPanel, BorderLayout.CENTER);
-
         // Visualization History Slider
         JPanel historyPanel = new JPanel(new BorderLayout(10, 0));
         historyPanel.setBackground(new Color(40, 41, 44));
@@ -257,8 +219,6 @@ public class TrajectoryTrainerMonitor extends VitaFrame
         historyPanel.add(historyLabel, BorderLayout.WEST);
         historyPanel.add(historySliderPanel, BorderLayout.CENTER);
 
-        panel.add(timeoutPanel);
-        panel.add(Box.createVerticalStrut(10));
         panel.add(historyPanel);
 
         return panel;
@@ -330,22 +290,24 @@ public class TrajectoryTrainerMonitor extends VitaFrame
 
     private String evaluateQuality(int count)
     {
-        if (count < 50) return "Poor";
-        if (count < 150) return "Fair";
-        if (count < 300) return "Good";
-        if (count < 500) return "Very Good";
-        return "Excellent";
+        if (count < 50) return "Poor - Record more varied movements";
+        if (count < 150) return "Fair - Getting better";
+        if (count < 300) return "Good - Solid coverage";
+        if (count < 500) return "Very Good - Excellent coverage";
+        if (count < 1000) return "Excellent - Comprehensive";
+        return "Outstanding - Maximum coverage";
     }
 
     private Color getQualityColor(String quality)
     {
         switch (quality)
         {
-            case "Poor": return Color.RED;
-            case "Fair": return Color.ORANGE;
-            case "Good": return Color.YELLOW;
-            case "Very Good": return new Color(150, 255, 150);
-            case "Excellent": return Color.GREEN;
+            case "Poor - Record more varied movements": return Color.RED;
+            case "Fair - Getting better": return Color.ORANGE;
+            case "Good - Solid coverage": return Color.YELLOW;
+            case "Very Good - Excellent coverage": return new Color(150, 255, 150);
+            case "Excellent - Comprehensive": return new Color(75, 255, 75);
+            case "Outstanding - Maximum coverage": return Color.GREEN;
             default: return Color.GRAY;
         }
     }

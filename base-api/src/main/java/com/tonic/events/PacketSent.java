@@ -2,6 +2,8 @@ package com.tonic.events;
 
 import com.tonic.packets.PacketBuffer;
 import com.tonic.packets.PacketMapReader;
+import com.tonic.packets.types.MapEntry;
+import com.tonic.services.mouserecorder.MousePacketDecoder;
 import lombok.Getter;
 
 /**
@@ -10,6 +12,7 @@ import lombok.Getter;
 @Getter
 public class PacketSent {
     private static final PacketSent INSTANCE = new PacketSent();
+    private static int MOUSE_CLICK = -1;
 
     /**
      * Get a reusable instance of PacketSent
@@ -52,6 +55,32 @@ public class PacketSent {
         return buffer;
     }
 
+    //0=false, 1=click, 2=move
+    public int isMouse()
+    {
+        if(MousePacketDecoder.test(getBuffer()))
+            return 2;
+        if(MOUSE_CLICK == -1)
+        {
+            MapEntry entry = PacketMapReader.get("OP_MOUSE_CLICK");
+            if(entry != null)
+            {
+                MOUSE_CLICK = entry.getPacket().getId();
+                return MOUSE_CLICK == id ? 1 : 0;
+            }
+        }
+        return MOUSE_CLICK == id ? 1 : 0;
+    }
+
+    public void release()
+    {
+        if(buffer != null)
+        {
+            buffer.dispose();
+            buffer = null;
+        }
+    }
+
     /**
      * Prettify the packet payload using PacketMapReader.
      * Disposes of the PacketBuffer after use.
@@ -61,9 +90,6 @@ public class PacketSent {
     public String toString()
     {
         PacketBuffer pb = getBuffer();
-        String out = PacketMapReader.prettify(pb);
-        pb.dispose();
-        buffer = null;
-        return out;
+        return PacketMapReader.prettify(pb);
     }
 }

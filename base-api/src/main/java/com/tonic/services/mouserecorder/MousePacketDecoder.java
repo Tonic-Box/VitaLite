@@ -2,7 +2,6 @@ package com.tonic.services.mouserecorder;
 
 import com.tonic.packets.PacketBuffer;
 import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,96 +32,128 @@ public class MousePacketDecoder
 
         try
         {
-            int bufferCapacity = buffer.getPayload().capacity();
-            int remaining = bufferCapacity - originalOffset;
+            int bufferSize = buffer.getPayload().writerIndex();
+            int remaining = bufferSize - originalOffset;
 
-            // Need at least 3 bytes for header + at least 2 bytes for one sample
             if (remaining < 5)
             {
                 return false;
             }
 
-            // Read header (convert signed byte to unsigned)
             int totalLength = buffer.readByte() & 0xFF;
             int avgMillisDelta = buffer.readByte() & 0xFF;
             int remainderMillisDelta = buffer.readByte() & 0xFF;
 
-            // Validate header values
             if (totalLength < 2 || totalLength > 248)
             {
                 return false;
             }
 
-            int dataLength = totalLength - 2;
-            if (dataLength < 2 || dataLength > 246)
+            // Validate time values to filter out REFLECTION_CHECK_REPLY packets
+            // Mouse movements take time - avgMillisDelta CANNOT be 0 for real movement
+            // All REFLECTION_CHECK_REPLY packets have avgDelta=0, remainder=0
+            // Real mouse: avgMillisDelta is 1-100ms (typically 4-13ms from logs)
+            // Real mouse: remainderMillisDelta is 0-19ms (one game tick)
+            if (avgMillisDelta < 1 || avgMillisDelta > 100 || remainderMillisDelta > 20)
             {
                 return false;
             }
 
-            // Check if we have enough data for the declared length
-            remaining = bufferCapacity - buffer.getOffset();
+            int dataLength = totalLength - 2;
+
+            remaining = bufferSize - buffer.getOffset();
             if (remaining < dataLength)
             {
                 return false;
             }
 
+            if (dataLength >= 2)
+            {
+                int firstSampleByte = buffer.getPayload().getByte(buffer.getOffset()) & 0xFF;
+
+                // Determine expected sample size based on compression scheme
+                // Small: 0-127 (2 bytes), Medium: 128-191 (3 bytes)
+                // Large: 192-223 (5 bytes), XLarge: 224-255 (6 bytes)
+                int expectedFirstSampleSize;
+                if (firstSampleByte < 128)
+                {
+                    expectedFirstSampleSize = 2;
+                }
+                else if (firstSampleByte < 192)
+                {
+                    expectedFirstSampleSize = 3;
+                }
+                else if (firstSampleByte < 224)
+                {
+                    expectedFirstSampleSize = 5;
+                }
+                else
+                {
+                    expectedFirstSampleSize = 6;
+                }
+
+                if (dataLength < expectedFirstSampleSize)
+                {
+                    return false;
+                }
+            }
+
             // Simulate decode loop: verify sample structure adds up to exact dataLength
             int bytesRead = 0;
             int currentPos = buffer.getOffset();
+            int sampleCount = 0;
 
             while (bytesRead < dataLength)
             {
-                // Check we can peek at compression scheme byte
-                if (currentPos >= bufferCapacity)
+                if (currentPos >= bufferSize)
                 {
                     return false;
                 }
 
-                // Peek at compression scheme byte (don't modify buffer offset)
                 int firstByte = buffer.getPayload().getByte(currentPos) & 0xFF;
 
-                // Determine sample size based on compression scheme
                 int sampleSize;
                 if (firstByte < 128)
                 {
-                    sampleSize = 2;  // Small delta
+                    sampleSize = 2;
                 }
                 else if (firstByte < 192)
                 {
-                    sampleSize = 3;  // Medium delta
+                    sampleSize = 3;
                 }
                 else if (firstByte < 224)
                 {
-                    sampleSize = 5;  // Large delta
+                    sampleSize = 5;
                 }
                 else
                 {
-                    sampleSize = 6;  // XLarge delta
+                    sampleSize = 6;
                 }
 
-                // Verify this sample fits within declared dataLength
                 if (bytesRead + sampleSize > dataLength)
                 {
                     return false;
                 }
 
-                // Verify buffer has capacity for this sample
-                if (currentPos + sampleSize > bufferCapacity)
+                for (int i = 0; i < sampleSize; i++)
                 {
-                    return false;
+                    if (currentPos + i >= bufferSize)
+                    {
+                        return false;
+                    }
                 }
 
                 bytesRead += sampleSize;
                 currentPos += sampleSize;
+                sampleCount++;
             }
 
-            // Must consume exactly dataLength bytes, no more, no less
             if (bytesRead != dataLength)
             {
                 return false;
             }
 
-            return true;
+            return sampleCount >= 1 && sampleCount <= 63;
         }
         catch (Exception e)
         {
@@ -130,7 +161,6 @@ public class MousePacketDecoder
         }
         finally
         {
-            // Always restore original position
             buffer.setOffset(originalOffset);
         }
     }
@@ -143,7 +173,6 @@ public class MousePacketDecoder
      */
     public static DecodedMousePacket decode(PacketBuffer buffer)
     {
-        // Read 3-byte header (convert signed bytes to unsigned)
         int totalLength = buffer.readByte() & 0xFF;
         int avgMillisDelta = buffer.readByte() & 0xFF;
         int remainderMillisDelta = buffer.readByte() & 0xFF;
@@ -155,21 +184,18 @@ public class MousePacketDecoder
         int currentY = 0;
         long currentTime = 0;
 
-        // Decode samples until we've read all data
-        int dataLength = totalLength - 2; // Subtract header bytes
+        int dataLength = totalLength - 2;
         int bytesRead = 0;
 
         while (bytesRead < dataLength)
         {
             int startOffset = buffer.getOffset();
 
-            // Peek at first byte/short to determine compression scheme
             int firstByte = buffer.readByte() & 0xFF;
-            buffer.setOffset(startOffset); // Reset to re-read
+            buffer.setOffset(startOffset);
 
-            DecodedSample sample = null;
+            DecodedSample sample;
 
-            // Determine compression scheme based on first byte value
             if (firstByte < 128)
             {
                 // Small delta (2 bytes)
@@ -177,14 +203,14 @@ public class MousePacketDecoder
                 stats.smallDelta++;
                 bytesRead += 2;
             }
-            else if (firstByte >= 128 && firstByte < 192)
+            else if (firstByte < 192)
             {
                 // Medium delta (3 bytes)
                 sample = decodeMediumDelta(buffer, currentX, currentY, currentTime);
                 stats.mediumDelta++;
                 bytesRead += 3;
             }
-            else if (firstByte >= 192 && firstByte < 224)
+            else if (firstByte < 224)
             {
                 // Large delta (5 bytes)
                 sample = decodeLargeDelta(buffer, currentTime);
@@ -199,13 +225,10 @@ public class MousePacketDecoder
                 bytesRead += 6;
             }
 
-            if (sample != null)
-            {
-                samples.add(sample);
-                currentX = sample.x;
-                currentY = sample.y;
-                currentTime = sample.timestampMillis;
-            }
+            samples.add(sample);
+            currentX = sample.x;
+            currentY = sample.y;
+            currentTime = sample.timestampMillis;
         }
 
         return new DecodedMousePacket(samples, stats, avgMillisDelta, remainderMillisDelta);
@@ -269,7 +292,6 @@ public class MousePacketDecoder
 
         if (packed == Integer.MIN_VALUE)
         {
-            // Special case: mouse off-screen
             return new DecodedSample(-1, -1, lastTime + (deltaTicks * 20), 0, 0, deltaTicks, "LARGE");
         }
 
@@ -286,14 +308,13 @@ public class MousePacketDecoder
      */
     private static DecodedSample decodeXLargeDelta(PacketBuffer buffer, long lastTime)
     {
-        int deltaTicksPlusOffset = buffer.readUnsignedShort();  // This one already exists and is correct
+        int deltaTicksPlusOffset = buffer.readUnsignedShort();
         int deltaTicks = (deltaTicksPlusOffset - 57344) & 8191;
 
         int packed = buffer.readInt();
 
         if (packed == Integer.MIN_VALUE)
         {
-            // Special case: mouse off-screen
             return new DecodedSample(-1, -1, lastTime + (deltaTicks * 20), 0, 0, deltaTicks, "XLARGE");
         }
 
