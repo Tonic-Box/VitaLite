@@ -1,5 +1,6 @@
 package com.tonic.data.magic.spellbooks;
 
+import com.tonic.Static;
 import com.tonic.api.game.QuestAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.MagicAPI;
@@ -313,7 +314,7 @@ public enum Lunar implements Spell
     @Override
     public boolean canCast()
     {
-        return MagicCast.canCastLunar(spellIndex);
+        return Static.invoke(() -> MagicCast.canCastLunar(spellIndex));
     }
 
     @Override
