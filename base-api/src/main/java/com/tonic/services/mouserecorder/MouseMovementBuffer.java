@@ -280,73 +280,73 @@ public class MouseMovementBuffer
                 return;
             }
 
+            EncodedMousePacket packet = null;
+
             try
             {
                 long flushStartTime = System.currentTimeMillis();
-                long timeSinceLastFlush = lastFlushTime > 0 ? (flushStartTime - lastFlushTime) : 0;
 
-                // Build list of samples for encoder
                 List<MouseDataPoint> points = new ArrayList<>(index);
                 for (int i = 0; i < index; i++)
                 {
                     points.add(new MouseDataPoint(xs[i], ys[i], millis[i]));
                 }
 
-                // Encode using our existing encoder (already 1:1 with client)
                 MouseMovementSequence sequence = new MouseMovementSequence(points);
-                EncodedMousePacket packet = MousePacketEncoder.encode(sequence);
+                packet = MousePacketEncoder.encode(sequence);
 
                 if (packet == null)
                 {
-                    // All samples were duplicates - clear buffer but don't send packet
                     index = 0;
                     lastFlushTime = flushStartTime;
                     return;
                 }
 
-                if (packet.getSamplesEncoded() > 0)
-                {
-                    // Calculate metrics
-                    int packetSize = packet.getSize();
-                    int samplesEncoded = packet.getSamplesEncoded();
-                    EncodedMousePacket.CompressionStats stats = packet.getStats();
-
-                    // Log detailed metrics
-//                    Logger.warn(String.format(
-//                        "[MOVEMENT PACKET] Samples: %d/%d | Time since last: %.1fs | Packet size: %d bytes | Compression: S=%d M=%d L=%d XL=%d",
-//                        samplesEncoded, index,
-//                        timeSinceLastFlush / 1000.0,
-//                        packetSize,
-//                        stats.smallDelta,
-//                        stats.mediumDelta,
-//                        stats.largeDelta,
-//                        stats.xlargeDelta
-//                    ));
-
-                    sendPacket(packet);
-
-                    // Remove consumed samples from buffer (matches Client.java:3098-3106)
-                    int consumed = packet.getSamplesEncoded();
-                    if (consumed >= index)
+                EncodedMousePacket finalPacket = packet;
+                boolean await = Static.invoke(() -> {
+                    try
                     {
-                        index = 0;
-                    }
-                    else
-                    {
-                        // Shift remaining samples to beginning (arraycopy like client)
-                        index -= consumed;
-                        System.arraycopy(xs, consumed, xs, 0, index);
-                        System.arraycopy(ys, consumed, ys, 0, index);
-                        System.arraycopy(millis, consumed, millis, 0, index);
-                    }
+                        if (finalPacket.getSamplesEncoded() > 0)
+                        {
+                            sendPacket(finalPacket);
 
-                    lastFlushTime = flushStartTime;
-                }
+                            int consumed = finalPacket.getSamplesEncoded();
+                            if (consumed >= index)
+                            {
+                                index = 0;
+                            }
+                            else
+                            {
+                                index -= consumed;
+                                System.arraycopy(xs, consumed, xs, 0, index);
+                                System.arraycopy(ys, consumed, ys, 0, index);
+                                System.arraycopy(millis, consumed, millis, 0, index);
+                            }
+
+                            lastFlushTime = flushStartTime;
+                        }
+                        else
+                        {
+                            finalPacket.getBuffer().dispose();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        finalPacket.getBuffer().dispose();
+                        Logger.error("MouseMovementBuffer: Send packet failed: " + e.getMessage());
+                        index = 0; // Clear buffer on error
+                    }
+                    return true;
+                });
             }
             catch (Exception e)
             {
+                if (packet != null)
+                {
+                    packet.getBuffer().dispose();
+                }
                 Logger.error("MouseMovementBuffer: Flush failed: " + e.getMessage());
-                index = 0; // Clear buffer on error
+                index = 0;
             }
         }
     }
@@ -365,6 +365,7 @@ public class MouseMovementBuffer
             }
             catch (Exception e)
             {
+                packet.getBuffer().dispose();
                 Logger.error("MouseMovementBuffer: Failed to send packet: " + e.getMessage());
             }
         });

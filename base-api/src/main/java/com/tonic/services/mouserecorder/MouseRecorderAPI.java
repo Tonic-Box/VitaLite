@@ -199,32 +199,6 @@ public class MouseRecorderAPI
     }
 
     /**
-     * Builds multiple packets from all pending samples.
-     * Continues encoding until no samples remain.
-     *
-     * @return List of encoded packets (may be empty)
-     */
-    public List<EncodedMousePacket> buildAllPackets()
-    {
-        List<EncodedMousePacket> packets = new ArrayList<>();
-
-        while (!pendingSamples.isEmpty())
-        {
-            EncodedMousePacket packet = buildPacket();
-            if (packet != null)
-            {
-                packets.add(packet);
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        return packets;
-    }
-
-    /**
      * Checks if there are enough samples to build a packet.
      * Recommended minimum is 40 samples (matching Jagex's threshold).
      *

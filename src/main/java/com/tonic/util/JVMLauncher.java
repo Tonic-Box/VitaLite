@@ -21,6 +21,7 @@ public class JVMLauncher {
         command.add("-XX:CompileThreshold=1500");
         command.add("-XX:+UseSerialGC");
         command.add("-XX:+UseStringDeduplication");
+        command.add("-Dio.netty.leakDetectionLevel=advanced");
 
         if (classpath != null && !classpath.isEmpty()) {
             command.add("-cp");
