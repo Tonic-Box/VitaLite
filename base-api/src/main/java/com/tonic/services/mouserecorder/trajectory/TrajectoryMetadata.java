@@ -62,12 +62,18 @@ public class TrajectoryMetadata
 
     public static TrajectoryMetadata create(int startX, int startY, int endX, int endY)
     {
+        return create(startX, startY, endX, endY, 0);
+    }
+
+    public static TrajectoryMetadata create(int startX, int startY, int endX, int endY, long expectedDuration)
+    {
         int dx = endX - startX;
         int dy = endY - startY;
         double distance = Math.sqrt(dx * dx + dy * dy);
         double angle = Math.atan2(dy, dx);
+        double avgVelocity = expectedDuration > 0 ? distance / expectedDuration : 0;
 
-        return new TrajectoryMetadata(distance, angle, 0, 0, 0, startX, startY, endX, endY);
+        return new TrajectoryMetadata(distance, angle, expectedDuration, avgVelocity, 0, startX, startY, endX, endY);
     }
 
     public double computeSimilarity(TrajectoryMetadata other)
@@ -81,7 +87,14 @@ public class TrajectoryMetadata
         double curvatureDiff = Math.abs(this.curvature - other.curvature);
         double curvatureScore = Math.max(0.0, 1.0 - curvatureDiff);
 
-        return (distanceRatio * 0.5) + (angleScore * 0.4) + (curvatureScore * 0.1);
+        double velocityScore = 0.5;
+        if (this.avgVelocity > 0 && other.avgVelocity > 0)
+        {
+            double velocityRatio = Math.min(this.avgVelocity, other.avgVelocity) / Math.max(this.avgVelocity, other.avgVelocity);
+            velocityScore = velocityRatio;
+        }
+
+        return (distanceRatio * 0.4) + (angleScore * 0.35) + (velocityScore * 0.15) + (curvatureScore * 0.1);
     }
 
     private static double computeCurvature(List<MouseDataPoint> points)

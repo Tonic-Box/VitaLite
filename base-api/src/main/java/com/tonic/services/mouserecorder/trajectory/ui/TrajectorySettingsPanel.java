@@ -20,6 +20,7 @@ public class TrajectorySettingsPanel extends VitaFrame
     private final TrajectoryGeneratorConfig config;
 
     private JSlider retrievalCountSlider;
+    private JSlider variationAnalysisCountSlider;
     private JSlider minSimilaritySlider;
     private JSlider blendRandomnessSlider;
     private JComboBox<String> noiseTypeCombo;
@@ -32,8 +33,15 @@ public class TrajectorySettingsPanel extends VitaFrame
     private JSlider maxInstantJumpDistSlider;
     private JSlider instantJumpChanceSlider;
     private JCheckBox adaptiveProfilingCheckbox;
+    private JCheckBox rapidModeCheckbox;
+    private JSlider rapidModeThresholdSlider;
+    private JSlider rapidModeShortDistSlider;
+    private JSlider rapidModeMediumDistSlider;
+    private JSlider rapidModeSampleReductionSlider;
+    private JSlider rapidModeRandomChanceSlider;
 
     private JLabel retrievalCountLabel;
+    private JLabel variationAnalysisCountLabel;
     private JLabel minSimilarityLabel;
     private JLabel blendRandomnessLabel;
     private JLabel whiteNoiseSigmaLabel;
@@ -44,6 +52,11 @@ public class TrajectorySettingsPanel extends VitaFrame
     private JLabel minDistanceLabel;
     private JLabel maxInstantJumpDistLabel;
     private JLabel instantJumpChanceLabel;
+    private JLabel rapidModeThresholdLabel;
+    private JLabel rapidModeShortDistLabel;
+    private JLabel rapidModeMediumDistLabel;
+    private JLabel rapidModeSampleReductionLabel;
+    private JLabel rapidModeRandomChanceLabel;
 
     public static TrajectorySettingsPanel getInstance()
     {
@@ -70,7 +83,7 @@ public class TrajectorySettingsPanel extends VitaFrame
         getContentPanel().add(scrollPane, BorderLayout.CENTER);
         getContentPanel().add(createButtonPanel(), BorderLayout.SOUTH);
 
-        setSize(700, 500);
+        setSize(1020, 700);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -85,6 +98,8 @@ public class TrajectorySettingsPanel extends VitaFrame
         content.setBorder(new EmptyBorder(15, 15, 15, 15));
 
         content.add(createNaturalMovementSection());
+        content.add(Box.createVerticalStrut(15));
+        content.add(createRapidModeSection());
         content.add(Box.createVerticalStrut(15));
         content.add(createRetrievalSection());
         content.add(Box.createVerticalStrut(15));
@@ -164,6 +179,77 @@ public class TrajectorySettingsPanel extends VitaFrame
         return panel;
     }
 
+    private JPanel createRapidModeSection()
+    {
+        JPanel panel = createSectionPanel("Rapid Action Mode");
+
+        JPanel checkboxPanel = new JPanel(new BorderLayout(10, 0));
+        checkboxPanel.setBackground(new Color(40, 41, 44));
+        checkboxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+
+        JLabel rapidModeLabel = new JLabel("Enable Rapid Mode:");
+        rapidModeLabel.setForeground(Color.WHITE);
+        rapidModeLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+
+        rapidModeCheckbox = new JCheckBox();
+        rapidModeCheckbox.setBackground(new Color(40, 41, 44));
+        rapidModeCheckbox.setForeground(Color.WHITE);
+        rapidModeCheckbox.addActionListener(e ->
+            config.setRapidModeEnabled(rapidModeCheckbox.isSelected()));
+
+        checkboxPanel.add(rapidModeLabel, BorderLayout.WEST);
+        checkboxPanel.add(rapidModeCheckbox, BorderLayout.CENTER);
+        panel.add(checkboxPanel);
+
+        panel.add(createSliderRow("Time Threshold:", 100, 5000, 1800, 100, " ms",
+            value -> {
+                rapidModeThresholdLabel.setText(value + " ms");
+                config.setRapidModeThresholdMs(value);
+            },
+            value -> rapidModeThresholdSlider = value,
+            label -> rapidModeThresholdLabel = label));
+
+        panel.add(createSliderRow("Short Distance:", 50, 200, 100, 25, " px",
+            value -> {
+                rapidModeShortDistLabel.setText(value + " px");
+                config.setRapidModeShortDistanceThreshold(value);
+            },
+            value -> rapidModeShortDistSlider = value,
+            label -> rapidModeShortDistLabel = label));
+
+        panel.add(createSliderRow("Medium Distance:", 100, 400, 200, 50, " px",
+            value -> {
+                rapidModeMediumDistLabel.setText(value + " px");
+                config.setRapidModeMediumDistanceThreshold(value);
+            },
+            value -> rapidModeMediumDistSlider = value,
+            label -> rapidModeMediumDistLabel = label));
+
+        panel.add(createSliderRow("Sample Reduction:", 30, 90, 60, 10, "%",
+            value -> {
+                rapidModeSampleReductionLabel.setText(value + "%");
+                config.setRapidModeSampleReduction(value / 100.0);
+            },
+            value -> rapidModeSampleReductionSlider = value,
+            label -> rapidModeSampleReductionLabel = label));
+
+        panel.add(createSliderRow("Random Speedup Chance:", 0, 100, 0, 5, "%",
+            value -> {
+                rapidModeRandomChanceLabel.setText(value + "%");
+                config.setRapidModeRandomChance(value / 100.0);
+            },
+            value -> rapidModeRandomChanceSlider = value,
+            label -> rapidModeRandomChanceLabel = label));
+
+        JLabel helpText = new JLabel("<html><i>Rapid mode activates when movements occur within threshold time. Random speedup chance adds variation by occasionally applying speedup to longer movements.</i></html>");
+        helpText.setForeground(new Color(150, 150, 150));
+        helpText.setFont(new Font("Segoe UI", Font.ITALIC, 10));
+        helpText.setBorder(new EmptyBorder(5, 0, 0, 0));
+        panel.add(helpText);
+
+        return panel;
+    }
+
     private JPanel createRetrievalSection()
     {
         JPanel panel = createSectionPanel("Retrieval & Blending");
@@ -175,6 +261,14 @@ public class TrajectorySettingsPanel extends VitaFrame
             },
             value -> retrievalCountSlider = value,
             label -> retrievalCountLabel = label));
+
+        panel.add(createSliderRow("Variation Analysis Count:", 1, 10, 5, 1, "",
+            value -> {
+                variationAnalysisCountLabel.setText(value + " paths");
+                config.setVariationAnalysisCount(value);
+            },
+            value -> variationAnalysisCountSlider = value,
+            label -> variationAnalysisCountLabel = label));
 
         panel.add(createSliderRow("Min Similarity:", 0, 100, 30, 10, "%",
             value -> {
@@ -331,15 +425,40 @@ public class TrajectorySettingsPanel extends VitaFrame
         panel.setBackground(new Color(30, 31, 34));
         panel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(20, 21, 24)));
 
+        JButton docButton = new JButton("Documentation");
+        docButton.setBackground(new Color(45, 85, 125));
+        docButton.setForeground(Color.WHITE);
+        docButton.setFocusPainted(false);
+        docButton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        docButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        docButton.addActionListener(e -> openDocumentation());
+        panel.add(docButton);
+
         JButton resetButton = new JButton("Reset to Defaults");
         resetButton.setBackground(new Color(60, 61, 64));
         resetButton.setForeground(Color.WHITE);
         resetButton.setFocusPainted(false);
         resetButton.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        resetButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         resetButton.addActionListener(e -> resetToDefaults());
         panel.add(resetButton);
 
         return panel;
+    }
+
+    private void openDocumentation()
+    {
+        try
+        {
+            Desktop.getDesktop().browse(new java.net.URI("https://github.com/Tonic-Box/VitaLite/blob/main/docs/MOUSE-MOVEMENT.md"));
+        }
+        catch (Exception ex)
+        {
+            JOptionPane.showMessageDialog(this,
+                "Could not open documentation in browser.\nURL: https://github.com/Tonic-Box/VitaLite/blob/main/docs/MOUSE-MOVEMENT.md",
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void loadConfigValues()
@@ -351,7 +470,15 @@ public class TrajectorySettingsPanel extends VitaFrame
         maxInstantJumpDistSlider.setValue(config.getMaxDistanceForInstantJump());
         instantJumpChanceSlider.setValue((int) (config.getInstantJumpChance() * 100));
 
+        rapidModeCheckbox.setSelected(config.isRapidModeEnabled());
+        rapidModeThresholdSlider.setValue(config.getRapidModeThresholdMs());
+        rapidModeShortDistSlider.setValue(config.getRapidModeShortDistanceThreshold());
+        rapidModeMediumDistSlider.setValue(config.getRapidModeMediumDistanceThreshold());
+        rapidModeSampleReductionSlider.setValue((int) (config.getRapidModeSampleReduction() * 100));
+        rapidModeRandomChanceSlider.setValue((int) (config.getRapidModeRandomChance() * 100));
+
         retrievalCountSlider.setValue(config.getRetrievalCount());
+        variationAnalysisCountSlider.setValue(config.getVariationAnalysisCount());
         minSimilaritySlider.setValue((int) (config.getMinSimilarity() * 100));
         blendRandomnessSlider.setValue((int) (config.getBlendRandomness() * 100));
         noiseTypeCombo.setSelectedItem(config.getNoiseType());
@@ -379,7 +506,15 @@ public class TrajectorySettingsPanel extends VitaFrame
             maxInstantJumpDistSlider.setValue(120);
             instantJumpChanceSlider.setValue(15);
 
+            rapidModeCheckbox.setSelected(true);
+            rapidModeThresholdSlider.setValue(1800);
+            rapidModeShortDistSlider.setValue(100);
+            rapidModeMediumDistSlider.setValue(200);
+            rapidModeSampleReductionSlider.setValue(60);
+            rapidModeRandomChanceSlider.setValue(0);
+
             retrievalCountSlider.setValue(3);
+            variationAnalysisCountSlider.setValue(5);
             minSimilaritySlider.setValue(30);
             blendRandomnessSlider.setValue(30);
             noiseTypeCombo.setSelectedItem("NONE");
@@ -393,7 +528,14 @@ public class TrajectorySettingsPanel extends VitaFrame
             config.setMinDistanceForTrajectory(50);
             config.setMaxDistanceForInstantJump(120);
             config.setInstantJumpChance(0.15);
+            config.setRapidModeEnabled(true);
+            config.setRapidModeThresholdMs(1800);
+            config.setRapidModeShortDistanceThreshold(100);
+            config.setRapidModeMediumDistanceThreshold(200);
+            config.setRapidModeSampleReduction(0.6);
+            config.setRapidModeRandomChance(0.0);
             config.setRetrievalCount(3);
+            config.setVariationAnalysisCount(5);
             config.setMinSimilarity(0.3);
             config.setBlendRandomness(0.3);
             config.setNoiseType("NONE");

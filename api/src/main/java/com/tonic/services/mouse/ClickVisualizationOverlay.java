@@ -4,7 +4,6 @@ import com.tonic.Static;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickPacket;
 import com.tonic.services.ClickPacket.ClickType;
-import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
@@ -31,12 +30,6 @@ public class ClickVisualizationOverlay extends Overlay {
 
     private static final CopyOnWriteArrayList<ClickVisualization> recentClicks = new CopyOnWriteArrayList<>();
     private static final long CLICK_DISPLAY_DURATION_MS = 2000; // Show clicks for 2 seconds
-    /**
-     * -- GETTER --
-     *  Check if click visualization is enabled
-     */
-    @Getter
-    private static boolean enabled = true;
 
     @Inject
     private Client client;
@@ -60,7 +53,7 @@ public class ClickVisualizationOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        if (!enabled || client == null) {
+        if (!Static.getVitaConfig().shouldVisualizeClicks() || client == null) {
             return null;
         }
 
@@ -113,7 +106,7 @@ public class ClickVisualizationOverlay extends Overlay {
      * Record a click at the specified location
      */
     public static void recordClick(int x, int y, ClickType type, String label) {
-        if (!enabled) {
+        if (!Static.getVitaConfig().shouldVisualizeClicks()) {
             return;
         }
         recentClicks.add(new ClickVisualization(x, y, type, label, System.currentTimeMillis()));
@@ -126,13 +119,6 @@ public class ClickVisualizationOverlay extends Overlay {
         if (point != null) {
             recordClick(point.getX(), point.getY(), type, label);
         }
-    }
-
-    /**
-     * Enable or disable click visualization
-     */
-    public static void setEnabled(boolean enable) {
-        enabled = enable;
     }
 
     /**
@@ -206,13 +192,6 @@ public class ClickVisualizationOverlay extends Overlay {
                         clickBox.addPoint(screenPoint.getX() - boxWidth / 2, screenPoint.getY() + boxHeight / 2);
                         ClickManager.queueClickBox(clickBox);
                     }
-
-//                    ClickVisualizationOverlay.recordClick(
-//                            screenPoint.getX(),
-//                            screenPoint.getY(),
-//                            ClickType.MOVEMENT,
-//                            "Walk"
-//                    );
                 } else {
                     Point minimapPoint = Static.invoke(() -> Perspective.localToMinimap(client, localPoint));
                     if (minimapPoint != null) {
@@ -227,17 +206,10 @@ public class ClickVisualizationOverlay extends Overlay {
                         Polygon minimapClickBox = new Polygon(xPoints, yPoints, 8);
 
                         ClickManager.queueClickBox(minimapClickBox);
-
-//                        ClickVisualizationOverlay.recordClick(
-//                                minimapPoint.getX(),
-//                                minimapPoint.getY(),
-//                                ClickType.MOVEMENT,
-//                                "Walk (Minimap)"
-//                        );
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 }

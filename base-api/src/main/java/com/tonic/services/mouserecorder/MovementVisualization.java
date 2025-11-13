@@ -66,10 +66,8 @@ public class MovementVisualization
 
         long currentTime = System.currentTimeMillis();
 
-        // Remove expired movements
         recentMovements.removeIf(movement -> currentTime - movement.timestamp > MOVEMENT_DISPLAY_DURATION_MS);
 
-        // Render each movement
         for (MovementRecord movement : recentMovements)
         {
             renderMovement(graphics, movement, currentTime);
@@ -87,7 +85,6 @@ public class MovementVisualization
             return;
         }
 
-        // Calculate fade: full opacity at start, fade to 0 at end
         float fadeRatio = 1.0f - ((float) age / MOVEMENT_DISPLAY_DURATION_MS);
         int alpha = (int) (255 * fadeRatio);
 
@@ -101,13 +98,11 @@ public class MovementVisualization
 
         graphics.setColor(fadedColor);
 
-        // Stroke width decreases as movement ages
         float strokeWidth = 2.0f + fadeRatio;
         graphics.setStroke(new BasicStroke(strokeWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
         List<MouseDataPoint> points = movement.points;
 
-        // Draw connected line segments
         for (int i = 0; i < points.size() - 1; i++)
         {
             MouseDataPoint p1 = points.get(i);
@@ -116,14 +111,12 @@ public class MovementVisualization
             graphics.drawLine(p1.getX(), p1.getY(), p2.getX(), p2.getY());
         }
 
-        // Draw start marker (small circle)
         if (!points.isEmpty())
         {
             MouseDataPoint start = points.get(0);
             int markerSize = (int) (6 * fadeRatio);
             graphics.fillOval(start.getX() - markerSize / 2, start.getY() - markerSize / 2, markerSize, markerSize);
 
-            // Draw end marker (larger circle)
             MouseDataPoint end = points.get(points.size() - 1);
             int endMarkerSize = (int) (8 * fadeRatio);
             graphics.setColor(new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(), alpha / 2));
@@ -131,8 +124,7 @@ public class MovementVisualization
                     endMarkerSize, endMarkerSize);
         }
 
-        // Optional: Draw point count label
-        if (fadeRatio > 0.7f && !points.isEmpty())
+        if (fadeRatio > 0.3f && !points.isEmpty())
         {
             MouseDataPoint mid = points.get(points.size() / 2);
             String label = String.format("%s (%d pts)", movement.source.getLabel(), points.size());
@@ -143,12 +135,10 @@ public class MovementVisualization
             int textX = mid.getX() - textWidth / 2;
             int textY = mid.getY() - 8;
 
-            // Shadow
             graphics.setColor(new Color(0, 0, 0, alpha));
             graphics.drawString(label, textX + 1, textY + 1);
 
-            // Text
-            graphics.setColor(fadedColor);
+            graphics.setColor(Color.CYAN);
             graphics.drawString(label, textX, textY);
         }
     }
@@ -190,6 +180,5 @@ public class MovementVisualization
             this.color = color;
             this.label = label;
         }
-
     }
 }
