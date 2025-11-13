@@ -4,6 +4,7 @@ import com.tonic.Logger;
 import com.tonic.injector.annotations.Disable;
 import com.tonic.injector.annotations.Mixin;
 import com.tonic.injector.util.ExceptionUtil;
+import com.tonic.util.StackTraceUtil;
 
 @Mixin("Client")
 public class TRunExceptionMixin {
@@ -26,6 +27,7 @@ public class TRunExceptionMixin {
         {
             Logger.error(message);
             Logger.error(ExceptionUtil.formatException(throwable));
+            StackTraceUtil.printStackTrace("CLIENT_ERROR");
         }
         return false;
     }

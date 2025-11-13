@@ -316,6 +316,7 @@ public class TrajectoryTrainerMonitor extends VitaFrame
     public void dispose()
     {
         updateTimer.cancel();
+        instance = null;
         super.dispose();
     }
 
