@@ -31,6 +31,8 @@ public class Static
     private static final ClientConfig vitaConfig = ConfigFactory.create(ClientConfig.class);
     @Getter
     private static ClassLoader classLoader;
+    @Getter
+    private static VitaLiteOptions cliArgs = new VitaLiteOptions();
     private static Object CLIENT_OBJECT;
     private static RuneLite RL;
 

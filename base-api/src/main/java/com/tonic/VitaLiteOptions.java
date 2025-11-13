@@ -4,7 +4,6 @@ import com.tonic.util.AudioDeviceChecker;
 import com.tonic.util.optionsparser.OptionsParser;
 import com.tonic.util.optionsparser.annotations.CLIArgument;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class VitaLiteOptions extends OptionsParser

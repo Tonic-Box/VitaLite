@@ -1,5 +1,6 @@
 package com.tonic.injector.util.expreditor.impls;
 
+import com.tonic.Static;
 import com.tonic.injector.util.BytecodeBuilder;
 import com.tonic.injector.util.expreditor.ExprEditor;
 import com.tonic.injector.util.expreditor.LiteralValue;
@@ -50,7 +51,7 @@ public class ModifyResourceLoading extends ExprEditor
         if (!literal.isString() || !literal.getStringValue().equals("Sound FX"))
             return;
 
-        if(!Main.optionsParser.isNoMusic())
+        if(!Static.getCliArgs().isNoMusic())
             return;
 
         subEditor.instrument(literal.getClassNode(), literal.getMethod());

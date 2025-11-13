@@ -1,6 +1,7 @@
 package com.tonic.util;
 
 
+import com.tonic.Static;
 import com.tonic.vitalite.Main;
 import java.io.*;
 import java.nio.file.Files;
@@ -12,7 +13,7 @@ import java.util.jar.*;
 public class JarDumper
 {
     public static void dump(HashMap<String, byte[]> classes) throws IOException {
-        String outputPath = Main.optionsParser.getRsdump();
+        String outputPath = Static.getCliArgs().getRsdump();
         if(outputPath == null)
             return;
         ensureFolders(outputPath);

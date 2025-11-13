@@ -3,26 +3,20 @@ package com.tonic.api.handlers;
 import com.tonic.Static;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.TileObjectAPI;
-import com.tonic.api.game.MovementAPI;
 import com.tonic.api.widgets.BankAPI;
-import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.data.LayoutView;
 import com.tonic.data.TileObjectEx;
 import com.tonic.data.locatables.BankLocations;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.ClickManager;
-import com.tonic.services.pathfinder.Walker;
-import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.util.ClickManagerUtil;
 import com.tonic.util.Location;
 import com.tonic.util.handler.AbstractHandlerBuilder;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
-import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.gameval.ItemID;
 
 import javax.annotation.Nullable;
 

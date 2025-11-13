@@ -29,9 +29,7 @@ import java.nio.file.Path;
 import static com.tonic.vitalite.Versioning.isRunningFromShadedJar;
 
 public class Main {
-    //public static final Path VITA_DIR = Path.of(RUNELITE_DIR.toString(), "vitalite");
     public static final Path REPOSITORY_DIR = Path.of(Static.VITA_DIR.toString(), "repository2");
-    public static final VitaLiteOptions optionsParser = new VitaLiteOptions();
     private static URL[] URLS = null;
     public static Libs LIBS;
     public static RLClassLoader CLASSLOADER;
@@ -39,6 +37,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception
     {
+        VitaLiteOptions optionsParser = Static.getCliArgs();
         args = optionsParser.parse(args);
         optionsParser._checkAudio();
         if(!optionsParser.isSafeLaunch())
@@ -143,6 +142,7 @@ public class Main {
     }
 
     public static boolean isMinMode() {
+        VitaLiteOptions optionsParser = Static.getCliArgs();
         return optionsParser.isNoPlugins() || optionsParser.isMin();
     }
 }
