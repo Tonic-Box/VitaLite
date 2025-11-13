@@ -1,5 +1,6 @@
 package com.tonic.mixins;
 
+import com.tonic.Static;
 import com.tonic.injector.annotations.At;
 import com.tonic.injector.annotations.AtTarget;
 import com.tonic.injector.annotations.Insert;
@@ -13,7 +14,7 @@ import org.objectweb.asm.tree.*;
 public class TMidiPcmStreamMixin {
     @Insert(method = "<init>", at = @At(value = AtTarget.RETURN), raw = true)
     public static void constructorHook(MethodNode method, AbstractInsnNode insertionPoint) {
-        if (!Main.optionsParser.isNoMusic() && !Main.optionsParser.isMin()) return;
+        if (!Static.getCliArgs().isNoMusic() && !Static.getCliArgs().isMin()) return;
 
         for (AbstractInsnNode insn : method.instructions.toArray()) {
             if (insn.getOpcode() != Opcodes.NEW) continue;

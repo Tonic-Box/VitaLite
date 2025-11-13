@@ -1,6 +1,7 @@
 package com.tonic.bootstrap;
 
 import com.google.gson.Gson;
+import com.tonic.Static;
 import com.tonic.bootstrap.beans.Artifact;
 import com.tonic.bootstrap.beans.Bootstrap;
 import com.tonic.bootstrap.beans.Platform;
@@ -63,7 +64,7 @@ public class RLUpdater
         // Phase 1: Check if any artifact needs updating
         boolean needsUpdate = false;
         boolean isForcedVersion = false;
-        String forcedVersion = Main.optionsParser.getTargetBootstrap();
+        String forcedVersion = Static.getCliArgs().getTargetBootstrap();
         String version = bootstrap.getVersion();
 
         if(forcedVersion != null && !forcedVersion.isEmpty())

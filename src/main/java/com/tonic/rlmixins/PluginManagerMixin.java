@@ -1,5 +1,6 @@
 package com.tonic.rlmixins;
 
+import com.tonic.Static;
 import com.tonic.injector.annotations.*;
 import com.tonic.injector.util.BytecodeBuilder;
 import com.tonic.injector.util.LogCallRemover;
@@ -83,7 +84,7 @@ public class PluginManagerMixin {
     )
     public static void loadPlugins(MethodNode method, AbstractInsnNode insertionPoint)
     {
-        if(!Main.optionsParser.isIncognito())
+        if(!Static.getCliArgs().isIncognito())
         {
             InsnList code = BytecodeBuilder.create()
                     .pushInt(1)

@@ -1,8 +1,6 @@
 package com.tonic.services;
 
 import lombok.Getter;
-import lombok.Setter;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

@@ -1,5 +1,6 @@
 package com.tonic.injector;
 
+import com.tonic.Static;
 import com.tonic.injector.util.BytecodeBuilder;
 import com.tonic.injector.util.LdcRewriter;
 import com.tonic.injector.util.MappingProvider;
@@ -29,7 +30,7 @@ public class OSGlobalMixin
         propertyReplacer.instrument(classNode);
         integerReplacer.instrument(classNode);
 
-        if(Main.optionsParser.isNoMusic() || Main.optionsParser.isMin())
+        if(Static.getCliArgs().isNoMusic() || Static.getCliArgs().isMin())
         {
             replaceMethodByString.instrument(classNode);
             modifyResourceLoading.instrument(classNode);
@@ -40,7 +41,7 @@ public class OSGlobalMixin
             randomDat(classNode, method);
             mouseFlag(method);
 
-            if(!Main.optionsParser.isIncognito())
+            if(!Static.getCliArgs().isIncognito())
             {
                 LdcRewriter.rewriteString(
                         method,

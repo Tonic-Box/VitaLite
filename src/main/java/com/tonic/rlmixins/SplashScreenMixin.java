@@ -1,5 +1,6 @@
 package com.tonic.rlmixins;
 
+import com.tonic.Static;
 import com.tonic.injector.annotations.*;
 import com.tonic.injector.util.BytecodeBuilder;
 import com.tonic.injector.util.LdcRewriter;
@@ -23,10 +24,10 @@ public class SplashScreenMixin
         BytecodeBuilder bb = BytecodeBuilder.create();
         var label = bb.createLabel("skipPatch");
         InsnList code = bb
-                .getStaticField(
-                        "com/tonic/vitalite/Main",
-                        "optionsParser",
-                        "Lcom/tonic/VitaLiteOptions;"
+                .invokeStatic(
+                        "com/tonic/Static",
+                        "getCliArgs",
+                        "()Lcom/tonic/VitaLiteOptions;"
                 )
                 .invokeVirtual(
                         "com/tonic/VitaLiteOptions",
@@ -60,7 +61,7 @@ public class SplashScreenMixin
     )
     public static void constructorHook2(MethodNode method, AbstractInsnNode insertionPoint)
     {
-        if(Main.optionsParser.isIncognito())
+        if(Static.getCliArgs().isIncognito())
             return;
         ((FieldInsnNode)insertionPoint).name = "GRAND_EXCHANGE_LIMIT";
         LdcRewriter.rewriteString(method, "runelite_splash.png", "icon_splash.png");

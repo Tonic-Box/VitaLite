@@ -1,8 +1,8 @@
 package com.tonic.mixins;
 
+import com.tonic.Static;
 import com.tonic.injector.annotations.Disable;
 import com.tonic.injector.annotations.Mixin;
-import com.tonic.vitalite.Main;
 
 @Mixin("Client")
 public class TMouseHookMixin
@@ -10,6 +10,6 @@ public class TMouseHookMixin
     @Disable("mouseHookLoader")
     public static boolean mouseHookLoader()
     {
-        return !Main.optionsParser.isDisableMouseHook();
+        return !Static.getCliArgs().isDisableMouseHook();
     }
 }

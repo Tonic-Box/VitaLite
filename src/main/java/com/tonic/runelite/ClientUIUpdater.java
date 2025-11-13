@@ -1,6 +1,7 @@
 package com.tonic.runelite;
 
 import com.tonic.Logger;
+import com.tonic.Static;
 import com.tonic.services.proxy.ProxyManager;
 import com.tonic.vitalite.Main;
 import com.tonic.model.NavButton;
@@ -20,7 +21,7 @@ public class ClientUIUpdater
 
     public static void inject()
     {
-        if(Main.optionsParser.isIncognito())
+        if(Static.getCliArgs().isIncognito())
             return;
 
         addNavigation();
