@@ -20,6 +20,7 @@ import java.util.function.Function;
  */
 public final class StepHandler
 {
+    private static final int MAGIC_LABEL_STEP = 0xDECAFBAD;
     @Getter
     private final StepContext context = new StepContext();
 
@@ -46,12 +47,28 @@ public final class StepHandler
             return false;
         }
         STEP_POINTER = steps.get(STEP_POINTER).apply(context);
+        STEP_POINTER = translate(STEP_POINTER);
         if(context.get("SPEED_UP") != null && steps.containsKey(STEP_POINTER))
         {
             context.remove("SPEED_UP");
             return step();
         }
         return true;
+    }
+
+    private int translate(int pointer)
+    {
+        if(pointer != MAGIC_LABEL_STEP || !context.contains("MAGIC_LABEL_STEP"))
+            return pointer;
+
+        String label = context.get("MAGIC_LABEL_STEP");
+        if(!context.getLabels().containsKey(label))
+        {
+            Logger.warn("No such label: " + label);
+            return pointer;
+        }
+
+        return context.getLabels().get(label);
     }
 
     /**

@@ -8,7 +8,9 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
 
@@ -34,6 +36,7 @@ public class HandlerBuilder
     }
 
     protected final StepHandler handler;
+    protected Map<String,Integer> LABELS = new HashMap<>();
 
     public HandlerBuilder() {
         handler = new StepHandler();
@@ -42,6 +45,12 @@ public class HandlerBuilder
     public static void speedUp(StepContext context)
     {
         context.put("SPEED_UP", true);
+    }
+
+    public static int jump(String label, StepContext context)
+    {
+        context.put("MAGIC_LABEL_STEP", label);
+        return 0xDECAFBAD;
     }
 
     /**
@@ -325,6 +334,10 @@ public class HandlerBuilder
      * @return the TransportHandler
      */
     public StepHandler build() {
+        if(!LABELS.isEmpty())
+        {
+            handler.getContext().getLabels().putAll(LABELS);
+        }
         return handler;
     }
 }
