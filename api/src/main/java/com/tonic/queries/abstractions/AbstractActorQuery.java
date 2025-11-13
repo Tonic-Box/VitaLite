@@ -54,6 +54,16 @@ public abstract class AbstractActorQuery<T extends Actor, Q extends AbstractActo
     }
 
     /**
+     * filter actors that are currently interacting with a specific target actor.
+     *
+     * @param target actor
+     * @return ActorQuery
+     */
+    public Q interactingWith(Actor target) {
+        return keepIf(o -> o.getInteracting() != null && o.getInteracting().equals(target));
+    }
+
+    /**
      * filter by distance
      * @param distance distance
      * @return ActorQuery
