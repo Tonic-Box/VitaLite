@@ -610,7 +610,8 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
             {
                 Logger.info(event.toString());
             }
-            else if(logMousePacketsToggle.isSelected() || recordTrajectory.isSelected() && isMouse == 2)
+
+            if(logMousePacketsToggle.isSelected() || recordTrajectory.isSelected() && isMouse == 2)
             {
                 DecodedMousePacket decodedInfo = MousePacketDecoder.decode(event.getBuffer());
                 if(recordTrajectory.isSelected())
