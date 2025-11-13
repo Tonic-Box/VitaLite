@@ -8,6 +8,8 @@ import java.util.Map;
 
 public class StepContext
 {
+    @Getter
+    private final Map<String,Integer> labels = new HashMap<>();
     private final Map<String, Object> contextMap = new HashMap<>();
 
     public List<Object> values() {
