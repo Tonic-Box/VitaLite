@@ -1,5 +1,6 @@
 package com.tonic.data.magic.spellbooks;
 
+import com.tonic.Static;
 import com.tonic.data.magic.MagicCast;
 import com.tonic.data.magic.Rune;
 import com.tonic.data.magic.RuneRequirement;
@@ -163,7 +164,7 @@ public enum Ancient implements Spell
     @Override
     public boolean canCast()
     {
-        return MagicCast.canCastAncient(spellIndex);
+        return Static.invoke(() -> MagicCast.canCastAncient(spellIndex));
     }
 
     @Override
