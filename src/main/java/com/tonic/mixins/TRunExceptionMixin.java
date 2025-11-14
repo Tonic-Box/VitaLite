@@ -20,14 +20,14 @@ public class TRunExceptionMixin {
 
     @Disable("newRunException")
     public static boolean newRunException(Throwable throwable, String message) {
-        if((message != null && message.equals("bj.ac()")) || throwable instanceof NullPointerException)
+        if((message != null && message.equals("be.av()")) || throwable instanceof NullPointerException)
             return true;
 
         if(throwable != null)
         {
             Logger.error(message);
             Logger.error(ExceptionUtil.formatException(throwable));
-            StackTraceUtil.printStackTrace("CLIENT_ERROR");
+            System.err.println(StackTraceUtil.getStackTrace("CLIENT_ERROR"));
         }
         return false;
     }
