@@ -7,7 +7,9 @@ import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.game.WorldsAPI;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.NpcEx;
+import com.tonic.data.wrappers.PlayerEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.plugins.multiclientutils.model.MultiMessage;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.PlayerQuery;
@@ -18,8 +20,6 @@ import com.tonic.util.MessageUtil;
 import com.tonic.util.ThreadPool;
 import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
-import net.runelite.api.NPC;
-import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
 import java.time.Instant;
 import java.util.HashMap;
@@ -54,7 +54,7 @@ public class CommandDispatcher
             case "NPC":
                 id = message.getInt(0);
                 action = message.getInt(1);
-                NPC npc = new NpcQuery()
+                NpcEx npc = new NpcQuery()
                         .withIndex(id)
                         .first();
                 if(npc == null)
@@ -64,8 +64,8 @@ public class CommandDispatcher
             case "PLAYER":
                 id = message.getInt(0);
                 action = message.getInt(1);
-                Player player = new PlayerQuery()
-                        .keepIf(p -> p.getId() == id)
+                PlayerEx player = new PlayerQuery()
+                        .keepIf(p -> p.getIndex() == id)
                         .first();
                 if(player == null)
                     break;
@@ -88,7 +88,9 @@ public class CommandDispatcher
 
     public static void process(MultiMessage message)
     {
-        Player sender = getPlayer(message.getSender());
+        PlayerEx sender = PlayerAPI.search()
+                .withName(message.getSender())
+                .first();
         switch (message.getCommand())
         {
             case "DESPAWN":
@@ -127,11 +129,11 @@ public class CommandDispatcher
                 PlayerAPI.interact(sender, 2);
                 return;
             case "DD":
-                MovementAPI.walkToWorldPoint(sender.getWorldLocation());
+                MovementAPI.walkToWorldPoint(sender.getWorldPoint());
                 return;
             case "SCATTER":
-                int x = sender.getWorldLocation().getX() - 6;
-                int y = sender.getWorldLocation().getY() - 6;
+                int x = sender.getWorldPoint().getX() - 6;
+                int y = sender.getWorldPoint().getY() - 6;
                 x += ThreadLocalRandom.current().nextInt(0, 13);
                 y += ThreadLocalRandom.current().nextInt(0, 13);
                 MovementAPI.walkToWorldPoint(x, y);
@@ -143,7 +145,7 @@ public class CommandDispatcher
             case "NPC":
                 id = message.getInt(0);
                 action = message.getInt(1);
-                NPC npc = new NpcQuery()
+                NpcEx npc = new NpcQuery()
                         .withIndex(id)
                         .first();
                 if(npc == null)
@@ -153,8 +155,8 @@ public class CommandDispatcher
             case "PLAYER":
                 id = message.getInt(0);
                 action = message.getInt(1);
-                Player player = new PlayerQuery()
-                        .keepIf(p -> p.getId() == id)
+                PlayerEx player = new PlayerQuery()
+                        .keepIf(p -> p.getIndex() == id)
                         .first();
                 if(player == null)
                     break;
@@ -175,12 +177,5 @@ public class CommandDispatcher
             default:
                 Logger.error("[ExtendedMenu] Unrecognized command '" + message.getCommand() + "'");
         }
-    }
-
-    private static Player getPlayer(String name)
-    {
-        return new PlayerQuery()
-                .withName(name)
-                .first();
     }
 }

@@ -7,8 +7,10 @@ import com.tonic.api.widgets.MiniMapAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.api.widgets.WorldMapAPI;
 import com.tonic.data.LoginResponse;
-import com.tonic.data.TileItemEx;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.NpcEx;
+import com.tonic.data.wrappers.PlayerEx;
+import com.tonic.data.wrappers.TileItemEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.hotswapper.PluginReloader;
 import com.tonic.services.mouse.ClickVisualizationOverlay;
 import com.tonic.services.mouse.MovementVisualizationOverlay;
@@ -31,7 +33,6 @@ import net.runelite.client.game.WorldService;
 import net.runelite.client.ui.overlay.*;
 import net.runelite.http.api.worlds.WorldResult;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -58,43 +59,49 @@ public class GameManager extends Overlay {
     private static int lastUpdatePlayers = 0;
     private static int lastUpdateNpcs = 0;
     private static final List<TileObjectEx> tileObjects = new ArrayList<>();
-    private static final List<NPC> npcs = new ArrayList<>();
-    private static final List<Player> players = new ArrayList<>();
-    public static Stream<Player> playerStream()
+    private static final List<NpcEx> npcs = new ArrayList<>();
+    private static final List<PlayerEx> players = new ArrayList<>();
+    public static Stream<PlayerEx> playerStream()
     {
         return  playerList().stream();
     }
 
-    public static Stream<NPC> npcStream()
+    public static Stream<NpcEx> npcStream()
     {
         return npcList().stream();
     }
     private static WalkerPath walkerPath;
 
-    public static List<Player> playerList()
+    public static List<PlayerEx> playerList()
     {
         Client client = Static.getClient();
 
         if (lastUpdatePlayers < client.getTickCount())
         {
             players.clear();
-            List<Player> playersList = Static.invoke(() -> client.getTopLevelWorldView().players().stream().collect(Collectors.toCollection(ArrayList::new)));
-            players.addAll(playersList);
+            players.addAll(Static.invoke(() ->
+                    client.getTopLevelWorldView().players().stream()
+                            .map(PlayerEx::new)
+                            .collect(Collectors.toList())
+            ));
             lastUpdatePlayers = client.getTickCount();
         }
 
         return players;
     }
 
-    public static List<NPC> npcList()
+    public static List<NpcEx> npcList()
     {
         Client client = Static.getClient();
 
         if (lastUpdateNpcs < client.getTickCount())
         {
             npcs.clear();
-            List<NPC> npcsList = Static.invoke(() -> client.getTopLevelWorldView().npcs().stream().collect(Collectors.toCollection(ArrayList::new)));
-            npcs.addAll(npcsList);
+            npcs.addAll(Static.invoke(() ->
+                    client.getTopLevelWorldView().npcs().stream()
+                            .map(NpcEx::new)
+                            .collect(Collectors.toList())
+            ));
             lastUpdateNpcs = client.getTickCount();
         }
 
@@ -159,7 +166,7 @@ public class GameManager extends Overlay {
         Client client = Static.getClient();
         WorldView wv = client.getTopLevelWorldView();
         ArrayList<TileItemEx> copy = new ArrayList<>(INSTANCE.tileItemCache);
-        copy.removeIf(i -> i.getWorldLocation().getPlane() != wv.getPlane());
+        copy.removeIf(i -> i.getWorldPoint().getPlane() != wv.getPlane());
         return copy;
     }
 
@@ -413,7 +420,7 @@ public class GameManager extends Overlay {
     public void onItemDespawned(ItemDespawned event)
     {
         tileItemCache.removeIf(ex -> ex.getItem().equals(event.getItem()) &&
-                ex.getWorldLocation().equals(WorldPoint.fromLocal(Static.getClient(), event.getTile().getLocalLocation())) &&
+                ex.getWorldPoint().equals(WorldPoint.fromLocal(Static.getClient(), event.getTile().getLocalLocation())) &&
                 ex.getLocalPoint().equals(event.getTile().getLocalLocation())
         );
     }

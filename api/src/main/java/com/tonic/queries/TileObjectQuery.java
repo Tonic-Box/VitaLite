@@ -3,7 +3,7 @@ package com.tonic.queries;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.services.GameManager;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
 import net.runelite.api.coords.WorldPoint;
@@ -105,7 +105,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      */
     public TileObjectQuery<T> within(int distance)
     {
-        return keepIf(o -> Location.within(client.getLocalPlayer().getWorldLocation(), o.getWorldLocation(), distance));
+        return keepIf(o -> Location.within(client.getLocalPlayer().getWorldLocation(), o.getWorldPoint(), distance));
     }
 
     /**
@@ -116,7 +116,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      */
     public TileObjectQuery<T> within(WorldPoint center, int distance)
     {
-        return keepIf(o -> Location.within(center, o.getWorldLocation(), distance));
+        return keepIf(o -> Location.within(center, o.getWorldPoint(), distance));
     }
 
     /**
@@ -126,7 +126,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      */
     public TileObjectQuery<T> atLocation(WorldPoint location)
     {
-        return keepIf(o -> o.getWorldLocation().equals(location));
+        return keepIf(o -> o.getWorldPoint().equals(location));
     }
 
     /**
@@ -147,8 +147,8 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
     {
         Point2D point = new Point2D.Double(center.getX(), center.getY());
         return sort((o1, o2) -> {
-            Point2D p0 = new Point2D.Double(o1.getWorldLocation().getX(), o1.getWorldLocation().getY());
-            Point2D p1 = new Point2D.Double(o2.getWorldLocation().getX(), o2.getWorldLocation().getY());
+            Point2D p0 = new Point2D.Double(o1.getWorldPoint().getX(), o1.getWorldPoint().getY());
+            Point2D p1 = new Point2D.Double(o2.getWorldPoint().getX(), o2.getWorldPoint().getY());
             return Double.compare(point.distance(p0), point.distance(p1));
         });
     }
@@ -171,8 +171,8 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
     {
         Point2D point = new Point2D.Double(center.getX(), center.getY());
         return sort((o1, o2) -> {
-            Point2D p0 = new Point2D.Double(o1.getWorldLocation().getX(), o1.getWorldLocation().getY());
-            Point2D p1 = new Point2D.Double(o2.getWorldLocation().getX(), o2.getWorldLocation().getY());
+            Point2D p0 = new Point2D.Double(o1.getWorldPoint().getX(), o1.getWorldPoint().getY());
+            Point2D p1 = new Point2D.Double(o2.getWorldPoint().getX(), o2.getWorldPoint().getY());
             return Double.compare(point.distance(p1), point.distance(p0));
         });
     }
@@ -194,8 +194,8 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
     public TileObjectQuery<T> sortShortestPath(WorldPoint center)
     {
         return sort((o1, o2) -> {
-            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getWorldLocation());
-            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getWorldLocation());
+            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getWorldPoint());
+            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getWorldPoint());
             int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
             int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
             return Integer.compare(len1, len2);
@@ -219,8 +219,8 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
     public TileObjectQuery<T> sortLongestPath(WorldPoint center)
     {
         return sort((o1, o2) -> {
-            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getWorldLocation());
-            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getWorldLocation());
+            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getWorldPoint());
+            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getWorldPoint());
             int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
             int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
             return Integer.compare(len2, len1);

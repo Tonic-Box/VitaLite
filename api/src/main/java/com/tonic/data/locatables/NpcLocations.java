@@ -3,6 +3,7 @@ package com.tonic.data.locatables;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.DialogueAPI;
+import com.tonic.data.wrappers.NpcEx;
 import com.tonic.queries.NpcQuery;
 import com.tonic.services.pathfinder.Walker;
 import lombok.AllArgsConstructor;
@@ -370,7 +371,7 @@ public enum NpcLocations {
 
     public void interact(String option) {
         Walker.walkTo(getLocation());
-        NPC npc = new NpcQuery().withName(getName()).first();
+        NpcEx npc = new NpcQuery().withName(getName()).first();
         NpcAPI.interact(npc, option);
     }
 

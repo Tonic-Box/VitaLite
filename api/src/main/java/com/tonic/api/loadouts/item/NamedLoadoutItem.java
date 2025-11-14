@@ -3,7 +3,7 @@ package com.tonic.api.loadouts.item;
 import com.tonic.api.loadouts.LoadoutException;
 import com.tonic.api.loadouts.item.restock.RestockConfig;
 import com.tonic.data.EquipmentSlot;
-import com.tonic.data.ItemEx;
+import com.tonic.data.wrappers.ItemEx;
 import com.tonic.queries.InventoryQuery;
 import net.runelite.api.gameval.InventoryID;
 

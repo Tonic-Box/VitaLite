@@ -6,7 +6,7 @@ import com.tonic.api.loadouts.EquipmentLoadout;
 import com.tonic.api.loadouts.item.LoadoutItem;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.data.EquipmentSlot;
-import com.tonic.data.ItemEx;
+import com.tonic.data.wrappers.ItemEx;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
 import net.runelite.api.gameval.InventoryID;

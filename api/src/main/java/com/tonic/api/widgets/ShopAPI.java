@@ -1,10 +1,9 @@
 package com.tonic.api.widgets;
 
 import com.tonic.queries.InventoryQuery;
-import com.tonic.data.ItemEx;
+import com.tonic.data.wrappers.ItemEx;
 import com.tonic.data.ShopID;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.widgets.Widget;
 
 import java.util.function.Supplier;
 

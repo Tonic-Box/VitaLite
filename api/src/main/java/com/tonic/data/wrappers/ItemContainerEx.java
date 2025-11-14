@@ -1,6 +1,7 @@
-package com.tonic.data;
+package com.tonic.data.wrappers;
 
 import com.tonic.Static;
+import com.tonic.data.wrappers.ItemEx;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;

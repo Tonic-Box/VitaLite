@@ -1,6 +1,8 @@
-package com.tonic.data;
+package com.tonic.data.wrappers;
 
 import com.tonic.Static;
+import com.tonic.api.widgets.InventoryAPI;
+import com.tonic.data.wrappers.abstractions.Interactable;
 import com.tonic.util.TextUtil;
 import lombok.*;
 import net.runelite.api.Client;
@@ -15,7 +17,8 @@ import java.awt.*;
 
 @Getter
 @RequiredArgsConstructor
-public class ItemEx {
+public class ItemEx implements Interactable
+{
     private final Item item;
     private final int slot;
     private String[] actions = null;
@@ -51,6 +54,16 @@ public class ItemEx {
 
     public int getQuantity() {
         return item.getQuantity();
+    }
+
+    @Override
+    public void interact(String action) {
+        InventoryAPI.interact(this, action);
+    }
+
+    @Override
+    public void interact(int action) {
+        InventoryAPI.interact(this, action);
     }
 
     public String[] getActions()

@@ -2,10 +2,11 @@ package com.tonic.util;
 
 import com.tonic.Static;
 import com.tonic.api.widgets.WidgetAPI;
-import com.tonic.data.ItemEx;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.ActorEx;
+import com.tonic.data.wrappers.ItemEx;
+import com.tonic.data.wrappers.TileItemEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.ClickManager;
-import net.runelite.api.Actor;
 import net.runelite.api.widgets.Widget;
 import java.awt.*;
 
@@ -24,10 +25,23 @@ public class ClickManagerUtil
         });
     }
 
-    public static void queueClickBox(Actor actor)
+    public static void queueClickBox(TileItemEx item)
     {
         Static.invoke(() -> {
-            Shape shape = actor.getConvexHull();
+            Shape shape = item.getShape();
+            if(shape == null)
+            {
+                shape = Static.getRuneLite().getGameApplet().getWorldViewportArea();
+            }
+            ClickManager.queueClickBox(shape);
+            return true;
+        });
+    }
+
+    public static void queueClickBox(ActorEx<?> actor)
+    {
+        Static.invoke(() -> {
+            Shape shape = actor.getShape();
             if(shape == null)
             {
                 shape = Static.getRuneLite().getGameApplet().getWorldViewportArea();

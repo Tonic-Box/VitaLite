@@ -3,7 +3,7 @@ package com.tonic.api.widgets;
 import com.tonic.Static;
 import com.tonic.api.game.GameAPI;
 import com.tonic.data.EquipmentSlot;
-import com.tonic.data.ItemEx;
+import com.tonic.data.wrappers.ItemEx;
 import com.tonic.queries.InventoryQuery;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;

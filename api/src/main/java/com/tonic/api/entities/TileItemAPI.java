@@ -3,7 +3,7 @@ package com.tonic.api.entities;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.TItemComposition;
-import com.tonic.data.TileItemEx;
+import com.tonic.data.wrappers.TileItemEx;
 import com.tonic.queries.TileItemQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
@@ -48,7 +48,7 @@ public class TileItemAPI
         if (item == null)
             return;
 
-        interact(action, item.getId(), item.getWorldLocation().getX(), item.getWorldLocation().getY(), ctrlDown);
+        interact(action, item.getId(), item.getWorldPoint().getX(), item.getWorldPoint().getY(), ctrlDown);
     }
 
     /**
@@ -74,7 +74,7 @@ public class TileItemAPI
 
         int actionIndex = getActionIndex(item, action);
 
-        interact(actionIndex, item.getId(), item.getWorldLocation().getX(), item.getWorldLocation().getY(), ctrlDown);
+        interact(actionIndex, item.getId(), item.getWorldPoint().getX(), item.getWorldPoint().getY(), ctrlDown);
     }
 
     /**

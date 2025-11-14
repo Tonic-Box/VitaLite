@@ -2,8 +2,8 @@ package com.tonic.queries;
 
 import com.tonic.Static;
 import com.tonic.queries.abstractions.AbstractQuery;
-import com.tonic.data.ItemContainerEx;
-import com.tonic.data.ItemEx;
+import com.tonic.data.wrappers.ItemContainerEx;
+import com.tonic.data.wrappers.ItemEx;
 import com.tonic.data.ShopID;
 import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
@@ -14,10 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Query class for searching and filtering items in an inventory.

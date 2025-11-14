@@ -1,7 +1,7 @@
 package com.tonic.util;
 
 import com.tonic.Static;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.TileOverlays;
 import net.runelite.api.*;

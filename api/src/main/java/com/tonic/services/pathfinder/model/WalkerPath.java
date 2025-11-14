@@ -2,7 +2,6 @@ package com.tonic.services.pathfinder.model;
 
 import com.tonic.Logger;
 import com.tonic.Static;
-import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.widgets.DialogueAPI;
@@ -10,10 +9,12 @@ import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.PrayerAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.*;
+import com.tonic.data.wrappers.ItemEx;
+import com.tonic.data.wrappers.PlayerEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.queries.WidgetQuery;
-import com.tonic.services.mouse.ClickVisualizationOverlay;
 import static com.tonic.services.pathfinder.Walker.*;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
@@ -208,7 +209,7 @@ public class WalkerPath
             if (MovementAPI.isMoving()) {
                 return true;
             }
-            if (handlePassThroughObjects(local, steps, step) || !PlayerAPI.isIdle(local)) {
+            if (handlePassThroughObjects(local, steps, step) || !PlayerEx.getLocal().isIdle()) {
                 return !isDone();
             }
             repath();
@@ -216,7 +217,7 @@ public class WalkerPath
         }
 
         int rand = ThreadLocalRandom.current().nextInt(4, 8);
-        if (last.distanceTo2D(dest) > rand && !PlayerAPI.isIdle(local))
+        if (last.distanceTo2D(dest) > rand && !PlayerEx.getLocal().isIdle())
         {
             return true;
         }
@@ -253,7 +254,7 @@ public class WalkerPath
     {
         TileObjectEx object = new TileObjectQuery<>()
                 .withNamesContains("door", "gate", "curtain")
-                .keepIf(o -> (o.getWorldLocation().equals(local.getWorldLocation()) || o.getWorldLocation().equals(step.getPosition())))
+                .keepIf(o -> (o.getWorldPoint().equals(local.getWorldLocation()) || o.getWorldPoint().equals(step.getPosition())))
                 .sortNearest()
                 .first();
 
@@ -270,7 +271,7 @@ public class WalkerPath
             return true;
         }
         else {
-            if (!PlayerAPI.isIdle(local))
+            if (!PlayerEx.getLocal().isIdle())
             {
                 return true;
             }
@@ -281,7 +282,7 @@ public class WalkerPath
     }
 
     private boolean handleTransports() {
-        if(!PlayerAPI.isIdle(client.getLocalPlayer()) && !MovementAPI.isMoving())
+        if(!PlayerEx.getLocal().isIdle() && !MovementAPI.isMoving())
         {
             return true;
         }

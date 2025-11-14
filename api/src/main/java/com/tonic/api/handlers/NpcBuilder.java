@@ -3,6 +3,7 @@ package com.tonic.api.handlers;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.data.locatables.NpcLocations;
+import com.tonic.data.wrappers.NpcEx;
 import com.tonic.queries.NpcQuery;
 import com.tonic.util.DialogueNode;
 import com.tonic.util.handler.AbstractHandlerBuilder;
@@ -33,7 +34,7 @@ public class NpcBuilder extends AbstractHandlerBuilder<NpcBuilder>
     public NpcBuilder interact(String name, String action)
     {
         add(() -> {
-            NPC npc = new NpcQuery().withName(name).first();
+            NpcEx npc = new NpcQuery().withName(name).first();
             NpcAPI.interact(npc, action);
         });
         return this;

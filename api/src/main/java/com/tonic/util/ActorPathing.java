@@ -1,6 +1,9 @@
 package com.tonic.util;
 
 import com.tonic.Static;
+import com.tonic.data.wrappers.ActorEx;
+import com.tonic.data.wrappers.NpcEx;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.collision.CollisionMap;
@@ -9,11 +12,9 @@ import com.tonic.services.pathfinder.local.LocalCollisionMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.runelite.api.Actor;
 import net.runelite.api.Client;
-import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,21 +50,21 @@ public class ActorPathing
      * @return Pair.of(true destination next to target, path)
      */
     @Nullable
-    public static Pair<WorldPoint,List<WorldPoint>> dumbTargeting(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap)
+    public static Pair<WorldPoint,List<WorldPoint>> dumbTargeting(final ActorEx<?> actor, final WorldPoint destination, final List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap)
     {
         blacklist.addAll(actorTiles(actor));
         return dumbTargetingNoNpcBlocking(actor, destination, blacklist, localMap);
     }
 
     @Nullable
-    public static Pair<WorldPoint,List<WorldPoint>> dumbTargeting(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist)
+    public static Pair<WorldPoint,List<WorldPoint>> dumbTargeting(final ActorEx<?> actor, final WorldPoint destination, final List<WorldPoint> blacklist)
     {
         return dumbTargeting(actor, destination, blacklist, null);
     }
 
-    public static Pair<WorldPoint,List<WorldPoint>> dumbTargetingNoNpcBlocking(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap)
+    public static Pair<WorldPoint,List<WorldPoint>> dumbTargetingNoNpcBlocking(final ActorEx<?> actor, final WorldPoint destination, final List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap)
     {
-        final WorldPoint start = actor.getWorldLocation();
+        final WorldPoint start = actor.getWorldPoint();
         int width = actor.getWorldArea().getWidth();
         int height = actor.getWorldArea().getHeight();
         final List<WorldPoint> path = dumbTargeting(start, destination, width, height, blacklist, localMap);
@@ -156,7 +157,7 @@ public class ActorPathing
      * @param blacklist list of hardcoded worldpoints to avoid
      * @return path
      */
-    public static List<WorldPoint> dumbPathing(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist) {
+    public static List<WorldPoint> dumbPathing(final ActorEx<?> actor, final WorldPoint destination, final List<WorldPoint> blacklist) {
         return dumbPathing(actor, destination, blacklist, null);
     }
 
@@ -169,10 +170,10 @@ public class ActorPathing
      * @param localMap collision map for inside instances
      * @return path
      */
-    public static List<WorldPoint> dumbPathing(final Actor actor, final WorldPoint destination, final List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap) {
+    public static List<WorldPoint> dumbPathing(final ActorEx<?> actor, final WorldPoint destination, final List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap) {
         blacklist.addAll(actorTiles(actor));
         final WorldArea area = actor.getWorldArea();
-        return dumbPathing(actor.getWorldLocation(), destination, area.getWidth(), area.getHeight(), blacklist, localMap);
+        return dumbPathing(actor.getWorldPoint(), destination, area.getWidth(), area.getHeight(), blacklist, localMap);
     }
 
     public static List<WorldPoint> dumbPathing(final WorldPoint start, final WorldPoint destination, final int actorWidth, final int actorHeight, final List<WorldPoint> blacklist)
@@ -323,10 +324,10 @@ public class ActorPathing
         return true;
     }
 
-    public static List<WorldPoint> actorTiles(final Actor target) {
+    public static List<WorldPoint> actorTiles(final ActorEx<?> target) {
         List<WorldPoint> actorTiles = new ArrayList<>();
-        for (NPC npc : GameManager.npcList() ) {
-            if (npc == null || npc == target)
+        for (NpcEx npc : GameManager.npcList() ) {
+            if (npc == null || npc.equals(target))
                 continue;
             actorTiles.addAll(npc.getWorldArea().toWorldPointList());
         }
@@ -334,11 +335,10 @@ public class ActorPathing
         if(target instanceof Player)
             return actorTiles;
 
-        Client client = Static.getClient();
-        for (Player player : GameManager.playerList()) {
-            if (player == null || player == client.getLocalPlayer())
+        for (PlayerEx player : GameManager.playerList()) {
+            if (player == null || player.equals(PlayerEx.getLocal()))
                 continue;
-            actorTiles.add(player.getWorldLocation());
+            actorTiles.add(player.getWorldPoint());
         }
         return actorTiles;
     }

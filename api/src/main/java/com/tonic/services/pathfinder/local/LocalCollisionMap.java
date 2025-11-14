@@ -131,7 +131,7 @@ public class LocalCollisionMap
                             String name = o.getName() == null ? "" :  o.getName().toLowerCase();
                             return (name.contains("door") || name.contains("gate")) && !name.contains("trapdoor");
                         })
-                        .map(door -> WorldPointUtil.compress(door.getWorldLocation().getX(), door.getWorldLocation().getY(), door.getWorldLocation().getPlane()))
+                        .map(door -> WorldPointUtil.compress(door.getWorldPoint().getX(), door.getWorldPoint().getY(), door.getWorldPoint().getPlane()))
                         .collect(Collectors.toList())
         );
     }

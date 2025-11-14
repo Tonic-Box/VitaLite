@@ -5,9 +5,7 @@ import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileItemAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.widgets.InventoryAPI;
-import com.tonic.data.ItemEx;
-import com.tonic.data.TileItemEx;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.*;
 import com.tonic.util.handler.AbstractHandlerBuilder;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
@@ -109,7 +107,7 @@ public class InventoryBuilder extends AbstractHandlerBuilder<InventoryBuilder>
         ItemEx item1 = InventoryAPI.getItem(itemName1);
         ItemEx item2 = InventoryAPI.getItem(itemName2);
         add(() -> InventoryAPI.useOn(item1, item2));
-        addDelayUntil(() -> PlayerAPI.isIdle());
+        addDelayUntil(() -> PlayerEx.getLocal().isIdle());
         if(delay > 0)
         {
             addDelay(delay);
@@ -129,7 +127,7 @@ public class InventoryBuilder extends AbstractHandlerBuilder<InventoryBuilder>
         ItemEx item = InventoryAPI.getItem(itemName);
         TileItemEx tileItem = TileItemAPI.search().withName(tileItemName).first();
         add(() -> InventoryAPI.useOn(item, tileItem));
-        addDelayUntil(() -> PlayerAPI.isIdle());
+        addDelayUntil(() -> PlayerEx.getLocal().isIdle());
         if(delay > 0)
         {
             addDelay(delay);
@@ -149,7 +147,7 @@ public class InventoryBuilder extends AbstractHandlerBuilder<InventoryBuilder>
         ItemEx item = InventoryAPI.getItem(itemName);
         TileObjectEx object = TileObjectAPI.get(objectName);
         add(() -> InventoryAPI.useOn(item, object));
-        addDelayUntil(() -> PlayerAPI.isIdle());
+        addDelayUntil(() -> PlayerEx.getLocal().isIdle());
         if(delay > 0)
         {
             addDelay(delay);
@@ -167,9 +165,9 @@ public class InventoryBuilder extends AbstractHandlerBuilder<InventoryBuilder>
     public InventoryBuilder useOnNpc(int delay, String itemName, String npcName)
     {
         ItemEx item = InventoryAPI.getItem(itemName);
-        NPC npc = NpcAPI.search().withName(npcName).first();
+        NpcEx npc = NpcAPI.search().withName(npcName).first();
         add(() -> InventoryAPI.useOn(item, npc));
-        addDelayUntil(() -> PlayerAPI.isIdle());
+        addDelayUntil(() -> PlayerEx.getLocal().isIdle());
         if(delay > 0)
         {
             addDelay(delay);
@@ -187,9 +185,9 @@ public class InventoryBuilder extends AbstractHandlerBuilder<InventoryBuilder>
     public InventoryBuilder useOnPlayer(int delay, String itemName, String playerName)
     {
         ItemEx item = InventoryAPI.getItem(itemName);
-        Player player = PlayerAPI.search().withName(playerName).first();
+        PlayerEx player = PlayerAPI.search().withName(playerName).first();
         add(() -> InventoryAPI.useOn(item, player));
-        addDelayUntil(() -> PlayerAPI.isIdle());
+        addDelayUntil(() -> PlayerEx.getLocal().isIdle());
         if(delay > 0)
         {
             addDelay(delay);

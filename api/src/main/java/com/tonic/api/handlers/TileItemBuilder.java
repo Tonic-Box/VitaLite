@@ -3,7 +3,7 @@ package com.tonic.api.handlers;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileItemAPI;
 import com.tonic.api.widgets.InventoryAPI;
-import com.tonic.data.TileItemEx;
+import com.tonic.data.wrappers.TileItemEx;
 import com.tonic.util.handler.AbstractHandlerBuilder;
 import net.runelite.api.coords.WorldPoint;
 

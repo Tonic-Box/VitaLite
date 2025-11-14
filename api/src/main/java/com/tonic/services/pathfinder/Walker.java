@@ -5,6 +5,7 @@ import com.tonic.Static;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.threaded.Delays;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.mouse.ClickVisualizationOverlay;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.collision.CollisionMap;
@@ -142,7 +143,7 @@ public class Walker
                     return true;
                 }
                 Delays.tick();
-                if(PlayerAPI.isIdle(client.getLocalPlayer()))
+                if(PlayerEx.getLocal().isIdle())
                 {
                     timeout--;
                     if(!Location.isReachable(client.getLocalPlayer().getWorldLocation(), end))

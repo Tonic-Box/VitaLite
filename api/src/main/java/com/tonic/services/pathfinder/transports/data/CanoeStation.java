@@ -2,7 +2,7 @@ package com.tonic.services.pathfinder.transports.data;
 
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.widgets.WidgetAPI;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.util.handler.StepHandler;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.util.handler.HandlerBuilder;

@@ -6,6 +6,7 @@ import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.WidgetAPI;
+import com.tonic.data.wrappers.TileObjectEx;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;

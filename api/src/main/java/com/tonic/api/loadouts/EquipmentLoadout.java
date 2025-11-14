@@ -4,7 +4,7 @@ import com.tonic.api.loadouts.item.Loadout;
 import com.tonic.api.loadouts.item.LoadoutItem;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.data.EquipmentSlot;
-import com.tonic.data.ItemEx;
+import com.tonic.data.wrappers.ItemEx;
 
 import java.util.*;
 

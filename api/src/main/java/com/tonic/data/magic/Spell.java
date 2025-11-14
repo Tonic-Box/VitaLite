@@ -1,10 +1,9 @@
 package com.tonic.data.magic;
 
 import com.tonic.api.widgets.WidgetAPI;
-import com.tonic.data.ItemEx;
-import com.tonic.data.TileItemEx;
-import com.tonic.data.TileObjectEx;
-import com.tonic.data.WorldLocation;
+import com.tonic.data.wrappers.ItemEx;
+import com.tonic.data.wrappers.TileItemEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
@@ -40,13 +39,13 @@ public interface Spell {
 
     default void castOn(TileObjectEx tileObject)
     {
-        WorldPoint loc = tileObject.getWorldLocation();
+        WorldPoint loc = tileObject.getWorldPoint();
         WidgetAPI.onTileObject(getWidget(), -1, -1, tileObject.getId(), loc.getX(), loc.getY(), false);
     }
 
     default void castOn(TileItemEx tileItem)
     {
-        WorldPoint loc = tileItem.getWorldLocation();
+        WorldPoint loc = tileItem.getWorldPoint();
         WidgetAPI.onGroundItem(getWidget(), -1, -1, tileItem.getId(), loc.getX(), loc.getY(), false);
     }
 

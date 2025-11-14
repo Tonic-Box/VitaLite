@@ -2,11 +2,8 @@ package com.tonic.api.widgets;
 
 import com.tonic.Logger;
 import com.tonic.Static;
-import com.tonic.data.TileItemEx;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.*;
 import com.tonic.queries.InventoryQuery;
-import com.tonic.data.ItemContainerEx;
-import com.tonic.data.ItemEx;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
@@ -455,7 +452,7 @@ public class InventoryAPI
         if(item == null || tileObject == null)
             return;
 
-        WorldPoint wp = tileObject.getWorldLocation();
+        WorldPoint wp = tileObject.getWorldPoint();
         WidgetAPI.onTileObject(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), tileObject.getId(), wp.getX(), wp.getY(), false);
     }
 
@@ -469,7 +466,7 @@ public class InventoryAPI
         if(item == null || tileItem == null)
             return;
 
-        WorldPoint wp = tileItem.getWorldLocation();
+        WorldPoint wp = tileItem.getWorldPoint();
         WidgetAPI.onGroundItem(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), tileItem.getId(), wp.getX(), wp.getY(), false);
     }
 
@@ -478,12 +475,12 @@ public class InventoryAPI
      * @param item item
      * @param player player
      */
-    public static void useOn(ItemEx item, Player player)
+    public static void useOn(ItemEx item, PlayerEx player)
     {
         if(item == null || player == null)
             return;
 
-        WidgetAPI.onPlayer(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), player.getId(), false);
+        WidgetAPI.onPlayer(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), player.getIndex(), false);
     }
 
     /**
@@ -491,7 +488,7 @@ public class InventoryAPI
      * @param item item
      * @param npc npc
      */
-    public static void useOn(ItemEx item, NPC npc)
+    public static void useOn(ItemEx item, NpcEx npc)
     {
         if(item == null || npc == null)
             return;

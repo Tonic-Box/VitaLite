@@ -6,7 +6,7 @@ import com.tonic.api.TClient;
 import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.data.GrandExchangeSlot;
-import com.tonic.data.ItemEx;
+import com.tonic.data.wrappers.ItemEx;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
 import net.runelite.api.Client;

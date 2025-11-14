@@ -3,10 +3,8 @@ package com.tonic.services.pathfinder.teleports;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.InventoryAPI;
-import com.tonic.services.pathfinder.requirements.QuestRequirement;
 import net.runelite.api.ItemID;
 import net.runelite.api.Quest;
-import net.runelite.api.QuestState;
 import net.runelite.api.Varbits;
 import net.runelite.api.coords.WorldPoint;
 import org.apache.commons.lang3.ArrayUtils;
@@ -134,7 +132,7 @@ public enum TeleportItem
                 return hasQuestReqs && VarAPI.getVarp(302) >= 61;
             case QUETZAL_WHISTLE:
                 //cannot be used from within the hunter guild
-                int regionID = PlayerAPI.getLocal().getWorldLocation().getRegionID();
+                int regionID = PlayerAPI.getLocal().getWorldPoint().getRegionID();
                 return hasQuestReqs && regionID != 6191 && regionID != 6291;
             default:
                 return hasQuestReqs;

@@ -1,5 +1,6 @@
 package com.tonic.queries;
 
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.queries.abstractions.AbstractActorQuery;
 import com.tonic.services.GameManager;
 import net.runelite.api.Player;
@@ -7,7 +8,7 @@ import net.runelite.api.Player;
 /**
  * A query class for filtering and retrieving Player entities in the game.
  */
-public class PlayerQuery extends AbstractActorQuery<Player, PlayerQuery>
+public class PlayerQuery extends AbstractActorQuery<PlayerEx, PlayerQuery>
 {
     /**
      * Constructs a new PlayerQuery instance.
