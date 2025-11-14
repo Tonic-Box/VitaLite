@@ -29,10 +29,12 @@ public class TileObjectEx implements Entity
     private final TileObject tileObject;
     private String[] actions;
 
+    @Override
     public int getId() {
         return tileObject.getId();
     }
 
+    @Override
     public String getName() {
         Client client = Static.getClient();
         return Static.invoke(() -> {

@@ -25,6 +25,7 @@ public class TileItemEx implements Entity
     private final LocalPoint localPoint;
     private String[] actions = null;
 
+    @Override
     public int getId() {
         return item.getId();
     }
@@ -39,6 +40,7 @@ public class TileItemEx implements Entity
         return itemManager.canonicalize(item.getId());
     }
 
+    @Override
     public String getName() {
         Client client = Static.getClient();
         return Static.invoke(() -> client.getItemDefinition(item.getId()).getName());

@@ -96,4 +96,9 @@ public class PlayerEx extends ActorEx<Player>
             return cleaned;
         });
     }
+
+    @Override
+    public int getId() {
+        return getIndex();
+    }
 }

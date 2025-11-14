@@ -48,6 +48,7 @@ public abstract class ActorEx<T extends Actor> implements Entity
         return new NpcEx((NPC) interacting);
     }
 
+    @Override
     public String getName()
     {
         return TextUtil.sanitize(Static.invoke(() -> {
