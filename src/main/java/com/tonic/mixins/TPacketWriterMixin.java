@@ -5,13 +5,10 @@ import com.tonic.api.*;
 import com.tonic.events.PacketSent;
 import com.tonic.injector.annotations.*;
 import com.tonic.model.ui.VitaLiteOptionsPanel;
-import com.tonic.packets.PacketBuffer;
 import com.tonic.packets.PacketMapReader;
 import com.tonic.packets.types.MapEntry;
 import lombok.Getter;
-import net.runelite.api.Client;
-import net.runelite.api.widgets.WidgetInfo;
-
+import net.runelite.api.gameval.InterfaceID;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
@@ -393,33 +390,33 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     @Override
     public void itemOnNpcPacket(int itemId, int slot, int npcIndex, boolean run)
     {
-        widgetTargetOnNpcPacket(npcIndex, WidgetInfo.INVENTORY.getId(), itemId, slot, run);
+        widgetTargetOnNpcPacket(npcIndex, InterfaceID.Inventory.ITEMS, itemId, slot, run);
     }
 
     @Inject
     @Override
     public void itemOnPlayerPacket(int itemId, int slot, int playerIndex, boolean run)
     {
-        widgetTargetOnPlayerPacket(playerIndex, WidgetInfo.INVENTORY.getId(), itemId, slot, run);
+        widgetTargetOnPlayerPacket(playerIndex, InterfaceID.Inventory.ITEMS, itemId, slot, run);
     }
 
     @Inject
     @Override
     public void itemOnGameObjectPacket(int itemID, int slot, int objectID, int worldX, int worldY, boolean run)
     {
-        widgetTargetOnGameObjectPacket(WidgetInfo.INVENTORY.getId(), itemID, slot, objectID, worldX, worldY, run);
+        widgetTargetOnGameObjectPacket(InterfaceID.Inventory.ITEMS, itemID, slot, objectID, worldX, worldY, run);
     }
 
     @Inject
     @Override
     public void itemOnItemPacket(int itemId, int slot, int itemId2, int slot2)
     {
-        widgetOnWidgetPacket(WidgetInfo.INVENTORY.getId(), itemId, slot, WidgetInfo.INVENTORY.getId(), itemId2, slot2);
+        widgetOnWidgetPacket(InterfaceID.Inventory.ITEMS, itemId, slot, InterfaceID.Inventory.ITEMS, itemId2, slot2);
     }
 
     @Inject
     @Override
     public void itemActionPacket(int slot, int id, int action) {
-        widgetActionPacket(action, WidgetInfo.INVENTORY.getId(), slot, id);
+        widgetActionPacket(action, InterfaceID.Inventory.ITEMS, slot, id);
     }
 }
