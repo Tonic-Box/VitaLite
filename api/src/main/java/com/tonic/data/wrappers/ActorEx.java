@@ -2,8 +2,7 @@ package com.tonic.data.wrappers;
 
 import com.tonic.Static;
 import com.tonic.api.game.CombatAPI;
-import com.tonic.data.wrappers.abstractions.Interactable;
-import com.tonic.data.wrappers.abstractions.Locatable;
+import com.tonic.data.wrappers.abstractions.Entity;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.PlayerQuery;
 import com.tonic.util.TextUtil;
@@ -17,7 +16,7 @@ import java.awt.*;
 import java.util.stream.StreamSupport;
 
 @Getter
-public abstract class ActorEx<T extends Actor> implements Locatable, Interactable
+public abstract class ActorEx<T extends Actor> implements Entity
 {
     public static ActorEx<?> fromActor(Actor actor)
     {

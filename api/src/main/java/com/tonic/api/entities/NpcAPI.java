@@ -6,10 +6,6 @@ import com.tonic.data.wrappers.NpcEx;
 import com.tonic.queries.NpcQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
-import net.runelite.api.HeadIcon;
-import net.runelite.api.NPC;
-import net.runelite.api.NPCComposition;
-import net.runelite.client.game.NPCManager;
 
 /**
  * NPC API
