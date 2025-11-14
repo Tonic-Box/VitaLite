@@ -8,9 +8,8 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion = "3"
-val runeliteVersion = "1.12.3.1"
-//https://repo.runelite.net/net/runelite/runelite-api/1.12.3.1/runelite-api-1.12.3.1.jar
+val vitaVersion = "0"
+val runeliteVersion = "1.12.4"
 
 group = "com.tonic"
 version = runeliteVersion + "_" + vitaVersion
