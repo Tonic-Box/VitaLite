@@ -52,6 +52,21 @@ public class TileItemAPI
     }
 
     /**
+     * interact with a tile item
+     * @param item tile item
+     * @param actions actions
+     */
+    public static void interact(TileItemEx item, String... actions)
+    {
+        if (item == null)
+            return;
+
+        int actionIndex = getActionIndex(item, actions);
+
+        interact(actionIndex, item.getId(), item.getWorldPoint().getX(), item.getWorldPoint().getY(), false);
+    }
+
+    /**
      * interact with a tile item without holding down control
      * @param item tile item
      * @param action action
@@ -168,6 +183,20 @@ public class TileItemAPI
             ClickManager.click(ClickType.GROUND_ITEM);
             tClient.getPacketWriter().groundItemActionPacket(action, identifier, worldX, worldY, ctrlDown);
         });
+    }
+
+    private static int getActionIndex(TileItemEx item, String... actions)
+    {
+        if(item == null || item.getActions() == null || actions == null || actions.length == 0)
+            return -1;
+
+        for(String action : actions)
+        {
+            int index = getActionIndex(item.getActions(), action);
+            if(index != -1)
+                return index;
+        }
+        return -1;
     }
 
     private static int getActionIndex(TileItemEx item, String action)

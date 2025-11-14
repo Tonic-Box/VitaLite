@@ -45,6 +45,11 @@ public class WidgetQuery extends AbstractQuery<Widget, WidgetQuery>
         super(new ArrayList<>(cache));
     }
 
+    public WidgetQuery withName(String name)
+    {
+        return removeIf(w -> w.getName() == null || !w.getName().equalsIgnoreCase(name));
+    }
+
     /**
      * Filters widgets by their IDs.
      * @param id One or more widget IDs to filter by.

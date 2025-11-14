@@ -189,7 +189,7 @@ public abstract class ActorEx<T extends Actor> implements Entity
         return Static.invoke(actor::getConvexHull);
     }
 
-    public abstract void interact(String action);
+    public abstract void interact(String... actions);
 
     public abstract void interact(int action);
 

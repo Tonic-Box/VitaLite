@@ -59,7 +59,7 @@ public class ItemEx implements Interactable, Identifiable
     }
 
     @Override
-    public void interact(String action) {
+    public void interact(String... action) {
         InventoryAPI.interact(this, action);
     }
 
