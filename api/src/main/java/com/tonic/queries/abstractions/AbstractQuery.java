@@ -18,7 +18,6 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
     private final Random random = new Random();
     private final List<Predicate<T>> filters = new ArrayList<>();
     private final List<Comparator<T>> sorters = new ArrayList<>();
-    private boolean negate = false;
 
     public AbstractQuery(List<T> cache) {
         this.dataSource = () -> new ArrayList<>(cache);
@@ -104,6 +103,13 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
         if (results.isEmpty()) {
             elseAction.run();
         } else {
+            action.accept(results.get(0));
+        }
+    }
+
+    public void firstIfPresent(Consumer<T> action) {
+        List<T> results = execute();
+        if (!results.isEmpty()) {
             action.accept(results.get(0));
         }
     }

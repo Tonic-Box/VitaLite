@@ -3,6 +3,7 @@ package com.tonic.queries.abstractions;
 import com.tonic.api.entities.ActorAPI;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.data.wrappers.ActorEx;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
 import net.runelite.api.Actor;
@@ -43,6 +44,26 @@ public abstract class AbstractActorQuery<T extends ActorEx<?>, Q extends Abstrac
     public Q canAttack()
     {
         return keepIf(n -> n.canAttack());
+    }
+
+    /**
+     * filter reachable actors
+     * @return ActorQuery
+     */
+    public Q isReachable()
+    {
+        WorldPoint playerLoc = PlayerEx.getLocal().getWorldPoint();
+        return keepIf(o -> Location.isReachable(playerLoc, o.getWorldPoint()));
+    }
+
+    /**
+     * filter actors that the player has line of sight to
+     * @return ActorQuery
+     */
+    public Q hasLos()
+    {
+        WorldPoint playerLoc = PlayerEx.getLocal().getWorldPoint();
+        return keepIf(o -> Location.hasLineOfSightTo(playerLoc, o.getWorldPoint()));
     }
 
     /**
