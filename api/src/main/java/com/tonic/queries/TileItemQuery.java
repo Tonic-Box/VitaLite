@@ -73,7 +73,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery greaterThanShopPrice(int price)
     {
-        return removeIf(o -> o.getQuantity() * o.getShopPrice() <= price);
+        return removeIf(o -> (long) o.getQuantity() * o.getShopPrice() <= price);
     }
 
     /**
@@ -83,7 +83,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery lessThanShopPrice(int price)
     {
-        return removeIf(o -> o.getQuantity() * o.getShopPrice() >= price);
+        return removeIf(o -> (long) o.getQuantity() * o.getShopPrice() >= price);
     }
 
     /**
@@ -93,7 +93,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery greaterThanGePrice(int price)
     {
-        return removeIf(o -> o.getQuantity() * o.getGePrice() <= price);
+        return removeIf(o -> (long) o.getQuantity() * o.getGePrice() <= price);
     }
 
     /**
@@ -103,7 +103,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery lessThanGePrice(int price)
     {
-        return removeIf(o -> o.getQuantity() * o.getGePrice() >= price);
+        return removeIf(o -> (long) o.getQuantity() * o.getGePrice() >= price);
     }
 
     /**
@@ -113,7 +113,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery greaterThanHighAlchValue(int value)
     {
-        return removeIf(o -> o.getQuantity() * o.getHighAlchValue() <= value);
+        return removeIf(o -> (long) o.getQuantity() * o.getHighAlchValue() <= value);
     }
 
     /**
@@ -123,7 +123,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery lessThanHighAlchValue(int value)
     {
-        return removeIf(o -> o.getQuantity() * o.getHighAlchValue() >= value);
+        return removeIf(o -> (long) o.getQuantity() * o.getHighAlchValue() >= value);
     }
 
     /**
@@ -133,7 +133,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery greaterThanLowAlchValue(int value)
     {
-        return removeIf(o -> o.getQuantity() * o.getLowAlchValue() <= value);
+        return removeIf(o -> (long) o.getQuantity() * o.getLowAlchValue() <= value);
     }
 
     /**
@@ -143,7 +143,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery lessThanLowAlchValue(int value)
     {
-        return removeIf(o -> o.getQuantity() * o.getLowAlchValue() >= value);
+        return removeIf(o -> (long) o.getQuantity() * o.getLowAlchValue() >= value);
     }
 
     /**
