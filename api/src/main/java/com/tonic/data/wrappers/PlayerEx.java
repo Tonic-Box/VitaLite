@@ -71,8 +71,8 @@ public class PlayerEx extends ActorEx<Player>
     }
 
     @Override
-    public void interact(String action) {
-        PlayerAPI.interact(this, action);
+    public void interact(String... actions) {
+        PlayerAPI.interact(this, actions);
     }
 
     @Override

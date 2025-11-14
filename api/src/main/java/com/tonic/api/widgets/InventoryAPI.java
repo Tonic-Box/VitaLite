@@ -74,6 +74,11 @@ public class InventoryAPI
         itemAction(item.getSlot(), item.getId(), getAction(item, action));
     }
 
+    public static void interact(ItemEx item, String... actions)
+    {
+        itemAction(item.getSlot(), item.getId(), getAction(item, actions));
+    }
+
     /**
      * interact with an item in your inventory by id and action name
      * @param itemId item id
@@ -201,6 +206,19 @@ public class InventoryAPI
         WidgetAPI.interact(action, InterfaceID.Inventory.ITEMS, slot, id);
     }
 
+    private static int getAction(ItemEx item, String... options)
+    {
+        for(String option : options)
+        {
+            int action = getAction(item, option);
+            if(action != -1)
+            {
+                return action;
+            }
+        }
+        return -1;
+    }
+
     /**
      * get the action index for an item action name
      * @param item item
@@ -232,6 +250,10 @@ public class InventoryAPI
                 index = i;
                 break;
             }
+        }
+        if(index == -1)
+        {
+            return -1;
         }
         return (index < 4) ? index + 2 : index + 3;
     }

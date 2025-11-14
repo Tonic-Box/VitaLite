@@ -51,8 +51,8 @@ public class TileItemEx implements Entity
     }
 
     @Override
-    public void interact(String action) {
-        TileItemAPI.interact(this, action);
+    public void interact(String... actions) {
+        TileItemAPI.interact(this, actions);
     }
 
     @Override

@@ -3,16 +3,16 @@ package com.tonic.data.wrappers.abstractions;
 public interface Interactable
 {
     /**
-     * Interacts with the entity using the specified action
+     * Interacts with the entity by first matching action
      *
-     * @param action The action(s) to perform on the object.
+     * @param actions The action(s) to perform on the entity.
      */
-    void interact(String action);
+    void interact(String... actions);
 
     /**
      * Interacts with the entity using the specified action index
      *
-     * @param action The action index to perform on the object.
+     * @param action The action index to perform on the entity.
      */
     void interact(int action);
 

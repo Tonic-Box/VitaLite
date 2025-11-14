@@ -87,8 +87,8 @@ public class NpcEx extends ActorEx<NPC>
     }
 
     @Override
-    public void interact(String action) {
-        NpcAPI.interact(this, action);
+    public void interact(String... actions) {
+        NpcAPI.interact(this, actions);
     }
 
     @Override
