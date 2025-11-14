@@ -17,10 +17,15 @@ import java.util.List;
  * Various location related utility methods.
  */
 public class Location {
-    public static int getDistance(Tile source, WorldPoint worldPoint)
+    public static int getDistance(Tile source, Tile dest)
     {
+        if(source == null || dest == null)
+            return Integer.MAX_VALUE;
+        if(source.getPlane() != dest.getPlane())
+            return Integer.MAX_VALUE;
         WorldPoint p1 = source.getWorldLocation();
-        return (int)Math.sqrt((p1.getY() - worldPoint.getY()) * (p1.getY() - worldPoint.getY()) + (p1.getX() - worldPoint.getX()) * (p1.getX() - worldPoint.getX()));
+        WorldPoint p2 = dest.getWorldLocation();
+        return (int)Math.sqrt((p1.getY() - p2.getY()) * (p1.getY() - p2.getY()) + (p1.getX() - p2.getX()) * (p1.getX() - p2.getX()));
     }
 
     /**
@@ -217,6 +222,11 @@ public class Location {
     public static boolean hasLineOfSightTo(Tile source, Tile other)
     {
         // Thanks to Henke for this method :)
+
+        if(source == null || other == null)
+        {
+            return false;
+        }
 
         if (source.getPlane() != other.getPlane())
         {

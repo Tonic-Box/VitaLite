@@ -108,6 +108,22 @@ public class GameManager extends Overlay {
         return npcs;
     }
 
+    public static List<Tile> getTiles()
+    {
+        Client client = Static.getClient();
+        WorldView worldView = client.getTopLevelWorldView();
+        Tile[][] planeTiles = worldView.getScene().getTiles()[worldView.getPlane()];
+
+        int totalSize = Constants.SCENE_SIZE * Constants.SCENE_SIZE;
+        List<Tile> out = new ArrayList<>(totalSize);
+
+        for (Tile[] row : planeTiles) {
+            Collections.addAll(out, row);
+        }
+
+        return out;
+    }
+
     public static Stream<TileObjectEx> objectStream()
     {
         return objectList().stream();
