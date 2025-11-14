@@ -11,8 +11,8 @@ if (localPlayer != null) {
     out.println("No local player found (not logged in?)");
 }
 
-List<Player> players = GameManager.playerList();
+List<PlayerEx> players = GameManager.playerList();
 out.println("Players in area: " + players.size());
 
-List<NPC> npcs = GameManager.npcList();
+List<NpcEx> npcs = GameManager.npcList();
 out.println("NPCs in area: " + npcs.size());
