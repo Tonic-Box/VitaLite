@@ -1,7 +1,6 @@
 package com.tonic.queries.combined;
 
 import com.tonic.api.game.SceneAPI;
-import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.wrappers.NpcEx;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileItemEx;
@@ -10,7 +9,6 @@ import com.tonic.data.wrappers.abstractions.Entity;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.util.TextUtil;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.widgets.Widget;
 import net.runelite.client.util.Text;
 import net.runelite.client.util.WildcardMatcher;
 import org.apache.commons.lang3.ArrayUtils;
