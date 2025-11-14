@@ -3,8 +3,7 @@ package com.tonic.data.wrappers;
 import com.tonic.Static;
 import com.tonic.api.TItemComposition;
 import com.tonic.api.entities.TileItemAPI;
-import com.tonic.data.wrappers.abstractions.Interactable;
-import com.tonic.data.wrappers.abstractions.Locatable;
+import com.tonic.data.wrappers.abstractions.Entity;
 import com.tonic.util.Location;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ import java.awt.*;
 
 @RequiredArgsConstructor
 @Getter
-public class TileItemEx implements Locatable, Interactable
+public class TileItemEx implements Entity
 {
     private final TileItem item;
     private final WorldPoint worldPoint;
