@@ -102,7 +102,6 @@ public class TrajectoryService
                 }
             }
         }, AUTO_SAVE_INTERVAL_MS, AUTO_SAVE_INTERVAL_MS);
-        Logger.info("TrajectoryService: Auto-save enabled (interval: " + (AUTO_SAVE_INTERVAL_MS / 1000) + "s)");
     }
 
     public static void saveToFile()
@@ -155,7 +154,7 @@ public class TrajectoryService
             }
 
             lastSavedCount = count;
-            Logger.info("Loaded " + count + " trajectories from " + SAVE_PATH);
+            Logger.info("Loaded " + count + " trajectories");
         }
         catch (IOException | ClassNotFoundException e)
         {
