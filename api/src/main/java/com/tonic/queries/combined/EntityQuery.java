@@ -9,6 +9,9 @@ import com.tonic.data.wrappers.abstractions.Entity;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.util.TextUtil;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.client.util.Text;
+import net.runelite.client.util.WildcardMatcher;
+import org.apache.commons.lang3.ArrayUtils;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.List;
@@ -18,10 +21,9 @@ import java.util.stream.Stream;
 import static com.tonic.services.GameManager.*;
 
 /**
- * A query class to filter and sort locatable and interactable entities in the game world.
+ * A query class to filter and sort locatable, identifiable and interactable entities in the game world.
  */
 public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
-
     public EntityQuery() {
         super(Stream.of(npcList(), playerList(), tileItemList(), objectList())
                 .flatMap(Collection::stream)
@@ -47,7 +49,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
 
     /**
      * Filters the query results to exclude players.
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery removePlayers()
     {
@@ -56,7 +58,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
 
     /**
      * Filters the query results to exclude NPCs.
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery removeNpcs()
     {
@@ -65,7 +67,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
 
     /**
      * Filters the query results to exclude tile items.
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery removeTileItems()
     {
@@ -74,7 +76,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
 
     /**
      * Filters the query results to exclude tile objects.
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery removeTileObjects()
     {
@@ -82,9 +84,69 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
     }
 
     /**
-     * Filters the query results to only include locatable interactables with the specified action.
+     * Filters the query to only include entities with the specified IDs.
+     * @param id The IDs to filter by.
+     * @return EntityQuery
+     */
+    public EntityQuery withId(int... id)
+    {
+        return removeIf(o -> !ArrayUtils.contains(id, o.getId()));
+    }
+
+    /**
+     * Filters the query to only include entities with the specified name.
+     * @param name The name to filter by.
+     * @return EntityQuery
+     */
+    public EntityQuery withName(String name)
+    {
+        return keepIf(o -> o.getName() != null && o.getName().equalsIgnoreCase(name));
+    }
+
+    /**
+     * Filters the query to only include entities with names that contain the specified string.
+     * @param name The string to filter by.
+     * @return EntityQuery
+     */
+    public EntityQuery withNameContains(String name)
+    {
+        return keepIf(o -> o.getName() != null && o.getName().toLowerCase().contains(name.toLowerCase()));
+    }
+
+    /**
+     * Filters the query to only include entities with the specified names.
+     * @param names The names to filter by.
+     * @return EntityQuery
+     */
+    public EntityQuery withNames(String... names)
+    {
+        return keepIf(o -> o.getName() != null && ArrayUtils.contains(names, o.getName()));
+    }
+
+    /**
+     * Filters the query to only include entities with names that contain any of the specified strings.
+     * @param names The strings to filter by.
+     * @return EntityQuery
+     */
+    public EntityQuery withNamesContains(String... names)
+    {
+        return keepIf(o -> o.getName() != null && TextUtil.containsIgnoreCase(o.getName(), names));
+    }
+
+    /**
+     * Filters the query to only include entities with names that match the specified wildcard pattern.
+     * @param namePart The wildcard pattern to filter by.
+     * @return EntityQuery
+     */
+    public EntityQuery withNameMatches(String namePart)
+    {
+        return keepIf(o -> o.getName() != null && WildcardMatcher.matches(namePart.toLowerCase(), Text.removeTags(o.getName().toLowerCase())));
+    }
+
+    /**
+     * Filters the query results to only include entities with the specified action.
      * @param action The action to filter by.
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery withAction(String action)
     {
@@ -92,27 +154,27 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
     }
 
     /**
-     * Filters the query results to only include locatable interactables with an action that partially matches the specified string.
+     * Filters the query results to only include entities with an action that partially matches the specified string.
      * @param partial The partial action string to filter by.
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery withPartialAction(String partial) {
         return keepIf(locint -> locint.getActions() != null && TextUtil.containsIgnoreCaseInverse(partial, locint.getActions()));
     }
 
     /**
-     * Filters the query results to only include locatable interactables beyond the specified distance from the local player.
+     * Filters the query results to only include entities beyond the specified distance from the local player.
      * @param distance The distance threshold.
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery beyondDistance(int distance) {
         return removeIf(locint -> locint.getWorldPoint().distanceTo(PlayerEx.getLocal().getWorldPoint()) <= distance);
     }
 
     /**
-     * Filters the query results to only include locatable interactables within the specified distance from the local player.
+     * Filters the query results to only include entities within the specified distance from the local player.
      * @param distance The distance threshold.
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery withinDistance(int distance) {
         return removeIf(locint -> locint.getWorldPoint().distanceTo(PlayerEx.getLocal().getWorldPoint()) > distance);
@@ -120,7 +182,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
 
     /**
      * Sorts the query results by distance from the local player, nearest first.
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery sortNearest()
     {
@@ -130,7 +192,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
     /**
      * Sorts the query results by distance from the specified center point, nearest first.
      * @param center The center point to measure distance from.
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery sortNearest(WorldPoint center)
     {
@@ -144,7 +206,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
 
     /**
      * Sorts the query results by distance from the local player, furthest first.
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery sortFurthest()
     {
@@ -154,7 +216,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
     /**
      * Sorts the query results by distance from the specified center point, furthest first.
      * @param center The center point to measure distance from.
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery sortFurthest(WorldPoint center)
     {
@@ -168,7 +230,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
 
     /**
      * sort by shortest path from the player
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery sortShortestPath()
     {
@@ -178,7 +240,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
     /**
      * sort by shortest path from a specific point
      * @param center center point
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery sortShortestPath(WorldPoint center)
     {
@@ -193,7 +255,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
 
     /**
      * sort by longest path from the player
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery sortLongestPath()
     {
@@ -203,7 +265,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
     /**
      * sort by longest path from a specific point
      * @param center center point
-     * @return LocatableInteractableQuery
+     * @return EntityQuery
      */
     public EntityQuery sortLongestPath(WorldPoint center)
     {

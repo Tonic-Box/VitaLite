@@ -2,6 +2,7 @@ package com.tonic.data.wrappers;
 
 import com.tonic.Static;
 import com.tonic.api.widgets.InventoryAPI;
+import com.tonic.data.wrappers.abstractions.Identifiable;
 import com.tonic.data.wrappers.abstractions.Interactable;
 import com.tonic.util.TextUtil;
 import lombok.*;
@@ -17,12 +18,13 @@ import java.awt.*;
 
 @Getter
 @RequiredArgsConstructor
-public class ItemEx implements Interactable
+public class ItemEx implements Interactable, Identifiable
 {
     private final Item item;
     private final int slot;
     private String[] actions = null;
 
+    @Override
     public int getId() {
         return item.getId();
     }
