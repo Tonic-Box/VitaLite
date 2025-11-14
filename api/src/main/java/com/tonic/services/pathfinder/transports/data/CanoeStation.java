@@ -33,7 +33,7 @@ public enum CanoeStation
     {
         return HandlerBuilder.get()
                 .add(0, () -> {
-                    TileObjectEx station = new TileObjectQuery<>()
+                    TileObjectEx station = new TileObjectQuery()
                             .withName("Canoe Station")
                             .sortNearest()
                             .first();
@@ -41,7 +41,7 @@ public enum CanoeStation
                 })
                 .add(1, () -> 2)
                 .add(2, () -> {
-                    TileObjectEx station = new TileObjectQuery<>()
+                    TileObjectEx station = new TileObjectQuery()
                             .withAction("Shape-Canoe")
                             .sortNearest()
                             .first();
@@ -55,7 +55,7 @@ public enum CanoeStation
                 .addDelayUntil(3, () -> WidgetAPI.get(416, 3) != null)
                 .add(4, () -> WidgetAPI.interact(1, canoe.getWidgetId(), 0))
                 .add(5, () -> {
-                    TileObjectEx station = new TileObjectQuery<>()
+                    TileObjectEx station = new TileObjectQuery()
                             .withPartialAction("Float ")
                             .sortNearest()
                             .first();
@@ -67,7 +67,7 @@ public enum CanoeStation
                     return 5;
                 })
                 .add(6, () -> {
-                    TileObjectEx station = new TileObjectQuery<>()
+                    TileObjectEx station = new TileObjectQuery()
                             .withPartialAction("Paddle ")
                             .sortNearest()
                             .first();

@@ -129,8 +129,7 @@ public class Cannon
 
     public static boolean spotOpen(final WorldPoint spot, int radius)
     {
-        //return TileObject.findObjectWithin(client, spot, radius, "Dwarf multicannon") == null;
-        return new TileObjectQuery<>()
+        return new TileObjectQuery()
                 .withNameContains("Dwarf multicannon")
                 .within(spot, radius)
                 .sortNearest()
@@ -160,7 +159,7 @@ public class Cannon
         if(!client.getLocalPlayer().getWorldLocation().equals(location))
             Walker.walkTo(location);
 
-        TileObjectEx cannon = new TileObjectQuery<>()
+        TileObjectEx cannon = new TileObjectQuery()
                 .withNameContains("Dwarf multicannon")
                 .within(3)
                 .sortNearest()
@@ -192,7 +191,7 @@ public class Cannon
             Walker.walkTo(location);
 
         //RSTileObject cannon = TileObject.findObjectWithin(client, 3, "Broken multicannon");
-        TileObjectEx cannon = new TileObjectQuery<>()
+        TileObjectEx cannon = new TileObjectQuery()
                 .withAction("Repair")
                 .within(3)
                 .sortNearest()
@@ -223,7 +222,7 @@ public class Cannon
             return false;
         }
         Walker.walkTo(current);
-        TileObjectEx cannon = new TileObjectQuery<>()
+        TileObjectEx cannon = new TileObjectQuery()
                 .withNameContains("Dwarf multicannon")
                 .within(3)
                 .sortNearest()

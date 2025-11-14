@@ -65,7 +65,7 @@ public class LongTransport extends Transport
         DialogueNode node = DialogueNode.get(options);
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    TileObjectEx obj = new TileObjectQuery<>()
+                    TileObjectEx obj = new TileObjectQuery()
                             .withId(objectID)
                             .sortNearest()
                             .first();

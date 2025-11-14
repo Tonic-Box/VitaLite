@@ -362,7 +362,7 @@ public class ExtendedMenuDispatcher
     private static TileObjectEx getObject(int id, int worldPoint)
     {
         WorldPoint wp = WorldPointUtil.fromCompressed(worldPoint);
-        return new TileObjectQuery<>()
+        return new TileObjectQuery()
                 .withId(id)
                 .within(wp, 1)
                 .first();

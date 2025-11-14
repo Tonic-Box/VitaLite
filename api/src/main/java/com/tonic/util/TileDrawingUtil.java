@@ -160,7 +160,7 @@ public class TileDrawingUtil
     private static Shape finaObjectShape(LocalPoint location) {
         Client client = Static.getClient();
         WorldPoint worldPoint = WorldPoint.fromLocal(client, location);
-        TileObjectEx obj = new TileObjectQuery<>()
+        TileObjectEx obj = new TileObjectQuery()
                 .keepIf(o -> o.getWorldArea().contains(worldPoint))
                 .first();
 

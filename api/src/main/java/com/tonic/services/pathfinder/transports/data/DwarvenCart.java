@@ -59,7 +59,7 @@ public enum DwarvenCart
                 .add(0, () -> {
                     if(npcName == null)
                     {
-                        TileObjectEx object = new TileObjectQuery<>()
+                        TileObjectEx object = new TileObjectQuery()
                                 .withNameContains("Trapdoor")
                                 .first();
                         TileObjectAPI.interact(object, "Travel");
@@ -73,7 +73,7 @@ public enum DwarvenCart
                 .add(1, () -> DialogueAPI.dialoguePresent() ? 2 : 1)
                 .add(2, () -> node.processStep() ? 2 : 3)
                 .add(3, () -> {
-                    TileObjectEx object = new TileObjectQuery<>()
+                    TileObjectEx object = new TileObjectQuery()
                             .withNameContains("Train cart")
                             .first();
                     TileObjectAPI.interact(object, "Ride");
@@ -110,7 +110,7 @@ public enum DwarvenCart
                 })
                 .add(4, () -> MovementAPI.isMoving() ? 4 : 5)
                 .add(5, () -> {
-                    TileObjectEx object = new TileObjectQuery<>()
+                    TileObjectEx object = new TileObjectQuery()
                             .withNameContains("Train cart")
                             .first();
                     TileObjectAPI.interact(object, "Ride");

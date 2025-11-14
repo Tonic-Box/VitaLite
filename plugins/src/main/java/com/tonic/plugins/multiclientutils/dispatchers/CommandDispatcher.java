@@ -75,7 +75,7 @@ public class CommandDispatcher
                 id = message.getInt(0);
                 action = message.getInt(1);
                 worldPoint = WorldPointUtil.fromCompressed(message.getInt(2));
-                TileObjectEx object = new TileObjectQuery<>()
+                TileObjectEx object = new TileObjectQuery()
                         .withId(id)
                         .within(worldPoint, 1)
                         .first();
@@ -166,7 +166,7 @@ public class CommandDispatcher
                 id = message.getInt(0);
                 action = message.getInt(1);
                 worldPoint = WorldPointUtil.fromCompressed(message.getInt(2));
-                TileObjectEx object = new TileObjectQuery<>()
+                TileObjectEx object = new TileObjectQuery()
                         .withId(id)
                         .within(worldPoint, 1)
                         .first();

@@ -484,7 +484,7 @@ public class TransportLoader
                 {
                     HandlerBuilder builder = HandlerBuilder.get()
                             .add(0, () -> {
-                                TileObjectEx current = new TileObjectQuery<>()
+                                TileObjectEx current = new TileObjectQuery()
                                         .withName("Fairy ring")
                                         .first();
                                 TileObjectAPI.interact(current, "Zanaris");
@@ -503,7 +503,7 @@ public class TransportLoader
 
                 HandlerBuilder builder = HandlerBuilder.get()
                         .add(0, () -> {
-                            TileObjectEx current = new TileObjectQuery<>()
+                            TileObjectEx current = new TileObjectQuery()
                                     .withName("Fairy ring")
                                     .nearest();
                             TileObjectAPI.interact(current, "Configure");
@@ -610,7 +610,7 @@ public class TransportLoader
 
                 HandlerBuilder builder = HandlerBuilder.get()
                         .add(0, () -> {
-                            TileObjectEx current = new TileObjectQuery<>()
+                            TileObjectEx current = new TileObjectQuery()
                                     .withName("Spirit tree")
                                     .first();
                             TileObjectAPI.interact(current, "Travel");
@@ -749,7 +749,7 @@ public class TransportLoader
 
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    TileObjectEx object = new TileObjectQuery<>()
+                    TileObjectEx object = new TileObjectQuery()
                             .withId(2406)
                             .sortNearest()
                             .first();
@@ -793,7 +793,7 @@ public class TransportLoader
     {
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    TileObjectEx openDoor = new TileObjectQuery<>()
+                    TileObjectEx openDoor = new TileObjectQuery()
                             .withId(openDoorId)
                             .within(source, 1)
                             .first();
@@ -823,7 +823,7 @@ public class TransportLoader
     {
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    TileObjectEx closedTrapDoor = new TileObjectQuery<>()
+                    TileObjectEx closedTrapDoor = new TileObjectQuery()
                             .withId(closedId)
                             .within(source, 5)
                             .first();
@@ -833,7 +833,7 @@ public class TransportLoader
                         return 1;
                     }
 
-                    TileObjectEx openedTrapdoor = new TileObjectQuery<>()
+                    TileObjectEx openedTrapdoor = new TileObjectQuery()
                             .withId(openedId)
                             .within(source, 5)
                             .first();
@@ -845,7 +845,7 @@ public class TransportLoader
                     return 0;
                 })
                 .add(1, () -> {
-                    TileObjectEx openedTrapdoor = new TileObjectQuery<>()
+                    TileObjectEx openedTrapdoor = new TileObjectQuery()
                             .withId(openedId)
                             .within(source, 5)
                             .first();
@@ -875,7 +875,7 @@ public class TransportLoader
                         return 0;
                     }
 
-                    TileObjectEx transport = new TileObjectQuery<>()
+                    TileObjectEx transport = new TileObjectQuery()
                             .withId(objId)
                             .within(source, 8)
                             .first();
@@ -976,7 +976,7 @@ public class TransportLoader
                     {
                         return 99;
                     }
-                    TileObjectEx plank = new TileObjectQuery<>()
+                    TileObjectEx plank = new TileObjectQuery()
                             .withAction("Cross")
                             .nearest();
 
@@ -1021,7 +1021,7 @@ public class TransportLoader
                     {
                         return 99;
                     }
-                    TileObjectEx plank = new TileObjectQuery<>()
+                    TileObjectEx plank = new TileObjectQuery()
                             .withAction("Cross")
                             .nearest();
 
@@ -1073,14 +1073,14 @@ public class TransportLoader
     {
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    TileObjectEx first = new TileObjectQuery<>()
+                    TileObjectEx first = new TileObjectQuery()
                             .atLocation(source)
                             .withId(objId)
                             .first();
 
                     if (first == null)
                     {
-                        first = new TileObjectQuery<>()
+                        first = new TileObjectQuery()
                                 .within(source, 5)
                                 .withId(objId)
                                 .first();
@@ -1116,13 +1116,13 @@ public class TransportLoader
                     WorldView wv = client.getTopLevelWorldView();
                     WorldPoint localSource =
                             WorldPoint.toLocalInstance(wv, source).stream().findFirst().orElse(source);
-                    TileObjectEx first = new TileObjectQuery<>().atLocation(localSource).withId(objId).first();
+                    TileObjectEx first = new TileObjectQuery().atLocation(localSource).withId(objId).first();
                     if (first != null)
                     {
                         TileObjectAPI.interact(first, action);
                         return 1;
                     }
-                    TileObjectEx obj = new TileObjectQuery<>()
+                    TileObjectEx obj = new TileObjectQuery()
                             .withId(objId)
                             .within(localSource, 5)
                             .sortNearest()
@@ -1154,7 +1154,7 @@ public class TransportLoader
                 .node((Object[])chatOptions);
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    TileObjectEx obj = new TileObjectQuery<>()
+                    TileObjectEx obj = new TileObjectQuery()
                             .withId(objId)
                             .within(source, 5)
                             .sortNearest()
@@ -1180,7 +1180,7 @@ public class TransportLoader
     {
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    TileObjectEx web = new TileObjectQuery<>()
+                    TileObjectEx web = new TileObjectQuery()
                             .withNameContains("Web")
                             .within(source, 5)
                             .withAction("Slash")
@@ -1233,7 +1233,7 @@ public class TransportLoader
     {
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    TileObjectEx object = new TileObjectQuery<>()
+                    TileObjectEx object = new TileObjectQuery()
                             .withId(objectIdClosed)
                             .within(source, 5)
                             .first();
@@ -1243,7 +1243,7 @@ public class TransportLoader
                         return 1;
                     }
 
-                    TileObjectEx object2 = new TileObjectQuery<>()
+                    TileObjectEx object2 = new TileObjectQuery()
                             .withId(objectIdOpen)
                             .within(source, 5)
                             .first();
@@ -1251,7 +1251,7 @@ public class TransportLoader
                     return 2;
                 })
                 .add(1, () -> {
-                    TileObjectEx object2 = new TileObjectQuery<>()
+                    TileObjectEx object2 = new TileObjectQuery()
                             .withId(objectIdOpen)
                             .within(source, 5)
                             .first();
@@ -1279,14 +1279,14 @@ public class TransportLoader
                         NpcAPI.interact(npc, "Buy-pass");
                         return 1;
                     }
-                    TileObjectEx object = new TileObjectQuery<>()
+                    TileObjectEx object = new TileObjectQuery()
                             .withId(ObjectID.SHANTAY_PASS)
                             .first();
                     TileObjectAPI.interact(object, 0);
                     return 2;
                 })
                 .add(1, () -> {
-                    TileObjectEx object = new TileObjectQuery<>()
+                    TileObjectEx object = new TileObjectQuery()
                             .withId(ObjectID.SHANTAY_PASS)
                             .first();
                     TileObjectAPI.interact(object, 0);
@@ -1312,20 +1312,20 @@ public class TransportLoader
                     if(VarAPI.getVar(279) != 1 && InventoryAPI.contains(ItemID.ROPE))
                     {
                         ItemEx rope = InventoryAPI.getItem(ItemID.ROPE);
-                        TileObjectEx object = new TileObjectQuery<>()
+                        TileObjectEx object = new TileObjectQuery()
                                 .withId(ObjectID.DARK_HOLE)
                                 .first();
                         InventoryAPI.useOn(rope, object);
                         return 1;
                     }
-                    TileObjectEx object = new TileObjectQuery<>()
+                    TileObjectEx object = new TileObjectQuery()
                             .withId(ObjectID.DARK_HOLE)
                             .first();
                     TileObjectAPI.interact(object, 0);
                     return 2;
                 })
                 .add(1, () -> {
-                    TileObjectEx object = new TileObjectQuery<>()
+                    TileObjectEx object = new TileObjectQuery()
                             .withId(ObjectID.DARK_HOLE)
                             .first();
                     TileObjectAPI.interact(object, 0);
