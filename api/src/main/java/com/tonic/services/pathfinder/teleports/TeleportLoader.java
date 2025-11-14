@@ -6,7 +6,7 @@ import com.tonic.api.game.GameAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
-import com.tonic.data.ItemEx;
+import com.tonic.data.wrappers.ItemEx;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
 import net.runelite.api.Client;

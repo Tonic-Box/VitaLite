@@ -1,6 +1,10 @@
-package com.tonic.data;
+package com.tonic.data.wrappers;
 
 import com.tonic.Static;
+import com.tonic.api.entities.TileObjectAPI;
+import com.tonic.data.wrappers.abstractions.Interactable;
+import com.tonic.data.wrappers.abstractions.Locatable;
+import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +18,7 @@ import java.awt.*;
 
 @RequiredArgsConstructor
 @Getter
-public class TileObjectEx
+public class TileObjectEx implements Locatable, Interactable
 {
     public static TileObjectEx of(TileObject object)
     {
@@ -48,6 +52,17 @@ public class TileObjectEx
         return getActionIndex(action) != -1;
     }
 
+    @Override
+    public void interact(String action) {
+        TileObjectAPI.interact(this, action);
+    }
+
+    @Override
+    public void interact(int action) {
+        TileObjectAPI.interact(this, action);
+    }
+
+    @Override
     public String[] getActions() {
         if(actions == null)
         {
@@ -79,7 +94,8 @@ public class TileObjectEx
         return -1;
     }
 
-    public WorldPoint getWorldLocation() {
+    @Override
+    public WorldPoint getWorldPoint() {
         WorldPoint wp = tileObject.getWorldLocation();
         if(tileObject instanceof GameObject)
         {
@@ -92,6 +108,7 @@ public class TileObjectEx
         return wp;
     }
 
+    @Override
     public WorldArea getWorldArea()
     {
         int width = 1;
@@ -103,7 +120,18 @@ public class TileObjectEx
             width = max.getX() - min.getX() + 1;
             height = max.getY() - min.getY() + 1;
         }
-        return new WorldArea(getWorldLocation(), width, height);
+        return new WorldArea(getWorldPoint(), width, height);
+    }
+
+    @Override
+    public LocalPoint getLocalPoint() {
+        return tileObject.getLocalLocation();
+    }
+
+    @Override
+    public Tile getTile()
+    {
+        return Location.toTile(getWorldPoint());
     }
 
     public Shape getShape()
@@ -125,9 +153,5 @@ public class TileObjectEx
             return ground.getConvexHull();
         }
         return tileObject.getClickbox();
-    }
-
-    public LocalPoint getLocalLocation() {
-        return tileObject.getLocalLocation();
     }
 }

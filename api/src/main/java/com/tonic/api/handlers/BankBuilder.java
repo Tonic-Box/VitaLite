@@ -5,7 +5,8 @@ import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.widgets.BankAPI;
 import com.tonic.data.LayoutView;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.NpcEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.data.locatables.BankLocations;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
@@ -55,9 +56,9 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
     {
         int step2 = currentStep;
         add(context -> {
-            NPC banker = new NpcQuery()
+            NpcEx banker = new NpcQuery()
                     .withNameContains("Banker")
-                    .keepIf(n -> Location.losTileNextTo(n.getWorldLocation()) != null)
+                    .keepIf(n -> Location.losTileNextTo(n.getWorldPoint()) != null)
                     .nearest();
             if(banker != null)
             {
@@ -70,7 +71,7 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
                     .withNamesContains("Bank booth", "Bank chest")
                     .sortNearest()
                     .first();
-            if(bank != null && Location.losTileNextTo(bank.getWorldLocation()) != null)
+            if(bank != null && Location.losTileNextTo(bank.getWorldPoint()) != null)
             {
                 ClickManagerUtil.queueClickBox(bank);
                 if(bank.getName().contains("Bank booth"))
@@ -89,9 +90,9 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
             {
                 return step + 1;
             }
-            NPC banker = new NpcQuery()
+            NpcEx banker = new NpcQuery()
                     .withNameContains("Banker")
-                    .keepIf(n -> Location.losTileNextTo(n.getWorldLocation()) != null)
+                    .keepIf(n -> Location.losTileNextTo(n.getWorldPoint()) != null)
                     .nearest();
             if(banker != null)
             {
@@ -106,7 +107,7 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
                     .sortNearest()
                     .first();
             Client client = Static.getClient();
-            if(bank != null && bank.getWorldLocation().distanceTo(client.getLocalPlayer().getWorldLocation())  < 10)
+            if(bank != null && bank.getWorldPoint().distanceTo(client.getLocalPlayer().getWorldLocation())  < 10)
             {
                 ClickManagerUtil.queueClickBox(bank);
                 if(bank.getName().contains("Bank booth"))

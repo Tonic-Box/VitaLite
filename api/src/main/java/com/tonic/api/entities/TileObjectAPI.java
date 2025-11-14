@@ -2,7 +2,7 @@ package com.tonic.api.entities;
 
 import com.tonic.Static;
 import com.tonic.api.TClient;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
@@ -40,7 +40,7 @@ public class TileObjectAPI
         Static.invoke(() ->
         {
             ClickManager.click(ClickType.OBJECT);
-            tclient.getPacketWriter().objectActionPacket(action, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false);
+            tclient.getPacketWriter().objectActionPacket(action, object.getId(), object.getWorldPoint().getX(), object.getWorldPoint().getY(), false);
         });
     }
 
@@ -82,7 +82,7 @@ public class TileObjectAPI
             if (actionIndex == -1)
                 continue;
 
-            final WorldPoint wp = object.getWorldLocation();
+            final WorldPoint wp = object.getWorldPoint();
             Static.invoke(() ->
             {
                 ClickManager.click(ClickType.OBJECT);

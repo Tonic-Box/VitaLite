@@ -6,7 +6,8 @@ import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.InventoryAPI;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.PlayerEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.data.locatables.NpcLocations;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.pathfinder.Walker;
@@ -44,11 +45,10 @@ public class Cannon
             if(opperation.get())
                 break;
 
-            Client client = Static.getClient();
             Delays.waitUntil(() -> {
                 if(repair())
                 {
-                    Delays.waitUntil(() -> PlayerAPI.isIdle(client.getLocalPlayer()));
+                    Delays.waitUntil(() -> PlayerEx.getLocal().isIdle());
                 }
                 return Cannon.ballsLeft() < 25;
             });
@@ -120,7 +120,7 @@ public class Cannon
                 return false;
             }
             InventoryAPI.interact(ItemID.CANNON_BASE, "Set-up");
-            Delays.waitUntil(() -> isPlaced(), 30);
+            Delays.waitUntil(Cannon::isPlaced, 30);
         }
 
         placed = isPlaced();
@@ -165,7 +165,6 @@ public class Cannon
                 .within(3)
                 .sortNearest()
                 .first();
-        //TileObject.findObjectWithin(client, 3, "Dwarf multicannon");
 
         if(cannon == null)
         {
@@ -224,7 +223,6 @@ public class Cannon
             return false;
         }
         Walker.walkTo(current);
-        //RSTileObject cannon = TileObject.findObjectWithin(client, 3, "Dwarf multicannon");
         TileObjectEx cannon = new TileObjectQuery<>()
                 .withNameContains("Dwarf multicannon")
                 .within(3)
@@ -293,7 +291,7 @@ public class Cannon
      */
     public static boolean ensureBalls()
     {
-        return InventoryAPI.containsAny(ItemID.BRONZE_CANNONBALL , ItemID.IRON_CANNONBALL, ItemID.STEEL_CANNONBALL, ItemID.MITHRIL_CANNONBALL, ItemID.ADAMANT_CANNONBALL, ItemID.RUNE_CANNONBALL, ItemID.DRAGON_CANNONBALL);
+        return InventoryAPI.containsAny(ItemID.STEEL_CANNONBALL);
     }
 
     public static void reclaimCannon()

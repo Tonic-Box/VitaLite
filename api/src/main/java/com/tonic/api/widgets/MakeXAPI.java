@@ -1,7 +1,7 @@
 package com.tonic.api.widgets;
 
 import com.tonic.api.game.VarAPI;
-import com.tonic.data.ItemEx;
+import com.tonic.data.wrappers.ItemEx;
 import net.runelite.api.Item;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarClientID;

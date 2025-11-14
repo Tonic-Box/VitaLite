@@ -3,8 +3,9 @@ package com.tonic.services.pathfinder.transports;
 import com.tonic.Static;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.TileObjectAPI;
+import com.tonic.data.wrappers.NpcEx;
 import com.tonic.util.DialogueNode;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.util.handler.StepHandler;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
@@ -39,7 +40,7 @@ public class LongTransport extends Transport
         DialogueNode node = DialogueNode.get(dialogueOptions);
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    NPC npc = new NpcQuery()
+                    NpcEx npc = new NpcQuery()
                             .withName(npcName)
                             .keepIf(n -> n.getComposition() != null)
                             .sortNearest()
@@ -74,7 +75,7 @@ public class LongTransport extends Transport
 
                     Client client = Static.getClient();
 
-                    if((client.getLocalPlayer().getWorldLocation().distanceTo(obj.getWorldLocation()) > 2) && objectID != 190)
+                    if((client.getLocalPlayer().getWorldLocation().distanceTo(obj.getWorldPoint()) > 2) && objectID != 190)
                         return 0;
 
                     if(NumberUtils.isCreatable(action))

@@ -10,6 +10,7 @@ import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.TabsAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.Tab;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.util.handler.StepHandler;
 import lombok.AllArgsConstructor;
@@ -72,6 +73,10 @@ public class Minigames
             Quest.WITCHS_HOUSE
     );
 
+    private static final int[] teleportGraphics = new int[] {
+            800, 802, 803, 804
+    };
+
     /**
      * Checks if the player can currently use minigame teleport.
      *
@@ -97,7 +102,6 @@ public class Minigames
         }
 
         Widget minigamesTeleportButton = WidgetAPI.get(InterfaceID.Grouping.TELEPORT_TEXT1);
-        List<Integer> teleportGraphics = List.of(800, 802, 803, 804);
 
         open();
 
@@ -111,7 +115,7 @@ public class Minigames
                 Delays.tick();
             }
 
-            if (teleportGraphics.contains(client.getLocalPlayer().getGraphic()))
+            if(PlayerEx.getLocal().hasGraphic(teleportGraphics))
             {
                 return false;
             }
@@ -119,7 +123,7 @@ public class Minigames
             WorldPoint wp = client.getLocalPlayer().getWorldLocation();
             WidgetAPI.interact(1, InterfaceID.Grouping.TELEPORT_TEXT1, destination.index);
             Delays.tick();
-            while(wp.equals(client.getLocalPlayer().getWorldLocation()) || !PlayerAPI.isIdle(client.getLocalPlayer()))
+            while(wp.equals(client.getLocalPlayer().getWorldLocation()) || !PlayerEx.getLocal().isIdle())
             {
                 Delays.tick();
             }

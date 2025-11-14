@@ -5,7 +5,8 @@ import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.TradeAPI;
 import static com.tonic.api.widgets.TradeAPI.*;
 
-import com.tonic.data.ItemEx;
+import com.tonic.data.wrappers.ItemEx;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.queries.PlayerQuery;
 import com.tonic.util.handler.AbstractHandlerBuilder;
 import com.tonic.util.handler.StepContext;
@@ -51,7 +52,7 @@ public class TradeBuilder extends AbstractHandlerBuilder<TradeBuilder>
         int step = currentStep;
         add(context -> {
             context.put("ORIGINAL", TradeItem.of(InventoryAPI.getItems(), false));
-            Player player = new PlayerQuery()
+            PlayerEx player = new PlayerQuery()
                     .withName(name)
                     .first();
             if(player == null)

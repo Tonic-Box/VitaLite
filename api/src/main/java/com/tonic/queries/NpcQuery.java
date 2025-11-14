@@ -1,5 +1,6 @@
 package com.tonic.queries;
 
+import com.tonic.data.wrappers.NpcEx;
 import com.tonic.queries.abstractions.AbstractActorQuery;
 import com.tonic.services.GameManager;
 import com.tonic.util.TextUtil;
@@ -9,7 +10,7 @@ import net.runelite.api.NPCComposition;
 /**
  * A query class to filter and retrieve NPCs based on various criteria.
  */
-public class NpcQuery extends AbstractActorQuery<NPC, NpcQuery>
+public class NpcQuery extends AbstractActorQuery<NpcEx, NpcQuery>
 {
     /**
      * Initializes the NpcQuery with the list of all NPCs from the GameManager.
@@ -28,12 +29,10 @@ public class NpcQuery extends AbstractActorQuery<NPC, NpcQuery>
     public NpcQuery withIds(int... ids)
     {
         return keepIf(n -> {
-            NPCComposition composition = getComposition(n);
-            if (composition == null)
-                return false;
+            int npcId = n.getId();
             for (int id : ids)
             {
-                if (composition.getId() == id)
+                if (npcId == id)
                 {
                     return true;
                 }
@@ -62,10 +61,7 @@ public class NpcQuery extends AbstractActorQuery<NPC, NpcQuery>
     public NpcQuery withAction(String action)
     {
         return keepIf(n -> {
-            NPCComposition composition = getComposition(n);
-            if (composition == null || composition.getActions() == null)
-                return false;
-            for (String a : composition.getActions())
+            for (String a : n.getActions())
             {
                 if (a != null && a.equalsIgnoreCase(action))
                 {
@@ -85,23 +81,15 @@ public class NpcQuery extends AbstractActorQuery<NPC, NpcQuery>
     @Override
     public NpcQuery withName(String name)
     {
-        return removeIf(o -> {
-            NPCComposition composition = getComposition(o);
-            if (composition == null || composition.getName() == null)
-                return true;
-            return !name.equalsIgnoreCase(TextUtil.sanitize(composition.getName()));
-        });
+        return removeIf(o -> !name.equalsIgnoreCase(o.getName()));
     }
 
     public NpcQuery withNames(String... names)
     {
         return removeIf(o -> {
-            NPCComposition composition = getComposition(o);
-            if (composition == null || composition.getName() == null)
-                return true;
             for(String name : names)
             {
-                if(name.equalsIgnoreCase(TextUtil.sanitize(composition.getName())))
+                if(name.equalsIgnoreCase(o.getName()))
                     return false;
             }
             return true;
@@ -117,23 +105,6 @@ public class NpcQuery extends AbstractActorQuery<NPC, NpcQuery>
     @Override
     public NpcQuery withNameContains(String name)
     {
-        return removeIf(o -> {
-            NPCComposition composition = getComposition(o);
-            if (composition == null || composition.getName() == null)
-                return true;
-            return composition.getName() == null ||  !TextUtil.sanitize(composition.getName()).toLowerCase().contains(name.toLowerCase());
-        });
-    }
-
-    private NPCComposition getComposition(NPC npc)
-    {
-        NPCComposition composition = npc.getComposition();
-        if(composition == null)
-            return null;
-        if(composition.getConfigs() != null)
-        {
-            composition = composition.transform();
-        }
-        return composition;
+        return removeIf(o -> o.getName() == null || !TextUtil.sanitize(o.getName()).toLowerCase().contains(name.toLowerCase()));
     }
 }

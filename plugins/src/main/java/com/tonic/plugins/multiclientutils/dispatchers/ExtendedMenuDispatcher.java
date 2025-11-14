@@ -6,12 +6,13 @@ import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.NpcEx;
+import com.tonic.data.wrappers.PlayerEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.plugins.multiclientutils.MultiClientUtilPlugin;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.PlayerQuery;
 import com.tonic.queries.TileObjectQuery;
-import com.tonic.services.ipc.Channel;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.util.TextUtil;
 import com.tonic.util.ThreadPool;
@@ -130,7 +131,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("NPC", id, 0);
-                            NPC npc = getNpc(id);
+                            NpcEx npc = getNpc(id);
                             if(npc == null)
                                 return;
                             NpcAPI.interact(npc, 0);
@@ -144,7 +145,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("NPC", id, 1);
-                            NPC npc = getNpc(id);
+                            NpcEx npc = getNpc(id);
                             if(npc == null)
                                 return;
                             NpcAPI.interact(npc, 1);
@@ -158,7 +159,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("NPC", id, 2);
-                            NPC npc = getNpc(id);
+                            NpcEx npc = getNpc(id);
                             if(npc == null)
                                 return;
                             NpcAPI.interact(npc, 2);
@@ -172,7 +173,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("NPC", id, 3);
-                            NPC npc = getNpc(id);
+                            NpcEx npc = getNpc(id);
                             if(npc == null)
                                 return;
                             NpcAPI.interact(npc, 3);
@@ -186,7 +187,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("NPC", id, 4);
-                            NPC npc = getNpc(id);
+                            NpcEx npc = getNpc(id);
                             if(npc == null)
                                 return;
                             NpcAPI.interact(npc, 4);
@@ -200,7 +201,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("PLAYER", id, 0);
-                            Player player = getPlayer(id);
+                            PlayerEx player = getPlayer(id);
                             if(player == null)
                                 return;
                             PlayerAPI.interact(player, 0);
@@ -214,7 +215,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("PLAYER", id, 1);
-                            Player player = getPlayer(id);
+                            PlayerEx player = getPlayer(id);
                             if(player == null)
                                 return;
                             PlayerAPI.interact(player, 1);
@@ -228,7 +229,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("PLAYER", id, 2);
-                            Player player = getPlayer(id);
+                            PlayerEx player = getPlayer(id);
                             if(player == null)
                                 return;
                             PlayerAPI.interact(player, 2);
@@ -242,7 +243,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("PLAYER", id, 3);
-                            Player player = getPlayer(id);
+                            PlayerEx player = getPlayer(id);
                             if(player == null)
                                 return;
                             PlayerAPI.interact(player, 3);
@@ -256,7 +257,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("PLAYER", id, 4);
-                            Player player = getPlayer(id);
+                            PlayerEx player = getPlayer(id);
                             if(player == null)
                                 return;
                             PlayerAPI.interact(player, 4);
@@ -270,7 +271,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("PLAYER", id, 5);
-                            Player player = getPlayer(id);
+                            PlayerEx player = getPlayer(id);
                             if(player == null)
                                 return;
                             PlayerAPI.interact(player, 5);
@@ -284,7 +285,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("PLAYER", id, 6);
-                            Player player = getPlayer(id);
+                            PlayerEx player = getPlayer(id);
                             if(player == null)
                                 return;
                             PlayerAPI.interact(player, 6);
@@ -298,7 +299,7 @@ public class ExtendedMenuDispatcher
                         name,
                         e -> ThreadPool.submit(() -> {
                             plugin.sendMessage("PLAYER", id, 7);
-                            Player player = getPlayer(id);
+                            PlayerEx player = getPlayer(id);
                             if(player == null)
                                 return;
                             PlayerAPI.interact(player, 7);
@@ -344,17 +345,17 @@ public class ExtendedMenuDispatcher
         return 1;
     }
 
-    private static NPC getNpc(int index)
+    private static NpcEx getNpc(int index)
     {
         return new NpcQuery()
                 .withIndex(index)
                 .first();
     }
 
-    private static Player getPlayer(int index)
+    private static PlayerEx getPlayer(int index)
     {
         return new PlayerQuery()
-                .keepIf(p -> p.getId() == index)
+                .keepIf(p -> p.getIndex() == index)
                 .first();
     }
 

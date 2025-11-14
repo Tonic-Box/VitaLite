@@ -1,6 +1,6 @@
 package com.tonic.api.loadouts.item;
 
-import com.tonic.data.ItemEx;
+import com.tonic.data.wrappers.ItemEx;
 
 import java.util.*;
 

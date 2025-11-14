@@ -5,7 +5,7 @@ import com.tonic.Static;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.WidgetAPI;
-import com.tonic.data.ItemEx;
+import com.tonic.data.wrappers.ItemEx;
 import com.tonic.queries.InventoryQuery;
 import net.runelite.api.Client;
 import net.runelite.api.Skill;

@@ -2,6 +2,7 @@ package com.tonic.api.threaded;
 
 import com.tonic.Static;
 import com.tonic.api.entities.PlayerAPI;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.util.AsyncTask;
 import com.tonic.services.GameManager;
 import net.runelite.api.Client;
@@ -119,9 +120,7 @@ public class Delays
     public static void waitUntilIdle()
     {
         tick(1);
-        Client client = Static.getClient();
-        Player player = client.getLocalPlayer();
-        while(!Static.invoke(() -> PlayerAPI.isIdle(player)))
+        while(!Static.invoke(() -> PlayerEx.getLocal().isIdle()))
         {
             tick(1);
         }

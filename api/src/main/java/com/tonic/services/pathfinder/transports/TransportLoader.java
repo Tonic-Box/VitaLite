@@ -7,14 +7,16 @@ import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.*;
+import com.tonic.data.wrappers.NpcEx;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.util.DialogueNode;
 import com.tonic.api.game.WorldsAPI;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.WidgetAPI;
-import com.tonic.data.ItemEx;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.ItemEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.pathfinder.Walker;
@@ -36,8 +38,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.jar.JarFile;
-import java.util.logging.Handler;
 import java.util.stream.Collectors;
 
 import static com.tonic.services.pathfinder.teleports.MovementConstants.SLASH_ITEMS;
@@ -540,7 +540,7 @@ public class TransportLoader
 
                 HandlerBuilder builder = HandlerBuilder.get()
                         .add(0, () -> {
-                            NPC npc = new NpcQuery().withName(glider.getNpcName()).first();
+                            NpcEx npc = new NpcQuery().withName(glider.getNpcName()).first();
                             NpcAPI.interact(npc, "Glider");
                             return 1;
                         })
@@ -570,14 +570,11 @@ public class TransportLoader
 
                 HandlerBuilder builder = HandlerBuilder.get()
                         .add(0, () -> {
-                            NPC npc = new NpcQuery().withName(minecart.getNpcName()).first();
+                            NpcEx npc = new NpcQuery().withName(minecart.getNpcName()).first();
                             NpcAPI.interact(npc, "Travel");
                             return 1;
                         })
-                        .addDelayUntil(1, () -> {
-                            Client client = Static.getClient();
-                            return PlayerAPI.isIdle(client.getLocalPlayer());
-                        })
+                        .addDelayUntil(1, () -> PlayerEx.getLocal().isIdle())
                         .add(2, () -> 3)
                         .add(3, () -> {
                             DialogueAPI.resumePause(12255235, destination.getIndex());
@@ -643,7 +640,7 @@ public class TransportLoader
             for(CharterShip destination : map.getDestinations()) {
                 HandlerBuilder builder = HandlerBuilder.get()
                         .add(0, () -> {
-                            NPC npc = new NpcQuery().withName("Trader Crewmember").sortNearest().first();
+                            NpcEx npc = new NpcQuery().withName("Trader Crewmember").sortNearest().first();
                             NpcAPI.interact(npc, "Charter");
                             return 1;
                         })
@@ -681,7 +678,7 @@ public class TransportLoader
             for(BarnabyShip destination : map.getDestinations()) {
                 HandlerBuilder builder = HandlerBuilder.get()
                         .add(0, () -> {
-                            NPC npc = new NpcQuery().withName("Captain Barnaby").first();
+                            NpcEx npc = new NpcQuery().withName("Captain Barnaby").first();
                             NpcAPI.interact(npc, destination.getOption());
                         })
                         .addDelayUntil(1, () -> !MovementAPI.isMoving())
@@ -902,7 +899,7 @@ public class TransportLoader
     {
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    NPC npc = new NpcQuery()
+                    NpcEx npc = new NpcQuery()
                             .withIds(npcId)
                             .within(source, 10)
                             .first();
@@ -930,7 +927,7 @@ public class TransportLoader
     {
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    NPC npc = new NpcQuery()
+                    NpcEx npc = new NpcQuery()
                             .withName(npcName)
                             .within(source, 10)
                             .first();
@@ -959,7 +956,7 @@ public class TransportLoader
     {
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    NPC npc = new NpcQuery()
+                    NpcEx npc = new NpcQuery()
                             .withIds(npcId)
                             .within(source, 10)
                             .first();
@@ -1004,7 +1001,7 @@ public class TransportLoader
     {
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    NPC npc = new NpcQuery()
+                    NpcEx npc = new NpcQuery()
                             .withName(npcName)
                             .within(source, 10)
                             .first();
@@ -1050,7 +1047,7 @@ public class TransportLoader
                 .node((Object[])chatOptions);
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    NPC npc = new NpcQuery()
+                    NpcEx npc = new NpcQuery()
                             .withIds(npcId)
                             .within(source, 10)
                             .first();
@@ -1275,7 +1272,7 @@ public class TransportLoader
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
                     if (!InventoryAPI.contains(ItemID.SHANTAY_PASS)) {
-                        NPC npc = new NpcQuery()
+                        NpcEx npc = new NpcQuery()
                                 .withIds(NpcID.SHANTAY)
                                 .within(source, 10)
                                 .first();

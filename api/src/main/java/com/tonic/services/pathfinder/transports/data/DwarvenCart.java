@@ -4,9 +4,10 @@ import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.threaded.Delays;
+import com.tonic.data.wrappers.NpcEx;
 import com.tonic.util.DialogueNode;
 import com.tonic.api.widgets.DialogueAPI;
-import com.tonic.data.TileObjectEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.util.handler.StepHandler;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
@@ -65,7 +66,7 @@ public enum DwarvenCart
                         return 1;
                     }
 
-                    NPC npc = new NpcQuery().withName(npcName).nearest();
+                    NpcEx npc = new NpcQuery().withName(npcName).nearest();
                     NpcAPI.interact(npc, "Tickets");
                     return 1;
                 })
@@ -91,7 +92,7 @@ public enum DwarvenCart
                 .add(0, () -> {
                     if(npcName != null)
                     {
-                        NPC npc = new NpcQuery().withName("Cart conductor").nearest();
+                        NpcEx npc = new NpcQuery().withName("Cart conductor").nearest();
                         NpcAPI.interact(npc, "Tickets");
                         while (!DialogueAPI.dialoguePresent())
                         {

@@ -1,24 +1,28 @@
-package com.tonic.data;
+package com.tonic.data.wrappers;
 
 import com.tonic.Static;
 import com.tonic.api.TItemComposition;
-import com.tonic.services.GameManager;
+import com.tonic.api.entities.TileItemAPI;
+import com.tonic.data.wrappers.abstractions.Interactable;
+import com.tonic.data.wrappers.abstractions.Locatable;
+import com.tonic.util.Location;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.runelite.api.Client;
-import net.runelite.api.ItemComposition;
-import net.runelite.api.TileItem;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.client.game.ItemManager;
 
+import java.awt.*;
+
 @RequiredArgsConstructor
 @Getter
-public class TileItemEx
+public class TileItemEx implements Locatable, Interactable
 {
     private final TileItem item;
-    private final WorldPoint worldLocation;
+    private final WorldPoint worldPoint;
     private final LocalPoint localPoint;
     private String[] actions = null;
 
@@ -43,6 +47,16 @@ public class TileItemEx
 
     public int getQuantity() {
         return item.getQuantity();
+    }
+
+    @Override
+    public void interact(String action) {
+        TileItemAPI.interact(this, action);
+    }
+
+    @Override
+    public void interact(int action) {
+        TileItemAPI.interact(this, action);
     }
 
     public String[] getActions()
@@ -98,5 +112,21 @@ public class TileItemEx
     public int getLowAlchValue()
     {
         return (int) Math.floor(getHighAlchValue() * 0.6);
+    }
+
+    @Override
+    public WorldArea getWorldArea() {
+        return worldPoint.toWorldArea();
+    }
+
+    @Override
+    public Tile getTile() {
+        return Location.toTile(worldPoint);
+    }
+
+    @Override
+    public Shape getShape() {
+        Client client = Static.getClient();
+        return Perspective.getCanvasTilePoly(client, getLocalPoint());
     }
 }

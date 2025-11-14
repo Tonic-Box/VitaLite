@@ -4,6 +4,7 @@ import com.tonic.Logger;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.widgets.GrandExchangeAPI;
 import com.tonic.data.GrandExchangeSlot;
+import com.tonic.data.wrappers.NpcEx;
 import com.tonic.queries.NpcQuery;
 import com.tonic.util.handler.AbstractHandlerBuilder;
 import net.runelite.api.NPC;
@@ -35,7 +36,7 @@ public class GrandExchangeHandler extends AbstractHandlerBuilder<GrandExchangeHa
     {
         walkTo(location);
         add(() -> {
-            NPC clerk = new NpcQuery()
+            NpcEx clerk = new NpcQuery()
                     .withNameContains("Clerk")
                     .nearest();
             NpcAPI.interact(clerk, 2);

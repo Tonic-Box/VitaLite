@@ -2,6 +2,7 @@ package com.tonic.api.entities;
 
 import com.tonic.Static;
 import com.tonic.api.TClient;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.queries.PlayerQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
@@ -27,9 +28,9 @@ public class PlayerAPI extends ActorAPI
      * @param player player
      * @param option option number
      */
-    public static void interact(Player player, int option)
+    public static void interact(PlayerEx player, int option)
     {
-        interact(player.getId(), option);
+        interact(player.getIndex(), option);
     }
 
     /**
@@ -37,10 +38,9 @@ public class PlayerAPI extends ActorAPI
      * @param player player
      * @param actions actions list
      */
-    public static void interact(Player player, String... actions)
+    public static void interact(PlayerEx player, String... actions)
     {
-        Client client = Static.getClient();
-        String[] playerActions = Static.invoke(client::getPlayerOptions);
+        String[] playerActions = player.getActions();
         for (String action : actions)
         {
             for(int i = 0; i < playerActions.length; i++)
@@ -72,20 +72,19 @@ public class PlayerAPI extends ActorAPI
     /**
      * @return The current player
      */
-    public static Player getLocal()
+    @Deprecated
+    public static PlayerEx getLocal()
     {
-        Client client = Static.getClient();
-        return client.getLocalPlayer();
+        return PlayerEx.getLocal();
     }
 
     /**
      * check if the local player is idle
      * @return true if idle
      */
+    @Deprecated
     public static boolean isIdle()
     {
-        Client client = Static.getClient();
-        Player player = client.getLocalPlayer();
-        return (player.getIdlePoseAnimation() == player.getPoseAnimation() && player.getAnimation() == -1);
+        return PlayerEx.getLocal().isIdle();
     }
 }
