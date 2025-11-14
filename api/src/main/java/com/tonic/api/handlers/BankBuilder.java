@@ -67,7 +67,7 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
                 ClickManager.clearClickBox();
                 return step2 + 3;
             }
-            TileObjectEx bank = new TileObjectQuery<>()
+            TileObjectEx bank = new TileObjectQuery()
                     .withNamesContains("Bank booth", "Bank chest")
                     .sortNearest()
                     .first();
@@ -102,7 +102,7 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
                 return step + 1;
             }
 
-            TileObjectEx bank = new TileObjectQuery<>()
+            TileObjectEx bank = new TileObjectQuery()
                     .withNamesContains("Bank booth", "Bank chest")
                     .sortNearest()
                     .first();

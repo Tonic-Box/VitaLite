@@ -2,7 +2,6 @@ package com.tonic.queries.abstractions;
 
 import com.tonic.Static;
 import net.runelite.api.Client;
-
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -16,8 +15,12 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
     protected final Supplier<List<T>> dataSource;
     protected final Client client;
     private final Random random = new Random();
+    private int limitValue = -1;
+    private int skipValue = 0;
+    private boolean distinctValue = false;
     private final List<Predicate<T>> filters = new ArrayList<>();
     private final List<Comparator<T>> sorters = new ArrayList<>();
+    private final List<Consumer<T>> peekActions = new ArrayList<>();
 
     public AbstractQuery(List<T> cache) {
         this.dataSource = () -> new ArrayList<>(cache);
@@ -31,6 +34,7 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
 
     /**
      * Lazily filter by predicate (removes matching items)
+     * @return the query instance
      */
     public Q removeIf(Predicate<T> predicate) {
         filters.add(predicate.negate());
@@ -39,6 +43,7 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
 
     /**
      * Lazily filter by predicate (keeps matching items)
+     * @return the query instance
      */
     public Q keepIf(Predicate<T> predicate) {
         filters.add(predicate);
@@ -47,9 +52,47 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
 
     /**
      * Lazily add sorting
+     * @return the query instance
      */
     public Q sort(Comparator<T> comparator) {
         sorters.add(comparator);
+        return self();
+    }
+
+    /**
+     * Limit the number of results
+     * @return the query instance
+     */
+    public Q limit(int maxSize) {
+        this.limitValue = maxSize;
+        return self();
+    }
+
+    /**
+     * Skip a number of results
+     * @return the query instance
+     */
+    public Q skip(int count) {
+        this.skipValue = count;
+        return self();
+    }
+
+    /**
+     * Ensure results are distinct
+     * @return the query instance
+     */
+    public Q distinct() {
+        this.distinctValue = true;
+        return self();
+    }
+
+    /**
+     * Peek at each element during processing
+     * @param action action to perform on each element
+     * @return the query instance
+     */
+    public Q peek(Consumer<T> action) {
+        peekActions.add(action);
         return self();
     }
 
@@ -60,17 +103,31 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
         return Static.invoke(() -> {
             Stream<T> stream = dataSource.get().stream();
 
-            // Apply all filters
             for (Predicate<T> filter : filters) {
                 stream = stream.filter(filter);
             }
 
-            // Apply sorting (chain comparators if multiple)
+            for (Consumer<T> peekAction : peekActions) {
+                stream = stream.peek(peekAction);
+            }
+
+            if (distinctValue) {
+                stream = stream.distinct();
+            }
+
             if (!sorters.isEmpty()) {
                 Comparator<T> combined = sorters.stream()
                         .reduce(Comparator::thenComparing)
                         .orElse(null);
                 stream = stream.sorted(combined);
+            }
+
+            if (skipValue > 0) {
+                stream = stream.skip(skipValue);
+            }
+
+            if (limitValue > 0) {
+                stream = stream.limit(limitValue);
             }
 
             return stream.collect(Collectors.toList());
@@ -107,13 +164,6 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
         }
     }
 
-    public void firstIfPresent(Consumer<T> action) {
-        List<T> results = execute();
-        if (!results.isEmpty()) {
-            action.accept(results.get(0));
-        }
-    }
-
     /**
      * Perform action on the last element, or else run elseAction if no results
      * @param action action to perform on the last element
@@ -125,6 +175,13 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
             elseAction.run();
         } else {
             action.accept(results.get(results.size() - 1));
+        }
+    }
+
+    public void firstIfPresent(Consumer<T> action) {
+        List<T> results = execute();
+        if (!results.isEmpty()) {
+            action.accept(results.get(0));
         }
     }
 
@@ -181,7 +238,8 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
     }
 
     /**
-     * Check if filtered results are empty
+     * Check if there are no filtered results
+     * @return true if no results after filtering, false otherwise
      */
     public boolean isEmpty() {
         return Static.invoke(() -> {
@@ -190,6 +248,51 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
                 stream = stream.filter(filter);
             }
             return stream.findAny().isEmpty();
+        });
+    }
+
+    /**
+     * Check if any filtered result matches the predicate
+     * @param predicate predicate to test
+     * @return true if any match, false otherwise
+     */
+    public boolean any(Predicate<T> predicate) {
+        return Static.invoke(() -> {
+            Stream<T> stream = dataSource.get().stream();
+            for (Predicate<T> filter : filters) {
+                stream = stream.filter(filter);
+            }
+            return stream.anyMatch(predicate);
+        });
+    }
+
+    /**
+     * Check if all filtered results match the predicate
+     * @param predicate predicate to test
+     * @return true if all match, false otherwise
+     */
+    public boolean all(Predicate<T> predicate) {
+        return Static.invoke(() -> {
+            Stream<T> stream = dataSource.get().stream();
+            for (Predicate<T> filter : filters) {
+                stream = stream.filter(filter);
+            }
+            return stream.allMatch(predicate);
+        });
+    }
+
+    /**
+     * Check if no filtered results match the predicate
+     * @param predicate predicate to test
+     * @return true if none match, false otherwise
+     */
+    public boolean none(Predicate<T> predicate) {
+        return Static.invoke(() -> {
+            Stream<T> stream = dataSource.get().stream();
+            for (Predicate<T> filter : filters) {
+                stream = stream.filter(filter);
+            }
+            return stream.noneMatch(predicate);
         });
     }
 
@@ -224,9 +327,7 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
                 Comparator<T> combined = sorters.stream()
                         .reduce(Comparator::thenComparing)
                         .orElse(null);
-                if (combined != null) {
-                    stream = stream.sorted(combined);
-                }
+                stream = stream.sorted(combined);
             }
 
             return stream.collect(collector);

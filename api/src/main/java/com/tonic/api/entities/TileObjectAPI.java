@@ -20,9 +20,9 @@ public class TileObjectAPI
      * Creates an instance of TileObjectQuery
      * @return TileObjectQuery
      */
-    public static TileObjectQuery<TileObjectEx> search()
+    public static TileObjectQuery search()
     {
-        return new TileObjectQuery<>();
+        return new TileObjectQuery();
     }
 
     /**
@@ -161,7 +161,7 @@ public class TileObjectAPI
      */
     public static TileObjectEx get(Predicate<TileObjectEx> filter)
     {
-        return Static.invoke(() -> new TileObjectQuery<>().keepIf(filter).sortNearest().first());
+        return Static.invoke(() -> search().keepIf(filter).sortNearest().first());
     }
 
     /**
@@ -171,7 +171,7 @@ public class TileObjectAPI
      */
     public static TileObjectEx get(String... names)
     {
-        return Static.invoke(() -> new TileObjectQuery<>().withNames(names).sortNearest().first());
+        return Static.invoke(() -> search().withNames(names).sortNearest().first());
     }
 
     /**
@@ -181,7 +181,7 @@ public class TileObjectAPI
      */
     public static TileObjectEx getContains(String... names)
     {
-        return Static.invoke(() -> new TileObjectQuery<>().withNamesContains(names).sortNearest().first());
+        return Static.invoke(() -> search().withNamesContains(names).sortNearest().first());
     }
 
     /**
@@ -191,6 +191,6 @@ public class TileObjectAPI
      */
     public static TileObjectEx get(int... ids)
     {
-        return Static.invoke(() -> new TileObjectQuery<>().withId(ids).sortNearest().first());
+        return Static.invoke(() -> search().withId(ids).sortNearest().first());
     }
 }

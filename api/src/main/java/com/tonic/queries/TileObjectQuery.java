@@ -10,15 +10,13 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.util.Text;
 import net.runelite.client.util.WildcardMatcher;
 import org.apache.commons.lang3.ArrayUtils;
-
 import java.awt.geom.Point2D;
 import java.util.List;
 
 /**
  * A query to find {@link TileObjectEx}'s in the game world.
- * @param <T> The type of TileObjectEx to query for (or ?)
  */
-public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileObjectEx, TileObjectQuery<T>>
+public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery>
 {
     /**
      * Creates a new TileObjectQuery that queries all TileObjectEx's in the game world.
@@ -33,7 +31,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param id The IDs to filter by.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> withId(int... id)
+    public TileObjectQuery withId(int... id)
     {
         return removeIf(o -> !ArrayUtils.contains(id, o.getId()));
     }
@@ -43,7 +41,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param name The name to filter by.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> withName(String name)
+    public TileObjectQuery withName(String name)
     {
         return keepIf(o -> o.getName() != null && o.getName().equalsIgnoreCase(name));
     }
@@ -53,7 +51,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param name The string to filter by.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> withNameContains(String name)
+    public TileObjectQuery withNameContains(String name)
     {
         return keepIf(o -> o.getName() != null && o.getName().toLowerCase().contains(name.toLowerCase()));
     }
@@ -63,7 +61,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param names The names to filter by.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> withNames(String... names)
+    public TileObjectQuery withNames(String... names)
     {
         return keepIf(o -> o.getName() != null && ArrayUtils.contains(names, o.getName()));
     }
@@ -73,7 +71,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param names The strings to filter by.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> withNamesContains(String... names)
+    public TileObjectQuery withNamesContains(String... names)
     {
         return keepIf(o -> o.getName() != null && TextUtil.containsIgnoreCase(o.getName(), names));
     }
@@ -83,7 +81,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param namePart The wildcard pattern to filter by.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> withNameMatches(String namePart)
+    public TileObjectQuery withNameMatches(String namePart)
     {
         return keepIf(o -> o.getName() != null && WildcardMatcher.matches(namePart.toLowerCase(), Text.removeTags(o.getName().toLowerCase())));
     }
@@ -93,7 +91,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param action The action to filter by.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> withAction(String action)
+    public TileObjectQuery withAction(String action)
     {
         return keepIf(o -> o.getActions() != null && TextUtil.containsIgnoreCaseInverse(action, o.getActions()));
     }
@@ -103,7 +101,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param distance The distance to filter by.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> within(int distance)
+    public TileObjectQuery within(int distance)
     {
         return keepIf(o -> Location.within(client.getLocalPlayer().getWorldLocation(), o.getWorldPoint(), distance));
     }
@@ -114,7 +112,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param distance The distance to filter by.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> within(WorldPoint center, int distance)
+    public TileObjectQuery within(WorldPoint center, int distance)
     {
         return keepIf(o -> Location.within(center, o.getWorldPoint(), distance));
     }
@@ -124,7 +122,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param location The location to filter by.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> atLocation(WorldPoint location)
+    public TileObjectQuery atLocation(WorldPoint location)
     {
         return keepIf(o -> o.getWorldPoint().equals(location));
     }
@@ -133,7 +131,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * Sorts the query results by distance from the local player, nearest first.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> sortNearest()
+    public TileObjectQuery sortNearest()
     {
         return sortNearest(client.getLocalPlayer().getWorldLocation());
     }
@@ -143,7 +141,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param center The center point to measure distance from.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> sortNearest(WorldPoint center)
+    public TileObjectQuery sortNearest(WorldPoint center)
     {
         Point2D point = new Point2D.Double(center.getX(), center.getY());
         return sort((o1, o2) -> {
@@ -157,7 +155,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * Sorts the query results by distance from the local player, furthest first.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> sortFurthest()
+    public TileObjectQuery sortFurthest()
     {
         return sortFurthest(client.getLocalPlayer().getWorldLocation());
     }
@@ -167,7 +165,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param center The center point to measure distance from.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> sortFurthest(WorldPoint center)
+    public TileObjectQuery sortFurthest(WorldPoint center)
     {
         Point2D point = new Point2D.Double(center.getX(), center.getY());
         return sort((o1, o2) -> {
@@ -181,7 +179,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * sort by shortest path from the player
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> sortShortestPath()
+    public TileObjectQuery sortShortestPath()
     {
         return sortShortestPath(client.getLocalPlayer().getWorldLocation());
     }
@@ -191,7 +189,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param center center point
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> sortShortestPath(WorldPoint center)
+    public TileObjectQuery sortShortestPath(WorldPoint center)
     {
         return sort((o1, o2) -> {
             List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getWorldPoint());
@@ -206,7 +204,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * sort by longest path from the player
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> sortLongestPath()
+    public TileObjectQuery sortLongestPath()
     {
         return sortLongestPath(client.getLocalPlayer().getWorldLocation());
     }
@@ -216,7 +214,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param center center point
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> sortLongestPath(WorldPoint center)
+    public TileObjectQuery sortLongestPath(WorldPoint center)
     {
         return sort((o1, o2) -> {
             List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getWorldPoint());
@@ -232,7 +230,7 @@ public class TileObjectQuery<T extends TileObjectEx> extends AbstractQuery<TileO
      * @param partial The string to filter by.
      * @return TileObjectQuery
      */
-    public TileObjectQuery<T> withPartialAction(String partial) {
+    public TileObjectQuery withPartialAction(String partial) {
         return keepIf(o -> o.getActions() != null && TextUtil.containsIgnoreCaseInverse(partial, o.getActions()));
     }
 
