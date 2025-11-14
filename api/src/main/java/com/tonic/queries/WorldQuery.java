@@ -1,6 +1,7 @@
 package com.tonic.queries;
 
 import com.tonic.Static;
+import com.tonic.api.game.SkillAPI;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.util.TextUtil;
 import net.runelite.api.Client;
@@ -195,6 +196,28 @@ public class WorldQuery extends AbstractQuery<World, WorldQuery>
             {
             }
             return minLevel <= total;
+        });
+    }
+
+    /**
+     * Filters the skill total worlds, keeping those accessible based on the player's total skill level.
+     *
+     * @return A new {@link WorldQuery} with worlds that meet the skill total requirements.
+     */
+    public WorldQuery withQualifyingSkillTotalWorlds() {
+        int totalLevel = SkillAPI.getTotalLevel();
+        return keepIf(w -> {
+            boolean isSkillTotal = w.getTypes().contains(WorldType.SKILL_TOTAL);
+            if (isSkillTotal) {
+                if (w.getActivity() == null) return false;
+                try {
+                    int minLevel = Integer.parseInt(w.getActivity().replaceAll("[^0-9.]", ""));
+                    return minLevel <= totalLevel;
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+            }
+            return true; // Include non-skill-total worlds
         });
     }
 
