@@ -9,6 +9,7 @@ import net.runelite.api.*;
 import net.runelite.api.coords.*;
 import net.runelite.api.events.*;
 import net.runelite.api.widgets.*;
+import com.tonic.data.wrappers.*;
 
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
