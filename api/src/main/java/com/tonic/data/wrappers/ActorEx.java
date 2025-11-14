@@ -198,10 +198,18 @@ public abstract class ActorEx<T extends Actor> implements Entity
     @Override
     public boolean equals(Object obj)
     {
-        if(!(obj instanceof ActorEx))
-            return false;
+        if(obj instanceof Actor)
+        {
+            Actor other = (Actor) obj;
+            return actor == other;
+        }
 
-        ActorEx<?> actorEx = (ActorEx<?>) obj;
-        return actor == actorEx.getActor();
+        if(obj instanceof ActorEx)
+        {
+            ActorEx<?> actorEx = (ActorEx<?>) obj;
+            return actor == actorEx.getActor();
+        }
+
+        return false;
     }
 }
