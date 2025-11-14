@@ -1,9 +1,7 @@
 package com.tonic.data.magic;
 
 import com.tonic.api.widgets.WidgetAPI;
-import com.tonic.data.wrappers.ItemEx;
-import com.tonic.data.wrappers.TileItemEx;
-import com.tonic.data.wrappers.TileObjectEx;
+import com.tonic.data.wrappers.*;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
@@ -27,14 +25,14 @@ public interface Spell {
         WidgetAPI.onWidget(getWidget(), -1, -1, InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot());
     }
 
-    default void castOn(NPC npc)
+    default void castOn(NpcEx npc)
     {
         WidgetAPI.onNpc(getWidget(), -1, -1, npc.getIndex(), false);
     }
 
-    default void castOn(Player player)
+    default void castOn(PlayerEx player)
     {
-        WidgetAPI.onNpc(getWidget(), -1, -1, player.getId(), false);
+        WidgetAPI.onPlayer(getWidget(), -1, -1, player.getId(), false);
     }
 
     default void castOn(TileObjectEx tileObject)
