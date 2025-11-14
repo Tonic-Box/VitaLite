@@ -1,12 +1,18 @@
 package com.tonic.queries;
 
+import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.services.GameManager;
 import com.tonic.util.Location;
 import net.runelite.api.Tile;
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
+import net.runelite.api.coords.WorldPoint;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class LocationQuery extends AbstractQuery<Tile, LocationQuery>
 {
@@ -71,5 +77,13 @@ public class LocationQuery extends AbstractQuery<Tile, LocationQuery>
         );
     }
 
+    public List<WorldPoint> toWorldPointList()
+    {
+        return Static.invoke(() -> collect().stream().map(Tile::getWorldLocation).collect(Collectors.toList()));
+    }
 
+    public List<LocalPoint> toLocalPointList()
+    {
+        return Static.invoke(() -> collect().stream().map(Tile::getLocalLocation).collect(Collectors.toList()));
+    }
 }
