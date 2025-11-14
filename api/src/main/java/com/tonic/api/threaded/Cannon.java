@@ -10,7 +10,6 @@ import com.tonic.data.TileObjectEx;
 import com.tonic.data.locatables.NpcLocations;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.pathfinder.Walker;
-import com.tonic.util.DialogueNode;
 import com.tonic.util.WorldPointUtil;
 import lombok.Setter;
 import net.runelite.api.Client;
@@ -293,7 +292,7 @@ public class Cannon
      */
     public static boolean ensureBalls()
     {
-        return InventoryAPI.containsAny(ItemID.BRONZE_CANNONBALL , ItemID.IRON_CANNONBALL, ItemID.STEEL_CANNONBALL, ItemID.MITHRIL_CANNONBALL, ItemID.ADAMANT_CANNONBALL, ItemID.RUNE_CANNONBALL, ItemID.DRAGON_CANNONBALL);
+        return InventoryAPI.contains(ItemID.CANNON_BALL);
     }
 
     public static void reclaimCannon()
