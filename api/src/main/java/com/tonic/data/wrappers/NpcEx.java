@@ -13,7 +13,6 @@ import net.runelite.client.game.NPCManager;
 
 public class NpcEx extends ActorEx<NPC>
 {
-    private NPCComposition composition;
     public NpcEx(NPC actor) {
         super(actor);
     }
@@ -22,9 +21,14 @@ public class NpcEx extends ActorEx<NPC>
         return actor;
     }
 
-    public NPCComposition getComposition() {
-        if (composition == null) {
-            composition = Static.invoke(actor::getTransformedComposition);
+    public NPCComposition getComposition()
+    {
+        NPCComposition composition = actor.getComposition();
+        if(composition == null)
+            return null;
+        if(composition.getConfigs() != null)
+        {
+            composition = composition.transform();
         }
         return composition;
     }
