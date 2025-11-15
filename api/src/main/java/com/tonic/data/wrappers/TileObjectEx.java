@@ -1,7 +1,10 @@
 package com.tonic.data.wrappers;
 
 import com.tonic.Static;
+import com.tonic.api.TObjectComposition;
 import com.tonic.api.entities.TileObjectAPI;
+import com.tonic.api.game.SceneAPI;
+import com.tonic.data.ObjectBlockAccessFlags;
 import com.tonic.data.wrappers.abstractions.Entity;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
@@ -14,6 +17,8 @@ import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 
 import java.awt.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @RequiredArgsConstructor
 @Getter
@@ -154,5 +159,105 @@ public class TileObjectEx implements Entity
             return ground.getConvexHull();
         }
         return tileObject.getClickbox();
+    }
+
+    public ObjectComposition getObjectComposition()
+    {
+        Client client = Static.getClient();
+        return Static.invoke(() -> {
+            ObjectComposition composition = client.getObjectDefinition(getId());
+            if(composition.getImpostorIds() != null)
+            {
+                composition = composition.getImpostor();
+            }
+            return composition;
+        });
+    }
+
+    public boolean isReachable()
+    {
+        WorldPoint player = PlayerEx.getLocal().getWorldPoint();
+        for(WorldPoint wp : interactableFrom())
+        {
+            if(SceneAPI.isReachable(player, wp))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Set<WorldPoint> interactableFrom()
+    {
+        return Static.invoke(() -> {
+            ObjectComposition composition = getObjectComposition();
+
+            int modelRotation = getOrientation();
+            int type = getConfig() & 0x1F;
+
+            int rotation = modelRotation;
+            if (type == 2 || type == 6 || type == 8) {
+                rotation -= 4;
+            } else if (type == 7) {
+                rotation = (rotation - 2 & 0x3);
+            }
+
+            TObjectComposition tComp = (TObjectComposition) composition;
+            final Set<WorldPoint> accessibleFrom = new HashSet<>();
+            WorldPoint objPos = getWorldPoint();
+            int rotatedFlags = tComp.rotateBlockAccessFlags(rotation);
+            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_NORTH) == 0) {
+                accessibleFrom.add(objPos.dy(1));
+            }
+            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_EAST) == 0) {
+                accessibleFrom.add(objPos.dx(1));
+            }
+            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_SOUTH) == 0) {
+                accessibleFrom.add(objPos.dy(-1));
+            }
+            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_WEST) == 0) {
+                accessibleFrom.add(objPos.dx(-1));
+            }
+            return accessibleFrom;
+        });
+    }
+
+    public int getConfig()
+    {
+        if (tileObject instanceof GameObject) {
+            GameObject gameObject = (GameObject) tileObject;
+            return gameObject.getConfig();
+        } else if (tileObject instanceof WallObject) {
+            WallObject wallObject = (WallObject) tileObject;
+            return wallObject.getConfig();
+        } else if (tileObject instanceof DecorativeObject) {
+            DecorativeObject decorativeObject = (DecorativeObject) tileObject;
+            return decorativeObject.getConfig();
+        } else if (tileObject instanceof GroundObject) {
+            GroundObject groundObject = (GroundObject) tileObject;
+            return groundObject.getConfig();
+        }
+        return -1;
+    }
+
+    public int getOrientation()
+    {
+        if (tileObject instanceof GameObject)
+        {
+            return ((GameObject) tileObject).getModelOrientation();
+        }
+        else if (tileObject instanceof GroundObject)
+        {
+            return 0;
+        }
+        else if (tileObject instanceof DecorativeObject)
+        {
+            return 0;
+        }
+        else if (tileObject instanceof WallObject)
+        {
+            return 0;
+        }
+        return -1;
     }
 }
