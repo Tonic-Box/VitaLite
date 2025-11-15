@@ -446,6 +446,12 @@ public class GameManager extends Overlay {
     @Subscribe
     public void onGameStateChanged(GameStateChanged event)
     {
+        if (event.getGameState() == GameState.LOGIN_SCREEN
+                || event.getGameState() == GameState.HOPPING
+                || event.getGameState() == GameState.CONNECTION_LOST)
+        {
+            tileItemCache.clear();
+        }
         if(event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
             tickCount = 0;
     }
