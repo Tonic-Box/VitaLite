@@ -67,6 +67,7 @@ public enum CanoeStation
                     return 5;
                 })
                 .add(6, () -> {
+
                     TileObjectEx station = new TileObjectQuery()
                             .withPartialAction("Paddle ")
                             .sortNearest()
