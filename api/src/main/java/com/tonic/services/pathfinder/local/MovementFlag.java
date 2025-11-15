@@ -25,6 +25,12 @@ public enum MovementFlag {
     BLOCK_MOVEMENT_FLOOR(CollisionDataFlag.BLOCK_MOVEMENT_FLOOR),
     BLOCK_MOVEMENT_FULL(CollisionDataFlag.BLOCK_MOVEMENT_FULL);
 
+    public static final int BLOCKING_FLAGS =
+            CollisionDataFlag.BLOCK_MOVEMENT_FULL |
+                    CollisionDataFlag.BLOCK_MOVEMENT_OBJECT |
+                    CollisionDataFlag.BLOCK_MOVEMENT_FLOOR |
+                    CollisionDataFlag.BLOCK_MOVEMENT_FLOOR_DECORATION;
+
     private final int flag;
 
     public static Set<MovementFlag> getSetFlags(int collisionData)

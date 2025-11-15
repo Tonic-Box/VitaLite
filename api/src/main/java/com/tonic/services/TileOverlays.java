@@ -10,6 +10,7 @@ import com.tonic.data.Walls;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.pathfinder.collision.Flags;
+import com.tonic.services.pathfinder.local.CollisionUtil;
 import com.tonic.services.pathfinder.local.LocalCollisionMap;
 import com.tonic.util.RelativePosition;
 import com.tonic.util.ThreadPool;
@@ -148,9 +149,9 @@ public class TileOverlays extends Overlay
                     newX = objPos.getX() + x;
                     newY = objPos.getY() + height - 1;
                     plane = objPos.getPlane();
-                    if(!GameManager.isReachable(newX, newY + 1, plane))
+                    if(!LocalCollisionMap.canStep(newX, newY + 1, plane))
                         continue;
-                    if(Walls.of(newX, newY, plane).hasSouthWall())
+                    if(Walls.of(newX, newY, plane).hasNorthWall())
                         continue;
                     WorldPoint wallPoint = new WorldPoint(newX, newY, plane);
                     LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
@@ -168,9 +169,9 @@ public class TileOverlays extends Overlay
                     newX = objPos.getX() + width - 1;
                     newY = objPos.getY() + y;
                     plane = objPos.getPlane();
-                    if(!GameManager.isReachable(newX + 1, newY, plane))
+                    if(!LocalCollisionMap.canStep(newX + 1, newY, plane))
                         continue;
-                    if(Walls.of(newX, newY, plane).hasSouthWall())
+                    if(Walls.of(newX, newY, plane).hasEastWall())
                         continue;
                     WorldPoint wallPoint = new WorldPoint(newX, newY, plane);
                     LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
@@ -188,7 +189,7 @@ public class TileOverlays extends Overlay
                     newX = objPos.getX() + x;
                     newY = objPos.getY();
                     plane = objPos.getPlane();
-                    if(!GameManager.isReachable(newX, newY - 1, plane))
+                    if(!LocalCollisionMap.canStep(newX, newY - 1, plane))
                         continue;
                     if(Walls.of(newX, newY, plane).hasSouthWall())
                         continue;
@@ -208,7 +209,7 @@ public class TileOverlays extends Overlay
                     newX = objPos.getX();
                     newY = objPos.getY() + y;
                     plane = objPos.getPlane();
-                    if (!GameManager.isReachable(newX - 1, newY, plane))
+                    if(!LocalCollisionMap.canStep(newX - 1, newY, plane))
                         continue;
                     if(Walls.of(newX, newY, plane).hasWestWall())
                         continue;

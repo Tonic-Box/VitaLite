@@ -163,4 +163,15 @@ public class Walls
             return null;
         }
     }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder("Walls: ");
+        for(Wall wall : walls)
+        {
+            sb.append(wall.name()).append(", ");
+        }
+        return sb.toString();
+    }
 }
