@@ -2,6 +2,7 @@ package com.tonic.services;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.api.game.SceneAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.MiniMapAPI;
 import com.tonic.api.widgets.WidgetAPI;
@@ -21,6 +22,9 @@ import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
+import com.tonic.util.WorldPointUtil;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.Point;
@@ -58,6 +62,7 @@ public class GameManager extends Overlay {
     private static int lastUpdateTileObjects = 0;
     private static int lastUpdatePlayers = 0;
     private static int lastUpdateNpcs = 0;
+    private static int lastUpdateReachableTiles = 0;
     private static final List<TileObjectEx> tileObjects = new ArrayList<>();
     private static final List<NpcEx> npcs = new ArrayList<>();
     private static final List<PlayerEx> players = new ArrayList<>();
@@ -71,6 +76,7 @@ public class GameManager extends Overlay {
         return npcList().stream();
     }
     private static WalkerPath walkerPath;
+    private static final TIntSet reachableTiles = new TIntHashSet();
 
     public static List<PlayerEx> playerList()
     {
@@ -106,6 +112,28 @@ public class GameManager extends Overlay {
         }
 
         return npcs;
+    }
+
+    public static boolean isReachable(WorldPoint worldPoint)
+    {
+        return isReachable(WorldPointUtil.compress(worldPoint));
+    }
+
+    public static boolean isReachable(int x, int y, int plane)
+    {
+        return isReachable(WorldPointUtil.compress(x, y, plane));
+    }
+
+    public static boolean isReachable(int compressed)
+    {
+        Client client = Static.getClient();
+        if(lastUpdateReachableTiles < client.getTickCount())
+        {
+            reachableTiles.clear();
+            reachableTiles.addAll(SceneAPI.reachableTilesCompressed(PlayerEx.getLocal().getWorldPoint()));
+            lastUpdateReachableTiles = client.getTickCount();
+        }
+        return reachableTiles.contains(compressed);
     }
 
     public static List<Tile> getTiles()

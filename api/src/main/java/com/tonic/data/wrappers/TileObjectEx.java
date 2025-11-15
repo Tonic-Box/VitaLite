@@ -3,13 +3,13 @@ package com.tonic.data.wrappers;
 import com.tonic.Static;
 import com.tonic.api.TObjectComposition;
 import com.tonic.api.entities.TileObjectAPI;
-import com.tonic.api.game.SceneAPI;
 import com.tonic.data.ObjectBlockAccessFlags;
+import com.tonic.data.Walls;
 import com.tonic.data.wrappers.abstractions.Entity;
+import com.tonic.services.GameManager;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
@@ -18,10 +18,9 @@ import net.runelite.api.coords.WorldPoint;
 
 import java.awt.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-@RequiredArgsConstructor
-@Getter
 public class TileObjectEx implements Entity
 {
     public static TileObjectEx of(TileObject object)
@@ -31,8 +30,14 @@ public class TileObjectEx implements Entity
         return new TileObjectEx(object);
     }
 
+    @Getter
     private final TileObject tileObject;
     private String[] actions;
+
+    public TileObjectEx(TileObject tileObject)
+    {
+        this.tileObject = tileObject;
+    }
 
     @Override
     public int getId() {
@@ -176,17 +181,21 @@ public class TileObjectEx implements Entity
 
     public boolean isReachable()
     {
-        WorldPoint player = PlayerEx.getLocal().getWorldPoint();
         for(WorldPoint wp : interactableFrom())
         {
-            if(SceneAPI.isReachable(player, wp))
-            {
+            if(GameManager.isReachable(wp))
                 return true;
-            }
         }
         return false;
     }
 
+    /**
+     * Gets all WorldPoints from which this object can be interacted with.
+     * Takes into account walls that may block access. Does not account for reachability
+     * Only works for GameObjects (type 2).
+     *
+     * @return A set of WorldPoints from which the object can be interacted with.
+     */
     public Set<WorldPoint> interactableFrom() {
         if(!(getTileObject() instanceof GameObject))
             return new HashSet<>();
@@ -222,6 +231,8 @@ public class TileObjectEx implements Entity
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_NORTH) == 0) {
                 int y = objPos.getY() + height;
                 for (int x = objPos.getX(); x < objPos.getX() + width; x++) {
+                    if(Walls.of(x, y, objPos.getPlane()).hasSouthWall())
+                        continue;
                     accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
                 }
             }
@@ -229,6 +240,8 @@ public class TileObjectEx implements Entity
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_EAST) == 0) {
                 int x = objPos.getX() + width;
                 for (int y = objPos.getY(); y < objPos.getY() + height; y++) {
+                    if(Walls.of(x, y, objPos.getPlane()).hasWestWall())
+                        continue;
                     accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
                 }
             }
@@ -236,6 +249,8 @@ public class TileObjectEx implements Entity
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_SOUTH) == 0) {
                 int y = objPos.getY() - 1;
                 for (int x = objPos.getX(); x < objPos.getX() + width; x++) {
+                    if(Walls.of(x, y, objPos.getPlane()).hasNorthWall())
+                        continue;
                     accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
                 }
             }
@@ -243,12 +258,13 @@ public class TileObjectEx implements Entity
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_WEST) == 0) {
                 int x = objPos.getX() - 1;
                 for (int y = objPos.getY(); y < objPos.getY() + height; y++) {
+                    if(Walls.of(x, y, objPos.getPlane()).hasEastWall())
+                        continue;
                     accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
                 }
             }
 
-            WorldPoint player = PlayerEx.getLocal().getWorldPoint();
-            return new HashSet<>(SceneAPI.filterReachable(player, accessibleFrom.toArray(new WorldPoint[0])));
+            return accessibleFrom;
         });
     }
 

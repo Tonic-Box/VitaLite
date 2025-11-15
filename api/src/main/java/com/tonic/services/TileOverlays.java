@@ -6,6 +6,7 @@ import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.data.ObjectBlockAccessFlags;
+import com.tonic.data.Walls;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.pathfinder.collision.Flags;
@@ -47,7 +48,10 @@ public class TileOverlays extends Overlay
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        //drawInteractableFrom(graphics);
+        if(Static.getVitaConfig().shouldDrawInteractable())
+        {
+            drawInteractableFrom(graphics);
+        }
 
         if(Static.getVitaConfig().shouldDrawCollision())
         {
@@ -105,12 +109,13 @@ public class TileOverlays extends Overlay
     public void drawInteractableFrom(Graphics2D graphics2D)
     {
         Client client = Static.getClient();
+
         for(TileObjectEx obj : GameManager.objectList())
         {
             if(!(obj.getTileObject() instanceof GameObject))
                 continue;
 
-            if(obj.getType() != 2)
+            if(obj.getType() != 2 || !obj.isInteractable())
                 continue;
 
             ObjectComposition composition = client.getObjectDefinition(obj.getId());
@@ -127,7 +132,6 @@ public class TileOverlays extends Overlay
             }
             rotation = rotation & 0x3;
 
-            // Get object dimensions
             WorldArea area = obj.getWorldArea();
             int width = area.getWidth();
             int height = area.getHeight();
@@ -135,11 +139,20 @@ public class TileOverlays extends Overlay
             WorldPoint objPos = obj.getWorldPoint();
             int rotatedFlags = tComp.rotateBlockAccessFlags(rotation);
 
-            // NORTH edge (top of object) - accessible from north
+            int newX;
+            int newY;
+            int plane;
+
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_NORTH) == 0) {
                 for(int x = 0; x < width; x++) {
-                    // FIXED: North edge is at Y + height - 1 (top)
-                    WorldPoint wallPoint = new WorldPoint(objPos.getX() + x, objPos.getY() + height - 1, objPos.getPlane());
+                    newX = objPos.getX() + x;
+                    newY = objPos.getY() + height - 1;
+                    plane = objPos.getPlane();
+                    if(!GameManager.isReachable(newX, newY + 1, plane))
+                        continue;
+                    if(Walls.of(newX, newY, plane).hasSouthWall())
+                        continue;
+                    WorldPoint wallPoint = new WorldPoint(newX, newY, plane);
                     LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
                     if(localPoint == null)
                         continue;
@@ -150,11 +163,16 @@ public class TileOverlays extends Overlay
                 }
             }
 
-            // EAST edge (right of object) - accessible from east
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_EAST) == 0) {
                 for(int y = 0; y < height; y++) {
-                    // This is correct - east edge is at X + width - 1
-                    WorldPoint wallPoint = new WorldPoint(objPos.getX() + width - 1, objPos.getY() + y, objPos.getPlane());
+                    newX = objPos.getX() + width - 1;
+                    newY = objPos.getY() + y;
+                    plane = objPos.getPlane();
+                    if(!GameManager.isReachable(newX + 1, newY, plane))
+                        continue;
+                    if(Walls.of(newX, newY, plane).hasSouthWall())
+                        continue;
+                    WorldPoint wallPoint = new WorldPoint(newX, newY, plane);
                     LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
                     if(localPoint == null)
                         continue;
@@ -165,11 +183,16 @@ public class TileOverlays extends Overlay
                 }
             }
 
-            // SOUTH edge (bottom of object) - accessible from south
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_SOUTH) == 0) {
                 for(int x = 0; x < width; x++) {
-                    // FIXED: South edge is at Y + 0 (bottom)
-                    WorldPoint wallPoint = new WorldPoint(objPos.getX() + x, objPos.getY(), objPos.getPlane());
+                    newX = objPos.getX() + x;
+                    newY = objPos.getY();
+                    plane = objPos.getPlane();
+                    if(!GameManager.isReachable(newX, newY - 1, plane))
+                        continue;
+                    if(Walls.of(newX, newY, plane).hasSouthWall())
+                        continue;
+                    WorldPoint wallPoint = new WorldPoint(newX, newY, plane);
                     LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
                     if(localPoint == null)
                         continue;
@@ -180,11 +203,16 @@ public class TileOverlays extends Overlay
                 }
             }
 
-            // WEST edge (left of object) - accessible from west
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_WEST) == 0) {
                 for(int y = 0; y < height; y++) {
-                    // This is correct - west edge is at X + 0
-                    WorldPoint wallPoint = new WorldPoint(objPos.getX(), objPos.getY() + y, objPos.getPlane());
+                    newX = objPos.getX();
+                    newY = objPos.getY() + y;
+                    plane = objPos.getPlane();
+                    if (!GameManager.isReachable(newX - 1, newY, plane))
+                        continue;
+                    if(Walls.of(newX, newY, plane).hasWestWall())
+                        continue;
+                    WorldPoint wallPoint = new WorldPoint(newX, newY, plane);
                     LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
                     if(localPoint == null)
                         continue;

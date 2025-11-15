@@ -252,16 +252,6 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 drawPath,
                 () -> Static.getVitaConfig().setShouldDrawWalkerPath(drawPath.isSelected())
         ));
-        walkerPanel.addVerticalStrut(12);
-
-        ToggleSlider drawCollision = new ToggleSlider();
-        drawCollision.setSelected(Static.getVitaConfig().shouldDrawCollision());
-        walkerPanel.addContent(createToggleOption(
-                "Draw Tile Collision",
-                "Draw tile collision on the floating and mini maps",
-                drawCollision,
-                () -> Static.getVitaConfig().setShouldDrawCollision(drawCollision.isSelected())
-        ));
 
         if(!Static.isRunningFromShadedJar())
         {
@@ -272,6 +262,31 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         }
 
         contentPanel.add(walkerPanel);
+        contentPanel.add(Box.createVerticalStrut(10));
+
+        // Scene Settings
+        CollapsiblePanel scenePanel = new CollapsiblePanel("Scene");
+
+        ToggleSlider drawCollision = new ToggleSlider();
+        drawCollision.setSelected(Static.getVitaConfig().shouldDrawCollision());
+        scenePanel.addContent(createToggleOption(
+                "Draw Tile Collision",
+                "Draw tile collision on the floating and mini maps",
+                drawCollision,
+                () -> Static.getVitaConfig().setShouldDrawCollision(drawCollision.isSelected())
+        ));
+        scenePanel.addVerticalStrut(12);
+
+        ToggleSlider drawInteractable = new ToggleSlider();
+        drawInteractable.setSelected(Static.getVitaConfig().shouldDrawInteractable());
+        scenePanel.addContent(createToggleOption(
+                "Draw Interactable Faces",
+                "Draw lines showing where objects are interactable from.",
+                drawInteractable,
+                () -> Static.getVitaConfig().setShouldDrawInteractable(drawInteractable.isSelected())
+        ));
+
+        contentPanel.add(scenePanel);
         contentPanel.add(Box.createVerticalStrut(10));
 
         // Input Settings

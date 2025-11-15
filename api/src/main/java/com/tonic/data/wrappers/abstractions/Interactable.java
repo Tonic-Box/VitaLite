@@ -22,4 +22,21 @@ public interface Interactable
      * @return An array of action strings.
      */
     String[] getActions();
+
+    default boolean isInteractable()
+    {
+        if(getActions() == null)
+        {
+            return false;
+        }
+
+        for (String action : getActions())
+        {
+            if (action != null && !action.isEmpty())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
