@@ -118,6 +118,16 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
     }
 
     /**
+     * Filters the query to only include objects that have interactable tiles that are reachable
+     * by the player.
+     * @return TileObjectQuery
+     */
+    public TileObjectQuery isReachable()
+    {
+        return keepIf(TileObjectEx::isReachable);
+    }
+
+    /**
      * Filters the query to only include objects at the specified location.
      * @param location The location to filter by.
      * @return TileObjectQuery

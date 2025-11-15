@@ -1,6 +1,10 @@
 package com.tonic.api.game;
 
 import com.tonic.Static;
+import com.tonic.util.WorldPointUtil;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
+import it.unimi.dsi.fastutil.ints.IntArrayFIFOQueue;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
@@ -77,6 +81,59 @@ public class SceneAPI {
             for (int y = 0; y < 104; ++y) {
                 if (visited[x][y]) {
                     finalPoints.add(new WorldPoint(baseX + x, baseY + y, plane));
+                }
+            }
+        }
+        return finalPoints;
+    }
+
+    public static TIntSet reachableTilesCompressed(WorldPoint origin) {
+        Client client = Static.getClient();
+        boolean[][] visited = new boolean[104][104];
+        CollisionData[] collisionData = client.getTopLevelWorldView().getCollisionMaps();
+        if (collisionData == null) {
+            return new TIntHashSet();
+        }
+        WorldView worldView = client.getTopLevelWorldView();
+        int[][] flags = collisionData[worldView.getPlane()].getFlags();
+        int firstPoint = (origin.getX()-worldView.getBaseX() << 16) | origin.getY()-worldView.getBaseY();
+
+        // Use IntArrayFIFOQueue instead of ArrayDeque<Integer>
+        IntArrayFIFOQueue queue = new IntArrayFIFOQueue();
+        queue.enqueue(firstPoint);
+
+        while (!queue.isEmpty()) {
+            int point = queue.dequeueInt();  // dequeueInt() instead of poll()
+            short x = (short)(point >> 16);
+            short y = (short)point;
+            if (y < 0 || x < 0 || y > 104 || x > 104) {
+                continue;
+            }
+            if ((flags[x][y] & CollisionDataFlag.BLOCK_MOVEMENT_SOUTH) == 0 && (flags[x][y - 1] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0 && !visited[x][y - 1]) {
+                queue.enqueue((x << 16) | (y - 1));  // enqueue() instead of add()
+                visited[x][y - 1] = true;
+            }
+            if ((flags[x][y] & CollisionDataFlag.BLOCK_MOVEMENT_NORTH) == 0 && (flags[x][y + 1] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0 && !visited[x][y + 1]) {
+                queue.enqueue((x << 16) | (y + 1));
+                visited[x][y + 1] = true;
+            }
+            if ((flags[x][y] & CollisionDataFlag.BLOCK_MOVEMENT_WEST) == 0 && (flags[x - 1][y] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0 && !visited[x - 1][y]) {
+                queue.enqueue(((x - 1) << 16) | y);
+                visited[x - 1][y] = true;
+            }
+            if ((flags[x][y] & CollisionDataFlag.BLOCK_MOVEMENT_EAST) == 0 && (flags[x + 1][y] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0 && !visited[x + 1][y]) {
+                queue.enqueue(((x + 1) << 16) | y);
+                visited[x + 1][y] = true;
+            }
+        }
+        int baseX = worldView.getBaseX();
+        int baseY = worldView.getBaseY();
+        int plane = worldView.getPlane();
+        TIntSet finalPoints = new TIntHashSet();
+        for (int x = 0; x < 104; ++x) {
+            for (int y = 0; y < 104; ++y) {
+                if (visited[x][y]) {
+                    finalPoints.add(WorldPointUtil.compress(baseX + x, baseY + y, plane));
                 }
             }
         }
@@ -640,7 +697,21 @@ public class SceneAPI {
         }
     }
 
-    public static List<WorldPoint> filterReachable(WorldPoint from, WorldPoint... to)
+    public static List<WorldPoint> filterReachable(WorldPoint... to)
+    {
+        List<WorldPoint> reachable = reachableTiles();
+        List<WorldPoint> finalList = new ArrayList<>();
+        for (WorldPoint wp : to)
+        {
+            if (reachable.contains(wp))
+            {
+                finalList.add(wp);
+            }
+        }
+        return finalList;
+    }
+
+    public static List<WorldPoint> filterReachable(List<WorldPoint> to)
     {
         List<WorldPoint> reachable = reachableTiles();
         List<WorldPoint> finalList = new ArrayList<>();

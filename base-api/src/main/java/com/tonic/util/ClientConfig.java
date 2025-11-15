@@ -57,6 +57,11 @@ public interface ClientConfig extends VitaConfig {
     @ConfigKey(value = "drawCollision")
     void setShouldDrawCollision(boolean shouldDraw);
 
+    @ConfigKey(value = "drawInteractable", defaultValue = "false")
+    boolean shouldDrawInteractable();
+    @ConfigKey(value = "drawInteractable")
+    void setShouldDrawInteractable(boolean shouldDraw);
+
     @ConfigKey(value = "logNames", defaultValue = "true")
     boolean shouldLogNames();
     @ConfigKey(value = "logNames")
