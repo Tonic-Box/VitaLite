@@ -113,9 +113,6 @@ public class TileOverlays extends Overlay
 
         for(TileObjectEx obj : GameManager.objectList())
         {
-            if(!(obj.getTileObject() instanceof GameObject))
-                continue;
-
             if(obj.getType() != 2 || !obj.isInteractable())
                 continue;
 
@@ -143,6 +140,29 @@ public class TileOverlays extends Overlay
             int newX;
             int newY;
             int plane;
+
+            if(obj.getTileObject() instanceof WallObject)
+            {
+                WallObject wall = (WallObject) obj.getTileObject();
+                Walls walls = Walls.of(wall);
+                if(walls.hasNorthWall())
+                {
+                    TileDrawingUtil.renderWall(graphics2D, LocalPoint.fromWorld(client, wall.getWorldLocation()), Color.RED, Wall.Direction.NORTH);
+                }
+                if(walls.hasEastWall())
+                {
+                    TileDrawingUtil.renderWall(graphics2D, LocalPoint.fromWorld(client, wall.getWorldLocation()), Color.RED, Wall.Direction.EAST);
+                }
+                if(walls.hasSouthWall())
+                {
+                    TileDrawingUtil.renderWall(graphics2D, LocalPoint.fromWorld(client, wall.getWorldLocation()), Color.RED, Wall.Direction.SOUTH);
+                }
+                if(walls.hasWestWall())
+                {
+                    TileDrawingUtil.renderWall(graphics2D, LocalPoint.fromWorld(client, wall.getWorldLocation()), Color.RED, Wall.Direction.WEST);
+                }
+                continue;
+            }
 
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_NORTH) == 0) {
                 for(int x = 0; x < width; x++) {

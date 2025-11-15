@@ -29,7 +29,7 @@ public class TileDrawingUtil
     }
 
     public static void drawNorthLine(Client client, Graphics2D graphics, LocalPoint localLocation, Color color, int strokeWidth) {
-        var wv = client.getWorldView(localLocation.getWorldView());
+        var wv = client.getTopLevelWorldView();
         if (wv == null) return;
 
         int plane = wv.getPlane();

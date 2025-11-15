@@ -21,6 +21,11 @@ public class Walls
         return new Walls(x, y, plane);
     }
 
+    public static Walls of(WallObject wallObject)
+    {
+        return new Walls(wallObject);
+    }
+
     private final Set<Wall> walls = new HashSet<>();
     Walls(int x, int y, int plane)
     {
@@ -29,6 +34,22 @@ public class Walls
         process(x + 1, y, plane, Wall.WEST); // East
         process(x, y - 1, plane, Wall.NORTH); // South
         process(x, y + 1, plane, Wall.SOUTH); // North
+    }
+
+    Walls(WallObject wallObject)
+    {
+        final int orientationA = wallObject.getOrientationA();
+        final int orientationB = wallObject.getOrientationB();
+
+        if(orientationA != 0)
+        {
+            walls.add(Wall.of(orientationA));
+        }
+
+        if(orientationB != 0)
+        {
+            walls.add(Wall.of(orientationB));
+        }
     }
 
     private void process(int x, int y, int plane)
