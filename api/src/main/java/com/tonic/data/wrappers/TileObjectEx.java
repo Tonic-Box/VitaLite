@@ -197,10 +197,7 @@ public class TileObjectEx implements Entity
      * @return A set of WorldPoints from which the object can be interacted with.
      */
     public Set<WorldPoint> interactableFrom() {
-        if(!(getTileObject() instanceof GameObject))
-            return new HashSet<>();
-
-        if(getType() != 2)
+        if(getType() != 2 || !isInteractable())
             return new HashSet<>();
 
         Client client = Static.getClient();
@@ -227,6 +224,12 @@ public class TileObjectEx implements Entity
             WorldPoint objPos = getWorldPoint();
             int rotatedFlags = tComp.rotateBlockAccessFlags(rotation);
             Set<WorldPoint> accessibleFrom = new HashSet<>();
+
+            if(tileObject instanceof DecorativeObject)
+            {
+                accessibleFrom.add(objPos);
+                return accessibleFrom;
+            }
 
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_NORTH) == 0) {
                 int y = objPos.getY() + height;
