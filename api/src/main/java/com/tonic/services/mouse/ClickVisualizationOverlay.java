@@ -19,6 +19,7 @@ import net.runelite.client.ui.overlay.OverlayPriority;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -47,7 +48,7 @@ public class ClickVisualizationOverlay extends Overlay {
     {
         List<ClickPacket> packets = ClickManager.releaseClicks();
         for (ClickPacket packet : packets) {
-            recordClick(packet.getX(), packet.getY(), packet.getPacketInteractionType(), packet.getDate().toString());
+            recordClick(packet.getX(), packet.getY(), packet.getPacketInteractionType(), packet.getDate().format(DateTimeFormatter.ISO_LOCAL_TIME));
         }
     }
 
