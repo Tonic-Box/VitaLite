@@ -23,7 +23,6 @@ public class TObjectCompositionMixin implements TObjectComposition
             byte[] array = buffer.getArray();
             int offset = buffer.getOffset();
             blockAccessFlags = array[offset] & 0xFF;
-            return false;
         }
 
         return true;

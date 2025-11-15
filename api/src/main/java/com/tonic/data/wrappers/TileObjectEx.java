@@ -188,8 +188,15 @@ public class TileObjectEx implements Entity
     }
 
     public Set<WorldPoint> interactableFrom() {
+        if(!(getTileObject() instanceof GameObject))
+            return new HashSet<>();
+
+        if(getType() != 2)
+            return new HashSet<>();
+
+        Client client = Static.getClient();
         return Static.invoke(() -> {
-            ObjectComposition composition = getObjectComposition();
+            ObjectComposition composition = client.getObjectDefinition(getId());
             TObjectComposition tComp = (TObjectComposition) composition;
 
             int modelRotation = getOrientation();
@@ -240,7 +247,8 @@ public class TileObjectEx implements Entity
                 }
             }
 
-            return accessibleFrom;
+            WorldPoint player = PlayerEx.getLocal().getWorldPoint();
+            return new HashSet<>(SceneAPI.filterReachable(player, accessibleFrom.toArray(new WorldPoint[0])));
         });
     }
 
@@ -269,6 +277,9 @@ public class TileObjectEx implements Entity
 
     public int getShapeFlag()
     {
-        return  (getConfig() >>> 6) & 3;
+        return  getConfig() & 31;
+    }
+    public int getType() {
+        return (int) (tileObject.getHash() >>> 16 & 0x7L);
     }
 }

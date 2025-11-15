@@ -316,4 +316,45 @@ public class WorldPointUtil {
     {
         return a.toWorldPointList().stream().anyMatch(b.toWorldPointList()::contains);
     }
+
+    public static RelativePosition getRelativePosition(WorldArea area, WorldPoint point) {
+        // Check if planes differ - could return null or a special value
+        if (area.getPlane() != point.getPlane()) {
+            return null; // Different plane, no relative position
+        }
+
+        int areaMinX = area.getX();
+        int areaMaxX = area.getX() + area.getWidth() - 1;
+        int areaMinY = area.getY();
+        int areaMaxY = area.getY() + area.getHeight() - 1;
+
+        int px = point.getX();
+        int py = point.getY();
+
+        // Check if inside
+        if (px >= areaMinX && px <= areaMaxX && py >= areaMinY && py <= areaMaxY) {
+            return RelativePosition.INSIDE;
+        }
+
+        // Determine position relative to area
+        boolean isNorth = py > areaMaxY;
+        boolean isSouth = py < areaMinY;
+        boolean isEast = px > areaMaxX;
+        boolean isWest = px < areaMinX;
+
+        // Return diagonal positions if applicable
+        if (isNorth && isEast) return RelativePosition.NORTH_EAST;
+        if (isNorth && isWest) return RelativePosition.NORTH_WEST;
+        if (isSouth && isEast) return RelativePosition.SOUTH_EAST;
+        if (isSouth && isWest) return RelativePosition.SOUTH_WEST;
+
+        // Return cardinal directions
+        if (isNorth) return RelativePosition.NORTH;
+        if (isSouth) return RelativePosition.SOUTH;
+        if (isEast) return RelativePosition.EAST;
+        if (isWest) return RelativePosition.WEST;
+
+        // Should never reach here
+        return RelativePosition.INSIDE;
+    }
 }

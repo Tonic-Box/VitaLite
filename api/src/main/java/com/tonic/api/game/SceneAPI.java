@@ -640,6 +640,20 @@ public class SceneAPI {
         }
     }
 
+    public static List<WorldPoint> filterReachable(WorldPoint from, WorldPoint... to)
+    {
+        List<WorldPoint> reachable = reachableTiles();
+        List<WorldPoint> finalList = new ArrayList<>();
+        for (WorldPoint wp : to)
+        {
+            if (reachable.contains(wp))
+            {
+                finalList.add(wp);
+            }
+        }
+        return finalList;
+    }
+
     /**
      * Determines if the destination world point is reachable from the player's current position.
      * @param to The destination WorldPoint.
