@@ -146,6 +146,8 @@ public class GameManager extends Overlay {
                             if (tile.getGameObjects() != null) {
                                 for (GameObject gameObject : tile.getGameObjects()) {
                                     if (gameObject != null && gameObject.getSceneMinLocation().equals(tile.getSceneLocation())) {
+                                        if((gameObject.getHash() >>> 16 & 0x7L) != 2)
+                                            continue;
                                         temp.add(new TileObjectEx(gameObject));
                                     }
                                 }

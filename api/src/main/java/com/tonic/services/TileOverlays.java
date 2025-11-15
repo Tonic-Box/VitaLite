@@ -1,17 +1,24 @@
 package com.tonic.services;
 
 import com.tonic.Static;
+import com.tonic.api.TObjectComposition;
+import com.tonic.api.entities.TileObjectAPI;
+import com.tonic.api.game.SceneAPI;
 import com.tonic.api.threaded.Delays;
+import com.tonic.data.ObjectBlockAccessFlags;
+import com.tonic.data.wrappers.PlayerEx;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.pathfinder.collision.Flags;
 import com.tonic.services.pathfinder.local.LocalCollisionMap;
+import com.tonic.util.RelativePosition;
 import com.tonic.util.ThreadPool;
 import com.tonic.util.TileDrawingUtil;
+import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.runelite.api.Client;
-import net.runelite.api.Perspective;
-import net.runelite.api.WorldView;
+import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.EventBus;
@@ -23,7 +30,9 @@ import net.runelite.client.ui.overlay.OverlayUtil;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class TileOverlays extends Overlay
 {
@@ -38,6 +47,8 @@ public class TileOverlays extends Overlay
 
     @Override
     public Dimension render(Graphics2D graphics) {
+        //drawInteractableFrom(graphics);
+
         if(Static.getVitaConfig().shouldDrawCollision())
         {
             drawCollisionMap(graphics);
@@ -88,6 +99,101 @@ public class TileOverlays extends Overlay
                 continue;
 
             OverlayUtil.renderPolygon(graphics, polygon, color, fillColor, stroke);
+        }
+    }
+
+    public void drawInteractableFrom(Graphics2D graphics2D)
+    {
+        Client client = Static.getClient();
+        for(TileObjectEx obj : GameManager.objectList())
+        {
+            if(!(obj.getTileObject() instanceof GameObject))
+                continue;
+
+            if(obj.getType() != 2)
+                continue;
+
+            ObjectComposition composition = client.getObjectDefinition(obj.getId());
+            TObjectComposition tComp = (TObjectComposition) composition;
+
+            int modelRotation = obj.getOrientation();
+            int type = obj.getConfig() & 0x1F;
+
+            int rotation = modelRotation;
+            if (type == 2 || type == 6 || type == 8) {
+                rotation -= 4;
+            } else if (type == 7) {
+                rotation = (rotation - 2) & 0x3;
+            }
+            rotation = rotation & 0x3;
+
+            // Get object dimensions
+            WorldArea area = obj.getWorldArea();
+            int width = area.getWidth();
+            int height = area.getHeight();
+
+            WorldPoint objPos = obj.getWorldPoint();
+            int rotatedFlags = tComp.rotateBlockAccessFlags(rotation);
+
+            // NORTH edge (top of object) - accessible from north
+            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_NORTH) == 0) {
+                for(int x = 0; x < width; x++) {
+                    // FIXED: North edge is at Y + height - 1 (top)
+                    WorldPoint wallPoint = new WorldPoint(objPos.getX() + x, objPos.getY() + height - 1, objPos.getPlane());
+                    LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
+                    if(localPoint == null)
+                        continue;
+                    Shape poly = Perspective.getCanvasTilePoly(client, localPoint);
+                    if(poly != null) {
+                        TileDrawingUtil.renderWall(graphics2D, localPoint, Color.RED, Wall.Direction.NORTH);
+                    }
+                }
+            }
+
+            // EAST edge (right of object) - accessible from east
+            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_EAST) == 0) {
+                for(int y = 0; y < height; y++) {
+                    // This is correct - east edge is at X + width - 1
+                    WorldPoint wallPoint = new WorldPoint(objPos.getX() + width - 1, objPos.getY() + y, objPos.getPlane());
+                    LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
+                    if(localPoint == null)
+                        continue;
+                    Shape poly = Perspective.getCanvasTilePoly(client, localPoint);
+                    if(poly != null) {
+                        TileDrawingUtil.renderWall(graphics2D, localPoint, Color.RED, Wall.Direction.EAST);
+                    }
+                }
+            }
+
+            // SOUTH edge (bottom of object) - accessible from south
+            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_SOUTH) == 0) {
+                for(int x = 0; x < width; x++) {
+                    // FIXED: South edge is at Y + 0 (bottom)
+                    WorldPoint wallPoint = new WorldPoint(objPos.getX() + x, objPos.getY(), objPos.getPlane());
+                    LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
+                    if(localPoint == null)
+                        continue;
+                    Shape poly = Perspective.getCanvasTilePoly(client, localPoint);
+                    if(poly != null) {
+                        TileDrawingUtil.renderWall(graphics2D, localPoint, Color.RED, Wall.Direction.SOUTH);
+                    }
+                }
+            }
+
+            // WEST edge (left of object) - accessible from west
+            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_WEST) == 0) {
+                for(int y = 0; y < height; y++) {
+                    // This is correct - west edge is at X + 0
+                    WorldPoint wallPoint = new WorldPoint(objPos.getX(), objPos.getY() + y, objPos.getPlane());
+                    LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
+                    if(localPoint == null)
+                        continue;
+                    Shape poly = Perspective.getCanvasTilePoly(client, localPoint);
+                    if(poly != null) {
+                        TileDrawingUtil.renderWall(graphics2D, localPoint, Color.RED, Wall.Direction.WEST);
+                    }
+                }
+            }
         }
     }
 
