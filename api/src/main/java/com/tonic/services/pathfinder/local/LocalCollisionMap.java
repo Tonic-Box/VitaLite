@@ -156,4 +156,16 @@ public class LocalCollisionMap
         }
         return collisionMap;
     }
+
+    public static boolean canStep(int x, int y, int plane) {
+        Client client = Static.getClient();
+        WorldView wv = client.getTopLevelWorldView();
+        if (wv.getCollisionMaps() == null || wv.getCollisionMaps()[plane] == null)
+            return false;
+        int sceneX = x - wv.getBaseX();
+        int SceneY = y - wv.getBaseY();
+        if(sceneX < 0 || SceneY < 0 || sceneX >= wv.getCollisionMaps()[plane].getFlags().length || SceneY >= wv.getCollisionMaps()[plane].getFlags()[0].length)
+            return false;
+        return (wv.getCollisionMaps()[plane].getFlags()[sceneX][SceneY] & MovementFlag.BLOCKING_FLAGS) == 0;
+    }
 }
