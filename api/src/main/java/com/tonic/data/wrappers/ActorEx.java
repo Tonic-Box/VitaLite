@@ -55,6 +55,10 @@ public abstract class ActorEx<T extends Actor> implements Entity
             if(this instanceof PlayerEx)
                 return actor.getName();
 
+            NpcEx npcEx = (NpcEx) this;
+            NPCComposition composition = npcEx.getComposition();
+            if(composition == null)
+                return null;
             return ((NpcEx) this).getComposition().getName();
         }));
     }
