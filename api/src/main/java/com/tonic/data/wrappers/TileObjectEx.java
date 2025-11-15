@@ -187,10 +187,10 @@ public class TileObjectEx implements Entity
         return false;
     }
 
-    public Set<WorldPoint> interactableFrom()
-    {
+    public Set<WorldPoint> interactableFrom() {
         return Static.invoke(() -> {
             ObjectComposition composition = getObjectComposition();
+            TObjectComposition tComp = (TObjectComposition) composition;
 
             int modelRotation = getOrientation();
             int type = getConfig() & 0x1F;
@@ -199,25 +199,47 @@ public class TileObjectEx implements Entity
             if (type == 2 || type == 6 || type == 8) {
                 rotation -= 4;
             } else if (type == 7) {
-                rotation = (rotation - 2 & 0x3);
+                rotation = (rotation - 2) & 0x3;
             }
+            rotation = rotation & 0x3;
 
-            TObjectComposition tComp = (TObjectComposition) composition;
-            final Set<WorldPoint> accessibleFrom = new HashSet<>();
+            // Get object dimensions
+            WorldArea area = getWorldArea();
+            int width = area.getWidth();
+            int height = area.getHeight();
+
             WorldPoint objPos = getWorldPoint();
             int rotatedFlags = tComp.rotateBlockAccessFlags(rotation);
+            Set<WorldPoint> accessibleFrom = new HashSet<>();
+
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_NORTH) == 0) {
-                accessibleFrom.add(objPos.dy(1));
+                int y = objPos.getY() + height;
+                for (int x = objPos.getX(); x < objPos.getX() + width; x++) {
+                    accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
+                }
             }
+
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_EAST) == 0) {
-                accessibleFrom.add(objPos.dx(1));
+                int x = objPos.getX() + width;
+                for (int y = objPos.getY(); y < objPos.getY() + height; y++) {
+                    accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
+                }
             }
+
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_SOUTH) == 0) {
-                accessibleFrom.add(objPos.dy(-1));
+                int y = objPos.getY() - 1;
+                for (int x = objPos.getX(); x < objPos.getX() + width; x++) {
+                    accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
+                }
             }
+
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_WEST) == 0) {
-                accessibleFrom.add(objPos.dx(-1));
+                int x = objPos.getX() - 1;
+                for (int y = objPos.getY(); y < objPos.getY() + height; y++) {
+                    accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
+                }
             }
+
             return accessibleFrom;
         });
     }
@@ -242,22 +264,11 @@ public class TileObjectEx implements Entity
 
     public int getOrientation()
     {
-        if (tileObject instanceof GameObject)
-        {
-            return ((GameObject) tileObject).getModelOrientation();
-        }
-        else if (tileObject instanceof GroundObject)
-        {
-            return 0;
-        }
-        else if (tileObject instanceof DecorativeObject)
-        {
-            return 0;
-        }
-        else if (tileObject instanceof WallObject)
-        {
-            return 0;
-        }
-        return -1;
+        return  (getConfig() >>> 6) & 3;
+    }
+
+    public int getShapeFlag()
+    {
+        return  (getConfig() >>> 6) & 3;
     }
 }
