@@ -37630,11 +37630,13 @@
     ]
   },
   {
+    "name": "ObjectComposition",
     "obfuscatedName": "iv",
     "fields": [
       {
         "name": "",
         "obfuscatedName": "ec",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lpu;",
         "isStatic": false
@@ -37642,6 +37644,7 @@
       {
         "name": "",
         "obfuscatedName": "at",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -37649,6 +37652,7 @@
       {
         "name": "",
         "obfuscatedName": "ag",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -37656,6 +37660,7 @@
       {
         "name": "",
         "obfuscatedName": "dw",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "[Ljava/lang/String;",
         "isStatic": false
@@ -37663,6 +37668,7 @@
       {
         "name": "",
         "obfuscatedName": "ae",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -37670,6 +37676,7 @@
       {
         "name": "",
         "obfuscatedName": "bx",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -37677,6 +37684,7 @@
       {
         "name": "",
         "obfuscatedName": "cr",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Z",
         "isStatic": false
@@ -37684,6 +37692,7 @@
       {
         "name": "",
         "obfuscatedName": "es",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Z",
         "isStatic": false
@@ -37691,6 +37700,7 @@
       {
         "name": "",
         "obfuscatedName": "dk",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lnb;",
         "isStatic": false
@@ -37698,6 +37708,7 @@
       {
         "name": "",
         "obfuscatedName": "ap",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -37705,6 +37716,7 @@
       {
         "name": "",
         "obfuscatedName": "bh",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lnb;",
         "isStatic": true
@@ -37712,6 +37724,7 @@
       {
         "name": "",
         "obfuscatedName": "bl",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lnb;",
         "isStatic": true
@@ -37719,6 +37732,7 @@
       {
         "name": "",
         "obfuscatedName": "bc",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lnb;",
         "isStatic": true
@@ -37726,6 +37740,7 @@
       {
         "name": "",
         "obfuscatedName": "ar",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -37733,6 +37748,7 @@
       {
         "name": "",
         "obfuscatedName": "bv",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lmc;",
         "isStatic": true
@@ -37740,6 +37756,7 @@
       {
         "name": "",
         "obfuscatedName": "ch",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lmc;",
         "isStatic": true
@@ -37747,6 +37764,7 @@
       {
         "name": "",
         "obfuscatedName": "aw",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -37754,6 +37772,7 @@
       {
         "name": "",
         "obfuscatedName": "cm",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lmc;",
         "isStatic": true
@@ -37761,6 +37780,7 @@
       {
         "name": "",
         "obfuscatedName": "cb",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lmc;",
         "isStatic": true
@@ -37768,6 +37788,7 @@
       {
         "name": "",
         "obfuscatedName": "ck",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "[Ljm;",
         "isStatic": true
@@ -37775,6 +37796,7 @@
       {
         "name": "",
         "obfuscatedName": "an",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -37782,6 +37804,7 @@
       {
         "name": "",
         "obfuscatedName": "cs",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "[I",
         "isStatic": false
@@ -37789,6 +37812,7 @@
       {
         "name": "",
         "obfuscatedName": "cn",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "[I",
         "isStatic": false
@@ -37796,6 +37820,7 @@
       {
         "name": "",
         "obfuscatedName": "co",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Ljava/lang/String;",
         "isStatic": false
@@ -37803,6 +37828,7 @@
       {
         "name": "",
         "obfuscatedName": "da",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Z",
         "isStatic": false
@@ -37810,6 +37836,7 @@
       {
         "name": "",
         "obfuscatedName": "cg",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "[S",
         "isStatic": false
@@ -37817,6 +37844,7 @@
       {
         "name": "",
         "obfuscatedName": "cp",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "[S",
         "isStatic": false
@@ -37824,6 +37852,7 @@
       {
         "name": "",
         "obfuscatedName": "cd",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "[S",
         "isStatic": false
@@ -37831,6 +37860,7 @@
       {
         "name": "",
         "obfuscatedName": "cz",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": 1813358617,
@@ -37840,6 +37870,7 @@
       {
         "name": "",
         "obfuscatedName": "ci",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -352504863,
@@ -37849,6 +37880,7 @@
       {
         "name": "",
         "obfuscatedName": "cf",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": 756705879,
@@ -37858,6 +37890,7 @@
       {
         "name": "",
         "obfuscatedName": "ds",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lnb;",
         "isStatic": false
@@ -37865,6 +37898,7 @@
       {
         "name": "",
         "obfuscatedName": "cq",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -1900812067,
@@ -37874,6 +37908,7 @@
       {
         "name": "",
         "obfuscatedName": "cv",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": 135730185,
@@ -37883,6 +37918,7 @@
       {
         "name": "",
         "obfuscatedName": "cw",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Z",
         "isStatic": false
@@ -37890,6 +37926,7 @@
       {
         "name": "",
         "obfuscatedName": "er",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Z",
         "isStatic": false
@@ -37897,6 +37934,7 @@
       {
         "name": "",
         "obfuscatedName": "cj",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": 930784507,
@@ -37906,6 +37944,7 @@
       {
         "name": "",
         "obfuscatedName": "ca",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -1556162377,
@@ -37915,6 +37954,7 @@
       {
         "name": "",
         "obfuscatedName": "dy",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Z",
         "isStatic": false
@@ -37922,6 +37962,7 @@
       {
         "name": "",
         "obfuscatedName": "dd",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -706784357,
@@ -37931,6 +37972,7 @@
       {
         "name": "",
         "obfuscatedName": "ax",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -37938,6 +37980,7 @@
       {
         "name": "",
         "obfuscatedName": "dv",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -2059094647,
@@ -37947,6 +37990,7 @@
       {
         "name": "",
         "obfuscatedName": "df",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": 93759001,
@@ -37956,6 +38000,7 @@
       {
         "name": "",
         "obfuscatedName": "ce",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Z",
         "isStatic": true
@@ -37963,6 +38008,7 @@
       {
         "name": "",
         "obfuscatedName": "db",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -274284999,
@@ -37972,6 +38018,7 @@
       {
         "name": "",
         "obfuscatedName": "dh",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": 69436381,
@@ -37981,6 +38028,7 @@
       {
         "name": "",
         "obfuscatedName": "dt",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": 135730185,
@@ -37990,6 +38038,7 @@
       {
         "name": "",
         "obfuscatedName": "as",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -37997,6 +38046,7 @@
       {
         "name": "",
         "obfuscatedName": "dz",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -671892153,
@@ -38006,6 +38056,7 @@
       {
         "name": "",
         "obfuscatedName": "di",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": 1406043891,
@@ -38015,6 +38066,7 @@
       {
         "name": "",
         "obfuscatedName": "dj",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": 1580309641,
@@ -38024,6 +38076,7 @@
       {
         "name": "",
         "obfuscatedName": "cc",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -965498101,
@@ -38033,6 +38086,7 @@
       {
         "name": "",
         "obfuscatedName": "pn",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lmc;",
         "isStatic": true
@@ -38040,6 +38094,7 @@
       {
         "name": "",
         "obfuscatedName": "dl",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Z",
         "isStatic": false
@@ -38047,6 +38102,7 @@
       {
         "name": "",
         "obfuscatedName": "dr",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": 1375017179,
@@ -38056,6 +38112,7 @@
       {
         "name": "",
         "obfuscatedName": "cl",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": 135730185,
@@ -38065,6 +38122,7 @@
       {
         "name": "",
         "obfuscatedName": "ub",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Z",
         "isStatic": true
@@ -38072,6 +38130,7 @@
       {
         "name": "",
         "obfuscatedName": "av",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -38079,6 +38138,7 @@
       {
         "name": "",
         "obfuscatedName": "du",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": 1406043891,
@@ -38088,6 +38148,7 @@
       {
         "name": "",
         "obfuscatedName": "dm",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -1194817153,
@@ -38097,6 +38158,7 @@
       {
         "name": "",
         "obfuscatedName": "ek",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lql;",
         "isStatic": false
@@ -38104,6 +38166,7 @@
       {
         "name": "",
         "obfuscatedName": "dg",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -965498101,
@@ -38113,6 +38176,7 @@
       {
         "name": "",
         "obfuscatedName": "dn",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Lnb;",
         "isStatic": false
@@ -38120,6 +38184,7 @@
       {
         "name": "",
         "obfuscatedName": "de",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -965498101,
@@ -38129,6 +38194,7 @@
       {
         "name": "",
         "obfuscatedName": "do",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -858993459,
@@ -38138,6 +38204,7 @@
       {
         "name": "",
         "obfuscatedName": "cy",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Z",
         "isStatic": false
@@ -38145,6 +38212,7 @@
       {
         "name": "",
         "obfuscatedName": "ea",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -858993459,
@@ -38154,6 +38222,7 @@
       {
         "name": "",
         "obfuscatedName": "cx",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "[S",
         "isStatic": false
@@ -38161,6 +38230,7 @@
       {
         "name": "",
         "obfuscatedName": "dc",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "Z",
         "isStatic": false
@@ -38168,6 +38238,7 @@
       {
         "name": "",
         "obfuscatedName": "ee",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -858993459,
@@ -38177,6 +38248,7 @@
       {
         "name": "",
         "obfuscatedName": "eq",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "[I",
         "isStatic": false
@@ -38184,6 +38256,7 @@
       {
         "name": "",
         "obfuscatedName": "dp",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -647466951,
@@ -38193,6 +38266,7 @@
       {
         "name": "",
         "obfuscatedName": "dq",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "getter": -753060269,
@@ -38202,6 +38276,7 @@
       {
         "name": "",
         "obfuscatedName": "dx",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "[I",
         "isStatic": false
@@ -38209,6 +38284,7 @@
       {
         "name": "",
         "obfuscatedName": "ay",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -38216,6 +38292,7 @@
       {
         "name": "",
         "obfuscatedName": "au",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "I",
         "isStatic": true
@@ -38224,6 +38301,7 @@
     "methods": [
       {
         "obfuscatedName": "ag",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(I)V",
         "garbageValue": 634828876,
@@ -38231,12 +38309,15 @@
       },
       {
         "obfuscatedName": "an",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(Lxa;B)V",
         "isStatic": false
       },
       {
+        "name": "decodeNext",
         "obfuscatedName": "ae",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(Lxa;II)V",
         "garbageValue": -1481714301,
@@ -38244,6 +38325,7 @@
       },
       {
         "obfuscatedName": "as",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(I)Z",
         "garbageValue": 413413256,
@@ -38251,6 +38333,7 @@
       },
       {
         "obfuscatedName": "ak",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(I)Z",
         "garbageValue": 1728800593,
@@ -38258,6 +38341,7 @@
       },
       {
         "obfuscatedName": "ap",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(II[[IIIII)Lky;",
         "garbageValue": -2147483648,
@@ -38265,6 +38349,7 @@
       },
       {
         "obfuscatedName": "ay",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(II[[IIIILiw;IB)Lky;",
         "garbageValue": 8,
@@ -38272,6 +38357,7 @@
       },
       {
         "obfuscatedName": "ad",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(III)I",
         "garbageValue": 0,
@@ -38279,6 +38365,7 @@
       },
       {
         "obfuscatedName": "ai",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(ILjava/lang/String;I)Ljava/lang/String;",
         "garbageValue": 0,
@@ -38286,30 +38373,35 @@
       },
       {
         "obfuscatedName": "hh",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(I)Liv;",
         "isStatic": true
       },
       {
         "obfuscatedName": "\u003cclinit\u003e",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "()V",
         "isStatic": true
       },
       {
         "obfuscatedName": "wj",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "()Z",
         "isStatic": false
       },
       {
         "obfuscatedName": "ey",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "()I",
         "isStatic": false
       },
       {
         "obfuscatedName": "ls",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(Liv;I)Liv;",
         "garbageValue": -2147483648,
@@ -38317,6 +38409,7 @@
       },
       {
         "obfuscatedName": "ag",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(S)V",
         "garbageValue": 0,
@@ -38324,18 +38417,21 @@
       },
       {
         "obfuscatedName": "getId",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "()I",
         "isStatic": false
       },
       {
         "obfuscatedName": "lk",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(II[[IIII)Ljz;",
         "isStatic": false
       },
       {
         "obfuscatedName": "au",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(IIB)Ljm;",
         "garbageValue": 0,
@@ -38343,36 +38439,42 @@
       },
       {
         "obfuscatedName": "getMapSceneId",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "()I",
         "isStatic": false
       },
       {
         "obfuscatedName": "\u003cinit\u003e",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "()V",
         "isStatic": false
       },
       {
         "obfuscatedName": "xo",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(II[[IIII)Lky;",
         "isStatic": false
       },
       {
         "obfuscatedName": "xi",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "()Z",
         "isStatic": false
       },
       {
         "obfuscatedName": "ew",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "()V",
         "isStatic": false
       },
       {
         "obfuscatedName": "aj",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(IB)Z",
         "garbageValue": 15,
@@ -38380,6 +38482,7 @@
       },
       {
         "obfuscatedName": "zz",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(Liv;II[[IIIII)Ljz;",
         "garbageValue": -2147483648,
@@ -38387,12 +38490,14 @@
       },
       {
         "obfuscatedName": "iv",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(II)Ljm;",
         "isStatic": false
       },
       {
         "obfuscatedName": "az",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(I)Liv;",
         "garbageValue": -2147483648,
@@ -38400,12 +38505,14 @@
       },
       {
         "obfuscatedName": "gb",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "()I",
         "isStatic": false
       },
       {
         "obfuscatedName": "aw",
+        "owner": "ObjectComposition",
         "ownerObfuscatedName": "iv",
         "descriptor": "(II[[IIIII)Ljz;",
         "garbageValue": -2147483648,
@@ -93494,327 +93601,3 @@
         "isStatic": false
       },
       {
-        "name": "",
-        "obfuscatedName": "aw",
-        "ownerObfuscatedName": "xw",
-        "descriptor": "I",
-        "getter": 390881283,
-        "setter": -1452717397,
-        "isStatic": false
-      },
-      {
-        "name": "",
-        "obfuscatedName": "ay",
-        "ownerObfuscatedName": "xw",
-        "descriptor": "Z",
-        "isStatic": false
-      },
-      {
-        "name": "",
-        "obfuscatedName": "av",
-        "ownerObfuscatedName": "xw",
-        "descriptor": "F",
-        "isStatic": true
-      },
-      {
-        "name": "",
-        "obfuscatedName": "ai",
-        "ownerObfuscatedName": "xw",
-        "descriptor": "I",
-        "getter": 1874703679,
-        "setter": -457524545,
-        "isStatic": false
-      },
-      {
-        "name": "",
-        "obfuscatedName": "ae",
-        "ownerObfuscatedName": "xw",
-        "descriptor": "I",
-        "getter": 1559677145,
-        "setter": -636930199,
-        "isStatic": false
-      },
-      {
-        "name": "",
-        "obfuscatedName": "an",
-        "ownerObfuscatedName": "xw",
-        "descriptor": "I",
-        "getter": -1256935427,
-        "setter": -15063723,
-        "isStatic": false
-      }
-    ],
-    "methods": [
-      {
-        "obfuscatedName": "av",
-        "ownerObfuscatedName": "xw",
-        "descriptor": "(IIIIIIIIZB)V",
-        "garbageValue": 0,
-        "isStatic": false
-      },
-      {
-        "obfuscatedName": "at",
-        "ownerObfuscatedName": "xw",
-        "descriptor": "(IIIII)V",
-        "garbageValue": 0,
-        "isStatic": false
-      },
-      {
-        "obfuscatedName": "ag",
-        "ownerObfuscatedName": "xw",
-        "descriptor": "(Lsf;Lsu;B)V",
-        "garbageValue": -128,
-        "isStatic": false
-      },
-      {
-        "obfuscatedName": "\u003cinit\u003e",
-        "ownerObfuscatedName": "xw",
-        "descriptor": "()V",
-        "isStatic": false
-      }
-    ]
-  },
-  {
-    "obfuscatedName": "xx",
-    "fields": [
-      {
-        "name": "",
-        "obfuscatedName": "av",
-        "ownerObfuscatedName": "xx",
-        "descriptor": "I",
-        "getter": 575488381,
-        "setter": 1073872853,
-        "isStatic": false
-      },
-      {
-        "name": "",
-        "obfuscatedName": "at",
-        "ownerObfuscatedName": "xx",
-        "descriptor": "Ljava/lang/Object;",
-        "isStatic": false
-      },
-      {
-        "name": "",
-        "obfuscatedName": "ba",
-        "ownerObfuscatedName": "xx",
-        "descriptor": "I",
-        "isStatic": true
-      }
-    ],
-    "methods": [
-      {
-        "obfuscatedName": "\u003cinit\u003e",
-        "ownerObfuscatedName": "xx",
-        "descriptor": "(ILjava/lang/Object;)V",
-        "isStatic": false
-      },
-      {
-        "obfuscatedName": "\u003cinit\u003e",
-        "ownerObfuscatedName": "xx",
-        "descriptor": "(I)V",
-        "isStatic": false
-      },
-      {
-        "obfuscatedName": "equals",
-        "ownerObfuscatedName": "xx",
-        "descriptor": "(Ljava/lang/Object;)Z",
-        "isStatic": false
-      },
-      {
-        "obfuscatedName": "hashCode",
-        "ownerObfuscatedName": "xx",
-        "descriptor": "()I",
-        "isStatic": false
-      },
-      {
-        "obfuscatedName": "bh",
-        "ownerObfuscatedName": "xx",
-        "descriptor": "(Lrt;)Lvz;",
-        "isStatic": true
-      },
-      {
-        "obfuscatedName": "he",
-        "ownerObfuscatedName": "xx",
-        "descriptor": "(Lrt;)Lvz;",
-        "isStatic": true
-      }
-    ]
-  },
-  {
-    "obfuscatedName": "xy",
-    "fields": [
-      {
-        "name": "",
-        "obfuscatedName": "av",
-        "ownerObfuscatedName": "xy",
-        "descriptor": "Lxy;",
-        "isStatic": true
-      },
-      {
-        "name": "",
-        "obfuscatedName": "at",
-        "ownerObfuscatedName": "xy",
-        "descriptor": "Lxy;",
-        "isStatic": true
-      },
-      {
-        "name": "",
-        "obfuscatedName": "ag",
-        "ownerObfuscatedName": "xy",
-        "descriptor": "Lxy;",
-        "isStatic": true
-      },
-      {
-        "name": "",
-        "obfuscatedName": "an",
-        "ownerObfuscatedName": "xy",
-        "descriptor": "I",
-        "getter": -1408231813,
-        "setter": -1087219533,
-        "isStatic": false
-      }
-    ],
-    "methods": [
-      {
-        "obfuscatedName": "\u003cinit\u003e",
-        "ownerObfuscatedName": "xy",
-        "descriptor": "(I)V",
-        "isStatic": false
-      },
-      {
-        "obfuscatedName": "\u003cclinit\u003e",
-        "ownerObfuscatedName": "xy",
-        "descriptor": "()V",
-        "isStatic": true
-      }
-    ]
-  },
-  {
-    "obfuscatedName": "xz",
-    "fields": [
-      {
-        "name": "",
-        "obfuscatedName": "at",
-        "ownerObfuscatedName": "xz",
-        "descriptor": "I",
-        "isStatic": true
-      },
-      {
-        "name": "",
-        "obfuscatedName": "av",
-        "ownerObfuscatedName": "xz",
-        "descriptor": "Z",
-        "isStatic": false
-      }
-    ],
-    "methods": [
-      {
-        "obfuscatedName": "\u003cinit\u003e",
-        "ownerObfuscatedName": "xz",
-        "descriptor": "(Z)V",
-        "isStatic": false
-      },
-      {
-        "obfuscatedName": "equals",
-        "ownerObfuscatedName": "xz",
-        "descriptor": "(Ljava/lang/Object;)Z",
-        "isStatic": false
-      },
-      {
-        "obfuscatedName": "compare",
-        "ownerObfuscatedName": "xz",
-        "descriptor": "(Ljava/lang/Object;Ljava/lang/Object;)I",
-        "isStatic": false
-      },
-      {
-        "obfuscatedName": "av",
-        "ownerObfuscatedName": "xz",
-        "descriptor": "(Ltz;Ltz;I)I",
-        "garbageValue": 2001367751,
-        "isStatic": false
-      }
-    ]
-  },
-  {
-    "obfuscatedName": "yg",
-    "fields": [
-      {
-        "name": "",
-        "obfuscatedName": "at",
-        "ownerObfuscatedName": "yg",
-        "descriptor": "Ljava/lang/String;",
-        "isStatic": true
-      },
-      {
-        "name": "",
-        "obfuscatedName": "ag",
-        "ownerObfuscatedName": "yg",
-        "descriptor": "I",
-        "getter": 1528671493,
-        "setter": -1162012723,
-        "isStatic": true
-      },
-      {
-        "name": "",
-        "obfuscatedName": "aj",
-        "ownerObfuscatedName": "yg",
-        "descriptor": "Ljava/lang/String;",
-        "isStatic": false
-      },
-      {
-        "name": "",
-        "obfuscatedName": "ak",
-        "ownerObfuscatedName": "yg",
-        "descriptor": "Ljava/lang/Throwable;",
-        "isStatic": false
-      },
-      {
-        "name": "",
-        "obfuscatedName": "bo",
-        "ownerObfuscatedName": "yg",
-        "descriptor": "I",
-        "isStatic": true
-      }
-    ],
-    "methods": [
-      {
-        "obfuscatedName": "an",
-        "ownerObfuscatedName": "yg",
-        "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
-        "isStatic": true
-      },
-      {
-        "obfuscatedName": "ag",
-        "ownerObfuscatedName": "yg",
-        "descriptor": "(Ljava/lang/String;Ljava/lang/Throwable;)V",
-        "isStatic": true
-      },
-      {
-        "obfuscatedName": "\u003cinit\u003e",
-        "ownerObfuscatedName": "yg",
-        "descriptor": "(Ljava/lang/Throwable;Ljava/lang/String;)V",
-        "isStatic": false
-      }
-    ]
-  },
-  {
-    "obfuscatedName": "ys",
-    "fields": [
-      {
-        "name": "",
-        "obfuscatedName": "ae",
-        "ownerObfuscatedName": "ys",
-        "descriptor": "I",
-        "isStatic": true
-      }
-    ],
-    "methods": [
-      {
-        "obfuscatedName": "\u003cinit\u003e",
-        "ownerObfuscatedName": "ys",
-        "descriptor": "()V",
-        "isStatic": false
-      }
-    ]
-  }
-]

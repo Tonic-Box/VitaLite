@@ -116,12 +116,29 @@ public class Injector {
         for (ClassNode mixin : pairs.keySet()) {
             StripLvtInfo.run(mixin);
             String gamepackName = AnnotationUtil.getAnnotation(mixin, Mixin.class, "value");
-            JClass jClass = MappingProvider.getClass(gamepackName);
-            if(jClass == null)
+            Boolean isCheatIdentifier = AnnotationUtil.getAnnotation(mixin, Mixin.class, "isInterface");
+            isCheatIdentifier = isCheatIdentifier != null && isCheatIdentifier;
+            ClassNode gamepackClass = null;
+            if(isCheatIdentifier)
             {
-                throw new ClassNotFoundException("Could not find mapping for mixin target class: " + gamepackName);
+                gamepackClass = gamepack.values().stream()
+                        .filter(cn -> cn.interfaces != null && cn.interfaces.contains(gamepackName))
+                        .findFirst()
+                        .orElse(null);
             }
-            ClassNode gamepackClass = gamepack.get(jClass.getObfuscatedName());
+            else
+            {
+                JClass clazz = MappingProvider.getClass(gamepackName);
+                if(clazz == null)
+                {
+                    throw new ClassNotFoundException("Could not find mapping for mixin target class: " + gamepackName);
+                }
+                gamepackClass = gamepack.get(clazz.getObfuscatedName());
+            }
+            if(gamepackClass == null)
+            {
+                throw new ClassNotFoundException("Could not find target class for mixin: " + gamepackName);
+            }
             for(FieldNode field : mixin.fields)
             {
                 if(AnnotationUtil.hasAnnotation(field, Inject.class))
@@ -193,8 +210,33 @@ public class Injector {
                 }
                 ClassNode mixin = entry.getKey();
                 String gamepackName = AnnotationUtil.getAnnotation(mixin, Mixin.class, "value");
-                JClass clazz = MappingProvider.getClass(gamepackName);
-                ClassNode gamepackClass = gamepack.get(clazz.getObfuscatedName());
+                Boolean isCheatIdentifier = AnnotationUtil.getAnnotation(api, Mixin.class, "isInterface");
+                isCheatIdentifier = isCheatIdentifier != null && isCheatIdentifier;
+                ClassNode gamepackClass = null;
+                if(isCheatIdentifier)
+                {
+                    gamepackClass = gamepack.values().stream()
+                            .filter(cn -> cn.interfaces != null && cn.interfaces.contains(gamepackName))
+                            .findFirst()
+                            .orElse(null);
+                }
+                else
+                {
+                    JClass clazz = MappingProvider.getClass(gamepackName);
+                    if(clazz == null)
+                    {
+                        System.err.println("Warning: Could not find mapping for mixin target class: " + gamepackName);
+                        continue;
+                    }
+                    gamepackClass = gamepack.get(clazz.getObfuscatedName());
+                }
+
+                if(gamepackClass == null)
+                {
+                    System.err.println("Warning: Could not find target class for interface mixin: " + gamepackName);
+                    continue;
+                }
+
                 if(gamepackClass.interfaces == null)
                 {
                     gamepackClass.interfaces = new ArrayList<>();
