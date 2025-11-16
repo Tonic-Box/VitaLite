@@ -223,9 +223,6 @@ public class TileObjectEx implements Entity
      * @return A set of WorldPoints from which the object can be interacted with.
      */
     public Set<WorldPoint> interactableFrom() {
-        if(getType() != 2 || !isInteractable())
-            return new HashSet<>();
-
         Client client = Static.getClient();
         return Static.invoke(() -> {
             ObjectComposition composition = client.getObjectDefinition(getId());

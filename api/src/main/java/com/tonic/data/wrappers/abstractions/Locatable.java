@@ -1,7 +1,6 @@
 package com.tonic.data.wrappers.abstractions;
 
 import com.tonic.api.game.SceneAPI;
-import com.tonic.data.wrappers.TileObjectEx;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
@@ -11,12 +10,14 @@ import java.awt.*;
 
 public interface Locatable
 {
-    default WorldPoint getReachablePoint()
+    /**
+     * Gets the interaction point of this locatable.
+     * By default, this is the same as the world point.
+     *
+     * @return the interaction point
+     */
+    default WorldPoint getInteractionPoint()
     {
-        if(this instanceof TileObjectEx) {
-            TileObjectEx obj = (TileObjectEx) this;
-            return obj.getInteractionPoint();
-        }
         return getWorldPoint();
     }
 
@@ -58,12 +59,12 @@ public interface Locatable
      */
     default int distanceTo(Locatable other)
     {
-        return distanceTo(other.getReachablePoint());
+        return distanceTo(other.getInteractionPoint());
     }
 
     default int distanceTo(WorldPoint other)
     {
-        var path = SceneAPI.pathTo(getReachablePoint(), other);
+        var path = SceneAPI.pathTo(getInteractionPoint(), other);
         return path != null ? path.size() : Integer.MAX_VALUE;
     }
 

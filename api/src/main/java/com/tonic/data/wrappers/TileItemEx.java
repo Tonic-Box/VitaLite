@@ -3,9 +3,12 @@ package com.tonic.data.wrappers;
 import com.tonic.Static;
 import com.tonic.api.TItemComposition;
 import com.tonic.api.entities.TileItemAPI;
+import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.data.wrappers.abstractions.Entity;
-import com.tonic.util.Location;
+import com.tonic.services.GameManager;
+import com.tonic.util.Distance;
+import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.*;
@@ -31,6 +34,28 @@ public class TileItemEx implements Entity
         this.worldPoint = worldPoint;
         Client client = Static.getClient();
         this.localPoint = LocalPoint.fromWorld(client, worldPoint);
+    }
+
+    @Override
+    public WorldPoint getInteractionPoint()
+    {
+        if(GameManager.isReachable(WorldPointUtil.compress(worldPoint)))
+        {
+            return worldPoint;
+        }
+
+        TileObjectEx object = TileObjectAPI.search()
+                .keepIf(to -> to.getTileObject() instanceof GameObject)
+                .keepIf(to -> to.getWorldArea().contains(worldPoint))
+                .keepIf(to -> to.getName() != null)
+                .first();
+
+        if(object != null)
+        {
+            return object.getInteractionPoint();
+        }
+
+        return worldPoint;
     }
 
     @Override
