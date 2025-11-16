@@ -13,7 +13,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.util.Text;
 import net.runelite.client.util.WildcardMatcher;
 import org.apache.commons.lang3.ArrayUtils;
-import java.awt.geom.Point2D;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -244,8 +244,8 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
     public EntityQuery sortShortestPath(WorldPoint center)
     {
         return sort((o1, o2) -> {
-            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getReachablePoint());
-            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getReachablePoint());
+            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getInteractionPoint());
+            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getInteractionPoint());
             int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
             int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
             return Integer.compare(len1, len2);
@@ -269,8 +269,8 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
     public EntityQuery sortLongestPath(WorldPoint center)
     {
         return sort((o1, o2) -> {
-            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getReachablePoint());
-            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getReachablePoint());
+            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getInteractionPoint());
+            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getInteractionPoint());
             int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
             int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
             return Integer.compare(len2, len1);

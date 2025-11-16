@@ -1,6 +1,5 @@
 package com.tonic.services;
 
-import com.tonic.api.game.SceneAPI;
 import com.tonic.data.wrappers.NpcEx;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileItemEx;
@@ -9,14 +8,12 @@ import com.tonic.model.ui.DistanceDebugger;
 import static com.tonic.model.ui.DistanceDebugger.DistanceMode;
 
 import com.tonic.util.Distance;
-import com.tonic.util.Location;
 import net.runelite.api.GameObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 import java.awt.*;
-import java.util.List;
 
 public class DistanceOverlays extends Overlay
 {
@@ -58,7 +55,7 @@ public class DistanceOverlays extends Overlay
     {
         for(TileItemEx item : GameManager.tileItemList())
         {
-            int distance = measureDistance(item.getWorldPoint());
+            int distance = measureDistance(item.getInteractionPoint());
             String text = item.getName() + "(" + distance + ")";
             OverlayUtil.renderTileOverlay(graphics, item.getTile().getItemLayer(), text, Color.RED);
         }
@@ -92,7 +89,7 @@ public class DistanceOverlays extends Overlay
             if(player == PlayerEx.getLocal())
                 continue;
 
-            int distance = measureDistance(player.getWorldPoint());
+            int distance = measureDistance(player.getInteractionPoint());
             String text = player.getName() + "(" + distance + ")";
             OverlayUtil.renderActorOverlay(graphics, player.getActor(), text, Color.CYAN);
         }
@@ -102,7 +99,7 @@ public class DistanceOverlays extends Overlay
     {
         for(NpcEx npc : GameManager.npcList())
         {
-            int distance = measureDistance(npc.getWorldPoint());
+            int distance = measureDistance(npc.getInteractionPoint());
             String text = npc.getName() + "(" + distance + ")";
             OverlayUtil.renderActorOverlay(graphics, npc.getActor(), text, Color.CYAN);
         }
