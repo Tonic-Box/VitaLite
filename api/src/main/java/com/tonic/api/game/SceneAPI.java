@@ -1,6 +1,7 @@
 package com.tonic.api.game;
 
 import com.tonic.Static;
+import com.tonic.util.Location;
 import com.tonic.util.WorldPointUtil;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
@@ -252,20 +253,6 @@ public class SceneAPI {
         return worldView.getSelectedSceneTile();
     }
 
-    public static int pathDistanceTo(WorldPoint from, WorldPoint to)
-    {
-        if(from.equals(to))
-            return 0;
-        return Static.invoke(() -> {
-            List<WorldPoint> path = pathTo(from, to);
-            if (path == null || path.isEmpty())
-            {
-                return Integer.MAX_VALUE;
-            }
-            return path.size() - 1;
-        });
-    }
-
     /**
      * Finds a path from one world point to another and returns a list of waypoints (WorldPoints) along the path.
      * @param from The starting WorldPoint.
@@ -396,6 +383,40 @@ public class SceneAPI {
             checkpointWPs.add(checkpointTile.getWorldLocation());
         }
         return checkpointWPs;
+    }
+
+    /**
+     * check if a world point is reachable from another world point
+     * @param start world point
+     * @param end target world point
+     * @return boolean
+     */
+    public static boolean isReachable(WorldPoint start, WorldPoint end) {
+        if (start.getPlane() != end.getPlane()) {
+            return false;
+        }
+
+        Client client = Static.getClient();
+        WorldView worldView = client.getTopLevelWorldView();
+        LocalPoint sourceLp = LocalPoint.fromWorld(worldView, start.getX(), start.getY());
+        LocalPoint targetLp = LocalPoint.fromWorld(worldView, end.getX(), end.getY());
+        if (sourceLp == null || targetLp == null) {
+            return false;
+        }
+
+        int thisX = sourceLp.getSceneX();
+        int thisY = sourceLp.getSceneY();
+        int otherX = targetLp.getSceneX();
+        int otherY = targetLp.getSceneY();
+
+        try {
+            Tile[][][] tiles = worldView.getScene().getTiles();
+            Tile sourceTile = tiles[start.getPlane()][thisX][thisY];
+            Tile targetTile = tiles[end.getPlane()][otherX][otherY];
+            return isReachable(sourceTile, targetTile);
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 
     /**
@@ -667,36 +688,6 @@ public class SceneAPI {
         return (path.get(path.size()-1) == to);
     }
 
-    /**
-     * Determines if the destination world point is reachable from the starting world point.
-     * @param from The starting WorldPoint.
-     * @param to The destination WorldPoint.
-     * @return True if the destination WorldPoint is reachable, false otherwise.
-     */
-    public static boolean isReachable(WorldPoint from, WorldPoint to)
-    {
-        Client client = Static.getClient();
-        WorldView worldView = client.getTopLevelWorldView();
-        if(worldView.getPlane() != to.getPlane())
-            return false;
-        LocalPoint lp = LocalPoint.fromWorld(worldView, to.getX(), to.getY());
-        LocalPoint lp_from = LocalPoint.fromWorld(worldView, from.getX(), from.getY());
-        if(lp == null || lp_from == null)
-            return false;
-        Tile[][][] tiles = worldView.getScene().getTiles();
-        try
-        {
-            Tile tile_from = tiles[from.getPlane()][lp_from.getSceneX()][lp_from.getSceneY()];
-            Tile tile_to = tiles[to.getPlane()][lp.getSceneX()][lp.getSceneY()];
-            List<Tile> path  = checkPointsTo(tile_from, tile_to);
-            return path != null && (path.get(path.size()-1) == tile_to);
-        }
-        catch (Exception ignored)
-        {
-            return false;
-        }
-    }
-
     public static List<WorldPoint> filterReachable(WorldPoint... to)
     {
         List<WorldPoint> reachable = reachableTiles();
@@ -735,5 +726,190 @@ public class SceneAPI {
         Client client = Static.getClient();
         WorldPoint from = client.getLocalPlayer().getWorldLocation();
         return isReachable(from, to);
+    }
+
+    public static boolean hasLineOfSightTo(WorldPoint source, WorldPoint other)
+    {
+        Tile sourceTile = getTile(source);
+        Tile otherTile = getTile(other);
+        if(sourceTile == null || otherTile == null)
+            return false;
+        return hasLineOfSightTo(sourceTile, otherTile);
+    }
+
+    public static boolean hasLineOfSightTo(Tile source, Tile other)
+    {
+        // Thanks to Henke for this method :)
+
+        if(source == null || other == null)
+        {
+            return false;
+        }
+
+        if (source.getPlane() != other.getPlane())
+        {
+            return false;
+        }
+
+        Client client = Static.getClient();
+
+        CollisionData[] collisionData = client.getTopLevelWorldView().getCollisionMaps();
+        if (collisionData == null)
+        {
+            return false;
+        }
+
+        int z = source.getPlane();
+        int[][] collisionDataFlags = collisionData[z].getFlags();
+
+        Point p1 = source.getSceneLocation();
+        Point p2 = other.getSceneLocation();
+        if (p1.getX() == p2.getX() && p1.getY() == p2.getY())
+        {
+            return true;
+        }
+
+        int dx = p2.getX() - p1.getX();
+        int dy = p2.getY() - p1.getY();
+        int dxAbs = Math.abs(dx);
+        int dyAbs = Math.abs(dy);
+
+        int xFlags = CollisionDataFlag.BLOCK_LINE_OF_SIGHT_FULL;
+        int yFlags = CollisionDataFlag.BLOCK_LINE_OF_SIGHT_FULL;
+        if (dx < 0)
+        {
+            xFlags |= CollisionDataFlag.BLOCK_LINE_OF_SIGHT_EAST;
+        }
+        else
+        {
+            xFlags |= CollisionDataFlag.BLOCK_LINE_OF_SIGHT_WEST;
+        }
+        if (dy < 0)
+        {
+            yFlags |= CollisionDataFlag.BLOCK_LINE_OF_SIGHT_NORTH;
+        }
+        else
+        {
+            yFlags |= CollisionDataFlag.BLOCK_LINE_OF_SIGHT_SOUTH;
+        }
+
+        if (dxAbs > dyAbs)
+        {
+            int x = p1.getX();
+            int yBig = p1.getY() << 16; // The y position is represented as a bigger number to handle rounding
+            int slope = (dy << 16) / dxAbs;
+            yBig += 0x8000; // Add half of a tile
+            if (dy < 0)
+            {
+                yBig--; // For correct rounding
+            }
+            int direction = dx < 0 ? -1 : 1;
+
+            while (x != p2.getX())
+            {
+                x += direction;
+                int y = yBig >>> 16;
+                if ((collisionDataFlags[x][y] & xFlags) != 0)
+                {
+                    // Collision while traveling on the x axis
+                    return false;
+                }
+                yBig += slope;
+                int nextY = yBig >>> 16;
+                if (nextY != y && (collisionDataFlags[x][nextY] & yFlags) != 0)
+                {
+                    // Collision while traveling on the y axis
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            int y = p1.getY();
+            int xBig = p1.getX() << 16; // The x position is represented as a bigger number to handle rounding
+            int slope = (dx << 16) / dyAbs;
+            xBig += 0x8000; // Add half of a tile
+            if (dx < 0)
+            {
+                xBig--; // For correct rounding
+            }
+            int direction = dy < 0 ? -1 : 1;
+
+            while (y != p2.getY())
+            {
+                y += direction;
+                int x = xBig >>> 16;
+                if ((collisionDataFlags[x][y] & yFlags) != 0)
+                {
+                    // Collision while traveling on the y axis
+                    return false;
+                }
+                xBig += slope;
+                int nextX = xBig >>> 16;
+                if (nextX != x && (collisionDataFlags[nextX][y] & xFlags) != 0)
+                {
+                    // Collision while traveling on the x axis
+                    return false;
+                }
+            }
+        }
+
+        // No collision
+        return true;
+    }
+
+    public static WorldPoint losTileNextTo(WorldPoint point) {
+        final Client client = Static.getClient();
+        return Static.invoke(() -> {
+            Tile tile = getTile(client.getLocalPlayer().getWorldLocation());
+            Tile thisTile = getTile(point);
+            if(thisTile == null || tile == null)
+            {
+                return null;
+            }
+
+            WorldPoint player = client.getLocalPlayer().getWorldLocation();
+
+            WorldPoint north = new WorldPoint(player.getX(), player.getY() + 2, player.getPlane());
+            if(isReachable(player, north) && hasLineOfSightTo(player, north))
+                return north;
+
+            WorldPoint south = new WorldPoint(player.getX(), player.getY() - 2, player.getPlane());
+            if(isReachable(player, south) && hasLineOfSightTo(player, south))
+                return south;
+
+            WorldPoint east = new WorldPoint(player.getX() + 2, player.getY(), player.getPlane());
+            if(isReachable(player, east) && hasLineOfSightTo(player, east))
+                return east;
+
+            WorldPoint west = new WorldPoint(player.getX() - 2, player.getY(), player.getPlane());
+            if(isReachable(player, west) && hasLineOfSightTo(player, west))
+                return west;
+
+            return null;
+        });
+    }
+
+    /**
+     * get the respective RSTile from a world point
+     * @param wp world point
+     * @return RSTile
+     */
+    public static Tile getTile(WorldPoint wp)
+    {
+        Client client = Static.getClient();
+        WorldView worldView = client.getTopLevelWorldView();
+        LocalPoint lp = LocalPoint.fromWorld(worldView, wp.getX(), wp.getY());
+        Tile[][][] tiles = worldView.getScene().getTiles();
+        if(lp == null || tiles == null)
+            return null;
+        try
+        {
+            return tiles[wp.getPlane()][lp.getSceneX()][lp.getSceneY()];
+        }
+        catch (Exception ignored)
+        {
+            return null;
+        }
     }
 }

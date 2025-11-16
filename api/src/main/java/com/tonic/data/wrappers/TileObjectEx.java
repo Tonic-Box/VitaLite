@@ -3,10 +3,13 @@ package com.tonic.data.wrappers;
 import com.tonic.Static;
 import com.tonic.api.TObjectComposition;
 import com.tonic.api.entities.TileObjectAPI;
+import com.tonic.api.game.SceneAPI;
 import com.tonic.data.ObjectBlockAccessFlags;
 import com.tonic.data.Walls;
 import com.tonic.data.wrappers.abstractions.Entity;
 import com.tonic.services.GameManager;
+import com.tonic.services.pathfinder.local.LocalCollisionMap;
+import com.tonic.util.Distance;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
 import lombok.Getter;
@@ -142,7 +145,7 @@ public class TileObjectEx implements Entity
     @Override
     public Tile getTile()
     {
-        return Location.toTile(getWorldPoint());
+        return SceneAPI.getTile(getWorldPoint());
     }
 
     public Shape getShape()
@@ -190,6 +193,32 @@ public class TileObjectEx implements Entity
     }
 
     /**
+     * Gets the closest WorldPoint from which this object can be interacted with.
+     * @return The closest WorldPoint from which the object can be interacted with.
+     */
+    public WorldPoint getInteractionPoint()
+    {
+        WorldPoint player = PlayerEx.getLocal().getWorldPoint();
+        return getInteractionPoint(player);
+    }
+
+    public WorldPoint getInteractionPoint(WorldPoint to)
+    {
+        WorldPoint closest = null;
+        int closestDist = Integer.MAX_VALUE;
+        for(WorldPoint wp : interactableFrom())
+        {
+            int dist = Distance.chebyshev(to, wp);
+            if(dist < closestDist)
+            {
+                closestDist = dist;
+                closest = wp;
+            }
+        }
+        return closest;
+    }
+
+    /**
      * Gets all WorldPoints from which this object can be interacted with.
      * Takes into account walls that may block access. Does not account for reachability
      * Only works for GameObjects (type 2).
@@ -233,17 +262,23 @@ public class TileObjectEx implements Entity
 
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_NORTH) == 0) {
                 int y = objPos.getY() + height;
+                int plane = objPos.getPlane();
                 for (int x = objPos.getX(); x < objPos.getX() + width; x++) {
                     if(Walls.of(x, y, objPos.getPlane()).hasSouthWall())
                         continue;
-                    accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
+                    if(!LocalCollisionMap.canStep(x, y, plane))
+                        continue;
+                    accessibleFrom.add(new WorldPoint(x, y, plane));
                 }
             }
 
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_EAST) == 0) {
                 int x = objPos.getX() + width;
+                int plane = objPos.getPlane();
                 for (int y = objPos.getY(); y < objPos.getY() + height; y++) {
                     if(Walls.of(x, y, objPos.getPlane()).hasWestWall())
+                        continue;
+                    if(!LocalCollisionMap.canStep(x, y, plane))
                         continue;
                     accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
                 }
@@ -251,8 +286,11 @@ public class TileObjectEx implements Entity
 
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_SOUTH) == 0) {
                 int y = objPos.getY() - 1;
+                int plane = objPos.getPlane();
                 for (int x = objPos.getX(); x < objPos.getX() + width; x++) {
                     if(Walls.of(x, y, objPos.getPlane()).hasNorthWall())
+                        continue;
+                    if(!LocalCollisionMap.canStep(x, y, plane))
                         continue;
                     accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
                 }
@@ -260,8 +298,11 @@ public class TileObjectEx implements Entity
 
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_WEST) == 0) {
                 int x = objPos.getX() - 1;
+                int plane = objPos.getPlane();
                 for (int y = objPos.getY(); y < objPos.getY() + height; y++) {
                     if(Walls.of(x, y, objPos.getPlane()).hasEastWall())
+                        continue;
+                    if(!LocalCollisionMap.canStep(x, y, plane))
                         continue;
                     accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
                 }

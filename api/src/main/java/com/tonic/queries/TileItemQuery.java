@@ -1,9 +1,11 @@
 package com.tonic.queries;
 
 import com.tonic.api.game.SceneAPI;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.services.GameManager;
 import com.tonic.data.wrappers.TileItemEx;
+import com.tonic.util.Distance;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
 import net.runelite.api.coords.WorldPoint;
@@ -173,7 +175,8 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery within(int distance)
     {
-        return keepIf(o -> Location.within(client.getLocalPlayer().getWorldLocation(), o.getWorldPoint(), distance));
+        WorldPoint player = PlayerEx.getLocal().getWorldPoint();
+        return keepIf(o -> Distance.chebyshev(player, o.getWorldPoint()) <= distance);
     }
 
     /**
@@ -184,7 +187,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery within(WorldPoint center, int distance)
     {
-        return keepIf(o -> Location.within(center, o.getWorldPoint(), distance));
+        return keepIf(o -> Distance.chebyshev(center, o.getWorldPoint()) <= distance);
     }
 
     /**

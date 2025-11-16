@@ -2,6 +2,7 @@ package com.tonic.data.wrappers;
 
 import com.tonic.Static;
 import com.tonic.api.entities.NpcAPI;
+import com.tonic.api.game.SceneAPI;
 import com.tonic.util.Location;
 import net.runelite.api.NPC;
 import net.runelite.api.NPCComposition;
@@ -87,7 +88,7 @@ public class NpcEx extends ActorEx<NPC>
 
     @Override
     public Tile getTile() {
-        return Location.toTile(getWorldPoint());
+        return SceneAPI.getTile(getWorldPoint());
     }
 
     @Override

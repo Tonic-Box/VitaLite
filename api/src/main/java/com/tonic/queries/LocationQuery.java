@@ -5,6 +5,7 @@ import com.tonic.api.game.SceneAPI;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.services.GameManager;
+import com.tonic.util.Distance;
 import com.tonic.util.Location;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
@@ -32,8 +33,8 @@ public class LocationQuery extends AbstractQuery<Tile, LocationQuery>
      * @return LocationQuery
      */
     public LocationQuery isReachable() {
-        Tile player = Location.toTile(PlayerEx.getLocal().getWorldPoint());
-        keepIf(tile -> Location.isReachable(player, tile));
+        Tile player = SceneAPI.getTile(PlayerEx.getLocal().getWorldPoint());
+        keepIf(tile -> SceneAPI.isReachable(player, tile));
         return this;
     }
 
@@ -43,8 +44,8 @@ public class LocationQuery extends AbstractQuery<Tile, LocationQuery>
      * @return LocationQuery
      */
     public LocationQuery hasLosTo() {
-        Tile player = Location.toTile(PlayerEx.getLocal().getWorldPoint());
-        return keepIf(tile -> Location.hasLineOfSightTo(player, tile));
+        Tile player = SceneAPI.getTile(PlayerEx.getLocal().getWorldPoint());
+        return keepIf(tile -> SceneAPI.hasLineOfSightTo(player, tile));
     }
 
     /**
@@ -54,8 +55,8 @@ public class LocationQuery extends AbstractQuery<Tile, LocationQuery>
      * @return LocationQuery
      */
     public LocationQuery withinDistance(int distance) {
-        Tile player = Location.toTile(PlayerEx.getLocal().getWorldPoint());
-        return keepIf(tile -> Location.getDistance(player, tile) <= distance);
+        Tile player = SceneAPI.getTile(PlayerEx.getLocal().getWorldPoint());
+        return keepIf(tile -> Distance.chebyshev(player, tile) <= distance);
     }
 
     /**
@@ -65,8 +66,8 @@ public class LocationQuery extends AbstractQuery<Tile, LocationQuery>
      * @return LocationQuery
      */
     public LocationQuery beyondDistance(int distance) {
-        Tile player = Location.toTile(PlayerEx.getLocal().getWorldPoint());
-        return removeIf(tile -> Location.getDistance(player, tile) <= distance);
+        Tile player = SceneAPI.getTile(PlayerEx.getLocal().getWorldPoint());
+        return removeIf(tile -> Distance.chebyshev(player, tile) <= distance);
     }
 
     /**
@@ -76,7 +77,7 @@ public class LocationQuery extends AbstractQuery<Tile, LocationQuery>
      * @return LocationQuery
      */
     public LocationQuery withinPathingDistance(int distance) {
-        Tile player = Location.toTile(PlayerEx.getLocal().getWorldPoint());
+        Tile player = SceneAPI.getTile(PlayerEx.getLocal().getWorldPoint());
         return keepIf(tile -> {
             var path = SceneAPI.pathTo(player, tile);
             return path != null && path.size() <= distance;
@@ -90,7 +91,7 @@ public class LocationQuery extends AbstractQuery<Tile, LocationQuery>
      * @return LocationQuery
      */
     public LocationQuery beyondPathingDistance(int distance) {
-        Tile player = Location.toTile(PlayerEx.getLocal().getWorldPoint());
+        Tile player = SceneAPI.getTile(PlayerEx.getLocal().getWorldPoint());
         return removeIf(tile -> {
             var path = SceneAPI.pathTo(player, tile);
             return path != null && path.size() <= distance;

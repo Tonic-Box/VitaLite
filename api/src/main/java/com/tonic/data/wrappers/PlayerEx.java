@@ -2,6 +2,7 @@ package com.tonic.data.wrappers;
 
 import com.tonic.Static;
 import com.tonic.api.entities.PlayerAPI;
+import com.tonic.api.game.SceneAPI;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
 import net.runelite.api.Client;
@@ -67,7 +68,7 @@ public class PlayerEx extends ActorEx<Player>
 
     @Override
     public Tile getTile() {
-        return Location.toTile(getWorldPoint());
+        return SceneAPI.getTile(getWorldPoint());
     }
 
     @Override

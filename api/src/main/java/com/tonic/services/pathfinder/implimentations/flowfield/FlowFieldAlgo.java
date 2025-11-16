@@ -549,7 +549,7 @@ public class FlowFieldAlgo implements IPathfinder
             Client client = Static.getClient();
             WorldPoint local = client.getLocalPlayer().getWorldLocation();
             List<WorldPoint> path = SceneAPI.pathTo(local, dest);
-            return path != null && path.size() < 20 && Location.isReachable(local, dest);
+            return path != null && path.size() < 20 && SceneAPI.isReachable(local, dest);
         });
     }
 }

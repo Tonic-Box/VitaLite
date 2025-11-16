@@ -4,6 +4,7 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
+import com.tonic.api.game.SceneAPI;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.PrayerAPI;
@@ -205,7 +206,7 @@ public class WalkerPath
     }
 
     private boolean handleWalking(Player local, WorldPoint last, IStep step, WorldPoint dest) {
-        if(!Location.isReachable(local.getWorldLocation(), step.getPosition())) {
+        if(!SceneAPI.isReachable(local.getWorldLocation(), step.getPosition())) {
             if (MovementAPI.isMoving()) {
                 return true;
             }
@@ -226,7 +227,7 @@ public class WalkerPath
         rand = ThreadLocalRandom.current().nextInt(5, 16);
         while(s <= rand && s < steps.size() && !steps.get(s).hasTransport())
         {
-            if(!Location.isReachable(local.getWorldLocation(), steps.get(s).getPosition()))
+            if(!SceneAPI.isReachable(local.getWorldLocation(), steps.get(s).getPosition()))
             {
                 break;
             }
@@ -243,7 +244,7 @@ public class WalkerPath
         }
         step = steps.get(0); //Walker.walkTo(new WorldPoint(2575,3268,1));
         IStep nextStep = steps.size() > 1 ? steps.get(1) : null;
-        boolean nextBlocked = nextStep != null && !Location.isReachable(step.getPosition(), nextStep.getPosition());
+        boolean nextBlocked = nextStep != null && !SceneAPI.isReachable(step.getPosition(), nextStep.getPosition());
         MovementAPI.walkTowards(step.getPosition());
         if((!step.hasTransport() && MovementAPI.isMoving()) || nextBlocked || (steps.size() == 1 && local.getWorldLocation().equals(step.getPosition())))
             steps.remove(step);
@@ -354,7 +355,7 @@ public class WalkerPath
     }
 
     private boolean shouldHandleDialogue(List<? extends IStep> steps) {
-        return DialogueAPI.dialoguePresent() && !steps.isEmpty() && !Location.isReachable(client.getLocalPlayer().getWorldLocation(), steps.get(steps.size() - 1).getPosition());
+        return DialogueAPI.dialoguePresent() && !steps.isEmpty() && !SceneAPI.isReachable(client.getLocalPlayer().getWorldLocation(), steps.get(steps.size() - 1).getPosition());
     }
 
     private void handleDialogue() {

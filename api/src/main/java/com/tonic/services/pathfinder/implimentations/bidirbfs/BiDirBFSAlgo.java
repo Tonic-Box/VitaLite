@@ -220,7 +220,7 @@ public class BiDirBFSAlgo implements IPathfinder
 
         if(meetingPoint != -1)
         {
-            Logger.info("[BiDirBFS] Nodes visited: " + (forwardVisited.size() + backwardVisited.size()) + " (meeting at " + meetingPoint + ")");
+            //Logger.info("[BiDirBFS] Nodes visited: " + (forwardVisited.size() + backwardVisited.size()) + " (meeting at " + meetingPoint + ")");
             return reconstructPath(forwardVisited, backwardVisited, meetingPoint);
         }
 
@@ -291,7 +291,7 @@ public class BiDirBFSAlgo implements IPathfinder
 
         if(meetingPoint != -1)
         {
-            Logger.info("[BiDirBFS] Nodes visited: " + (forwardVisited.size() + backwardVisited.size()) + " (meeting at " + meetingPoint + ")");
+            //Logger.info("[BiDirBFS] Nodes visited: " + (forwardVisited.size() + backwardVisited.size()) + " (meeting at " + meetingPoint + ")");
             return reconstructPath(forwardVisited, backwardVisited, meetingPoint);
         }
 
@@ -540,7 +540,7 @@ public class BiDirBFSAlgo implements IPathfinder
             Client client = Static.getClient();
             WorldPoint local = client.getLocalPlayer().getWorldLocation();
             List<WorldPoint> path = SceneAPI.pathTo(local, dest);
-            return path != null && path.size() < 20 && Location.isReachable(local, dest);
+            return path != null && path.size() < 20 && SceneAPI.isReachable(local, dest);
         });
     }
 
