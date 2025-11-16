@@ -1,6 +1,5 @@
 package com.tonic.services.pathfinder;
 
-import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.services.pathfinder.collections.BFSCache;
 import com.tonic.services.pathfinder.collections.IntQueue;
@@ -50,7 +49,7 @@ public class LocalPathfinder
             current = queue.dequeue();
             if(current == target)
             {
-                Logger.info("Nodes visited: " + visited.size());
+                //Logger.info("Nodes visited: " + visited.size());
                 return visited.path(current);
             }
             addNeighbors(current);

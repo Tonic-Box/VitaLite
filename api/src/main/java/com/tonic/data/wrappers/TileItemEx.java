@@ -3,6 +3,7 @@ package com.tonic.data.wrappers;
 import com.tonic.Static;
 import com.tonic.api.TItemComposition;
 import com.tonic.api.entities.TileItemAPI;
+import com.tonic.api.game.SceneAPI;
 import com.tonic.data.wrappers.abstractions.Entity;
 import com.tonic.util.Location;
 import lombok.Getter;
@@ -122,7 +123,7 @@ public class TileItemEx implements Entity
 
     @Override
     public Tile getTile() {
-        return Location.toTile(worldPoint);
+        return SceneAPI.getTile(worldPoint);
     }
 
     @Override

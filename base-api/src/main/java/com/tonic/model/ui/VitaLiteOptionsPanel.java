@@ -286,6 +286,21 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 () -> Static.getVitaConfig().setShouldDrawInteractable(drawInteractable.isSelected())
         ));
 
+        FancyButton distanceDebug = new FancyButton("Distance Debugger");
+        distanceDebug.addActionListener(e -> {
+            DistanceDebugger window = DistanceDebugger.getInstance();
+            if (window.isVisible())
+            {
+                window.setVisible(false);
+            }
+            else
+            {
+                window.setVisible(true);
+                window.toFront();
+            }
+        });
+        scenePanel.addContent(distanceDebug);
+
         contentPanel.add(scenePanel);
         contentPanel.add(Box.createVerticalStrut(10));
 

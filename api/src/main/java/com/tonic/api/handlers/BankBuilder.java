@@ -3,6 +3,7 @@ package com.tonic.api.handlers;
 import com.tonic.Static;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.TileObjectAPI;
+import com.tonic.api.game.SceneAPI;
 import com.tonic.api.widgets.BankAPI;
 import com.tonic.data.LayoutView;
 import com.tonic.data.wrappers.NpcEx;
@@ -58,7 +59,7 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
         add(context -> {
             NpcEx banker = new NpcQuery()
                     .withNameContains("Banker")
-                    .keepIf(n -> Location.losTileNextTo(n.getWorldPoint()) != null)
+                    .keepIf(n -> SceneAPI.losTileNextTo(n.getWorldPoint()) != null)
                     .nearest();
             if(banker != null)
             {
@@ -71,7 +72,7 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
                     .withNamesContains("Bank booth", "Bank chest")
                     .sortNearest()
                     .first();
-            if(bank != null && Location.losTileNextTo(bank.getWorldPoint()) != null)
+            if(bank != null && SceneAPI.losTileNextTo(bank.getWorldPoint()) != null)
             {
                 ClickManagerUtil.queueClickBox(bank);
                 if(bank.getName().contains("Bank booth"))
@@ -92,7 +93,7 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
             }
             NpcEx banker = new NpcQuery()
                     .withNameContains("Banker")
-                    .keepIf(n -> Location.losTileNextTo(n.getWorldPoint()) != null)
+                    .keepIf(n -> SceneAPI.losTileNextTo(n.getWorldPoint()) != null)
                     .nearest();
             if(banker != null)
             {

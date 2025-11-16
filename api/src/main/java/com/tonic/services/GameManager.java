@@ -342,6 +342,9 @@ public class GameManager extends Overlay {
         this.tileOverlays = new TileOverlays(this);
         overlayManager.add(tileOverlays);
 
+        this.distanceOverlays = new DistanceOverlays();
+        overlayManager.add(distanceOverlays);
+
         Static.getRuneLite()
                 .getEventBus()
                 .register(this);
@@ -422,6 +425,7 @@ public class GameManager extends Overlay {
     private volatile List<WorldPoint> testPoints = null;
 
     private final TileOverlays tileOverlays;
+    private final DistanceOverlays distanceOverlays;
 
     public static void setPathPoints(List<WorldPoint> points)
     {

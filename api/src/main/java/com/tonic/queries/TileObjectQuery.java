@@ -4,6 +4,7 @@ import com.tonic.api.game.SceneAPI;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.services.GameManager;
 import com.tonic.data.wrappers.TileObjectEx;
+import com.tonic.util.Distance;
 import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
 import net.runelite.api.coords.WorldPoint;
@@ -103,7 +104,7 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
      */
     public TileObjectQuery within(int distance)
     {
-        return keepIf(o -> Location.within(client.getLocalPlayer().getWorldLocation(), o.getWorldPoint(), distance));
+        return within(client.getLocalPlayer().getWorldLocation(), distance);
     }
 
     /**
@@ -114,7 +115,7 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
      */
     public TileObjectQuery within(WorldPoint center, int distance)
     {
-        return keepIf(o -> Location.within(center, o.getWorldPoint(), distance));
+        return keepIf(o -> Distance.chebyshev(center, o.getWorldPoint()) <= distance);
     }
 
     /**
@@ -153,11 +154,10 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
      */
     public TileObjectQuery sortNearest(WorldPoint center)
     {
-        Point2D point = new Point2D.Double(center.getX(), center.getY());
         return sort((o1, o2) -> {
-            Point2D p0 = new Point2D.Double(o1.getWorldPoint().getX(), o1.getWorldPoint().getY());
-            Point2D p1 = new Point2D.Double(o2.getWorldPoint().getX(), o2.getWorldPoint().getY());
-            return Double.compare(point.distance(p0), point.distance(p1));
+            int dist1 = Distance.chebyshev(center, o1.getWorldPoint());
+            int dist2 = Distance.chebyshev(center, o2.getWorldPoint());
+            return Integer.compare(dist1, dist2);
         });
     }
 
@@ -177,11 +177,10 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
      */
     public TileObjectQuery sortFurthest(WorldPoint center)
     {
-        Point2D point = new Point2D.Double(center.getX(), center.getY());
         return sort((o1, o2) -> {
-            Point2D p0 = new Point2D.Double(o1.getWorldPoint().getX(), o1.getWorldPoint().getY());
-            Point2D p1 = new Point2D.Double(o2.getWorldPoint().getX(), o2.getWorldPoint().getY());
-            return Double.compare(point.distance(p1), point.distance(p0));
+            int dist1 = Distance.chebyshev(center, o1.getWorldPoint());
+            int dist2 = Distance.chebyshev(center, o2.getWorldPoint());
+            return Integer.compare(dist2, dist1);
         });
     }
 
@@ -202,8 +201,8 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
     public TileObjectQuery sortShortestPath(WorldPoint center)
     {
         return sort((o1, o2) -> {
-            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getWorldPoint());
-            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getWorldPoint());
+            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getInteractionPoint());
+            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getInteractionPoint());
             int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
             int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
             return Integer.compare(len1, len2);
@@ -227,8 +226,8 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
     public TileObjectQuery sortLongestPath(WorldPoint center)
     {
         return sort((o1, o2) -> {
-            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getWorldPoint());
-            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getWorldPoint());
+            List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getInteractionPoint());
+            List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getInteractionPoint());
             int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
             int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
             return Integer.compare(len2, len1);
@@ -249,7 +248,6 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
      * Terminal operation - executes the query
      */
     public TileObjectEx nearest() {
-        // Apply filters and sort by distance, then get first
         return this.sortNearest().first();
     }
 

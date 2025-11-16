@@ -4,6 +4,7 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.game.MovementAPI;
+import com.tonic.api.game.SceneAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.mouse.ClickVisualizationOverlay;
@@ -146,7 +147,7 @@ public class Walker
                 if(PlayerEx.getLocal().isIdle())
                 {
                     timeout--;
-                    if(!Location.isReachable(client.getLocalPlayer().getWorldLocation(), end))
+                    if(!SceneAPI.isReachable(client.getLocalPlayer().getWorldLocation(), end))
                     {
                         walkTo(end);
                         GameManager.clearPathPoints();

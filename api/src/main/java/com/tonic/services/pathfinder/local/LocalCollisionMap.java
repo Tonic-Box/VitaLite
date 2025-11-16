@@ -164,7 +164,8 @@ public class LocalCollisionMap
             return false;
         int sceneX = x - wv.getBaseX();
         int SceneY = y - wv.getBaseY();
-        if(sceneX < 0 || SceneY < 0 || sceneX >= wv.getCollisionMaps()[plane].getFlags().length || SceneY >= wv.getCollisionMaps()[plane].getFlags()[0].length)
+        if(
+                sceneX < 0 || SceneY < 0 || sceneX >= wv.getCollisionMaps()[plane].getFlags().length || SceneY >= wv.getCollisionMaps()[plane].getFlags()[0].length)
             return false;
         return (wv.getCollisionMaps()[plane].getFlags()[sceneX][SceneY] & MovementFlag.BLOCKING_FLAGS) == 0;
     }

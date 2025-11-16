@@ -20,6 +20,7 @@ import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.pathfinder.Walker;
+import com.tonic.util.Distance;
 import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.services.pathfinder.model.TransportDto;
 import com.tonic.services.pathfinder.requirements.*;
@@ -808,7 +809,7 @@ public class TransportLoader
                 .addDelayUntil(1, () -> {
                     Client client = Static.getClient();
                     WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
-                    return SceneAPI.pathDistanceTo(worldPoint, destination) < 5;
+                    return Distance.pathDistanceTo(worldPoint, destination) < 5;
                 });
 
         return new Transport(source, destination, 0, 0, builder.build(), -1);
@@ -913,7 +914,7 @@ public class TransportLoader
                 .addDelayUntil(1, () -> {
                     Client client = Static.getClient();
                     WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
-                    return SceneAPI.pathDistanceTo(worldPoint, destination) < 5;
+                    return Distance.pathDistanceTo(worldPoint, destination) < 5;
                 });
         return new Transport(source, destination, 10, 0, builder.build(), -1);
     }
@@ -941,7 +942,7 @@ public class TransportLoader
                 .addDelayUntil(1, () -> {
                     Client client = Static.getClient();
                     WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
-                    return SceneAPI.pathDistanceTo(worldPoint, destination) < 5;
+                    return Distance.pathDistanceTo(worldPoint, destination) < 5;
                 });
         return new Transport(source, destination, 10, 0, builder.build(), -1);
     }
@@ -1097,7 +1098,7 @@ public class TransportLoader
                 .addDelayUntil(1, () -> {
                     Client client = Static.getClient();
                     WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
-                    return SceneAPI.pathDistanceTo(worldPoint, destination) < 5;
+                    return Distance.pathDistanceTo(worldPoint, destination) < 5;
                 });
         return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), -1);
     }
@@ -1137,7 +1138,7 @@ public class TransportLoader
                 .addDelayUntil(1, () -> {
                     Client client = Static.getClient();
                     WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
-                    return SceneAPI.pathDistanceTo(worldPoint, destination) < 5;
+                    return Distance.pathDistanceTo(worldPoint, destination) < 5;
                 });
         return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), requirements, objId);
     }
@@ -1195,7 +1196,7 @@ public class TransportLoader
                 .addDelayUntil(1, () -> {
                     Client client = Static.getClient();
                     WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
-                    return SceneAPI.pathDistanceTo(worldPoint, destination) < 3;
+                    return Distance.pathDistanceTo(worldPoint, destination) < 3;
                 });
         return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), -1);
     }
