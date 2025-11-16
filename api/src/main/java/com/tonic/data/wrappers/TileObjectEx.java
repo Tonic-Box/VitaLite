@@ -10,7 +10,6 @@ import com.tonic.data.wrappers.abstractions.Entity;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.local.LocalCollisionMap;
 import com.tonic.util.Distance;
-import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
 import lombok.Getter;
 import net.runelite.api.*;
@@ -18,10 +17,8 @@ import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-
 import java.awt.*;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class TileObjectEx implements Entity

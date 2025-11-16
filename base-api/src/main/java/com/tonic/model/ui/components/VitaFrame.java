@@ -37,6 +37,10 @@ public class VitaFrame extends JFrame {
     private Point resizeStart;
     private Rectangle boundsBeforeResize;
 
+    // For maximize/restore
+    private Rectangle boundsBeforeMaximize;
+    private boolean isMaximized = false;
+
     // Resize direction constants
     private static final int NORTH = 1, SOUTH = 2, WEST = 4, EAST = 8;
     private static final int NORTH_WEST = NORTH | WEST;
@@ -140,10 +144,33 @@ public class VitaFrame extends JFrame {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (mouseDownPoint != null) {
-                    Point currentLocation = e.getLocationOnScreen();
-                    int x = currentLocation.x - mouseDownPoint.x;
-                    int y = currentLocation.y - mouseDownPoint.y;
-                    setLocation(x, y);
+                    // If dragging while maximized, restore to normal size first
+                    if (isMaximized) {
+                        isMaximized = false;
+                        maximizeBtn.setText("[]");
+
+                        // Restore to saved bounds if available
+                        if (boundsBeforeMaximize != null) {
+                            setBounds(boundsBeforeMaximize);
+
+                            // Position window so title bar is centered under cursor
+                            Point currentLocation = e.getLocationOnScreen();
+                            int titleBarCenterOffset = boundsBeforeMaximize.width / 2;
+                            int newX = currentLocation.x - titleBarCenterOffset;
+                            int newY = currentLocation.y - mouseDownPoint.y;
+                            setLocation(newX, newY);
+
+                            // Update mouse down point to center of title bar for smooth dragging
+                            mouseDownPoint = new Point(titleBarCenterOffset, mouseDownPoint.y);
+                            windowLocation = getLocation();
+                        }
+                    } else {
+                        // Normal dragging
+                        Point currentLocation = e.getLocationOnScreen();
+                        int x = currentLocation.x - mouseDownPoint.x;
+                        int y = currentLocation.y - mouseDownPoint.y;
+                        setLocation(x, y);
+                    }
                 }
             }
 
@@ -267,11 +294,27 @@ public class VitaFrame extends JFrame {
     }
 
     private void toggleMaximize() {
-        if (getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+        if (isMaximized) {
+            // Restoring to normal
+            isMaximized = false;
             setExtendedState(JFrame.NORMAL);
             maximizeBtn.setText("[]");  // Normal state shows maximize icon
+
+            // Restore to saved bounds if available
+            if (boundsBeforeMaximize != null) {
+                setBounds(boundsBeforeMaximize);
+            }
         } else {
-            setExtendedState(JFrame.MAXIMIZED_BOTH);
+            // Maximizing - save current bounds first
+            boundsBeforeMaximize = getBounds();
+            isMaximized = true;
+            setExtendedState(JFrame.NORMAL); // Keep as NORMAL to prevent OS maximize
+
+            // Get maximum usable screen bounds (excludes taskbar/dock/menu bar)
+            GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            Rectangle maxBounds = env.getMaximumWindowBounds();
+            setBounds(maxBounds);
+
             maximizeBtn.setText("[=]"); // Maximized state shows restore icon
         }
     }
@@ -336,7 +379,8 @@ public class VitaFrame extends JFrame {
     }
 
     private int getResizeDirection(Point p) {
-        if (getExtendedState() == JFrame.MAXIMIZED_BOTH) return 0;
+        // Don't allow resizing when maximized
+        if (isMaximized) return 0;
 
         int dir = 0;
 

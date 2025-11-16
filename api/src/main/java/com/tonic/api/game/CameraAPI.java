@@ -17,9 +17,7 @@ public class CameraAPI
     public static final int PITCH_MAX = 383;
 
     // Camera rotation speeds (per game tick)
-    private static final int YAW_SPEED_SLOW = 12;
     private static final int YAW_SPEED_NORMAL = 24;
-    private static final int PITCH_SPEED_SLOW = 6;
     private static final int PITCH_SPEED_NORMAL = 12;
 
     // Conversion constants
@@ -33,7 +31,7 @@ public class CameraAPI
     public static int getYaw()
     {
         Client client = Static.getClient();
-        return Static.invoke(() -> client.getCameraYaw());
+        return Static.invoke(client::getCameraYaw);
     }
 
     /**
@@ -43,7 +41,7 @@ public class CameraAPI
     public static int getPitch()
     {
         Client client = Static.getClient();
-        return Static.invoke(() -> client.getCameraPitch());
+        return Static.invoke(client::getCameraPitch);
     }
 
     /**
@@ -53,7 +51,7 @@ public class CameraAPI
     public static int getYawTarget()
     {
         Client client = Static.getClient();
-        return Static.invoke(() -> client.getCameraYawTarget());
+        return Static.invoke(client::getCameraYawTarget);
     }
 
     /**
@@ -63,7 +61,7 @@ public class CameraAPI
     public static int getPitchTarget()
     {
         Client client = Static.getClient();
-        return Static.invoke(() -> client.getCameraPitchTarget());
+        return Static.invoke(client::getCameraPitchTarget);
     }
 
     /**
