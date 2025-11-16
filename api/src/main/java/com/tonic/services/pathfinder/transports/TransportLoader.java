@@ -113,10 +113,18 @@ public class TransportLoader
         {
             List<Transport> filteredStatic = new ArrayList<>();
             for (ArrayList<Transport> list : ALL_STATIC_TRANSPORTS.valueCollection()) {
-                for(var transport : list)
-                {
-                    if(transport.getRequirements() == null || transport.getRequirements().fulfilled() || !filter)
-                    {
+                for (var transport : list) {
+                    boolean hasMembersSkillRequirement = transport.getRequirements() != null
+                            && transport.getRequirements().getSkillRequirements().stream()
+                            .anyMatch(req -> SkillAPI.getMemberSkills().contains(req.getSkill()));
+                    boolean canUse = transport.getRequirements() == null
+                            || transport.getRequirements().fulfilled();
+
+                    if (hasMembersSkillRequirement && !WorldsAPI.inMembersWorld() && filter) {
+                        continue; // Skip this transport
+                    }
+
+                    if (canUse || !filter) {
                         filteredStatic.add(transport);
                     }
                 }
