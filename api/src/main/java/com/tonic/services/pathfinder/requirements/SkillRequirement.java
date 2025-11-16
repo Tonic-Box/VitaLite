@@ -1,9 +1,13 @@
 package com.tonic.services.pathfinder.requirements;
 
 import com.tonic.Static;
+import com.tonic.api.game.SkillAPI;
+import com.tonic.api.game.WorldsAPI;
 import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
+
+import java.util.Set;
 
 @Value
 public class SkillRequirement implements Requirement
@@ -14,8 +18,12 @@ public class SkillRequirement implements Requirement
     @Override
     public Boolean get()
     {
-        Client client = Static.getClient();
-        return client.getRealSkillLevel(skill) >= level;
+        if(SkillAPI.MEMBER_SKILLS.contains(skill) && !WorldsAPI.inMembersWorld())
+        {
+            return false;
+        }
+
+        return SkillAPI.getLevel(skill) >= level;
     }
 }
 

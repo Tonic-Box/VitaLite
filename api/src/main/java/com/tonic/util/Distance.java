@@ -2,8 +2,6 @@ package com.tonic.util;
 
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
-import com.tonic.services.pathfinder.LocalPathfinder;
-import com.tonic.services.pathfinder.implimentations.hybridbfs.HybridBFSStep;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.WorldPoint;
 

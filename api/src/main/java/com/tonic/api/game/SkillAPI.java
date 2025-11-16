@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.tonic.Static;
 import com.tonic.api.widgets.WidgetAPI;
 import java.util.Map;
+import java.util.Set;
+
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
 import net.runelite.api.gameval.InterfaceID;
@@ -13,6 +15,17 @@ import net.runelite.api.widgets.Widget;
  * Skill API
  */
 public class SkillAPI {
+    public final static Set<Skill> MEMBER_SKILLS = Set.of(
+            Skill.AGILITY,
+            Skill.HERBLORE,
+            Skill.THIEVING,
+            Skill.FLETCHING,
+            Skill.SLAYER,
+            Skill.FARMING,
+            Skill.CONSTRUCTION,
+            Skill.HUNTER,
+            Skill.SAILING
+    );
     private static final int MAX_SKILL_LEVEL = 99;
     private static final int[] XP_TABLE;
 
