@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.tonic.Static;
 import com.tonic.api.widgets.WidgetAPI;
 import java.util.Map;
+import java.util.Set;
+
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
 import net.runelite.api.gameval.InterfaceID;
@@ -214,5 +216,23 @@ public class SkillAPI {
         return rewardWidget != null
                 && rewardWidget.getChild(9) != null
                 && rewardWidget.getChild(9).getOpacity() != 150;
+    }
+
+    /**
+     * Retrieves a set of all skills that are exclusive to members.
+     * @return A Set containing the 9 member exclusive skills.
+     */
+    public static Set<Skill> getMemberSkills() {
+        return Set.of(
+                Skill.AGILITY,
+                Skill.HERBLORE,
+                Skill.THIEVING,
+                Skill.FLETCHING,
+                Skill.SLAYER,
+                Skill.FARMING,
+                Skill.CONSTRUCTION,
+                Skill.HUNTER,
+                Skill.SAILING
+        );
     }
 }
