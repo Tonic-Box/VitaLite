@@ -1,10 +1,8 @@
 package com.tonic.services.pathfinder.requirements;
 
-import com.tonic.Static;
 import com.tonic.api.game.SkillAPI;
 import com.tonic.api.game.WorldsAPI;
 import lombok.Value;
-import net.runelite.api.Client;
 import net.runelite.api.Skill;
 
 import java.util.Set;
