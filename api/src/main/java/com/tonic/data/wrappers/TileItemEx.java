@@ -26,6 +26,13 @@ public class TileItemEx implements Entity
     private final LocalPoint localPoint;
     private String[] actions = null;
 
+    public TileItemEx(TileItem item, WorldPoint worldPoint) {
+        this.item = item;
+        this.worldPoint = worldPoint;
+        Client client = Static.getClient();
+        this.localPoint = LocalPoint.fromWorld(client, worldPoint);
+    }
+
     @Override
     public int getId() {
         return item.getId();

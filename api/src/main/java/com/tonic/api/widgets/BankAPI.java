@@ -275,9 +275,7 @@ public class BankAPI
      */
     public static void withdraw(int id, int amount, boolean noted) {
         setWithdrawMode(noted);
-        ItemEx item = Static.invoke(() ->
-                InventoryQuery.fromInventoryId(InventoryID.BANK).withId(id).first()
-        );
+        ItemEx item = InventoryQuery.fromInventoryId(InventoryID.BANK).withId(id).first();
 
         if(item == null)
             return;
@@ -486,9 +484,7 @@ public class BankAPI
      */
     public static int getSlot(String itemName)
     {
-        ItemEx item = Static.invoke(() ->
-                InventoryQuery.fromInventoryId(InventoryID.BANK).withName(itemName).first()
-        );
+        ItemEx item = InventoryQuery.fromInventoryId(InventoryID.BANK).withName(itemName).first();
         if(item == null)
             return -1;
         return item.getSlot();
@@ -499,9 +495,7 @@ public class BankAPI
      * @param itemId The id of the item to use.
      */
     public static void use(int itemId) {
-        ItemEx item = Static.invoke(() ->
-                InventoryQuery.fromInventoryId(InventoryID.INV).withId(itemId).first()
-        );
+        ItemEx item = InventoryQuery.fromInventoryId(InventoryID.INV).withId(itemId).first();
         if(item == null)
             return;
         WidgetAPI.interact(9, InterfaceID.Bankside.ITEMS, item.getSlot(), itemId);
@@ -518,6 +512,28 @@ public class BankAPI
         if(item == null)
             return;
         WidgetAPI.interact(9, InterfaceID.Bankside.ITEMS, item.getSlot(), item.getId());
+    }
+
+    /**
+     * Uses the item with the specified id from the bank container.
+     * @param itemId The id of the item to use.
+     */
+    public static void bankUse(int itemId) {
+        ItemEx item = InventoryQuery.fromInventoryId(InventoryID.INV).withId(itemId).first();
+        if(item == null)
+            return;
+        WidgetAPI.interact(9, InterfaceID.Bankmain.ITEMS, item.getSlot(), itemId);
+    }
+
+    /**
+     * Uses the item with the specified name from the bank container.
+     * @param itemName The name of the item to use.
+     */
+    public static void bankUse(String itemName) {
+        ItemEx item = InventoryQuery.fromInventoryId(InventoryID.BANK).withName(itemName).first();
+        if(item == null)
+            return;
+        WidgetAPI.interact(9, InterfaceID.Bankmain.ITEMS, item.getSlot(), item.getId());
     }
 
     /**

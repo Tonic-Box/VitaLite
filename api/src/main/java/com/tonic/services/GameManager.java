@@ -63,9 +63,11 @@ public class GameManager extends Overlay {
     private static int lastUpdatePlayers = 0;
     private static int lastUpdateNpcs = 0;
     private static int lastUpdateReachableTiles = 0;
+    private static int lastUpdateTileItems = 0;
     private static final List<TileObjectEx> tileObjects = new ArrayList<>();
     private static final List<NpcEx> npcs = new ArrayList<>();
     private static final List<PlayerEx> players = new ArrayList<>();
+    private static final List<TileItemEx> tileItemCache = new CopyOnWriteArrayList<>();
     public static Stream<PlayerEx> playerStream()
     {
         return  playerList().stream();
@@ -207,7 +209,47 @@ public class GameManager extends Overlay {
         return tileItemList().stream();
     }
 
-    public static ArrayList<TileItemEx> tileItemList()
+    public static List<TileItemEx> tileItemList()
+    {
+        Client client = Static.getClient();
+        if(lastUpdateTileItems < client.getTickCount())
+        {
+            tileItemCache.clear();
+            tileItemCache.addAll(Static.invoke(() -> {
+                ArrayList<TileItemEx> temp = new ArrayList<>();
+                WorldView wv = client.getTopLevelWorldView();
+                Tile[][] value = wv.getScene().getTiles()[wv.getPlane()];
+                for(int x = 0; x < value.length; x++)
+                {
+                    for (int y = 0; y < value[x].length; y++)
+                    {
+                        Tile tile = value[x][y];
+                        if (tile != null) {
+                            if(tile.getGroundItems() != null)
+                            {
+                                for(TileItem tileItem : tile.getGroundItems())
+                                {
+                                    if(tileItem != null)
+                                    {
+                                        WorldPoint wp = WorldPoint.fromScene(wv, x, y, wv.getPlane());
+                                        TileItemEx itemEx = new TileItemEx(tileItem, wp);
+                                        temp.add(itemEx);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                return temp;
+            }));
+
+            lastUpdateTileItems = client.getTickCount();
+        }
+
+        return tileItemCache;
+    }
+
+    public static List<TileItemEx> tileItemList1()
     {
         Client client = Static.getClient();
         WorldView wv = client.getTopLevelWorldView();
@@ -417,7 +459,6 @@ public class GameManager extends Overlay {
         client.hopToWorld(quickHopTargetWorld);
     }
 
-    private final List<TileItemEx> tileItemCache = new CopyOnWriteArrayList<>();
     private int tickCount = 0;
     @Getter
     private volatile List<WorldPoint> pathPoints = null;
@@ -450,35 +491,8 @@ public class GameManager extends Overlay {
     @Subscribe
     public void onGameStateChanged(GameStateChanged event)
     {
-        if (event.getGameState() == GameState.LOGIN_SCREEN
-                || event.getGameState() == GameState.HOPPING
-                || event.getGameState() == GameState.CONNECTION_LOST)
-        {
-            tileItemCache.clear();
-        }
         if(event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
             tickCount = 0;
-    }
-
-    @Subscribe
-    public void onItemSpawned(ItemSpawned event)
-    {
-        tileItemCache.add(
-                new TileItemEx(
-                        event.getItem(),
-                        WorldPoint.fromLocal(Static.getClient(), event.getTile().getLocalLocation()),
-                        event.getTile().getLocalLocation()
-                )
-        );
-    }
-
-    @Subscribe
-    public void onItemDespawned(ItemDespawned event)
-    {
-        tileItemCache.removeIf(ex -> ex.getItem().equals(event.getItem()) &&
-                ex.getWorldPoint().equals(WorldPoint.fromLocal(Static.getClient(), event.getTile().getLocalLocation())) &&
-                ex.getLocalPoint().equals(event.getTile().getLocalLocation())
-        );
     }
 
     @Subscribe
