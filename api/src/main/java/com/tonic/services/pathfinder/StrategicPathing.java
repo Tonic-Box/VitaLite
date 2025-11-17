@@ -143,10 +143,24 @@ public class StrategicPathing {
         return pathToGoalSet(new HashSet<>(Collections.singletonList(goal)), dangerous, impassible, playerPosition());
     }
 
+    /**
+     * Finds a path to any of the specified goal points from the player's current position.
+     * @param goalSet A set of target WorldPoints to reach.
+     * @return A list of WorldPoints representing the path, or null if no path is found.
+     */
     public static List<WorldPoint> pathToSet(HashSet<WorldPoint> goalSet) {
         return pathToGoalSet(goalSet, EMPTY_SET, EMPTY_SET, playerPosition());
     }
 
+    /**
+     * Finds a path to any of the specified goal points from the player's current position,
+     * avoiding dangerous points.
+     *
+     * @param goalSet   A set of target WorldPoints to reach.
+     * @param dangerous A set of WorldPoints to avoid.
+     * @param impassible A set of WorldPoints that cannot be traversed.
+     * @return A list of WorldPoints representing the path, or null if no path is found.
+     */
     public static List<WorldPoint> pathToSet(HashSet<WorldPoint> goalSet, HashSet<WorldPoint> dangerous, HashSet<WorldPoint> impassible) {
         return pathToGoalSet(goalSet, dangerous, impassible, playerPosition());
     }
@@ -155,6 +169,16 @@ public class StrategicPathing {
     // Main Pathfinding Algorithm (Optimized)
     // ============================================
 
+    /**
+     * Core pathfinding algorithm to find a path to any goal in the goal set,
+     * avoiding dangerous and impassible tiles.
+     *
+     * @param goalSet     A set of target WorldPoints to reach.
+     * @param dangerous   A set of WorldPoints to avoid.
+     * @param impassible  A set of WorldPoints that cannot be traversed.
+     * @param starting    The starting WorldPoint for pathfinding.
+     * @return A list of WorldPoints representing the path, or null if no path is found.
+     */
     public static List<WorldPoint> pathToGoalSet(
             HashSet<WorldPoint> goalSet,
             HashSet<WorldPoint> dangerous,
