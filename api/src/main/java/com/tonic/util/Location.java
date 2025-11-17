@@ -3,6 +3,7 @@ package com.tonic.util;
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.services.pathfinder.LocalPathfinder;
+import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.implimentations.hybridbfs.HybridBFSStep;
 import lombok.Getter;
 import net.runelite.api.*;
@@ -80,5 +81,69 @@ public class Location {
     public static boolean isInWilderness(WorldPoint p) {
         return WILDERNESS_ABOVE_GROUND.distanceTo(p) == 0 ||
                 WILDERNESS_UNDERGROUND.distanceTo(p) == 0;
+    }
+
+    /**
+     * Get walkable surrounding points within a specified width and height
+     * @param point center point
+     * @param width width
+     * @param height height
+     * @return list of walkable surrounding points
+     */
+    public static List<WorldPoint> getSurroundingPoints(WorldPoint point, int width, int height)
+    {
+        int x = point.getX();
+        int y = point.getY();
+        byte z = (byte) point.getPlane();
+
+        if(Walker.getCollisionMap() == null)
+            return List.of();
+
+        List<WorldPoint> walkablePoints = new ArrayList<>();
+
+        for(int dx = -width; dx <= width; dx++)
+        {
+            for(int dy = -height; dy <= height; dy++)
+            {
+                if(dx == -width || dx == width || dy == -height || dy == height)
+                {
+                    if (Walker.getCollisionMap().walkable((short)(x + dx), (short)(y + dy), z))
+                        walkablePoints.add(new WorldPoint((short)(x + dx), (short)(y + dy), z));
+                }
+            }
+        }
+
+        return walkablePoints;
+    }
+
+    /**
+     * Get walkable surrounding points
+     * @param point center point
+     * @return list of walkable surrounding points
+     */
+    public static List<WorldPoint> getSurroundingPoints(WorldPoint point)
+    {
+        int x = point.getX();
+        int y = point.getY();
+        byte z = (byte) point.getPlane();
+
+        if(Walker.getCollisionMap() == null)
+            return List.of();
+
+        List<WorldPoint> walkablePoints = new ArrayList<>();
+
+        for(int dx = -1; dx <= 1; dx++)
+        {
+            for(int dy = -1; dy <= 1; dy++)
+            {
+                if(dx == 0 && dy == 0)
+                    continue;
+
+                if (Walker.getCollisionMap().walkable((short)(x + dx), (short)(y + dy), z))
+                    walkablePoints.add(new WorldPoint((short)(x + dx), (short)(y + dy), z));
+            }
+        }
+
+        return walkablePoints;
     }
 }
