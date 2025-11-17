@@ -63,6 +63,18 @@ public class ProfilesRootPanel extends PluginPanel {
         this.add(addJagexAccountPanel, gbc);
 
         gbc.gridy++;
+        JPanel profilesHeader = new JPanel(new BorderLayout());
+        profilesHeader.setPreferredSize(new Dimension(220, 32));
+        profilesHeader.setMinimumSize(new Dimension(220, 32));
+        profilesHeader.setMaximumSize(new Dimension(220, 32));
+        profilesHeader.setBackground(new Color(30, 30, 30));
+        JLabel profilesLabel = new JLabel("Profiles");
+        profilesLabel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 0));
+        profilesLabel.setForeground(Color.WHITE);
+        profilesHeader.add(profilesLabel, BorderLayout.WEST);
+        this.add(profilesHeader, gbc);
+
+        gbc.gridy++;
         searchField = new JTextField();
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
