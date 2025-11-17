@@ -14,7 +14,8 @@ import net.runelite.api.coords.WorldPoint;
 import java.util.*;
 
 /**
- * Strategic Pathfinding API - Optimized for performance
+ * Strategic Pathfinding API - Provides advanced pathfinding capabilities with support for
+ * avoiding and/or navigating around dangerous and impassible tiles.
  */
 public class StrategicPathing {
 
