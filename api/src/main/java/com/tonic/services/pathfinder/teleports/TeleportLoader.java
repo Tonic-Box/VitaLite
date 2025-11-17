@@ -1,31 +1,21 @@
 package com.tonic.services.pathfinder.teleports;
 
 import com.tonic.Static;
-import com.tonic.api.TClient;
 import com.tonic.api.game.GameAPI;
 import com.tonic.api.game.VarAPI;
+import com.tonic.api.game.WorldsAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.data.wrappers.ItemEx;
-import com.tonic.services.ClickManager;
-import com.tonic.services.ClickPacket.ClickType;
 import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarPlayerID;
 import org.apache.commons.lang3.ArrayUtils;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class TeleportLoader {
-    private static final List<Teleport> LAST_TELEPORT_LIST = new ArrayList<>();
-
     public static List<Teleport> buildTeleports() {
-        List<Teleport> teleports = new ArrayList<>();
-        teleports.addAll(LAST_TELEPORT_LIST);
-        teleports.addAll(buildTimedTeleports());
-        return teleports;
-    }
-
-    private static List<Teleport> buildTimedTeleports() {
         return Static.invoke(() -> {
             List<Teleport> teleports = new ArrayList<>();
 
@@ -45,15 +35,16 @@ public class TeleportLoader {
 
             for (TeleportItem tele : TeleportItem.values()) {
                 if (tele.canUse() && tele.getDestination().distanceTo(client.getLocalPlayer().getWorldLocation()) > 20) {
-                    switch (tele) {
-                        case ROYAL_SEED_POD:
-                            if (GameAPI.getWildyLevel() <= 30) {
-                                teleports.add(itemTeleport(tele));
-                            }
-                        default:
-                            if (GameAPI.getWildyLevel() <= 20) {
-                                teleports.add(itemTeleport(tele));
-                            }
+                    if(!membersCheck(tele.getItemId()))
+                        continue;
+
+                    if (tele == TeleportItem.ROYAL_SEED_POD) {
+                        if (GameAPI.getWildyLevel() <= 30) {
+                            teleports.add(itemTeleport(tele));
+                        }
+                    }
+                    if (GameAPI.getWildyLevel() <= 20) {
+                        teleports.add(itemTeleport(tele));
                     }
                 }
             }
@@ -63,7 +54,9 @@ public class TeleportLoader {
                 return teleports;
             }
 
-            if (getTeleportItem(MovementConstants.SLAYER_RING) != null) {
+            boolean inMembers = WorldsAPI.inMembersWorld();
+
+            if (getTeleportItem(MovementConstants.SLAYER_RING) != null && inMembers) {
                 teleports.add(new Teleport(new WorldPoint(2432, 3423, 0), 2,
                         new ArrayList<>() {{
                             addAll(jewelryTeleport("Teleport", "Stronghold", MovementConstants.SLAYER_RING));
@@ -83,7 +76,7 @@ public class TeleportLoader {
                             addAll(jewelryTeleport("Teleport", "Tarn's Lair", MovementConstants.SLAYER_RING));
                         }}));
             }
-            if (getTeleportItem(MovementConstants.AMULET_OF_GLORY) != null) {
+            if (getTeleportItem(MovementConstants.AMULET_OF_GLORY) != null && inMembers) {
                 teleports.add(new Teleport(new WorldPoint(3087, 3496, 0), 5,
                         new ArrayList<>() {{
                             addAll(jewelryTeleport("Rub", "Edgeville", MovementConstants.AMULET_OF_GLORY));
@@ -101,7 +94,7 @@ public class TeleportLoader {
                             addAll(jewelryTeleport("Rub", "Al Kharid", MovementConstants.AMULET_OF_GLORY));
                         }}));
             }
-            if (getTeleportItem(MovementConstants.GAMES_NECKLACE) != null) {
+            if (getTeleportItem(MovementConstants.GAMES_NECKLACE) != null && inMembers) {
                 teleports.add(new Teleport(new WorldPoint(2898, 3552, 0), 5,
                         new ArrayList<>() {{
                             addAll(jewelryTeleport("Rub", "Burthorpe", MovementConstants.GAMES_NECKLACE));
@@ -123,7 +116,7 @@ public class TeleportLoader {
                             addAll(jewelryTeleport("Rub", "Wintertodt Camp", MovementConstants.GAMES_NECKLACE));
                         }}));
             }
-            if (getTeleportItem(MovementConstants.RING_OF_WEALTH) != null) {
+            if (getTeleportItem(MovementConstants.RING_OF_WEALTH) != null && inMembers) {
                 teleports.add(new Teleport(new WorldPoint(2535, 3862, 0), 5,
                         new ArrayList<>() {{
                             addAll(jewelryTeleport("Rub", "Miscellania", MovementConstants.RING_OF_WEALTH));
@@ -142,7 +135,7 @@ public class TeleportLoader {
                             addAll(jewelryTeleport("Rub", "Dondakan", MovementConstants.RING_OF_WEALTH));
                         }}));
             }
-            if (getTeleportItem(MovementConstants.RING_OF_DUELING) != null) {
+            if (getTeleportItem(MovementConstants.RING_OF_DUELING) != null && inMembers) {
                 teleports.add(new Teleport(new WorldPoint(3315, 3235, 0), 5,
                         new ArrayList<>() {{
                             addAll(jewelryTeleport("Rub", "Emir's Arena", MovementConstants.RING_OF_DUELING));
@@ -162,7 +155,7 @@ public class TeleportLoader {
                             }}));
                 }
             }
-            if (getTeleportItem(MovementConstants.COMBAT_BRACELET) != null) {
+            if (getTeleportItem(MovementConstants.COMBAT_BRACELET) != null && inMembers) {
                 teleports.add(new Teleport(new WorldPoint(2883, 3549, 0), 5,
                         new ArrayList<>() {{
                             addAll(jewelryTeleport("Rub", "Warriors' Guild", MovementConstants.COMBAT_BRACELET));
@@ -180,7 +173,7 @@ public class TeleportLoader {
                             addAll(jewelryTeleport("Rub", "Ranging Guild", MovementConstants.COMBAT_BRACELET));
                         }}));
             }
-            if (getTeleportItem(MovementConstants.SKILLS_NECKLACE) != null) {
+            if (getTeleportItem(MovementConstants.SKILLS_NECKLACE) != null && inMembers) {
                 teleports.add(new Teleport(new WorldPoint(2612, 3391, 0), 4,
                         new ArrayList<>() {{
                             addAll(jewelryTeleport("Rub", "Fishing Guild", MovementConstants.SKILLS_NECKLACE));
@@ -206,7 +199,7 @@ public class TeleportLoader {
                             addAll(jewelryTeleport("Rub", "Farming Guild", MovementConstants.SKILLS_NECKLACE));
                         }}));
             }
-            if (InventoryAPI.getItem(i -> ArrayUtils.contains(MovementConstants.DIGSITE_PENDANT, i.getId())) != null) {
+            if (InventoryAPI.getItem(i -> ArrayUtils.contains(MovementConstants.DIGSITE_PENDANT, i.getId())) != null && inMembers) {
                 teleports.add(new Teleport(new WorldPoint(3341, 3444, 0), 3,
                         new ArrayList<>() {{
                             addAll(jewelryTeleport("Rub", "Digsite", MovementConstants.DIGSITE_PENDANT));
@@ -223,7 +216,7 @@ public class TeleportLoader {
                             addAll(jewelryTeleport("Rub", "Lithkren", MovementConstants.DIGSITE_PENDANT));
                         }}));*/
             }
-            if (getTeleportItem(MovementConstants.NECKLACE_OF_PASSAGE) != null) {
+            if (getTeleportItem(MovementConstants.NECKLACE_OF_PASSAGE) != null && inMembers) {
                 teleports.add(new Teleport(new WorldPoint(3114, 3181, 0), 5,
                         new ArrayList<>() {{
                             addAll(jewelryTeleport("Rub", "Wizards' Tower", MovementConstants.NECKLACE_OF_PASSAGE));
@@ -245,9 +238,9 @@ public class TeleportLoader {
         });
     }
 
-    public static List<Teleport> getTeleportSpells() {
-        var teleports = new ArrayList<Teleport>();
-
+//    public static List<Teleport> getTeleportSpells() {
+//        var teleports = new ArrayList<Teleport>();
+//
 //        if(GameAPI.getWildyLevel(client) > 20)
 //        {
 //            return teleports;
@@ -272,9 +265,9 @@ public class TeleportLoader {
 //                teleports.add(Teleport.fromSpell(teleportSpell));
 //            }
 //        }
-
-        return teleports;
-    }
+//
+//        return teleports;
+//    }
 
     public static Teleport itemTeleport(TeleportItem teleportItem) {
         return new Teleport(teleportItem.getDestination(), 5, new ArrayList<>() {{
@@ -312,28 +305,13 @@ public class TeleportLoader {
         }};
     }
 
-    public static List<Runnable> jewelryTeleport2(int option, int WidgetId, String itemAction, int... ids) {
-        return new ArrayList<>() {{
-            add(() -> {
-                ItemEx item = InventoryAPI.getItem(i -> ArrayUtils.contains(ids, i.getId()));
-                if (item == null)
-                    return;
-                InventoryAPI.interact(item, itemAction);
-            });
-            add(() -> {
-                TClient tClient = Static.getClient();
-                Static.invoke(() -> {
-                    ClickManager.click(ClickType.GENERIC);
-                    tClient.invokeMenuAction("", "", 0, 30, option, WidgetId, -1, -1, -1);
-                });
-            });
-            add(() -> {
-                TClient tClient = Static.getClient();
-                Static.invoke(() -> {
-                    ClickManager.click(ClickType.GENERIC);
-                    tClient.invokeMenuAction("", "", 0, 30, option, WidgetId, -1, -1, -1);
-                });
-            });
-        }};
+    private static boolean membersCheck(int... ids)
+    {
+        if(WorldsAPI.inMembersWorld())
+            return true;
+
+        ItemEx item = InventoryAPI.search().withId(ids).first();
+
+        return item != null && !item.getName().endsWith("(Members)");
     }
 }
