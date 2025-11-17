@@ -24,18 +24,19 @@ public class StepContext
         contextMap.putIfAbsent(key, value);
     }
 
+    public <T> T getOrDefault(String key, T defaultValue) {
+        if(!contextMap.containsKey(key)) {
+            put(key, defaultValue);
+            return defaultValue;
+        }
+        return (T) contextMap.get(key);
+    }
+
     public <T> T get(String key) {
         if(!contextMap.containsKey(key)) {
             return null;
         }
         return (T) contextMap.get(key);
-    }
-
-    public <T> T get(String key, Class<T> clazz) {
-        if(!contextMap.containsKey(key)) {
-            return null;
-        }
-        return clazz.cast(contextMap.get(key));
     }
 
     public boolean contains(String key) {

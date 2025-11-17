@@ -2,6 +2,7 @@ package com.tonic.api.game;
 
 import com.tonic.Static;
 import com.tonic.api.TClient;
+import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
 import com.tonic.services.mouse.ClickVisualizationOverlay;
@@ -10,6 +11,8 @@ import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.InterfaceID;
+
 import java.util.List;
 import java.util.Random;
 
@@ -44,6 +47,11 @@ public class MovementAPI {
     {
         Client client = Static.getClient();
         return Static.invoke(() -> client.getVarpValue(RUN_VARP)) == 1;
+    }
+
+    public static void toggleRun()
+    {
+        WidgetAPI.interact(1, InterfaceID.Orbs.RUNBUTTON, -1, -1);
     }
 
     /**
