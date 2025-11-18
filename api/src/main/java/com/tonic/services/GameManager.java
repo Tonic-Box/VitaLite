@@ -20,6 +20,7 @@ import com.tonic.services.pathfinder.abstractions.IStep;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.services.pathfinder.transports.TransportLoader;
+import com.tonic.services.stratpath.StratPathOverlay;
 import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
 import com.tonic.util.WorldPointUtil;
@@ -376,6 +377,9 @@ public class GameManager extends Overlay {
 
         MovementVisualizationOverlay moveVizOverlay = Static.getInjector().getInstance(MovementVisualizationOverlay.class);
         overlayManager.add(moveVizOverlay);
+
+        StratPathOverlay stratPathOverlay = Static.getInjector().getInstance(StratPathOverlay.class);
+        overlayManager.add(stratPathOverlay);
 
         setPosition(OverlayPosition.DYNAMIC);
         setPriority(PRIORITY_LOW);

@@ -288,6 +288,17 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
         scenePanel.addVerticalStrut(12);
 
+        ToggleSlider debugStratPathing = new ToggleSlider();
+        Static.getVitaConfig().setDrawStratPath(false);
+        scenePanel.addContent(createToggleOption(
+                "Debug Strat Pathing",
+                "Define warning and impassible tiles for strategic pathfinding with overlay.",
+                debugStratPathing,
+                () -> Static.getVitaConfig().setDrawStratPath(debugStratPathing.isSelected())
+        ));
+
+        scenePanel.addVerticalStrut(12);
+
         FancyButton distanceDebug = new FancyButton("Distance Debugger");
         distanceDebug.addActionListener(e -> {
             DistanceDebugger window = DistanceDebugger.getInstance();
