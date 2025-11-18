@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion = "0"
+val vitaVersion = "1"
 val runeliteVersion = "1.12.4"
 
 group = "com.tonic"
@@ -134,6 +134,25 @@ tasks {
         exclude("META-INF/*.DSA")
         exclude("META-INF/*.RSA")
         exclude("module-info.class")
+
+        // Dynamically exclude all constant classes in net/runelite/api and subpackages
+        // These are compile-time constants that get inlined, so runtime doesn't need them
+        exclude {
+            val path = it.path
+
+            // Check if it's anywhere in net/runelite/api/ or its subpackages
+            val isInApiPackage = path.startsWith("net/runelite/api/") && path.endsWith(".class")
+
+            // Whitelist: Classes that ARE needed at runtime (not just compile-time constants)
+            val whitelist = setOf(
+                "net/runelite/api/ItemID.class",
+                "net/runelite/api/InterfaceID.class",
+                "net/runelite/api/ObjectID.class"
+            )
+
+            // Exclude if it's in api package (any level) but NOT in whitelist
+            isInApiPackage && path !in whitelist
+        }
 
         transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer::class.java) {
             resource = "META-INF/services/javax.swing.LookAndFeel"
