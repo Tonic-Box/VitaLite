@@ -46,6 +46,7 @@ public class ProfilerWindow extends VitaFrame {
     private Timer refreshTimer;
     private Timer metricsTimer;
     private SamplingTab samplingTab;
+    private com.tonic.services.profiler.leak.LeakDetectorTab leakDetectorTab;
 
     // Resource Monitor components
     private ResourceMetricsCollector metricsCollector;
@@ -142,6 +143,8 @@ public class ProfilerWindow extends VitaFrame {
         tabbedPane.addTab("Resource Monitor", createResourceMonitorPanel());
         samplingTab = new SamplingTab();
         tabbedPane.addTab("Sampling", samplingTab);
+        leakDetectorTab = new com.tonic.services.profiler.leak.LeakDetectorTab();
+        tabbedPane.addTab("Leak Detector", leakDetectorTab);
         tabbedPane.addTab("JIT Compiler", createJITPanel());
         tabbedPane.addTab("Threads", createThreadPanel());
         tabbedPane.addTab("VM Configuration", createVMConfigPanel());
@@ -1523,6 +1526,11 @@ public class ProfilerWindow extends VitaFrame {
         // Stop sampling tab samplers
         if (samplingTab != null) {
             samplingTab.cleanup();
+        }
+
+        // Stop leak detector
+        if (leakDetectorTab != null) {
+            leakDetectorTab.cleanup();
         }
 
         // Clear instance reference
