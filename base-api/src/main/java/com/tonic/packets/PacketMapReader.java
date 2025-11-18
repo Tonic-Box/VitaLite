@@ -44,6 +44,20 @@ public class PacketMapReader
                 .findFirst().orElse(null);
     }
 
+    public static int getId(String packet)
+    {
+        if(defs == null)
+        {
+            fillMaps();
+        }
+        var entry = defs.stream()
+                .filter(e -> e.getName().equals(packet))
+                .findFirst().orElse(null);
+        if(entry == null)
+            return -1;
+        return entry.getPacket().getId();
+    }
+
     public static MapEntry get(int id)
     {
         if(defs == null)
@@ -68,6 +82,8 @@ public class PacketMapReader
         }
 
         MapEntry entry = idToEntryMap.get(buffer.getPacketId());
+        if(entry.getName().equals("OP_MOUSE_MOVEMENT"))
+            return "[UNKNOWN(" + buffer.getPacketId() + ")] " + buffer;
 
         StringBuilder out = new StringBuilder("[" + entry.getName() + "(" + entry.getPacket().getId() + ")] ");
         long num;
