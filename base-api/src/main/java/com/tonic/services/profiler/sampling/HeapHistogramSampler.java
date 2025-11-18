@@ -237,7 +237,7 @@ public class HeapHistogramSampler {
             // Base object overhead: 16 bytes (header)
             // Each reference field: 8 bytes (or 4 with compressed oops, use 8 to be safe)
             // Each primitive field: varies, use average of 4 bytes
-            return 16 + (fieldCount * 6); // Conservative estimate
+            return 16 + (fieldCount * 6L); // Conservative estimate
         } catch (Exception e) {
             return 32; // Safe default
         }
