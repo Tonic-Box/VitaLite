@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion = "1"
+val vitaVersion = "2"
 val runeliteVersion = "1.12.4"
 
 group = "com.tonic"
@@ -145,9 +145,13 @@ tasks {
 
             // Whitelist: Classes that ARE needed at runtime (not just compile-time constants)
             val whitelist = setOf(
-                "net/runelite/api/ItemID.class",
-                "net/runelite/api/InterfaceID.class",
-                "net/runelite/api/ObjectID.class"
+                "net/runelite/api/gameval/VarbitID.class",
+                "net/runelite/api/gameval/VarClientID.class",
+                "net/runelite/api/gameval/VarPlayerID.class",
+                "net/runelite/api/gameval/InventoryID.class",
+                "net/runelite/api/gameval/ItemID.class",
+                "net/runelite/api/gameval/InterfaceID.class",
+                "net/runelite/api/gameval/ObjectID.class"
             )
 
             // Exclude if it's in api package (any level) but NOT in whitelist
