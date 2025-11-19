@@ -158,8 +158,7 @@ public class LocalCollisionMap
     }
 
     public static boolean canStep(int x, int y, int plane) {
-        Client client = Static.getClient();
-        WorldView wv = client.getTopLevelWorldView();
+        WorldView wv = PlayerEx.getLocal().getWorldView();
         if (wv.getCollisionMaps() == null || wv.getCollisionMaps()[plane] == null)
             return false;
         int sceneX = x - wv.getBaseX();

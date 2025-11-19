@@ -83,7 +83,7 @@ public class TileOverlays extends Overlay
             return;
 
         final Client client = Static.getClient();
-        final WorldView worldView = client.getTopLevelWorldView();
+        final WorldView worldView = PlayerEx.getLocal().getWorldView();
         final WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
         final int MAX_DRAW_DISTANCE = 32;
 
@@ -248,7 +248,7 @@ public class TileOverlays extends Overlay
 
     public void drawCollisionMap(Graphics2D graphics) {
         Client client = Static.getClient();
-        WorldView wv = client.getTopLevelWorldView();
+        WorldView wv = PlayerEx.getLocal().getWorldView();
         if(wv.getCollisionMaps() == null || wv.getCollisionMaps()[wv.getPlane()] == null)
             return;
 
