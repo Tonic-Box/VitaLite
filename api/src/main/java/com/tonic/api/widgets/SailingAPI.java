@@ -63,6 +63,9 @@ public class SailingAPI
         GameAPI.invokeMenuAction(heading.getValue(), 60, 0, 0, 0, PlayerEx.getLocal().getWorldViewId());
     }
 
+    /**
+     * Boat Heading Enum
+     */
     @RequiredArgsConstructor
     @Getter
     public enum Heading
@@ -88,6 +91,9 @@ public class SailingAPI
         private final int value;
     }
 
+    /**
+     * Boat Move Mode Enum
+     */
     @RequiredArgsConstructor
     public enum MoveMode
     {
@@ -99,11 +105,19 @@ public class SailingAPI
 
         private final int value;
 
+        /**
+         * Checks if this move mode is currently active
+         * @return true if active, false otherwise
+         */
         public boolean isActive()
         {
             return VarAPI.getVar(VarbitID.SAILING_SIDEPANEL_BOAT_MOVE_MODE) == value;
         }
 
+        /**
+         * Gets the current move mode
+         * @return current MoveMode
+         */
         public static MoveMode getCurrent()
         {
             int var = VarAPI.getVar(VarbitID.SAILING_SIDEPANEL_BOAT_MOVE_MODE);
@@ -118,6 +132,9 @@ public class SailingAPI
         }
     }
 
+    /**
+     * Sailing Side Panel Tabs Enum
+     */
     @RequiredArgsConstructor
     public enum Tab
     {
@@ -130,6 +147,9 @@ public class SailingAPI
         private final int widgetId;
         private final int index;
 
+        /**
+         * Opens the tab
+         */
         public void open()
         {
             if(!sidePanelVisible())
@@ -143,11 +163,19 @@ public class SailingAPI
             WidgetAPI.interact(1, widgetId, -1);
         }
 
+        /**
+         * Checks if the tab is currently open
+         * @return true if open, false otherwise
+         */
         public boolean isOpen()
         {
             return sidePanelVisible() && VarAPI.getVar(VarbitID.SAILING_SIDEPANEL_TABS) == index;
         }
 
+        /**
+         * Checks if the sailing side panel is visible
+         * @return true if visible, false otherwise
+         */
         public static boolean sidePanelVisible()
         {
             return VarAPI.getVar(VarbitID.SAILING_SIDEPANEL_VISIBLE) == 1;
