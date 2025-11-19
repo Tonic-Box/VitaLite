@@ -27,6 +27,13 @@ public class LeakDetectorTab extends JPanel {
     private JTextArea detailsArea;
     private final Timer refreshTimer;
 
+    // Treemap view
+    private com.tonic.services.profiler.visualization.TreemapPanel treemapPanel;
+    private JPanel viewContainer;
+    private CardLayout viewCardLayout;
+    private JButton toggleViewButton;
+    private boolean showingTreemap = false;
+
     // Statistics labels
     private JLabel statusLabel;
     private JLabel snapshotsLabel;
@@ -141,6 +148,13 @@ public class LeakDetectorTab extends JPanel {
         leakTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         leakTable.setAutoCreateRowSorter(false);
         leakTable.setRowHeight(24);
+
+        // Initialize treemap
+        treemapPanel = new com.tonic.services.profiler.visualization.TreemapPanel();
+
+        // Initialize toggle button
+        toggleViewButton = new JButton("Show Treemap");
+        toggleViewButton.addActionListener(e -> toggleView());
     }
 
     private JPanel createStatisticsPanel() {
@@ -205,7 +219,32 @@ public class LeakDetectorTab extends JPanel {
 
     private JPanel createTablePanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("Suspicious Classes (Sorted by Confidence)"));
+        panel.setBorder(BorderFactory.createTitledBorder("Memory Analysis View"));
+
+        // Top: Toggle button
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        topPanel.add(toggleViewButton);
+        panel.add(topPanel, BorderLayout.NORTH);
+
+        // Center: Card layout with table and treemap views
+        viewCardLayout = new CardLayout();
+        viewContainer = new JPanel(viewCardLayout);
+
+        // Table view
+        JPanel tableView = createTableView();
+        viewContainer.add(tableView, "table");
+
+        // Treemap view
+        JPanel treemapView = createTreemapView();
+        viewContainer.add(treemapView, "treemap");
+
+        panel.add(viewContainer, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JPanel createTableView() {
+        JPanel panel = new JPanel(new BorderLayout());
 
         // Column widths
         TableColumn col0 = leakTable.getColumnModel().getColumn(0); // Confidence
@@ -259,6 +298,172 @@ public class LeakDetectorTab extends JPanel {
         panel.add(infoLabel, BorderLayout.SOUTH);
 
         return panel;
+    }
+
+    private JPanel createTreemapView() {
+        JPanel panel = new JPanel(new BorderLayout());
+
+        panel.add(treemapPanel, BorderLayout.CENTER);
+
+        // Info label at bottom
+        JLabel infoLabel = new JLabel("Click to drill down | Click breadcrumb to zoom out");
+        infoLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        infoLabel.setFont(infoLabel.getFont().deriveFont(Font.ITALIC));
+        panel.add(infoLabel, BorderLayout.SOUTH);
+
+        return panel;
+    }
+
+    private void toggleView() {
+        showingTreemap = !showingTreemap;
+        if (showingTreemap) {
+            updateTreemapData();
+            viewCardLayout.show(viewContainer, "treemap");
+            toggleViewButton.setText("Show Table");
+        } else {
+            viewCardLayout.show(viewContainer, "table");
+            toggleViewButton.setText("Show Treemap");
+        }
+    }
+
+    private void updateTreemapData() {
+        com.tonic.services.profiler.sampling.HeapHistogramSample[] histogram =
+            new com.tonic.services.profiler.sampling.HeapHistogramSampler().captureHistogram()
+                .toArray(new com.tonic.services.profiler.sampling.HeapHistogramSample[0]);
+
+        if (histogram.length == 0) {
+            return;
+        }
+
+        // Build package hierarchy
+        Map<String, PackageNode> packages = new HashMap<>();
+
+        for (com.tonic.services.profiler.sampling.HeapHistogramSample sample : histogram) {
+            String className = sample.className;
+            long bytes = sample.totalBytes;
+
+            // Extract package name
+            String packageName = "";
+            int lastDot = className.lastIndexOf('.');
+            if (lastDot > 0) {
+                packageName = className.substring(0, lastDot);
+            } else {
+                packageName = "(default)";
+            }
+
+            // Get or create package node
+            PackageNode pkgNode = packages.get(packageName);
+            if (pkgNode == null) {
+                pkgNode = new PackageNode(packageName);
+                packages.put(packageName, pkgNode);
+            }
+
+            pkgNode.addBytes(bytes);
+            pkgNode.addClass(className, bytes);
+        }
+
+        // Create root node
+        com.tonic.services.profiler.visualization.TreemapNode root =
+            new com.tonic.services.profiler.visualization.TreemapNode(
+                "Heap Memory",
+                getTotalBytes(packages),
+                new Color(64, 156, 255)
+            );
+
+        // Sort packages by size and take top 50
+        List<PackageNode> sortedPackages = new ArrayList<>(packages.values());
+        sortedPackages.sort((a, b) -> Long.compare(b.totalBytes, a.totalBytes));
+
+        int count = 0;
+        for (PackageNode pkgNode : sortedPackages) {
+            if (count++ >= 50) break;
+
+            Color pkgColor = getColorForSize(pkgNode.totalBytes, getTotalBytes(packages));
+            com.tonic.services.profiler.visualization.TreemapNode packageNode =
+                new com.tonic.services.profiler.visualization.TreemapNode(
+                    pkgNode.name,
+                    pkgNode.totalBytes,
+                    pkgColor
+                );
+
+            // Add top classes in this package
+            List<Map.Entry<String, Long>> sortedClasses = new ArrayList<>(pkgNode.classes.entrySet());
+            sortedClasses.sort((a, b) -> Long.compare(b.getValue(), a.getValue()));
+
+            int classCount = 0;
+            for (Map.Entry<String, Long> entry : sortedClasses) {
+                if (classCount++ >= 20) break;
+
+                String simpleClassName = entry.getKey();
+                int lastDot = simpleClassName.lastIndexOf('.');
+                if (lastDot >= 0) {
+                    simpleClassName = simpleClassName.substring(lastDot + 1);
+                }
+
+                Color classColor = brighten(pkgColor, 0.3f);
+                com.tonic.services.profiler.visualization.TreemapNode classNode =
+                    new com.tonic.services.profiler.visualization.TreemapNode(
+                        simpleClassName,
+                        entry.getValue(),
+                        classColor
+                    );
+
+                packageNode.addChild(classNode);
+            }
+
+            root.addChild(packageNode);
+        }
+
+        treemapPanel.setRoot(root);
+    }
+
+    private long getTotalBytes(Map<String, PackageNode> packages) {
+        long total = 0;
+        for (PackageNode node : packages.values()) {
+            total += node.totalBytes;
+        }
+        return total;
+    }
+
+    private Color getColorForSize(long size, long maxSize) {
+        float ratio = (float) size / maxSize;
+
+        if (ratio > 0.5f) {
+            return new Color(244, 67, 54); // Red - large
+        } else if (ratio > 0.2f) {
+            return new Color(255, 152, 0); // Orange - medium
+        } else if (ratio > 0.05f) {
+            return new Color(255, 193, 7); // Yellow - small
+        } else {
+            return new Color(76, 175, 80); // Green - tiny
+        }
+    }
+
+    private Color brighten(Color color, float factor) {
+        int r = Math.min(255, (int) (color.getRed() + (255 - color.getRed()) * factor));
+        int g = Math.min(255, (int) (color.getGreen() + (255 - color.getGreen()) * factor));
+        int b = Math.min(255, (int) (color.getBlue() + (255 - color.getBlue()) * factor));
+        return new Color(r, g, b);
+    }
+
+    private static class PackageNode {
+        String name;
+        long totalBytes;
+        Map<String, Long> classes;
+
+        PackageNode(String name) {
+            this.name = name;
+            this.totalBytes = 0;
+            this.classes = new HashMap<>();
+        }
+
+        void addBytes(long bytes) {
+            this.totalBytes += bytes;
+        }
+
+        void addClass(String className, long bytes) {
+            classes.put(className, bytes);
+        }
     }
 
     private JPanel createDetailsPanel() {

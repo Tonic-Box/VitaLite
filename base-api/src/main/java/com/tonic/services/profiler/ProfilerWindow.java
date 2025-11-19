@@ -48,6 +48,15 @@ public class ProfilerWindow extends VitaFrame {
     private SamplingTab samplingTab;
     private com.tonic.services.profiler.leak.LeakDetectorTab leakDetectorTab;
 
+    // GC Pause Analysis
+    private com.tonic.services.profiler.gc.GCPauseAnalyzer gcPauseAnalyzer;
+    private com.tonic.services.profiler.gc.GCTuningAdvisor gcTuningAdvisor;
+    private JTextArea gcStatsArea;
+    private JTextArea gcRecommendationsArea;
+
+    // Event Timeline
+    private com.tonic.services.profiler.timeline.TimelinePanel timelinePanel;
+
     // Resource Monitor components
     private ResourceMetricsCollector metricsCollector;
     private CircularBuffer<MetricSnapshot> metricsHistory;
@@ -72,6 +81,7 @@ public class ProfilerWindow extends VitaFrame {
     private JComboBox<String> compilationLevelCombo;
     private JTextField methodNameField;
     private JLabel jitInfoLabel;
+    private JTextArea escapeAnalysisArea;
 
     // Thread tab components
     private JList<String> threadList;
@@ -145,6 +155,8 @@ public class ProfilerWindow extends VitaFrame {
         tabbedPane.addTab("Sampling", samplingTab);
         leakDetectorTab = new com.tonic.services.profiler.leak.LeakDetectorTab();
         tabbedPane.addTab("Leak Detector", leakDetectorTab);
+        timelinePanel = new com.tonic.services.profiler.timeline.TimelinePanel(gcPauseAnalyzer);
+        tabbedPane.addTab("Event Timeline", timelinePanel);
         tabbedPane.addTab("JIT Compiler", createJITPanel());
         tabbedPane.addTab("Threads", createThreadPanel());
         tabbedPane.addTab("VM Configuration", createVMConfigPanel());
@@ -168,6 +180,11 @@ public class ProfilerWindow extends VitaFrame {
         metricsCollector = new ResourceMetricsCollector();
         metricsHistory = new CircularBuffer<>(timeWindowSeconds); // Store N seconds of history
 
+        // Initialize GC pause analyzer
+        gcPauseAnalyzer = new com.tonic.services.profiler.gc.GCPauseAnalyzer(500);
+        gcTuningAdvisor = new com.tonic.services.profiler.gc.GCTuningAdvisor(gcPauseAnalyzer);
+        gcPauseAnalyzer.startMonitoring();
+
         // Initialize time series
         initializeTimeSeries();
 
@@ -175,7 +192,11 @@ public class ProfilerWindow extends VitaFrame {
         JPanel controlPanel = createControlPanel();
         panel.add(controlPanel, BorderLayout.NORTH);
 
-        // Center - 2x2 Grid of Charts
+        // Center - Main content with charts and GC analysis
+        JPanel centerPanel = new JPanel(new BorderLayout(0, 10));
+        centerPanel.setOpaque(false);
+
+        // Charts Grid
         JPanel chartsGrid = new JPanel(new GridLayout(2, 2, 10, 10));
         chartsGrid.setOpaque(false);
 
@@ -189,7 +210,13 @@ public class ProfilerWindow extends VitaFrame {
         chartsGrid.add(metaspaceChartPanel);
         chartsGrid.add(threadChartPanel);
 
-        panel.add(chartsGrid, BorderLayout.CENTER);
+        centerPanel.add(chartsGrid, BorderLayout.CENTER);
+
+        // GC Pause Analysis Panel
+        JPanel gcAnalysisPanel = createGCAnalysisPanel();
+        centerPanel.add(gcAnalysisPanel, BorderLayout.SOUTH);
+
+        panel.add(centerPanel, BorderLayout.CENTER);
 
         // Bottom - Summary Stats Cards
         JPanel summaryPanel = createSummaryPanel();
@@ -580,6 +607,51 @@ public class ProfilerWindow extends VitaFrame {
         }
     }
 
+    private JPanel createGCAnalysisPanel() {
+        JPanel panel = new JPanel(new GridLayout(1, 2, 10, 0));
+        panel.setOpaque(false);
+        panel.setPreferredSize(new Dimension(0, 180));
+
+        // Left - GC Pause Statistics
+        JPanel statsPanel = createStyledPanel("GC Pause Statistics");
+        statsPanel.setLayout(new BorderLayout());
+
+        gcStatsArea = new JTextArea();
+        gcStatsArea.setEditable(false);
+        gcStatsArea.setBackground(PANEL_BG);
+        gcStatsArea.setForeground(TEXT_COLOR);
+        gcStatsArea.setFont(new Font("Consolas", Font.PLAIN, 11));
+        gcStatsArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+        gcStatsArea.setText("Collecting GC data...");
+
+        JScrollPane statsScroll = new JScrollPane(gcStatsArea);
+        statsScroll.setBorder(BorderFactory.createLineBorder(new Color(50, 52, 56)));
+        statsPanel.add(statsScroll, BorderLayout.CENTER);
+
+        // Right - Tuning Recommendations
+        JPanel recommendationsPanel = createStyledPanel("Tuning Recommendations");
+        recommendationsPanel.setLayout(new BorderLayout());
+
+        gcRecommendationsArea = new JTextArea();
+        gcRecommendationsArea.setEditable(false);
+        gcRecommendationsArea.setBackground(PANEL_BG);
+        gcRecommendationsArea.setForeground(TEXT_COLOR);
+        gcRecommendationsArea.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        gcRecommendationsArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+        gcRecommendationsArea.setLineWrap(true);
+        gcRecommendationsArea.setWrapStyleWord(true);
+        gcRecommendationsArea.setText("Analyzing GC patterns...");
+
+        JScrollPane recommendationsScroll = new JScrollPane(gcRecommendationsArea);
+        recommendationsScroll.setBorder(BorderFactory.createLineBorder(new Color(50, 52, 56)));
+        recommendationsPanel.add(recommendationsScroll, BorderLayout.CENTER);
+
+        panel.add(statsPanel);
+        panel.add(recommendationsPanel);
+
+        return panel;
+    }
+
     // ==================== JIT COMPILER PANEL ====================
 
     private JPanel createJITPanel() {
@@ -658,8 +730,28 @@ public class ProfilerWindow extends VitaFrame {
         buttonPanel.add(refreshBtn);
         controlsPanel.add(buttonPanel);
 
+        // Bottom - Escape Analysis Insights
+        JPanel escapePanel = createStyledPanel("Escape Analysis & Optimization Insights");
+        escapePanel.setLayout(new BorderLayout());
+        escapePanel.setPreferredSize(new Dimension(0, 200));
+
+        escapeAnalysisArea = new JTextArea();
+        escapeAnalysisArea.setEditable(false);
+        escapeAnalysisArea.setBackground(PANEL_BG);
+        escapeAnalysisArea.setForeground(TEXT_COLOR);
+        escapeAnalysisArea.setFont(new Font("Consolas", Font.PLAIN, 11));
+        escapeAnalysisArea.setBorder(new EmptyBorder(5, 5, 5, 5));
+        escapeAnalysisArea.setLineWrap(true);
+        escapeAnalysisArea.setWrapStyleWord(true);
+        escapeAnalysisArea.setText("JIT compiler optimization insights will appear here...");
+
+        JScrollPane escapeScroll = new JScrollPane(escapeAnalysisArea);
+        escapeScroll.setBorder(BorderFactory.createLineBorder(new Color(50, 52, 56)));
+        escapePanel.add(escapeScroll, BorderLayout.CENTER);
+
         panel.add(statusPanel, BorderLayout.NORTH);
         panel.add(controlsPanel, BorderLayout.CENTER);
+        panel.add(escapePanel, BorderLayout.SOUTH);
 
         return panel;
     }
@@ -1099,6 +1191,9 @@ public class ProfilerWindow extends VitaFrame {
             // Update summary labels
             updateSummaryLabels(snapshot);
 
+            // Update GC analysis
+            updateGCAnalysis();
+
         } catch (Exception e) {
             System.err.println("Error updating resource monitor: " + e.getMessage());
             e.printStackTrace();
@@ -1124,6 +1219,68 @@ public class ProfilerWindow extends VitaFrame {
         threadSummaryLabel.setText(String.format("%d (%d daemon)", snapshot.threadCount, snapshot.daemonThreadCount));
     }
 
+    private void updateGCAnalysis() {
+        if (gcPauseAnalyzer == null || gcStatsArea == null || gcRecommendationsArea == null) {
+            return;
+        }
+
+        try {
+            // Update statistics
+            com.tonic.services.profiler.gc.GCPauseAnalyzer.GCStatistics stats = gcPauseAnalyzer.getStatistics();
+
+            StringBuilder statsSb = new StringBuilder();
+            statsSb.append("GC Pause Statistics\n");
+            statsSb.append("===================\n\n");
+
+            if (stats.totalPauses == 0) {
+                statsSb.append("No GC events captured yet.\n");
+                statsSb.append("Waiting for garbage collection...");
+            } else {
+                statsSb.append(String.format("Total Pauses:    %d\n", stats.totalPauses));
+                statsSb.append(String.format("Total Time:      %d ms\n", stats.totalPauseTime));
+                statsSb.append(String.format("Average Pause:   %d ms\n", stats.avgPause));
+                statsSb.append(String.format("Longest Pause:   %d ms\n", stats.longestPause));
+                statsSb.append(String.format("95th Percentile: %d ms\n", stats.p95Pause));
+                statsSb.append(String.format("99th Percentile: %d ms\n\n", stats.p99Pause));
+
+                if (stats.longestPauseEvent != null) {
+                    statsSb.append("Longest Pause Details:\n");
+                    statsSb.append(String.format("  Type:   %s\n", stats.longestPauseEvent.getGcType().getLabel()));
+                    statsSb.append(String.format("  Action: %s\n", stats.longestPauseEvent.getGcAction()));
+                    statsSb.append(String.format("  Cause:  %s\n", stats.longestPauseEvent.getGcCause()));
+                    statsSb.append(String.format("  Freed:  %.1f MB (%.1f%%)\n",
+                        stats.longestPauseEvent.getMemoryFreed() / (1024.0 * 1024.0),
+                        stats.longestPauseEvent.getMemoryFreedPercent()));
+                }
+            }
+
+            gcStatsArea.setText(statsSb.toString());
+            gcStatsArea.setCaretPosition(0);
+
+            // Update recommendations
+            java.util.List<com.tonic.services.profiler.gc.GCTuningAdvisor.Recommendation> recommendations =
+                gcTuningAdvisor.getRecommendations();
+
+            StringBuilder recSb = new StringBuilder();
+
+            for (com.tonic.services.profiler.gc.GCTuningAdvisor.Recommendation rec : recommendations) {
+                recSb.append("[").append(rec.severity.getLabel().toUpperCase()).append("] ");
+                recSb.append(rec.title).append("\n");
+                recSb.append(rec.description).append("\n");
+                if (rec.suggestion != null) {
+                    recSb.append("\nSuggestion: ").append(rec.suggestion).append("\n");
+                }
+                recSb.append("\n");
+            }
+
+            gcRecommendationsArea.setText(recSb.toString());
+            gcRecommendationsArea.setCaretPosition(0);
+
+        } catch (Exception e) {
+            System.err.println("Error updating GC analysis: " + e.getMessage());
+        }
+    }
+
     private void refreshJITInfo() {
         if (!JITCompilerAccess.isAvailable()) {
             jitStatusArea.setText("JIT Compiler Access not available.\nCompilation monitoring requires JVM support.");
@@ -1144,6 +1301,64 @@ public class ProfilerWindow extends VitaFrame {
         }
 
         jitStatusArea.setText(sb.toString());
+
+        // Update escape analysis insights
+        updateEscapeAnalysisInsights(stats);
+    }
+
+    private void updateEscapeAnalysisInsights(JITCompilerAccess.CompilerStatistics stats) {
+        if (escapeAnalysisArea == null) {
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== JIT Compiler Optimization Insights ===\n\n");
+
+        // Compilation efficiency
+        long avgCompileTime = stats.totalCompilationTime > 0 && stats.availableProcessors > 0
+            ? stats.totalCompilationTime / stats.availableProcessors
+            : 0;
+
+        sb.append("Compilation Efficiency:\n");
+        sb.append(String.format("  Total Compilation Time: %d ms\n", stats.totalCompilationTime));
+        sb.append(String.format("  Avg Time per Core: %d ms\n", avgCompileTime));
+        sb.append(String.format("  Compiler: %s\n\n", stats.compilerName));
+
+        // Optimization insights (based on heuristics since WhiteBox API is unavailable)
+        sb.append("Optimization Patterns:\n");
+        sb.append("  Escape Analysis: The JIT compiler automatically performs escape analysis to:\n");
+        sb.append("    - Eliminate heap allocations for objects that don't escape their method\n");
+        sb.append("    - Allocate short-lived objects on the stack instead of heap\n");
+        sb.append("    - Perform scalar replacement (replace object fields with local variables)\n");
+        sb.append("    - Remove synchronization for objects that don't escape threads\n\n");
+
+        sb.append("  Common Optimizations Applied:\n");
+        sb.append("    - Inlining: Frequently called small methods are inlined\n");
+        sb.append("    - Loop Unrolling: Loops are expanded to reduce branch overhead\n");
+        sb.append("    - Dead Code Elimination: Unused code paths are removed\n");
+        sb.append("    - Constant Folding: Compile-time evaluation of constant expressions\n\n");
+
+        // Recommendations based on compilation time
+        sb.append("Recommendations:\n");
+        if (stats.totalCompilationTime < 1000) {
+            sb.append("  Status: Healthy compilation overhead\n");
+            sb.append("  - JIT compiler is efficiently optimizing hot methods\n");
+            sb.append("  - Low compilation overhead indicates good steady-state performance\n");
+        } else if (stats.totalCompilationTime < 5000) {
+            sb.append("  Status: Moderate compilation activity\n");
+            sb.append("  - Consider using tiered compilation (default in modern JVMs)\n");
+            sb.append("  - Monitor for excessive recompilation\n");
+        } else {
+            sb.append("  Status: High compilation overhead detected\n");
+            sb.append("  - May indicate frequent deoptimization/recompilation cycles\n");
+            sb.append("  - Consider:\n");
+            sb.append("    1. Reducing polymorphism in hot paths\n");
+            sb.append("    2. Avoiding megamorphic call sites\n");
+            sb.append("    3. Using final classes/methods where possible\n");
+        }
+
+        escapeAnalysisArea.setText(sb.toString());
+        escapeAnalysisArea.setCaretPosition(0);
     }
 
     private void refreshThreadInfo() {
@@ -1531,6 +1746,16 @@ public class ProfilerWindow extends VitaFrame {
         // Stop leak detector
         if (leakDetectorTab != null) {
             leakDetectorTab.cleanup();
+        }
+
+        // Stop GC pause analyzer
+        if (gcPauseAnalyzer != null) {
+            gcPauseAnalyzer.stopMonitoring();
+        }
+
+        // Stop timeline panel
+        if (timelinePanel != null) {
+            timelinePanel.cleanup();
         }
 
         // Clear instance reference
