@@ -68,6 +68,18 @@ public interface TPacketWriter
     void widgetActionSubOpPacket(int type, int subOp, int widgetId, int childId, int itemId);
 
     /**
+     * Sends a widget drag packet.
+     *
+     * @param widgetId the source widget id
+     * @param itemId the source item id
+     * @param slot the source slot
+     * @param widgetId2 the destination widget id
+     * @param itemId2 the destination item id
+     * @param slot2 the destination slot
+     */
+    void widgetDragPacket(int widgetId, int itemId, int slot, int widgetId2, int itemId2, int slot2);
+
+    /**
      * Sends a resume count dialogue packet.
      *
      * @param count the count value

@@ -110,8 +110,7 @@ public class TileObjectEx implements Entity
         WorldPoint wp = tileObject.getWorldLocation();
         if(tileObject instanceof GameObject)
         {
-            final Client client = Static.getClient();
-            WorldView wv = client.getTopLevelWorldView();
+            WorldView wv = getWorldView();
             GameObject go = (GameObject) tileObject;
             Point p = go.getSceneMinLocation();
             wp = WorldPoint.fromScene(wv, p.getX(), p.getY(), wv.getPlane());
@@ -197,6 +196,20 @@ public class TileObjectEx implements Entity
     {
         WorldPoint player = PlayerEx.getLocal().getWorldPoint();
         return getInteractionPoint(player);
+    }
+
+    @Override
+    public WorldView getWorldView() {
+        return Static.invoke(tileObject::getWorldView);
+    }
+
+    @Override
+    public int getWorldViewId()
+    {
+        WorldView worldView = getWorldView();
+        if(worldView == null)
+            return -1;
+        return worldView.getId();
     }
 
     public WorldPoint getInteractionPoint(WorldPoint to)

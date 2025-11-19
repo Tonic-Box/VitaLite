@@ -149,6 +149,21 @@ public abstract class TPacketWriterMixin implements TPacketWriter
 
     @Inject
     @Override
+    public void widgetDragPacket(int widgetId, int itemId, int slot, int widgetId2, int itemId2, int slot2)
+    {
+        MapEntry entry = PacketMapReader.get("OP_WIDGET_DRAG");
+        Map<String,Object> args = new HashMap<>();
+        args.put("widgetId", widgetId);
+        args.put("itemId", itemId);
+        args.put("slot", slot);
+        args.put("widgetId2", widgetId2);
+        args.put("itemId2", itemId2);
+        args.put("slot2", slot2);
+        this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
+    }
+
+    @Inject
+    @Override
     public void resumeCountDialoguePacket(int count)
     {
         MapEntry entry = PacketMapReader.get("OP_RESUME_COUNTDIALOG");

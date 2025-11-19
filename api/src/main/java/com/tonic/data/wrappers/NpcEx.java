@@ -73,17 +73,17 @@ public class NpcEx extends ActorEx<NPC>
 
     @Override
     public WorldPoint getWorldPoint() {
-        return actor.getWorldLocation();
+        return Static.invoke(actor::getWorldLocation);
     }
 
     @Override
     public WorldArea getWorldArea() {
-        return actor.getWorldArea();
+        return Static.invoke(actor::getWorldArea);
     }
 
     @Override
     public LocalPoint getLocalPoint() {
-        return actor.getLocalLocation();
+        return Static.invoke(actor::getLocalLocation);
     }
 
     @Override

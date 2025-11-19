@@ -1,6 +1,7 @@
 package com.tonic.services.pathfinder.local;
 
 import com.tonic.Static;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.util.WorldPointUtil;
@@ -10,6 +11,7 @@ import net.runelite.api.Client;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +33,12 @@ public class LocalCollisionMap
     {
         this.collisionMap = getCollision();
         this.ignoreTiles = getDoored();
+    }
+
+    public LocalCollisionMap(boolean ignoreDoors)
+    {
+        this.collisionMap = getCollision();
+        this.ignoreTiles = ignoreDoors ? getDoored() : new ArrayList<>();
     }
 
     public byte all(short x, short y, byte z)
@@ -139,8 +147,7 @@ public class LocalCollisionMap
     private TIntIntHashMap getCollision()
     {
         TIntIntHashMap collisionMap = new TIntIntHashMap();
-        Client client = Static.getClient();
-        WorldView wv = client.getTopLevelWorldView();
+        WorldView wv = PlayerEx.getLocal().getWorldView();
         if(wv.getCollisionMaps() == null || wv.getCollisionMaps()[wv.getPlane()] == null)
             return collisionMap;
 
@@ -158,8 +165,7 @@ public class LocalCollisionMap
     }
 
     public static boolean canStep(int x, int y, int plane) {
-        Client client = Static.getClient();
-        WorldView wv = client.getTopLevelWorldView();
+        WorldView wv = PlayerEx.getLocal().getWorldView();
         if (wv.getCollisionMaps() == null || wv.getCollisionMaps()[plane] == null)
             return false;
         int sceneX = x - wv.getBaseX();

@@ -158,6 +158,18 @@ public class RLClassLoader extends URLClassLoader {
         if (bytes != null) {
             try {
                 if (bytes.length > 0) {
+                    if (bytes.length < 8) {
+                        System.err.println("Class " + name + " is too small: " + bytes.length + " bytes");
+                        return null;
+                    }
+
+                    // Check class file magic number (0xCAFEBABE)
+                    if ((bytes[0] & 0xFF) != 0xCA || (bytes[1] & 0xFF) != 0xFE ||
+                            (bytes[2] & 0xFF) != 0xBA || (bytes[3] & 0xFF) != 0xBE) {
+                        System.err.println("Class " + name + " has invalid magic number");
+                        return null;
+                    }
+
                     ProtectionDomain pd = makeProtectionDomainFor(name);
                     loadedClass = defineClass(name, bytes, 0, bytes.length, pd);
                     if (loadedClass != null) {

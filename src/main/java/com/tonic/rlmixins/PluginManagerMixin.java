@@ -206,6 +206,10 @@ public class PluginManagerMixin {
                 .invokeStatic("com/tonic/vitalite/Main", "isMinMode", "()Z")
                 .storeLocal(7, ISTORE)
 
+                // Store the shaded jar check result in local var 8
+                .invokeStatic("com/tonic/Static", "isRunningFromShadedJar", "()Z")
+                .storeLocal(8, ISTORE)
+
                 .loadLocal(2, ALOAD)
                 .invokeInterface("java/util/List", "iterator", "()Ljava/util/Iterator;")
                 .storeLocal(4, ASTORE)
@@ -226,6 +230,20 @@ public class PluginManagerMixin {
                             LabelNode skipAdd = body.createLabel("skipAdd");
                             LabelNode checkDisallowed = body.createLabel("checkDisallowed");
                             LabelNode addPlugin = body.createLabel("addPlugin");
+                            LabelNode skipDevtoolsCheck = body.createLabel("skipDevtoolsCheck");
+
+                            // Devtools filter: skip if running from shaded jar AND plugin is devtools
+                            body.loadLocal(8, Opcodes.ILOAD)
+                                    .pushInt(0)
+                                    .jumpIf(ConditionType.EQUALS, skipDevtoolsCheck);  // If not shaded jar, skip this check
+
+                            body.loadLocal(6, ALOAD)
+                                    .pushString("net.runelite.client.plugins.devtools")
+                                    .invokeVirtual("java/lang/String", "startsWith", "(Ljava/lang/String;)Z")
+                                    .pushInt(0)
+                                    .jumpIf(ConditionType.NOT_EQUALS, skipAdd);  // If is devtools, skip plugin
+
+                            body.placeLabel(skipDevtoolsCheck);
 
                             // Check if we're in min mode (compare boolean against 0)
                             body.loadLocal(7, Opcodes.ILOAD)
@@ -270,6 +288,6 @@ public class PluginManagerMixin {
                 .build();
 
         method.instructions.insert(insertionPoint, code2);
-        method.maxLocals = Math.max(method.maxLocals, 8);  // Ensure we have enough local variable slots
+        method.maxLocals = Math.max(method.maxLocals, 9);  // Ensure we have enough local variable slots (added local 8 for shaded jar check)
     }
 }

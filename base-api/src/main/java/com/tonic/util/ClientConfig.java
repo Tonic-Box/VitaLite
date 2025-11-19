@@ -95,4 +95,9 @@ public interface ClientConfig extends VitaConfig {
     int getLogHistoryLimit();
     @ConfigKey(value = "logHistoryLimit")
     void setLogHistoryLimit(int limit);
+
+    @ConfigKey(value = "drawStratPath", defaultValue = "false")
+    boolean getDrawStratPath();
+    @ConfigKey(value = "drawStratPath")
+    void setDrawStratPath(boolean draw);
 }
