@@ -114,6 +114,21 @@ public interface TClient
      */
     void invokeMenuAction(String option, String target, int identifier, int opcode, int param0, int param1, int itemId, int x, int y);
 
+    /**
+     * Invokes a menu action with the specified parameters.
+     * @param option option
+     * @param target target
+     * @param identifier identifier
+     * @param opcode opcode
+     * @param param0 param0
+     * @param param1 param1
+     * @param itemId itemId
+     * @param worldView worldView
+     * @param x x
+     * @param y y
+     */
+    void invokeMenuAction(String option, String target, int identifier, int opcode, int param0, int param1, int itemId, int worldView, int x, int y);
+
     String getDisplayName();
 
     void setDisplayName(String name);

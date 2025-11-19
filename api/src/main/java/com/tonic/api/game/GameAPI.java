@@ -159,4 +159,22 @@ public class GameAPI
             return true;
         });
     }
+
+    /**
+     * Invokes a menu action
+     * @param identifier identifier
+     * @param opcode opcode
+     * @param param0 param0
+     * @param param1 param1
+     * @param itemId itemId
+     */
+    public static void invokeMenuAction(int identifier, int opcode, int param0, int param1, int itemId, int worldViewId)
+    {
+        TClient client = Static.getClient();
+        boolean lock = Static.invoke(() -> {
+            ClickManager.click(ClickType.GENERIC);
+            client.invokeMenuAction("", "", identifier, opcode, param0, param1, itemId, worldViewId, -1, -1);
+            return true;
+        });
+    }
 }
