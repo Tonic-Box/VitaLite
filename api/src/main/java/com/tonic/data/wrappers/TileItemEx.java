@@ -149,6 +149,21 @@ public class TileItemEx implements Entity
     }
 
     @Override
+    public WorldView getWorldView() {
+        Client client = Static.getClient();
+        return Static.invoke(client::getTopLevelWorldView);
+    }
+
+    @Override
+    public int getWorldViewId()
+    {
+        WorldView worldView = getWorldView();
+        if(worldView == null)
+            return -1;
+        return worldView.getId();
+    }
+
+    @Override
     public WorldArea getWorldArea() {
         return worldPoint.toWorldArea();
     }
