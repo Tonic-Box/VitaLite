@@ -1,4 +1,4 @@
-package com.tonic.data;
+package com.tonic.data.trading;
 
 import com.tonic.Static;
 import lombok.AllArgsConstructor;
@@ -6,6 +6,10 @@ import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.ItemContainer;
 
+/**
+ * @deprecated Replaced by {@link Shop}.
+ */
+@Deprecated
 @AllArgsConstructor
 public enum ShopID {
     BOBS_BRILLIANT_AXES(1),
