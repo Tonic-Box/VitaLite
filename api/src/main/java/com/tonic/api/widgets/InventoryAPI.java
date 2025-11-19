@@ -4,11 +4,10 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.data.wrappers.*;
 import com.tonic.queries.InventoryQuery;
-import net.runelite.api.NPC;
-import net.runelite.api.Player;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.gameval.ItemID;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -41,7 +40,7 @@ public class InventoryAPI
      */
     public static ItemEx getItem(int itemId)
     {
-        return Static.invoke(() -> InventoryQuery.fromInventoryId(InventoryID.INV).withId(itemId).first());
+        return InventoryQuery.fromInventoryId(InventoryID.INV).withId(itemId).first();
     }
 
     /**
@@ -51,7 +50,7 @@ public class InventoryAPI
      */
     public static ItemEx getItem(String itemName)
     {
-        return Static.invoke(() -> InventoryQuery.fromInventoryId(InventoryID.INV).withNameContains(itemName).first());
+        return InventoryQuery.fromInventoryId(InventoryID.INV).withNameContains(itemName).first();
     }
 
     /**
@@ -61,7 +60,7 @@ public class InventoryAPI
      */
     public static ItemEx getItem(Predicate<ItemEx> predicate)
     {
-        return Static.invoke(() -> InventoryQuery.fromInventoryId(InventoryID.INV).keepIf(predicate).first());
+        return InventoryQuery.fromInventoryId(InventoryID.INV).keepIf(predicate).first();
     }
 
     /**
@@ -204,6 +203,53 @@ public class InventoryAPI
             return;
 
         WidgetAPI.interact(action, InterfaceID.Inventory.ITEMS, slot, id);
+    }
+
+    /**
+     * drag an item in your inventory to another slot
+     * @param item item
+     * @param toSlot to slot
+     */
+    public static void dragItem(ItemEx item, int toSlot)
+    {
+        if(item == null)
+            return;
+
+        dragItem(item.getId(), item.getSlot(), toSlot);
+    }
+
+    /**
+     * drag an item in your inventory to another slot
+     * @param id item id
+     * @param toSlot to slot
+     */
+    public static void dragItem(int id, int toSlot)
+    {
+        ItemEx item = getItem(id);
+        if(item == null)
+            return;
+
+        dragItem(id, item.getSlot(), toSlot);
+    }
+
+    /**
+     * drag an item in your inventory to another slot
+     * @param itemId item itemId
+     * @param fromSlot from slot
+     * @param toSlot to slot
+     */
+    public static void dragItem(int itemId, int fromSlot, int toSlot)
+    {
+        ItemEx item = search().fromSlot(fromSlot).first();
+        if(item == null || item.getId() != itemId)
+            return;
+
+        ItemEx item2 = search().fromSlot(toSlot).first();
+        int itemId2 = ItemID.BLANKOBJECT;
+        if (item2 != null)
+            itemId2 = item2.getId();
+
+        WidgetAPI.dragWidget(InterfaceID.Inventory.ITEMS, item.getId(), item.getSlot(), InterfaceID.Inventory.ITEMS, itemId2, toSlot);
     }
 
     private static int getAction(ItemEx item, String... options)

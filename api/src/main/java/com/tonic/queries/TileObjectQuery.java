@@ -1,6 +1,7 @@
 package com.tonic.queries;
 
 import com.tonic.api.game.SceneAPI;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.services.GameManager;
 import com.tonic.data.wrappers.TileObjectEx;
@@ -25,6 +26,11 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
     public TileObjectQuery()
     {
         super(GameManager.objectList());
+    }
+
+    public TileObjectQuery fromWorldView()
+    {
+        return keepIf(o -> o.getWorldViewId() == PlayerEx.getLocal().getWorldViewId());
     }
 
     /**
@@ -144,7 +150,7 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
      */
     public TileObjectQuery sortNearest()
     {
-        return sortNearest(client.getLocalPlayer().getWorldLocation());
+        return sortNearest(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**

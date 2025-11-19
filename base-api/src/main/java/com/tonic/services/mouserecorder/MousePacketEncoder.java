@@ -1,6 +1,8 @@
 package com.tonic.services.mouserecorder;
 
+import com.tonic.Logger;
 import com.tonic.packets.PacketBuffer;
+import com.tonic.packets.PacketMapReader;
 
 import java.util.List;
 
@@ -17,6 +19,7 @@ public class MousePacketEncoder
     private static int persistentLastX = -1;
     private static int persistentLastY = -1;
     private static long persistentLastTime = -1;
+    private static int mousePacket = 70;
 
     /**
      * Encodes a mouse movement sequence into packet format.
@@ -33,7 +36,16 @@ public class MousePacketEncoder
             throw new IllegalArgumentException("Cannot encode empty sequence");
         }
 
-        PacketBuffer buffer = new PacketBuffer(70, 3 + MAX_PACKET_SIZE);
+        if(mousePacket == -1)
+        {
+            mousePacket = PacketMapReader.getId("OP_MOUSE_MOVEMENT");
+            if(mousePacket == -1)
+            {
+                Logger.error("MousePacketEncoder: Failed to get mouse movement packet ID");
+                return null;
+            }
+        }
+        PacketBuffer buffer = new PacketBuffer(mousePacket, 3 + MAX_PACKET_SIZE);
 
         EncodedMousePacket.CompressionStats stats = new EncodedMousePacket.CompressionStats();
 

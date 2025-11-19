@@ -6,6 +6,7 @@ import com.tonic.bootstrap.beans.Artifact;
 import com.tonic.bootstrap.beans.Bootstrap;
 import com.tonic.bootstrap.beans.Platform;
 import com.tonic.util.HashUtil;
+import com.tonic.util.LauncherVersionUtil;
 import com.tonic.vitalite.Main;
 
 import javax.swing.*;
@@ -19,6 +20,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.tonic.vitalite.Main.REPOSITORY_DIR;
@@ -35,7 +37,8 @@ public class RLUpdater
 
     public static void run() throws IOException, InterruptedException, NoSuchAlgorithmException
     {
-        properties = Properties.fetch();
+        properties = new HashMap<>(); //Properties.fetch();
+        properties.put("runelite.launcher.version", LauncherVersionUtil.getLauncherVersion());
 
         httpClient = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)

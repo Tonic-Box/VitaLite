@@ -55,6 +55,16 @@ public class PacketSent {
         return buffer;
     }
 
+    public PacketBuffer getFreshBuffer()
+    {
+        if(buffer != null)
+        {
+            buffer.dispose();
+        }
+        buffer = new PacketBuffer(id, payload);
+        return buffer;
+    }
+
     //0=false, 1=click, 2=move
     public int isMouse()
     {

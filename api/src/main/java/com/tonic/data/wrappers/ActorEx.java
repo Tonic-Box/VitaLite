@@ -2,6 +2,7 @@ package com.tonic.data.wrappers;
 
 import com.tonic.Static;
 import com.tonic.api.game.CombatAPI;
+import com.tonic.data.Orientation;
 import com.tonic.data.wrappers.abstractions.Entity;
 import com.tonic.queries.NpcQuery;
 import com.tonic.queries.PlayerQuery;
@@ -198,6 +199,24 @@ public abstract class ActorEx<T extends Actor> implements Entity
     public abstract void interact(int action);
 
     public abstract String[] getActions();
+
+    public WorldView getWorldView()
+    {
+        return Static.invoke(actor::getWorldView);
+    }
+
+    public int getWorldViewId()
+    {
+        WorldView worldView = getWorldView();
+        if(worldView == null)
+            return -1;
+        return worldView.getId();
+    }
+
+    public Orientation getOrientation()
+    {
+        return Orientation.of(this);
+    }
 
     @Override
     public boolean equals(Object obj)
