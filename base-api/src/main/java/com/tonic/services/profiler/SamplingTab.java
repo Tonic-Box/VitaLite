@@ -47,6 +47,9 @@ public class SamplingTab extends JPanel {
     private JTable heapHistogramTable;
     private JButton captureHistogramBtn;
 
+    // Flame graph
+    private com.tonic.services.profiler.visualization.FlameGraphPanel flameGraphPanel;
+
     // Analysis results
     private SampleAnalyzer.CPUAnalysisResults cpuResults;
     private SampleAnalyzer.MemoryAnalysisResults memResults;
@@ -73,6 +76,9 @@ public class SamplingTab extends JPanel {
         memorySampler = new MemorySampler(10_000); // 10K samples max
         analyzer = new SampleAnalyzer();
         exporter = new SampleExporter();
+
+        // Initialize flame graph
+        flameGraphPanel = new com.tonic.services.profiler.visualization.FlameGraphPanel();
     }
 
     private void initializeUI() {
@@ -192,6 +198,9 @@ public class SamplingTab extends JPanel {
         // Method Hotspots Tab
         tabs.addTab("Method Hotspots", createMethodHotspotsPanel());
 
+        // Flame Graph Tab
+        tabs.addTab("Flame Graph", createFlameGraphPanel());
+
         // Thread Breakdown Tab
         tabs.addTab("Thread Breakdown", createThreadBreakdownPanel());
 
@@ -199,6 +208,22 @@ public class SamplingTab extends JPanel {
         tabs.addTab("Package Aggregation", createPackageAggregationPanel());
 
         panel.add(tabs, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JPanel createFlameGraphPanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(BG_COLOR);
+
+        panel.add(flameGraphPanel, BorderLayout.CENTER);
+
+        // Info label at bottom
+        JLabel infoLabel = new JLabel("Click on a frame to zoom in | Click header to reset zoom");
+        infoLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        infoLabel.setForeground(TEXT_COLOR);
+        infoLabel.setFont(infoLabel.getFont().deriveFont(Font.ITALIC));
+        panel.add(infoLabel, BorderLayout.SOUTH);
 
         return panel;
     }
@@ -495,6 +520,52 @@ public class SamplingTab extends JPanel {
                 stats.methodCount
             });
         }
+
+        // Build flame graph
+        buildFlameGraph();
+    }
+
+    private void buildFlameGraph() {
+        List<com.tonic.services.profiler.sampling.StackSample> samples = cpuSampler.getStackSamples().getAll();
+        if (samples.isEmpty()) {
+            return;
+        }
+
+        // Create root node
+        com.tonic.services.profiler.visualization.FlameGraphNode root =
+            new com.tonic.services.profiler.visualization.FlameGraphNode("(root)", "", "");
+
+        // Build call tree from stack samples
+        for (com.tonic.services.profiler.sampling.StackSample sample : samples) {
+            StackTraceElement[] stack = sample.stackTrace;
+
+            if (stack.length == 0) {
+                continue;
+            }
+
+            // Traverse from bottom to top (root to leaf)
+            com.tonic.services.profiler.visualization.FlameGraphNode current = root;
+            current.addSample();
+
+            for (int i = stack.length - 1; i >= 0; i--) {
+                StackTraceElement frame = stack[i];
+
+                String methodName = frame.getMethodName();
+                String className = frame.getClassName();
+                String packageName = "";
+
+                int lastDot = className.lastIndexOf('.');
+                if (lastDot >= 0) {
+                    packageName = className.substring(0, lastDot);
+                    className = className.substring(lastDot + 1);
+                }
+
+                current = current.getOrCreateChild(methodName, className, packageName);
+                current.addSample();
+            }
+        }
+
+        flameGraphPanel.setRoot(root);
     }
 
     private void displayMemoryResults() {
