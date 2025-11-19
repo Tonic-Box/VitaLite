@@ -4,7 +4,6 @@ import com.tonic.api.game.GameAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.data.wrappers.ItemEx;
-import com.tonic.data.trading.ShopID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 
@@ -440,7 +439,7 @@ public class ShopAPI
      */
     public static ItemEx getShopItem(String itemName)
     {
-        return InventoryQuery.fromShopId(ShopID.getCurrent()).withName(itemName).first();
+        return InventoryQuery.fromCurrentShop().withName(itemName).first();
     }
 
     /**
@@ -450,7 +449,7 @@ public class ShopAPI
      */
     public static ItemEx getShopItem(int itemId)
     {
-        return InventoryQuery.fromShopId(ShopID.getCurrent()).withId(itemId).first();
+        return InventoryQuery.fromCurrentShop().withId(itemId).first();
     }
 
     /**
@@ -460,7 +459,7 @@ public class ShopAPI
      */
     public static int getStockQuantity(int itemId)
     {
-        return InventoryQuery.fromShopId(ShopID.getCurrent()).withId(itemId).getQuantity();
+        return InventoryQuery.fromCurrentShop().withId(itemId).getQuantity();
     }
 
     /**
@@ -470,7 +469,7 @@ public class ShopAPI
      */
     public static int getStockQuantity(String itemName)
     {
-        return InventoryQuery.fromShopId(ShopID.getCurrent()).withName(itemName).getQuantity();
+        return InventoryQuery.fromCurrentShop().withName(itemName).getQuantity();
     }
 
     /**
