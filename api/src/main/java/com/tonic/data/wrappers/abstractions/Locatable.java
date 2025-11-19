@@ -2,6 +2,7 @@ package com.tonic.data.wrappers.abstractions;
 
 import com.tonic.api.game.SceneAPI;
 import net.runelite.api.Tile;
+import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
@@ -20,6 +21,10 @@ public interface Locatable
     {
         return getWorldPoint();
     }
+
+    WorldView getWorldView();
+
+    int getWorldViewId();
 
     /**
      * Gets the world point of this locatable.

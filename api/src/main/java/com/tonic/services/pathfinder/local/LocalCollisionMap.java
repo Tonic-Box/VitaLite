@@ -1,6 +1,7 @@
 package com.tonic.services.pathfinder.local;
 
 import com.tonic.Static;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.util.WorldPointUtil;
@@ -139,8 +140,7 @@ public class LocalCollisionMap
     private TIntIntHashMap getCollision()
     {
         TIntIntHashMap collisionMap = new TIntIntHashMap();
-        Client client = Static.getClient();
-        WorldView wv = client.getTopLevelWorldView();
+        WorldView wv = PlayerEx.getLocal().getWorldView();
         if(wv.getCollisionMaps() == null || wv.getCollisionMaps()[wv.getPlane()] == null)
             return collisionMap;
 

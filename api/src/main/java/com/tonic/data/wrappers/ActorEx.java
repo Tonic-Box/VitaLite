@@ -200,6 +200,19 @@ public abstract class ActorEx<T extends Actor> implements Entity
 
     public abstract String[] getActions();
 
+    public WorldView getWorldView()
+    {
+        return Static.invoke(actor::getWorldView);
+    }
+
+    public int getWorldViewId()
+    {
+        WorldView worldView = getWorldView();
+        if(worldView == null)
+            return -1;
+        return worldView.getId();
+    }
+
     public Orientation getOrientation()
     {
         return Orientation.of(this);

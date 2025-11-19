@@ -2,6 +2,7 @@ package com.tonic.services;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.MiniMapAPI;
@@ -273,15 +274,6 @@ public class GameManager extends Overlay {
         }
 
         return tileItemCache;
-    }
-
-    public static List<TileItemEx> tileItemList1()
-    {
-        Client client = Static.getClient();
-        WorldView wv = client.getTopLevelWorldView();
-        ArrayList<TileItemEx> copy = new ArrayList<>(INSTANCE.tileItemCache);
-        copy.removeIf(i -> i.getWorldPoint().getPlane() != wv.getPlane());
-        return copy;
     }
 
     public static Stream<Widget> widgetStream()
