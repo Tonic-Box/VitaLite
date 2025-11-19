@@ -26,7 +26,7 @@ public class SailingAPI
         if(MoveMode.getCurrent() != MoveMode.NONE)
             return;
 
-        WidgetAPI.interact(1, InterfaceID.SailingSidepanel.FACILITIES_CONTENT_CLICKLAYER, -1);
+        WidgetAPI.interact(1, InterfaceID.SailingSidepanel.FACILITIES_CONTENT_CLICKLAYER, 0);
     }
 
     /**
@@ -42,7 +42,7 @@ public class SailingAPI
         if(MoveMode.getCurrent() == MoveMode.NONE)
             return;
 
-        WidgetAPI.interact(1, InterfaceID.SailingSidepanel.FACILITIES_CONTENT_CLICKLAYER, -1);
+        WidgetAPI.interact(1, InterfaceID.SailingSidepanel.FACILITIES_CONTENT_CLICKLAYER, 0);
     }
 
     /**
