@@ -41,6 +41,7 @@ import net.runelite.http.api.worlds.WorldResult;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -80,6 +81,7 @@ public class GameManager extends Overlay {
     }
     private static WalkerPath walkerPath;
     private static final TIntSet reachableTiles = new TIntHashSet();
+    private static final Set<Integer> worldViews = ConcurrentHashMap.newKeySet();
 
     public static List<PlayerEx> playerList()
     {
@@ -88,11 +90,17 @@ public class GameManager extends Overlay {
         if (lastUpdatePlayers < client.getTickCount())
         {
             players.clear();
-            players.addAll(Static.invoke(() ->
-                    client.getTopLevelWorldView().players().stream()
-                            .map(PlayerEx::new)
-                            .collect(Collectors.toList())
-            ));
+            for(int id : worldViews)
+            {
+                WorldView wv = client.getWorldView(id);
+                if(wv == null)
+                    continue;
+                players.addAll(Static.invoke(() ->
+                        wv.players().stream()
+                                .map(PlayerEx::new)
+                                .collect(Collectors.toList())
+                ));
+            }
             lastUpdatePlayers = client.getTickCount();
         }
 
@@ -106,11 +114,17 @@ public class GameManager extends Overlay {
         if (lastUpdateNpcs < client.getTickCount())
         {
             npcs.clear();
-            npcs.addAll(Static.invoke(() ->
-                    client.getTopLevelWorldView().npcs().stream()
-                            .map(NpcEx::new)
-                            .collect(Collectors.toList())
-            ));
+            for(int id : worldViews)
+            {
+                WorldView wv = client.getWorldView(id);
+                if(wv == null)
+                    continue;
+                npcs.addAll(Static.invoke(() ->
+                        wv.npcs().stream()
+                                .map(NpcEx::new)
+                                .collect(Collectors.toList())
+                ));
+            }
             lastUpdateNpcs = client.getTickCount();
         }
 
@@ -142,16 +156,20 @@ public class GameManager extends Overlay {
     public static List<Tile> getTiles()
     {
         Client client = Static.getClient();
-        WorldView worldView = client.getTopLevelWorldView();
-        Tile[][] planeTiles = worldView.getScene().getTiles()[worldView.getPlane()];
-
-        int totalSize = Constants.SCENE_SIZE * Constants.SCENE_SIZE;
+        int totalSize = Constants.SCENE_SIZE * Constants.SCENE_SIZE * worldViews.size();
         List<Tile> out = new ArrayList<>(totalSize);
+        for(int id : worldViews)
+        {
+            WorldView wv = client.getWorldView(id);
+            if(wv == null)
+                continue;
 
-        for (Tile[] row : planeTiles) {
-            Collections.addAll(out, row);
+            Tile[][] planeTiles = wv.getScene().getTiles()[wv.getPlane()];
+
+            for (Tile[] row : planeTiles) {
+                Collections.addAll(out, row);
+            }
         }
-
         return out;
     }
 
@@ -170,27 +188,34 @@ public class GameManager extends Overlay {
 
             ArrayList<TileObjectEx> objects = Static.invoke(() -> {
                 ArrayList<TileObjectEx> temp = new ArrayList<>();
-                Tile[][] value = client.getTopLevelWorldView().getScene().getTiles()[client.getTopLevelWorldView().getPlane()];
-                for (Tile[] item : value) {
-                    for (Tile tile : item) {
-                        if (tile != null) {
-                            if (tile.getGameObjects() != null) {
-                                for (GameObject gameObject : tile.getGameObjects()) {
-                                    if (gameObject != null && gameObject.getSceneMinLocation().equals(tile.getSceneLocation())) {
-                                        if((gameObject.getHash() >>> 16 & 0x7L) != 2)
-                                            continue;
-                                        temp.add(new TileObjectEx(gameObject));
+                for(int wv : worldViews)
+                {
+                    WorldView worldView = client.getWorldView(wv);
+                    if(worldView == null)
+                        continue;
+
+                    Tile[][] value = worldView.getScene().getTiles()[worldView.getPlane()];
+                    for (Tile[] item : value) {
+                        for (Tile tile : item) {
+                            if (tile != null) {
+                                if (tile.getGameObjects() != null) {
+                                    for (GameObject gameObject : tile.getGameObjects()) {
+                                        if (gameObject != null && gameObject.getSceneMinLocation().equals(tile.getSceneLocation())) {
+                                            if((gameObject.getHash() >>> 16 & 0x7L) != 2)
+                                                continue;
+                                            temp.add(new TileObjectEx(gameObject));
+                                        }
                                     }
                                 }
-                            }
-                            if (tile.getWallObject() != null) {
-                                temp.add(new TileObjectEx(tile.getWallObject()));
-                            }
-                            if (tile.getDecorativeObject() != null) {
-                                temp.add(new TileObjectEx(tile.getDecorativeObject()));
-                            }
-                            if (tile.getGroundObject() != null) {
-                                temp.add(new TileObjectEx(tile.getGroundObject()));
+                                if (tile.getWallObject() != null) {
+                                    temp.add(new TileObjectEx(tile.getWallObject()));
+                                }
+                                if (tile.getDecorativeObject() != null) {
+                                    temp.add(new TileObjectEx(tile.getDecorativeObject()));
+                                }
+                                if (tile.getGroundObject() != null) {
+                                    temp.add(new TileObjectEx(tile.getGroundObject()));
+                                }
                             }
                         }
                     }
@@ -497,6 +522,18 @@ public class GameManager extends Overlay {
     {
         if(event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
             tickCount = 0;
+    }
+
+    @Subscribe
+    public void onWorldViewLoaded(WorldViewLoaded event)
+    {
+        worldViews.add(event.getWorldView().getId());
+    }
+
+    @Subscribe
+    public void onWorldViewUnloaded(WorldViewUnloaded event)
+    {
+        worldViews.remove(event.getWorldView().getId());
     }
 
     @Subscribe
