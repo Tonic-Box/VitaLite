@@ -12,6 +12,7 @@ import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Strategic Pathfinding API - Provides advanced pathfinding capabilities with support for
@@ -89,6 +90,16 @@ public class StrategicPathing {
      * @param path The list of WorldPoints representing the path to follow.
      */
     public static void stepAlong(List<WorldPoint> path) {
+        stepAlong(path, wp -> false);
+    }
+
+    /**
+     * Steps along the given path by one step conditionally
+     *
+     * @param path          The list of WorldPoints representing the path to follow.
+     * @param stopCondition A predicate that determines whether to stop before taking the next step.
+     */
+    public static void stepAlong(List<WorldPoint> path, Predicate<WorldPoint> stopCondition) {
         if(path == null || path.isEmpty()) {
             return;
         }
@@ -101,7 +112,11 @@ public class StrategicPathing {
         {
             index = 1;
         }
-        MovementAPI.walkToWorldPoint(path.get(index));
+        WorldPoint nextPoint = path.get(index);
+        if(stopCondition.test(nextPoint)) {
+            return;
+        }
+        MovementAPI.walkToWorldPoint(nextPoint);
     }
 
     // ============================================
@@ -199,184 +214,189 @@ public class StrategicPathing {
             impassible = EMPTY_SET;
         }
 
-        // Get client and world view with null checks
-        Client client = Static.getClient();
-        if (client == null) {
-            return null;
-        }
+        HashSet<WorldPoint> finalDangerous = dangerous;
+        HashSet<WorldPoint> finalImpassible = impassible;
+        return Static.invoke(() -> {
 
-        WorldView wv = client.getTopLevelWorldView();
-        if (wv == null || wv.getCollisionMaps() == null) {
-            return null;
-        }
-
-        int plane = starting.getPlane();
-        if (plane < 0 || plane >= wv.getCollisionMaps().length || wv.getCollisionMaps()[plane] == null) {
-            return null;
-        }
-
-        // Get scene bounds for boundary checking
-        int baseX = wv.getBaseX();
-        int baseY = wv.getBaseY();
-        int[][] flags = wv.getCollisionMaps()[plane].getFlags();
-        if (flags == null || flags.length == 0) {
-            return null;
-        }
-        int sceneSize = flags.length; // typically 104
-
-        // Convert WorldPoint sets to packed long coordinates for fast lookups
-        LongOpenHashSet goalPacked = packWorldPoints(goalSet);
-        LongOpenHashSet dangerousPacked = packWorldPoints(dangerous);
-        LongOpenHashSet impassiblePacked = packWorldPoints(impassible);
-
-        // Create collision map instance for proper collision checking
-        LocalCollisionMap collisionMap = new LocalCollisionMap();
-
-        // Use boolean array for visited tracking (much faster than HashSet)
-        boolean[][] visited = new boolean[sceneSize][sceneSize];
-
-        // Queue using primitive coordinates
-        ArrayDeque<PrimitiveNode> queue = new ArrayDeque<>();
-
-        int startX = starting.getX();
-        int startY = starting.getY();
-        int startSceneX = startX - baseX;
-        int startSceneY = startY - baseY;
-
-        visited[startSceneX][startSceneY] = true;
-        queue.add(new PrimitiveNode(startX, startY, null));
-
-        while (!queue.isEmpty()) {
-            PrimitiveNode current = queue.poll();
-            int currentX = current.x;
-            int currentY = current.y;
-
-            // Check if we reached a goal (using packed coordinate)
-            long currentPacked = packCoords(currentX, currentY);
-            if (goalPacked.contains(currentPacked)) {
-                // Reconstruct path from primitive coordinates
-                List<WorldPoint> path = new ArrayList<>();
-                PrimitiveNode node = current;
-                while (node != null) {
-                    path.add(new WorldPoint(node.x, node.y, plane));
-                    node = node.previous;
-                }
-                Collections.reverse(path);
-                path.remove(0); // Remove starting position
-                return path;
+            // Get client and world view with null checks
+            Client client = Static.getClient();
+            if (client == null) {
+                return null;
             }
 
-            // Explore all directions
-            for (int[] direction : DIRECTIONS_MAP) {
-                int dx = direction[0];
-                int dy = direction[1];
-
-                if (dx == 0 && dy == 0) {
-                    continue;
-                }
-
-                // Calculate next position with primitives (no WorldPoint creation yet)
-                int nextX = currentX + dx;
-                int nextY = currentY + dy;
-
-                // Bounds check on primitives BEFORE any object creation
-                if (nextX < baseX || nextX >= baseX + sceneSize ||
-                    nextY < baseY || nextY >= baseY + sceneSize) {
-                    continue;
-                }
-
-                // Scene-local coordinates for visited array
-                int nextSceneX = nextX - baseX;
-                int nextSceneY = nextY - baseY;
-
-                // Check visited using fast array lookup
-                if (visited[nextSceneX][nextSceneY]) {
-                    continue;
-                }
-
-                // Pack coordinates for set lookups
-                long nextPacked = packCoords(nextX, nextY);
-
-                // Check dangerous/impassible using packed coordinates
-                if (impassiblePacked.contains(nextPacked) || dangerousPacked.contains(nextPacked)) {
-                    continue;
-                }
-
-                // Check movement obstruction using primitive coordinates
-                boolean obstructed = false;
-
-                // Single-tile cardinal movements
-                if (dx == 1 && dy == 0) {
-                    obstructed = collisionMap.e(currentX, currentY, plane);
-                } else if (dx == -1 && dy == 0) {
-                    obstructed = collisionMap.w(currentX, currentY, plane);
-                } else if (dx == 0 && dy == 1) {
-                    obstructed = collisionMap.n(currentX, currentY, plane);
-                } else if (dx == 0 && dy == -1) {
-                    obstructed = collisionMap.s(currentX, currentY, plane);
-                }
-                // Far cardinal movements
-                else if (dx == -2 && dy == 0) {
-                    obstructed = farWObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                } else if (dx == 2 && dy == 0) {
-                    obstructed = farEObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                } else if (dx == 0 && dy == -2) {
-                    obstructed = farSObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                } else if (dx == 0 && dy == 2) {
-                    obstructed = farNObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                }
-                // L-shaped movements
-                else if (Math.abs(dx) + Math.abs(dy) == 3) {
-                    if (dx == 1 && dy == 2) {
-                        obstructed = northEastLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == 2 && dy == 1) {
-                        obstructed = eastNorthLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == 2 && dy == -1) {
-                        obstructed = eastSouthLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == 1 && dy == -2) {
-                        obstructed = southEastLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == -1 && dy == -2) {
-                        obstructed = southWestLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == -2 && dy == -1) {
-                        obstructed = westSouthLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == -2 && dy == 1) {
-                        obstructed = westNorthLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == -1 && dy == 2) {
-                        obstructed = northWestLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    }
-                }
-                // Diagonal and far diagonal movements
-                else {
-                    if (dx == 1 && dy == -1) {
-                        obstructed = seObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == 1 && dy == 1) {
-                        obstructed = neObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == -1 && dy == 1) {
-                        obstructed = nwObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == -1 && dy == -1) {
-                        obstructed = swObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == -2 && dy == -2) {
-                        obstructed = farSWObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == -2 && dy == 2) {
-                        obstructed = farNWObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == 2 && dy == -2) {
-                        obstructed = farSEObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    } else if (dx == 2 && dy == 2) {
-                        obstructed = farNEObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
-                    }
-                }
-
-                if (obstructed) {
-                    continue;
-                }
-
-                // Mark as visited and add to queue
-                visited[nextSceneX][nextSceneY] = true;
-                queue.add(new PrimitiveNode(nextX, nextY, current));
+            WorldView wv = client.getTopLevelWorldView();
+            if (wv == null || wv.getCollisionMaps() == null) {
+                return null;
             }
-        }
 
-        return null;
+            int plane = starting.getPlane();
+            if (plane < 0 || plane >= wv.getCollisionMaps().length || wv.getCollisionMaps()[plane] == null) {
+                return null;
+            }
+
+            // Get scene bounds for boundary checking
+            int baseX = wv.getBaseX();
+            int baseY = wv.getBaseY();
+            int[][] flags = wv.getCollisionMaps()[plane].getFlags();
+            if (flags == null || flags.length == 0) {
+                return null;
+            }
+            int sceneSize = flags.length; // typically 104
+
+            // Convert WorldPoint sets to packed long coordinates for fast lookups
+            LongOpenHashSet goalPacked = packWorldPoints(goalSet);
+            LongOpenHashSet dangerousPacked = packWorldPoints(finalDangerous);
+            LongOpenHashSet impassiblePacked = packWorldPoints(finalImpassible);
+
+            // Create collision map instance for proper collision checking
+            LocalCollisionMap collisionMap = new LocalCollisionMap(false);
+
+            // Use boolean array for visited tracking (much faster than HashSet)
+            boolean[][] visited = new boolean[sceneSize][sceneSize];
+
+            // Queue using primitive coordinates
+            ArrayDeque<PrimitiveNode> queue = new ArrayDeque<>();
+
+            int startX = starting.getX();
+            int startY = starting.getY();
+            int startSceneX = startX - baseX;
+            int startSceneY = startY - baseY;
+
+            visited[startSceneX][startSceneY] = true;
+            queue.add(new PrimitiveNode(startX, startY, null));
+
+            while (!queue.isEmpty()) {
+                PrimitiveNode current = queue.poll();
+                int currentX = current.x;
+                int currentY = current.y;
+
+                // Check if we reached a goal (using packed coordinate)
+                long currentPacked = packCoords(currentX, currentY);
+                if (goalPacked.contains(currentPacked)) {
+                    // Reconstruct path from primitive coordinates
+                    List<WorldPoint> path = new ArrayList<>();
+                    PrimitiveNode node = current;
+                    while (node != null) {
+                        path.add(new WorldPoint(node.x, node.y, plane));
+                        node = node.previous;
+                    }
+                    Collections.reverse(path);
+                    path.remove(0); // Remove starting position
+                    return path;
+                }
+
+                // Explore all directions
+                for (int[] direction : DIRECTIONS_MAP) {
+                    int dx = direction[0];
+                    int dy = direction[1];
+
+                    if (dx == 0 && dy == 0) {
+                        continue;
+                    }
+
+                    // Calculate next position with primitives (no WorldPoint creation yet)
+                    int nextX = currentX + dx;
+                    int nextY = currentY + dy;
+
+                    // Bounds check on primitives BEFORE any object creation
+                    if (nextX < baseX || nextX >= baseX + sceneSize ||
+                            nextY < baseY || nextY >= baseY + sceneSize) {
+                        continue;
+                    }
+
+                    // Scene-local coordinates for visited array
+                    int nextSceneX = nextX - baseX;
+                    int nextSceneY = nextY - baseY;
+
+                    // Check visited using fast array lookup
+                    if (visited[nextSceneX][nextSceneY]) {
+                        continue;
+                    }
+
+                    // Pack coordinates for set lookups
+                    long nextPacked = packCoords(nextX, nextY);
+
+                    // Check dangerous/impassible using packed coordinates
+                    if (impassiblePacked.contains(nextPacked) || dangerousPacked.contains(nextPacked)) {
+                        continue;
+                    }
+
+                    // Check movement obstruction using primitive coordinates
+                    boolean obstructed = false;
+
+                    // Single-tile cardinal movements
+                    if (dx == 1 && dy == 0) {
+                        obstructed = collisionMap.e(currentX, currentY, plane);
+                    } else if (dx == -1 && dy == 0) {
+                        obstructed = collisionMap.w(currentX, currentY, plane);
+                    } else if (dx == 0 && dy == 1) {
+                        obstructed = collisionMap.n(currentX, currentY, plane);
+                    } else if (dx == 0 && dy == -1) {
+                        obstructed = collisionMap.s(currentX, currentY, plane);
+                    }
+                    // Far cardinal movements
+                    else if (dx == -2 && dy == 0) {
+                        obstructed = farWObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                    } else if (dx == 2 && dy == 0) {
+                        obstructed = farEObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                    } else if (dx == 0 && dy == -2) {
+                        obstructed = farSObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                    } else if (dx == 0 && dy == 2) {
+                        obstructed = farNObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                    }
+                    // L-shaped movements
+                    else if (Math.abs(dx) + Math.abs(dy) == 3) {
+                        if (dx == 1 && dy == 2) {
+                            obstructed = northEastLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == 2 && dy == 1) {
+                            obstructed = eastNorthLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == 2 && dy == -1) {
+                            obstructed = eastSouthLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == 1 && dy == -2) {
+                            obstructed = southEastLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == -1 && dy == -2) {
+                            obstructed = southWestLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == -2 && dy == -1) {
+                            obstructed = westSouthLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == -2 && dy == 1) {
+                            obstructed = westNorthLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == -1 && dy == 2) {
+                            obstructed = northWestLObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        }
+                    }
+                    // Diagonal and far diagonal movements
+                    else {
+                        if (dx == 1 && dy == -1) {
+                            obstructed = seObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == 1 && dy == 1) {
+                            obstructed = neObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == -1 && dy == 1) {
+                            obstructed = nwObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == -1 && dy == -1) {
+                            obstructed = swObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == -2 && dy == -2) {
+                            obstructed = farSWObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == -2 && dy == 2) {
+                            obstructed = farNWObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == 2 && dy == -2) {
+                            obstructed = farSEObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        } else if (dx == 2 && dy == 2) {
+                            obstructed = farNEObstructed(currentX, currentY, plane, impassiblePacked, collisionMap);
+                        }
+                    }
+
+                    if (obstructed) {
+                        continue;
+                    }
+
+                    // Mark as visited and add to queue
+                    visited[nextSceneX][nextSceneY] = true;
+                    queue.add(new PrimitiveNode(nextX, nextY, current));
+                }
+            }
+
+            return null;
+        });
     }
 
     // ============================================

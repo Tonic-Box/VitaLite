@@ -11,6 +11,7 @@ import net.runelite.api.Client;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.WorldPoint;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +33,12 @@ public class LocalCollisionMap
     {
         this.collisionMap = getCollision();
         this.ignoreTiles = getDoored();
+    }
+
+    public LocalCollisionMap(boolean ignoreDoors)
+    {
+        this.collisionMap = getCollision();
+        this.ignoreTiles = ignoreDoors ? getDoored() : new ArrayList<>();
     }
 
     public byte all(short x, short y, byte z)
