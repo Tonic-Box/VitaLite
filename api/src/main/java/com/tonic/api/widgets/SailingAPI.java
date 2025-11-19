@@ -1,12 +1,21 @@
 package com.tonic.api.widgets;
 
+import com.tonic.api.game.GameAPI;
 import com.tonic.api.game.VarAPI;
+import com.tonic.data.wrappers.PlayerEx;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
 
+/**
+ * Sailing API
+ */
 public class SailingAPI
 {
+    /**
+     * Sets sails to start navigating
+     */
     public void setSails()
     {
         if(!isNavigating())
@@ -20,6 +29,9 @@ public class SailingAPI
         WidgetAPI.interact(1, InterfaceID.SailingSidepanel.FACILITIES_CONTENT_CLICKLAYER, -1);
     }
 
+    /**
+     * Unsets sails to stop navigating
+     */
     public void unSetSails()
     {
         if(!isNavigating())
@@ -33,9 +45,47 @@ public class SailingAPI
         WidgetAPI.interact(1, InterfaceID.SailingSidepanel.FACILITIES_CONTENT_CLICKLAYER, -1);
     }
 
+    /**
+     * Checks if player is currently navigating
+     * @return true if navigating, false otherwise
+     */
     public boolean isNavigating()
     {
         return VarAPI.getVar(VarbitID.SAILING_BOAT_FACILITY_LOCKEDIN) == 3;
+    }
+
+    /**
+     * Sets the heading of the boat
+     * @param heading Heading value (0-15)
+     */
+    public void setHeading(Heading heading)
+    {
+        GameAPI.invokeMenuAction(heading.getValue(), 60, 0, 0, 0, PlayerEx.getLocal().getWorldViewId());
+    }
+
+    @RequiredArgsConstructor
+    @Getter
+    public enum Heading
+    {
+        SOUTH(0),
+        SOUTH_WEST_SOUTH(1),
+        SOUTH_WEST(2),
+        SOUTH_WEST_WEST(3),
+        WEST(4),
+        NORTH_WEST_WEST(5),
+        NORTH_WEST(6),
+        NORTH_WEST_NORTH(7),
+        NORTH(8),
+        NORTH_EAST_NORTH(9),
+        NORTH_EAST(10),
+        NORTH_EAST_EAST(11),
+        EAST(12),
+        SOUTH_EAST_EAST(13),
+        SOUTH_EAST(14),
+        SOUTH_EAST_SOUTH(15)
+        ;
+
+        private final int value;
     }
 
     @RequiredArgsConstructor

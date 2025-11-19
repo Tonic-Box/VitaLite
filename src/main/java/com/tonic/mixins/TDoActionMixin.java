@@ -25,4 +25,13 @@ public abstract class TDoActionMixin implements TClient {
 
         RSDoAction(param0, param1, opcode, identifier, itemId, -1, option, target, x, y);
     }
+
+    @Override
+    @Inject
+    public void invokeMenuAction(String option, String target, int identifier, int opcode, int param0, int param1, int itemId, int worldView, int x, int y) {
+        if (!isClientThread())
+            return;
+
+        RSDoAction(param0, param1, opcode, identifier, itemId, worldView, option, target, x, y);
+    }
 }
