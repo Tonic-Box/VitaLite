@@ -19,7 +19,7 @@ public class MousePacketEncoder
     private static int persistentLastX = -1;
     private static int persistentLastY = -1;
     private static long persistentLastTime = -1;
-    private static int mousePacket = -1;
+    private static int mousePacket = 70;
 
     /**
      * Encodes a mouse movement sequence into packet format.
