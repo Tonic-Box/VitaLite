@@ -4,7 +4,7 @@ import com.tonic.api.game.GameAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.queries.InventoryQuery;
 import com.tonic.data.wrappers.ItemEx;
-import com.tonic.data.ShopID;
+import com.tonic.data.trading.ShopID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 
