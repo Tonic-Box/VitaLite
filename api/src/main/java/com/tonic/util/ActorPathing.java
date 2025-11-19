@@ -1,6 +1,7 @@
 package com.tonic.util;
 
 import com.tonic.Static;
+import com.tonic.data.Orientation;
 import com.tonic.data.wrappers.ActorEx;
 import com.tonic.data.wrappers.NpcEx;
 import com.tonic.data.wrappers.PlayerEx;
@@ -21,12 +22,12 @@ import java.util.List;
 
 public class ActorPathing
 {
-    public static boolean hasLineOfWalk(Actor actor, WorldPoint destination, List<WorldPoint> blacklist) {
+    public static boolean hasLineOfWalk(ActorEx<?> actor, WorldPoint destination, List<WorldPoint> blacklist) {
         return hasLineOfWalk(actor, destination, blacklist, null);
     }
 
-    public static boolean hasLineOfWalk(Actor actor, WorldPoint destination, List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap) {
-        return hasLineOfWalk(actor.getWorldLocation(), destination, actor.getWorldArea().getWidth(), actor.getWorldArea().getHeight(), blacklist, localMap);
+    public static boolean hasLineOfWalk(ActorEx<?> actor, WorldPoint destination, List<WorldPoint> blacklist, @Nullable LocalCollisionMap localMap) {
+        return hasLineOfWalk(actor.getWorldPoint(), destination, actor.getWorldArea().getWidth(), actor.getWorldArea().getHeight(), blacklist, localMap);
     }
 
     public static boolean hasLineOfWalk(WorldPoint start, WorldPoint end, int actorWidth, int actorHeight, List<WorldPoint> blacklist) {

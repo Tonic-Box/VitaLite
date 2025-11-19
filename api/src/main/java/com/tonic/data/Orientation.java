@@ -1,5 +1,6 @@
 package com.tonic.data;
 
+import com.tonic.data.wrappers.ActorEx;
 import lombok.Getter;
 import net.runelite.api.Actor;
 import net.runelite.api.TileObject;
@@ -40,11 +41,11 @@ public enum Orientation
         return null;
     }
 
-    public static Orientation of(Actor actor)
+    public static Orientation of(ActorEx<?> actor)
     {
         for (Orientation orientation : values())
         {
-            if (orientation.value == actor.getOrientation())
+            if (orientation.value == (actor.getActor().getOrientation() / 256))
             {
                 return orientation;
             }
