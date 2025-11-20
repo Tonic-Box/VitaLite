@@ -4,7 +4,7 @@ import com.tonic.Static;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.data.wrappers.ItemContainerEx;
 import com.tonic.data.wrappers.ItemEx;
-import com.tonic.data.ShopID;
+import com.tonic.data.trading.Shop;
 import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
 import net.runelite.client.util.Text;
@@ -84,20 +84,20 @@ public class InventoryQuery extends AbstractQuery<ItemEx, InventoryQuery>
     }
 
     /**
-     * Create a query from a ShopID
-     * @param inventoryId The shop ID to query from
+     * Create a query from a Shop enum
+     * @param shop The shop to query from
      * @return A new InventoryQuery instance
      */
-    public static InventoryQuery fromShopId(ShopID inventoryId)
+    public static InventoryQuery fromShop(Shop shop)
     {
-        if(inventoryId == null)
-        {
+        if (shop == null) {
             return new InventoryQuery(new ArrayList<>());
         }
 
         List<ItemEx> cache;
-        ItemContainerEx itemContainer = new ItemContainerEx(inventoryId.getItemContainerId());
-        if(!itemContainer.getItems().isEmpty())
+        ItemContainerEx itemContainer = new ItemContainerEx(shop.getInventoryId());
+
+        if (!itemContainer.getItems().isEmpty())
             cache = Static.invoke(() ->
                     itemContainer.getItems().stream()
                             .filter(i -> i.getId() != -1)
@@ -107,6 +107,16 @@ public class InventoryQuery extends AbstractQuery<ItemEx, InventoryQuery>
             cache = new ArrayList<>();
 
         return new InventoryQuery(cache);
+    }
+
+    /**
+     * Create a query from the currently open shop
+     * @return A new InventoryQuery instance, or empty if no shop is open
+     */
+    public static InventoryQuery fromCurrentShop()
+    {
+        Shop currentShop = Shop.getCurrent();
+        return fromShop(currentShop);
     }
 
     /**
