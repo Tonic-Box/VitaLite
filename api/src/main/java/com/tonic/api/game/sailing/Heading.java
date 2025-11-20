@@ -1,6 +1,6 @@
 package com.tonic.api.game.sailing;
 
-import com.tonic.api.game.WorldViewAPI;
+import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.coords.WorldPoint;
@@ -31,7 +31,7 @@ public enum Heading
     ;
 
     public static Heading getOptimalHeading(WorldPoint target) {
-        WorldPoint current = WorldViewAPI.getTolWorldLocation();
+        WorldPoint current = WorldPointUtil.getTopWorldViewLocation();
 
         int deltaX = target.getX() - current.getX();
         int deltaY = target.getY() - current.getY();
