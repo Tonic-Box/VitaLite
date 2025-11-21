@@ -152,6 +152,11 @@ public enum Shop {
             InventoryID.WYDINSTORE,
             NpcLocations.WYDIN
     ),
+    TRADER_STANS_TRADING_POST(
+            InventoryID.TRADER_STAN_SHOP,
+            NpcLocations.TRADER_STAN,
+            new WorldRequirement(true)
+    ),
 
     // --- RIMMINGTON ---
     RIMMINGTON_GENERAL_STORE(
@@ -209,6 +214,7 @@ public enum Shop {
     // TODO: Add ISLAND_GREENGROCER_ETCETERIA - requires Throne of Miscellania
 
     // --- JATIZSO ---
+    // TODO: technically this doesn't require completion but partial progress in Quest.THE_FREMENNIK_ISLES
     ARMOUR_SHOP(
             InventoryID.FRISD_ARMOURSHOP,
             NpcLocations.RAUM_URDA_STEIN,
@@ -257,6 +263,7 @@ public enum Shop {
     // TODO: Add MISCELLANIAN_FOOD_SHOP - requires Throne of Miscellania
 
     // --- NEITIZNOT ---
+    // TODO: technically this doesn't require completion but partial progress in Quest.THE_FREMENNIK_ISLES
     // TODO: Add NEITIZNOT_SUPPLIES - requires The Fremennik Isles
 
     // --- RELLEKKA ---
@@ -268,7 +275,7 @@ public enum Shop {
     ),
     FREMENNIK_FISH_MONGER(
             InventoryID.VIKING_FISHMONGER,
-            NpcLocations.FISH_MONGER,
+            NpcLocations.RELLEKKA_FISH_MONGER,
             new WorldRequirement(true),
             new QuestRequirement(Quest.THE_FREMENNIK_TRIALS)
     ),
@@ -316,38 +323,164 @@ public enum Shop {
     ),
 
     // --- ARCEUUS ---
-    // TODO: Add FILAMINAS_WARES - NPC and inventory ID needed
-    // TODO: Add REGATHS_WARES - NPC and inventory ID needed
-    // TODO: Add THYRIAS_WARES - NPC and inventory ID needed
+    FILAMINAS_WARES(
+            InventoryID.SKILL_GUIDE_CRAFTING_STAFFS,
+            NpcLocations.FILAMINA,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    REGATHS_WARES(
+            InventoryID.SKILL_GUIDE_HUNTING_BIRDS,
+            NpcLocations.REGATH,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    THYRIAS_WARES(
+            InventoryID.SKILL_GUIDE_RUNECRAFTING,
+            NpcLocations.THYRIA,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
 
     // --- HOSIDIUS ---
-    // TODO: Add THE_GOLDEN_FIELD - NPC and inventory ID needed
-    // TODO: Add LITTLE_SHOP_OF_HORACE - NPC and inventory ID needed
-    // TODO: Add LOGAVA_GRICOLLER_COOKING - NPC and inventory ID needed
-    // TODO: Add GRICOLLERS_COOKING_SUPPLIES - NPC and inventory ID needed
-    // TODO: Add VANNAHS_FARMING_STALL - requires 50% Hosidius favor
+    THE_GOLDEN_FIELD(
+            InventoryID.ROYAL_BAR,
+            NpcLocations.HOSIDIUS_RICHARD,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    LITTLE_SHOP_OF_HORACE(
+            InventoryID.SKILL_GUIDE_FARMING_VEG,
+            NpcLocations.HORACE,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    LOGAVA_GRICOLLERS_COOKING_SUPPLIES(
+            InventoryID.SKILL_GUIDE_COOKING_DAIRY,
+            NpcLocations.LOGAVA,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    VANNAHS_FARMING_STALL(
+            InventoryID.SKILL_GUIDE_FARMING_SPECIAL,
+            NpcLocations.VANNAH,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    MARISI_FARMING_SUPPLIES(
+            InventoryID.FARMER_SUPPLIES,
+            NpcLocations.MARISI,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
 
     // --- LOVAKENGJ ---
-    // TODO: Add THE_DEEPER_LODE - NPC and inventory ID needed
-    // TODO: Add LITTLE_MUNTYS_LITTLE_SHOP - NPC and inventory ID needed
-    // TODO: Add TOOTHYS_PICKAXES - NPC and inventory ID needed
-    // TODO: Add THIRUS_URKARS_DYNAMITE - NPC and inventory ID needed
+    THE_DEEPER_LODE(
+            InventoryID.SKILL_GUIDE_FLETCHING_ARROWS,
+            NpcLocations.FUGGY,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    LITTLE_MUNTYS_LITTLE_SHOP(
+            InventoryID.SMITHING_BRONZE3,
+            NpcLocations.MUNTY,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    TOOTHYS_PICKAXES(
+            InventoryID.SKILL_GUIDE_MINING_PICKAXES,
+            NpcLocations.TOOTHY,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    THIRUS_URKARS_FINE_DYNAMITE_STORE(
+            InventoryID.LOVAKENGJ_DYNAMITE_SHOP,
+            NpcLocations.THIRUS,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
 
     // --- PORT PISCARILIUS ---
-    // TODO: Add FRANKIES_FISHING_EMPORIUM - NPC and inventory ID needed
-    // TODO: Add KENELMES_WARES - NPC and inventory ID needed
-    // TODO: Add LEENZS_GENERAL_SUPPLIES - NPC and inventory ID needed
-    // TODO: Add TYNANS_FISHING_SUPPLIES - NPC and inventory ID needed
-    // TODO: Add WARRENS_FISH_MONGER - NPC and inventory ID needed
-    // TODO: Add WARRENS_GENERAL_STORE - NPC and inventory ID needed
+    FRANKIES_FISHING_EMPORIUM(
+            InventoryID.PISCARILIUS_FISH_TRADER_1000,
+            NpcLocations.FRANKIE,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    KENELMES_WARES(
+            InventoryID.SKILL_GUIDE_COOKING_BREAD,
+            NpcLocations.KENELME,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    LEENZS_GENERAL_SUPPLIES(
+            InventoryID.PISCARILIUS_GENERALSTORE,
+            NpcLocations.LEENZ,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    TYNANS_FISHING_SUPPLIES(
+            InventoryID.PISCARILIUS_FISHING_SUPPLIES,
+            NpcLocations.TYNAN,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    WARRENS_GENERAL_STORE(
+            InventoryID.LLETYAGENERALSHOP1,
+            NpcLocations.WARRENS_SHOP_KEEPER,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    WARRENS_FISH_MONGER(
+            InventoryID.WARRENS_FISHMONGER,
+            NpcLocations.WARRENS_FISH_MONGER,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
 
     // --- SHAYZIEN ---
-    // TODO: Add THE_CLOAK_AND_STAGGER - NPC and inventory ID needed
-    // TODO: Add BRIGETS_WEAPONS - NPC and inventory ID needed
-    // TODO: Add BLAIRS_ARMOUR - NPC and inventory ID needed
-    // TODO: Add DARYLS_RANGING_SURPLUS - NPC and inventory ID needed
-    // TODO: Add JENNIFERS_GENERAL_SUPPLIES - NPC and inventory ID needed
-    // TODO: Add SHAYZIEN_STYLES - NPC and inventory ID needed
+    OSWALD_THE_CLOAK_AND_STAGGER(
+            InventoryID.SHAYZIEN_PUB,
+            NpcLocations.OSWALD,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    SHERYL_THE_CLOAK_AND_STAGGER(
+            InventoryID.SHAYZIEN_PUB,
+            NpcLocations.SHERYL,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    BRIGETS_WEAPONS(
+            InventoryID.SKILL_GUIDE_COMBAT_WEAPONS,
+            NpcLocations.BRIGET,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    BLAIRS_ARMOUR(
+            InventoryID.SKILL_GUIDE_COMBAT_ARMOURS,
+            NpcLocations.BLAIR,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    DARYLS_RANGING_SURPLUS(
+            InventoryID.SHAYZIEN_RANGESHOP,
+            NpcLocations.DARYL,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    JENNIFERS_GENERAL_SUPPLIES(
+            InventoryID.PEST_GENERAL_STORE,
+            NpcLocations.JENNIFER,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
+    SHAYZIEN_STYLES(
+            InventoryID.SHAYZIEN_CLOTHESSHOP,
+            NpcLocations.ROBYN,
+            new WorldRequirement(true),
+            KOUREND_VISITED_REQ
+    ),
 
     // ============================================
     // GUILDS
@@ -385,8 +518,16 @@ public enum Shop {
     // TODO: Add HAPPY_HEROES_HEMPORIUM - requires Heroes' Quest
 
     // --- HUNTER GUILD ---
-    // TODO: Add IMIAS_SUPPLIES - requires Hunter Guild (Hunter & Rumours)
-    // TODO: Add PELLEMS_FUR_STORE - requires Hunter Guild (Hunter & Rumours)
+    IMIAS_SUPPLIES(
+            InventoryID.HUNTING_SHOP_GUILD,
+            NpcLocations.IMIA,
+            new WorldRequirement(true),
+            new SkillRequirement(Skill.HUNTER, 46)),
+    PELLEMS_FUR_STORE(
+            InventoryID.FUR_SHOP_GUILD,
+            NpcLocations.PELLEM,
+            new WorldRequirement(true),
+            new SkillRequirement(Skill.HUNTER, 46)),
 
     // --- LEGENDS' GUILD ---
     // TODO: Add LEGENDS_GUILD_GENERAL_STORE - requires Legends' Quest
@@ -550,7 +691,7 @@ public enum Shop {
     ),
     ARDOUGNE_GEM_STALL(
             InventoryID.ARDOUGNEGEMSTALL,
-            NpcLocations.GEM_MERCHANT,
+            NpcLocations.EAST_ARDY_GEM_MERCHANT,
             new WorldRequirement(true)
     ),
     ARDOUGNE_SILVER_STALL(
@@ -754,7 +895,6 @@ public enum Shop {
     // TODO: Add OBLIS_GENERAL_STORE - requires Shilo Village
     // TODO: Add FERNAHEIS_FISHING_HUT - requires Shilo Village
     // TODO: Add SHILO_SLAYER_EQUIPMENT - requires Shilo Village
-    // TODO: Add SHILO_SLAYER_REWARDS - requires Shilo Village
 
     // --- TAI BWO WANNAI ---
     JIMINUAS_JUNGLE_STORE(
@@ -1184,101 +1324,418 @@ public enum Shop {
     // ============================================
 
     // --- KELDAGRIM ---
-    // TODO: Add ARMOUR_STORE_KELDAGRIM - requires Giant Dwarf
-    // TODO: Add CAREFREE_CRAFTING_STALL - requires Giant Dwarf
-    // TODO: Add CROSSBOW_SHOP_KELDAGRIM - requires Giant Dwarf
-    // TODO: Add GREEN_GEMSTONE_GEMS - requires Giant Dwarf
-    // TODO: Add KELDAGRIMS_BEST_BREAD - requires Giant Dwarf
-    // TODO: Add KJUTS_KEBABS - requires Giant Dwarf
-    // TODO: Add ORE_SELLER_KELDAGRIM - requires Giant Dwarf
-    // TODO: Add PICKAXE_IS_MINE - requires Giant Dwarf
-    // TODO: Add SILVER_COG_SILVER_STALL - requires Giant Dwarf
-    // TODO: Add VERMUNDIS_CLOTHES_STALL - requires Giant Dwarf
-    // TODO: Add GUNSLIKS_ASSORTED_ITEMS - requires Giant Dwarf
-    // TODO: Add AGMUNDI_QUALITY_CLOTHES - requires Giant Dwarf
-    // TODO: Add KELDAGRIM_STONEMASON - requires Giant Dwarf
-    // TODO: Add QUALITY_ARMOUR_SHOP - requires Giant Dwarf
-    // TODO: Add QUALITY_WEAPONS_SHOP - requires Giant Dwarf
-    // TODO: Add VIGRS_WARHAMMERS - requires Giant Dwarf
+    ARMOUR_STORE(
+            InventoryID.SMITHING_GUILD_BUYER,
+            NpcLocations.JORZIK,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    CAREFREE_CRAFTING_STALL(
+            InventoryID.KELDAGRIM_CRAFTING_STALL,
+            NpcLocations.NOLAR,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    CROSSBOW_SHOP(
+            InventoryID.XBOWS_SHOP_ADDY,
+            NpcLocations.HIRKO,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    GREEN_GEMSTONE_GEMS(
+            InventoryID.KELDAGRIM_GEM_STALL,
+            NpcLocations.HERVI,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    KELDAGRIMS_BEST_BREAD(
+            InventoryID.KELDAGRIM_BREAD_STALL,
+            NpcLocations.RANDIVOR,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    ORE_SELLER(
+            InventoryID.SMITHING_GUILD_ORE_SELLER,
+            NpcLocations.ORDAN,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    PICKAXE_IS_MINE(
+            InventoryID.KELDAGRIM_PICKAXE_SHOP,
+            NpcLocations.TATI,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    SILVER_COG_SILVER_STALL(
+            InventoryID.KELDAGRIM_SILVER_STALL,
+            NpcLocations.GULLDAMAR,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    VERMUNDIS_CLOTHES_STALL(
+            InventoryID.KELDAGRIM_CLOTHES_STALL,
+            NpcLocations.VERMUNDI,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    GUNSLIKS_ASSORTED_ITEMS(
+            InventoryID.KELDAGRIM_GENERAL_SHOP,
+            NpcLocations.GUNSLIK,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    KELDAGRIM_STONEMASON(
+            InventoryID.POH_STONEMASON_SHOP,
+            NpcLocations.STONEMASON,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    AGMUNDI_QUALITY_CLOTHES(
+            InventoryID.KELDAGRIM_CLOTHES_SHOP,
+            NpcLocations.AGMUNDI,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    QUALITY_ARMOUR_SHOP(
+            InventoryID.KELDAGRIM_QUALITY_ARMOUR_SHOP,
+            NpcLocations.SARO,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    QUALITY_WEAPONS_SHOP(
+            InventoryID.KELDAGRIM_QUALITY_WEAPONS_SHOP,
+            NpcLocations.SANTIRI,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
+    VIGRS_WARHAMMERS(
+            InventoryID.KELDAGRIM_WARHAMMER_SHOP,
+            NpcLocations.VIGR,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.THE_GIANT_DWARF)
+    ),
 
     // --- TROLL STRONGHOLD ---
-    // TODO: Add LEPRECHAUN_LARRYS_FARMING - requires Troll Stronghold
+    // TODO: Add LEPRECHAUN_LARRYS_FARMING - requires My Arm's Big Adventure.
 
-    // ============================================
-    // VARLAMORE
-    // ============================================
+// ============================================
+// VARLAMORE
+// ============================================
 
     // --- ALDARIN ---
-    // TODO: Add ALDARIN_GENERAL_STORE - requires Children of the Sun
-    // TODO: Add FAUSTUS_FRUIT_AND_VEG - requires Children of the Sun
-    // TODO: Add MISTROCK_MINING_SUPPLIES - requires Children of the Sun
-    // TODO: Add MOONRISE_WINES - requires Children of the Sun
-    // TODO: Add SHIELDS_OF_MISTROCK - requires Children of the Sun
-    // TODO: Add STICK_YOUR_ORE_INN - requires Children of the Sun
-    // TODO: Add SUNLIGHTS_SANCTUM - requires Children of the Sun
-    // TODO: Add TOCIS_GEM_STORE - requires Children of the Sun
+    ALDARIN_GENERAL_STORE(
+            InventoryID.ALDARIN_GENERAL_STORE,
+            NpcLocations.ALDARIN_SHOPKEEPER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+
+    FAUSTUS_FRUIT_AND_VEG(
+            InventoryID.ALDARIN_FOOD_STORE,
+            NpcLocations.FAUSTUS,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    MISTROCK_MINING_SUPPLIES(
+            InventoryID.MISTROCK_MINING_STORE,
+            NpcLocations.NECTO,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    MOONRISE_WINES(
+            InventoryID.ALDARIN_WINE_STORE,
+            NpcLocations.ANTONIUS,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    SHIELDS_OF_MISTROCK(
+            InventoryID.MISTROCK_SHIELD_STORE,
+            NpcLocations.ICHTA,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    STICK_YOUR_ORE_INN(
+            InventoryID.PUB_MISTROCK,
+            NpcLocations.MISTROCK_BARTENDER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    SUNLIGHTS_SANCTUM(
+            InventoryID.PUB_ALDARIN,
+            NpcLocations.ALDARIN_BARTENDER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    TOCIS_GEM_STORE(
+            InventoryID.ALDARIN_GEM_STORE,
+            NpcLocations.TOCI,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    ERCOS_FARMING_SUPPLIES(
+            InventoryID.FARMER_SUPPLIES,
+            NpcLocations.ERCOS,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
 
     // --- AUBURNVALE ---
-    // TODO: Add AUBURNVALE_GENERAL_STORE - requires Children of the Sun
-    // TODO: Add CONSTRUCTION_SUPPLIES_AUBURNVALE - Children of the Sun
-    // TODO: Add LUNAMIS_AXE_SHOP - requires Children of the Sun
-    // TODO: Add SEBAMOS_SUBLIME_STAFFS - requires Children of the Sun
+    AUBURNVALE_GENERAL_STORE(
+            InventoryID.AUBURN_GENERAL_STORE,
+            NpcLocations.AUBURNVALE_SHOPKEEPER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN) // Note: Based on comment, adding Children of the Sun
+    ),
+    LUNAMIS_AXE_SHOP(
+            InventoryID.LUNAMI_AXE_STORE,
+            NpcLocations.LUNAMI,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    SEBAMOS_SUBLIME_STAFFS(
+            InventoryID.SEBAMO_STAFF_STORE,
+            NpcLocations.SEBAMO,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
 
     // --- CAM TORUM ---
-    // TODO: Add CAM_TORUM_GENERAL_STORE - requires Children of the Sun
-    // TODO: Add CAM_TORUM_BLACKSMITH - requires Children of the Sun
-    // TODO: Add CONARAS_JEWELS - requires Children of the Sun
-    // TODO: Add HUITAS_HERBAL_SUPPLIES - requires Children of the Sun
-    // TODO: Add THE_LOST_PICKAXE - requires Children of the Sun
-    // TODO: Add THE_RUNIC_EMPORIUM - requires Children of the Sun
-    // TODO: Add TIZOROS_PICKAXES - requires Children of the Sun
-    // TODO: Add YARNIOS_BAKED_GOODS - requires Children of the Sun
+    // TODO: Add CAM_TORUM_GENERAL_STORE - requires Children of the Sun, Perilous Moons
+    // TODO: Add CAM_TORUM_BLACKSMITH - requires Children of the Sun, Perilous Moons
+    // TODO: Add CONARAS_JEWELS - requires Children of the Sun, Perilous Moons
+    // TODO: Add HUITAS_HERBAL_SUPPLIES - requires Children of the Sun, Perilous Moons
+    // TODO: Add THE_LOST_PICKAXE - requires Children of the Sun, Perilous Moons
+    // TODO: Add THE_RUNIC_EMPORIUM - requires Children of the Sun, Perilous Moons
+    // TODO: Add TIZOROS_PICKAXES - requires Children of the Sun, Perilous Moons
+    // TODO: Add YARNIOS_BAKED_GOODS - requires Children of the Sun, Perilous Moons
 
     // --- CIVITAS ILLA FORTIS ---
-    // TODO: Add ARTIMAS_CRAFTING_SUPPLIES - requires Children of the Sun
-    // TODO: Add COBADOS_GROCERIES - requires Children of the Sun
-    // TODO: Add FLORIAS_FASHION - requires Children of the Sun
-    // TODO: Add FORTIS_BAKERS_STALL - requires Children of the Sun
-    // TODO: Add FORTIS_FUR_STALL - requires Children of the Sun
-    // TODO: Add FORTIS_GEM_STALL - requires Children of the Sun
-    // TODO: Add FORTIS_GENERAL_STORE - requires Children of the Sun
-    // TODO: Add THE_FLAMING_ARROW - requires Children of the Sun
-    // TODO: Add FORTIS_SILK_STALL - requires Children of the Sun
-    // TODO: Add FORTIS_SPICE_STALL - requires Children of the Sun
-    // TODO: Add FORTIS_BLACKSMITH - requires Children of the Sun
+    ARTIMAS_CRAFTING_SUPPLIES(
+            InventoryID.FORTIS_SHOP_CRAFTING,
+            NpcLocations.ARTIMA,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    COBADOS_GROCERIES(
+            InventoryID.FORTIS_SHOP_FOOD,
+            NpcLocations.COBADO,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    FLORIAS_FASHION(
+            InventoryID.FORTIS_SHOP_SEAMSTRESS,
+            NpcLocations.FLORIA,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    FORTIS_BAKERS_STALL(
+            InventoryID.FORTIS_SHOP_BAKER,
+            NpcLocations.FORTIS_BAKER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    FORTIS_FUR_STALL(
+            InventoryID.FORTIS_SHOP_FUR,
+            NpcLocations.FORTIS_FUR_MERCHANT,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    FORTIS_GEM_STALL(
+            InventoryID.FORTIS_SHOP_GEMS,
+            NpcLocations.FORTIS_GEM_MERCHANT,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    FORTIS_GENERAL_STORE(
+            InventoryID.FORTIS_SHOP_GENERAL_1,
+            NpcLocations.FORTIS_SHOPKEEPER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    THE_FLAMING_ARROW(
+            InventoryID.PUB_FORTIS_1,
+            NpcLocations.FORTIS_BARTENDER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    FORTIS_SILK_STALL(
+            InventoryID.FORTIS_SHOP_SILK,
+            NpcLocations.FORTIS_SILK_MERCHANT,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    FORTIS_SPICE_STALL(
+            InventoryID.FORTIS_SHOP_SPICES,
+            NpcLocations.FORTIS_SPICE_MERCHANT,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    FORTIS_BLACKSMITH(
+            InventoryID.FORTIS_SHOP_BLACKSMITH,
+            NpcLocations.FORTIS_BLACKSMITH,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
 
     // --- KASTORI ---
-    // TODO: Add KASTORI_GENERAL_STORE - requires Children of the Sun
-    // TODO: Add KASTORI_FARMING_SUPPLIES - requires Children of the Sun
-    // TODO: Add SULISALS_FISHING_STORE - requires Children of the Sun
+    KASTORI_GENERAL_STORE(
+            InventoryID.KASTORI_GENERAL_STORE,
+            NpcLocations.KASTORI_SHOPKEEPER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    KASTORI_FARMING_SUPPLIES(
+            InventoryID.KASTORIFARMINGSTORE,
+            NpcLocations.AMEYALLI,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    SULISALS_SUPERB_FISHING_STORE(
+            InventoryID.KASTORIFISHINGSTORE,
+            NpcLocations.SULISAL,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    EHECATL_FARMING_SUPPLIES(
+            InventoryID.FARMER_SUPPLIES,
+            NpcLocations.EHECATL,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    TZIUHTLA_FARMING_SUPPLIES(
+            InventoryID.FARMER_SUPPLIES,
+            NpcLocations.TZIUHTLA,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+
+    // --- NEMUS RETREAT ---
+    AUB_FARMING_SUPPLIES(
+            InventoryID.FARMER_SUPPLIES,
+            NpcLocations.AUB,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
 
     // --- OUTER FORTIS ---
-    // TODO: Add ATLAZORAS_REST - requires Children of the Sun
-    // TODO: Add OUTER_FORTIS_GENERAL_STORE - requires Children of the Sun
-    // TODO: Add SPIKES_SPIKES - requires Children of the Sun
+    ATLAZORAS_REST(
+            InventoryID.PUB_FORTIS_2,
+            NpcLocations.OUTER_FORTIS_BARTENDER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    OUTER_FORTIS_GENERAL_STORE(
+            InventoryID.FORTIS_SHOP_GENERAL_2,
+            NpcLocations.OUTER_FORTIS_SHOPKEEPER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    SPIKES_SPIKES(
+            InventoryID.FORTIS_SHOP_MACES,
+            NpcLocations.SPIKE,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
 
     // --- QUETZACALLI GORGE ---
-    // TODO: Add QUETZACALLI_GORGE_GENERAL - requires Children of the Sun
-    // TODO: Add THE_WINDBREAKER - requires Children of the Sun
+    QUETZACALLI_GORGE_GENERAL_STORE(
+            InventoryID.QUETZACALLI_GENERAL_STORE,
+            NpcLocations.QUETZACALLI_SHOPKEEPER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    THE_WINDBREAKER(
+            InventoryID.PUB_QUETZACALLI,
+            NpcLocations.QUETZACALLI_BARTENDER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
 
     // --- SALVAGER OVERLOOK ---
-    // TODO: Add SALIUS_ARMOUR_SHOP - requires Children of the Sun
-    // TODO: Add SALVAGER_OVERLOOK_GENERAL - requires Children of the Sun
+    SALIUS_ARMOUR_SHOP(
+            InventoryID.SALVAGER_OVERLOOK_PLATEBODY_STORE,
+            NpcLocations.SALIUS,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    SALVAGER_OVERLOOK_GENERAL_STORE(
+            InventoryID.SALVAGER_OVERLOOK_GENERAL_STORE,
+            NpcLocations.SALVAGER_SHOPKEEPER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
 
     // --- SUNSET COAST ---
-    // TODO: Add PICARIAS_FISHING_SHOP - requires Children of the Sun
-    // TODO: Add SUNSET_COAST_GENERAL_STORE - requires Children of the Sun
-    // TODO: Add THURIDS_BRAIN_BUCKETS - requires Children of the Sun
+    PICARIAS_FISHING_SHOP(
+            InventoryID.SUNSET_COAST_FISHING_SHOP,
+            NpcLocations.PICARIA,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    SUNSET_COAST_GENERAL_STORE(
+            InventoryID.SUNSET_COAST_GENERAL_STORE,
+            NpcLocations.SUNSET_COAST_SHOPKEEPER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    THURIDS_BRAIN_BUCKETS(
+            InventoryID.SUNSET_COAST_HELMET_SHOP,
+            NpcLocations.THURID,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
 
     // --- TAL TEKLAN ---
-    // TODO: Add ARCUANIS_ARCHERY_SUPPLIES - requires Children of the Sun
-    // TODO: Add DYES_TO_DIE_FOR - requires Children of the Sun
-    // TODO: Add TAL_TEKLAN_GENERAL_STORE - requires Children of the Sun
-    // TODO: Add TAL_TEKLAN_RUNE_SHOP - requires Children of the Sun
+    ARCUANIS_ARCHERY_SUPPLIES(
+            InventoryID.TAL_TEKLAN_ARCHERSHOP,
+            NpcLocations.ARCUANI,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    DYES_TO_DIE_FOR(
+            InventoryID.TAL_TEKLAN_DYESHOP,
+            NpcLocations.XOCHITL,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    TAL_TEKLAN_GENERAL_STORE(
+            InventoryID.TAL_TEKLAN_GENERALSTORE,
+            NpcLocations.TAL_TEKLAN_SHOPKEEPER,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    TAL_TEKLAN_RUNE_SHOP(
+            InventoryID.TAL_TEKLAN_RUNESHOP,
+            NpcLocations.TEICUH,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    THE_KINGS_INN(
+            InventoryID.PUB_TAL_TEKLAN,
+            NpcLocations.KING,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
 
     // --- OTHER VARLAMORE ---
-    // TODO: Add AGELUS_FARM_SHOP - requires Children of the Sun
-    // TODO: Add STONECUTTER_SUPPLIES - requires Children of the Sun
+    AGELUS_FARM_SHOP(
+            InventoryID.FORTIS_SHOP_FARMING,
+            NpcLocations.AGELUS,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    STONECUTTER_SUPPLIES(
+            InventoryID.STONECUTTER_STONEMASON,
+            NpcLocations.METLA,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    HARMINA_FARMING_SUPPLIES(
+            InventoryID.FARMER_SUPPLIES,
+            NpcLocations.HARMINIA,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
 
     // ============================================
     // OTHER LOCATIONS
@@ -1363,8 +1820,14 @@ public enum Shop {
             InventoryID.WILDERNESSCAPESHOP9,
             NpcLocations.SIMON
     ),
-    BATTLE_RUNES(
+    BATTLE_RUNES_UBER(
             InventoryID.DARKRUNESHOP_UBER,
+            NpcLocations.MAGE_OF_ZAMORAK,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.ENTER_THE_ABYSS)
+    ),
+    BATTLE_RUNES_CRAP(
+            InventoryID.DARKRUNESHOP_CRAP,
             NpcLocations.MAGE_OF_ZAMORAK,
             new WorldRequirement(true)
     ),
@@ -1417,7 +1880,25 @@ public enum Shop {
     // TODO: Add CROSSBOW_SHOP_OTHER - requirement unknown
 
     // --- OTHER ---
-    // TODO: Add TRADER_STANS_TRADING_POST - location variable
+    FORTIS_TRADER_STANS_TRADING_POST(
+            InventoryID.TRADER_SHOP_FORTIS,
+            NpcLocations.FORTIS_TRADER_CREWMEMBER,
+            new WorldRequirement(true)
+    ),
+    SARIM_TRADER_STANS_TRADING_POST(
+            InventoryID.TRADER_STAN_SHOP,
+            NpcLocations.SARIM_TRADER_CREWMEMBER,
+            new WorldRequirement(true)
+    ),
+    SUNSET_COAST_TRADER_STANS_TRADING_POST(
+            InventoryID.TRADER_SHOP_SUNSETCOAST,
+            NpcLocations.SUNSET_COAST_TRADER_CREWMEMBER,
+            new WorldRequirement(true)
+    ),
+    ALDARIN_TRADER_STANS_TRADING_POST(
+            InventoryID.TRADER_SHOP_ALDARIN,
+            NpcLocations.ALDARIN_TRADER_CREWMEMBER,
+            new WorldRequirement(true)),
     ;
 
     private final int inventoryId;

@@ -90,6 +90,8 @@ public enum NpcLocations {
     WORMBRAIN("Wormbrain", new WorldPoint(3012, 3189, 0)),
     WYDIN("Wydin", new WorldPoint(3015, 3206, 0)),
     BARTENDER_PORT_SARIM("Bartender", new WorldPoint(3045, 3256, 0)),
+    TRADER_STAN("Trader Stan", new WorldPoint(3039, 3192, 0)),
+    SARIM_TRADER_CREWMEMBER("Trader Crewmember", new WorldPoint(3037, 3193, 0)),
 
     // --- RIMMINGTON ---
     BRIAN_RIMMINGTON("Brian", new WorldPoint(2956, 3203, 0)),
@@ -148,12 +150,111 @@ public enum NpcLocations {
     LARRISSA("Larrissa", new WorldPoint(2507, 3634, 0)),
 
     // --- RELLEKKA ---
-    FISH_MONGER("Fish monger", new WorldPoint(2649, 3675, 0)),
+    RELLEKKA_FISH_MONGER("Fish monger", new WorldPoint(2649, 3675, 0)),
     FUR_TRADER("Fur trader", new WorldPoint(2642, 3675, 0)),
     SIGMUND_THE_MERCHANT("Sigmund The Merchant", new WorldPoint(2641, 3679, 0)),
     SKULGRIMEN("Skulgrimen", new WorldPoint(2662, 3693, 0)),
     THORA_THE_BARKEEP("Thora the Barkeep", new WorldPoint(2662, 3673, 0)),
     YRSA("Yrsa", new WorldPoint(2622, 3672, 0)),
+
+    // ============================================
+    // KELDAGRIM AND TROLL COUNTRY
+    // ============================================
+
+    // --- KELDAGRIM ---
+    GULLDAMAR("Gulldamar", new WorldPoint(2885, 10196, 0)),
+    VERMUNDI("Vermundi", new WorldPoint(2887, 10191, 0)),
+    HIRKO("Hirko", new WorldPoint(2885, 10202, 0)),
+    NOLAR("Nolar", new WorldPoint(2885, 10208, 0)),
+    HERVI("Hervi", new WorldPoint(2888, 10212, 0)),
+    RANDIVOR("Randivor", new WorldPoint(2893, 10212, 0)),
+    VIGR("Vigr", new WorldPoint(2872, 10209, 0)),
+    ORDAN("Ordan", new WorldPoint(1936, 4966, 0)),
+    JORZIK("Jorzik", new WorldPoint(1941, 4969, 0)),
+    TATI("Tati", new WorldPoint(2925, 10211, 0)),
+    GUNSLIK("Gunslik", new WorldPoint(2869, 10191, 0)),
+    STONEMASON("Stonemason", new WorldPoint(2849, 10185, 0)),
+    SARO("Saro", new WorldPoint(2825, 10198, 0)),
+    SANTIRI("Santiri", new WorldPoint(2828, 10227, 0)),
+    AGMUNDI("Agmundi", new WorldPoint(2867, 10211, 0)),
+
+    // ============================================
+    // VARLAMORE
+    // ============================================
+
+    // --- ALDARIN ---
+    FAUSTUS("Faustus", new WorldPoint(1419, 2979, 0)),
+    ALDARIN_SHOPKEEPER("Shopkeeper", new WorldPoint(1414, 2973, 0)),
+    ALDARIN_TRADER_CREWMEMBER("Trader Crewmember", new WorldPoint(1454, 2967, 0)),
+    ALDARIN_BARTENDER("Bartender", new WorldPoint(1376, 2927, 0)),
+    ERCOS("Ercos", new WorldPoint(1367, 2939, 0)),
+    ICHTA("Ichta", new WorldPoint(1387, 2869, 0)),
+    NECTO("Necto", new WorldPoint(1399, 2867, 0)),
+    MISTROCK_BARTENDER("Bartender", new WorldPoint(1388, 2858, 0)),
+    ANTONIUS("Antonius", new WorldPoint(1361, 2922, 0)),
+    TOCI("Toci", new WorldPoint(1428, 2975, 0)),
+
+    // --- AUBURNVALE ---
+    AUBURNVALE_SHOPKEEPER("Shopkeeper", new WorldPoint(1381, 3351, 0)),
+    SEBAMO("Sebamo", new WorldPoint(1413, 3343, 0)),
+    LUNAMI("Lunami", new WorldPoint(1400, 3341, 0)),
+
+    // --- CAM TORUM ---
+
+    // --- CIVITAS ILLA FORTIS ---
+    ARTIMA("Artima", new WorldPoint(1767, 3103, 0)),
+    COBADO("Cobado", new WorldPoint(1703, 3113, 0)),
+    FORTIS_BARTENDER("Bartender", new WorldPoint(1711, 3116, 0)),
+    FORTIS_FUR_MERCHANT("Fur Merchant", new WorldPoint(1674, 3110, 0)),
+    FORTIS_SILK_MERCHANT("Silk Merchant", new WorldPoint(1676, 3113, 0)),
+    FORTIS_BAKER("Baker", new WorldPoint(1687, 3110, 0)),
+    FORTIS_SPICE_MERCHANT("Spice Merchant", new WorldPoint(1686, 3100, 0)),
+    FORTIS_GEM_MERCHANT("Gem Merchant", new WorldPoint(1674, 3102, 0)),
+    FLORIA("Floria", new WorldPoint(1659, 3100, 0)),
+    FORTIS_SHOPKEEPER("Shopkeeper", new WorldPoint(1666, 3120, 0)),
+    FORTIS_BLACKSMITH("Blacksmith", new WorldPoint(1656, 3141, 0)),
+    FORTIS_TRADER_CREWMEMBER("Trader Crewmember", new WorldPoint(1743, 3135, 0)),
+
+    // --- KASTORI ---
+    EHECATL("Ehecatl", new WorldPoint(1351, 3055, 0)),
+    AMEYALLI("Ameyalli", new WorldPoint(1357, 3061, 0)),
+    TZIUHTLA("Tziuhtla", new WorldPoint(1363, 3031, 0)),
+    SULISAL("Sulisal", new WorldPoint(1375, 3036, 0)),
+    KASTORI_SHOPKEEPER("Shopkeeper", new WorldPoint(1374, 3046, 0)),
+
+    // --- NEMUS RETREAT ---
+    AUB("Aub", new WorldPoint(1363, 3317, 0)),
+
+    // --- OUTER FORTIS ---
+    OUTER_FORTIS_SHOPKEEPER("Shopkeeper", new WorldPoint(1721, 3064, 0)),
+    SPIKE("Spike", new WorldPoint(1773, 3059, 0)),
+    OUTER_FORTIS_BARTENDER("Bartender", new WorldPoint(1723, 3077, 0)),
+
+    // --- QUETZACALLI GORGE ---
+    QUETZACALLI_SHOPKEEPER("Shopkeeper", new WorldPoint(1518, 3222, 0)),
+    QUETZACALLI_BARTENDER("Bartender", new WorldPoint(1499, 3224, 0)),
+
+    // --- SALVAGER OVERLOOK ---
+    SALIUS("Salius", new WorldPoint(1620, 3290, 0)),
+    SALVAGER_SHOPKEEPER("Shopkeeper", new WorldPoint(1626, 3287, 0)),
+
+    // --- SUNSET COAST ---
+    SUNSET_COAST_SHOPKEEPER("Shopkeeper", new WorldPoint(1515, 2986, 0)),
+    THURID("Thurid", new WorldPoint(1515, 2994, 0)),
+    SUNSET_COAST_TRADER_CREWMEMBER("Trader Crewmember", new WorldPoint(1515, 2973, 0)),
+    PICARIA("Picaria", new WorldPoint(1558, 2959, 0)),
+
+    // --- TAL TEKLAN ---
+    KING("King", new WorldPoint(1223, 3120, 0)),
+    TEICUH("Teicuh", new WorldPoint(1212, 3118, 0)),
+    XOCHITL("Xochitl", new WorldPoint(1204, 3119, 0)),
+    ARCUANI("Arcuani", new WorldPoint(1211, 3095, 0)),
+    TAL_TEKLAN_SHOPKEEPER("Shopkeeper", new WorldPoint(1243, 3109, 0)),
+
+    // --- OTHER VARLAMORE ---
+    AGELUS("Agelus", new WorldPoint(1593, 3103, 0)),
+    METLA("Metla", new WorldPoint(1741, 2976, 0)),
+    HARMINIA("Harminia", new WorldPoint(1584, 3100, 0)),
 
     // ============================================
     // GREAT KOUREND
@@ -165,15 +266,39 @@ public enum NpcLocations {
 
     // --- HOSIDIUS ---
     HORACE("Horace", new WorldPoint(1771, 3588, 0)),
+    LOGAVA("Logava", new WorldPoint(1768, 3598, 0)),
+    VANNAH("Vannah", new WorldPoint(1764, 3593, 0)),
+    HOSIDIUS_RICHARD("Richard", new WorldPoint(1741, 3612, 0)),
+    MARISI("Marisi", new WorldPoint(1733, 3556, 0)),
 
     // --- LOVAKENGJ ---
     MUNTY("Munty", new WorldPoint(1551, 3752, 0)),
+    FUGGY("Fuggy", new WorldPoint(1568, 3758, 0)),
+    THIRUS("Thirus", new WorldPoint(1516, 3834, 0)),
+    TOOTHY("Toothy", new WorldPoint(1453, 3858, 0)),
 
     // --- PORT PISCARILIUS ---
-    JENNIFER("Jennifer", new WorldPoint(1519, 3589, 0)),
     LEENZ("Leenz", new WorldPoint(1805, 3725, 0)),
-    REGATH("Regath", new WorldPoint(1720, 3724, 0)),
     VEOS_PORT_PISCARILIUS("Veos", new WorldPoint(1825, 3690, 0)),
+    FRANKIE("Frankie", new WorldPoint(1832, 3717, 0)),
+    KENELME("Kenelme", new WorldPoint(1783, 3758, 0)),
+    TYNAN("Tynan", new WorldPoint(1840, 3783, 0)),
+    WARRENS_SHOP_KEEPER("Shop keeper", new WorldPoint(1775, 10146, 0)),
+    WARRENS_FISH_MONGER("Fish monger", new WorldPoint(1761, 10145, 0)),
+
+    // --- ARCEUUS ---
+    REGATH("Regath", new WorldPoint(1720, 3724, 0)),
+    FILAMINA("Filamina", new WorldPoint(1668, 3727, 0)),
+    THYRIA("Thyria", new WorldPoint(1721, 3745, 0)),
+
+    // --- SHAYZIEN ---
+    JENNIFER("Jennifer", new WorldPoint(1519, 3589, 0)),
+    ROBYN("Robyn", new WorldPoint(1507, 3592, 0)),
+    DARYL("Daryl", new WorldPoint(1540, 3556, 0)),
+    OSWALD("Oswald", new WorldPoint(1550, 3562, 0)),
+    SHERYL("Sheryl", new WorldPoint(1551, 3566, 0)),
+    BLAIR("Blair", new WorldPoint(1566, 3571, 0)),
+    BRIGET("Briget", new WorldPoint(1568, 3545, 0)),
 
     // ============================================
     // GUILDS
@@ -189,6 +314,10 @@ public enum NpcLocations {
 
     // --- FISHING GUILD ---
     ROACHEY("Roachey", new WorldPoint(2593, 3403, 0)),
+
+    // --- HUNTER GUILD ---
+    PELLEM("Pellem", new WorldPoint(1565, 3034, 0)),
+    IMIA("Imia", new WorldPoint(1563, 3059, 0)),
 
     // --- RANGING GUILD ---
     ARMOUR_SALESMAN("Armour salesman", new WorldPoint(2666, 3435, 0)),
@@ -229,7 +358,7 @@ public enum NpcLocations {
     EDMOND_EAST_ARDOUGNE("Edmond", new WorldPoint(2568, 3333, 0)),
     EDMOND_UNDER_GROUND("Edmond", new WorldPoint(2517, 9755, 0)),
     ELENA("Elena", new WorldPoint(2591, 3338, 0)),
-    GEM_MERCHANT("Gem merchant", new WorldPoint(2669, 3303, 0)),
+    EAST_ARDY_GEM_MERCHANT("Gem merchant", new WorldPoint(2669, 3303, 0)),
     JERICO("Jerico", new WorldPoint(2609, 3324, 0)),
     KING_LATHAS("King Lathas", new WorldPoint(2577, 3293, 1)),
     OMART("Omart", new WorldPoint(2559, 3267, 0)),
@@ -307,7 +436,7 @@ public enum NpcLocations {
     HUDO("Hudo", new WorldPoint(2448, 3508, 1)),
     KING_NARNODE_SHAREEN("King Narnode Shareen", new WorldPoint(2465, 3494, 0)),
     KING_NARNODE_SHAREEN_DUNGEON("King Narnode Shareen", new WorldPoint(2465, 9895, 0)),
-    NIEVE("eve", new WorldPoint(2433, 3423, 0)),
+    NIEVE("Nieve", new WorldPoint(2433, 3423, 0)),
     PRISSY_SCILLA("Prissy Scilla", new WorldPoint(2437, 3418, 0)),
     ROMETTI("Rometti", new WorldPoint(2482, 3510, 1)),
     ANITA("Anita", new WorldPoint(2388, 3513, 1)),
