@@ -1484,7 +1484,7 @@ public enum Shop {
             InventoryID.AUBURN_GENERAL_STORE,
             NpcLocations.AUBURNVALE_SHOPKEEPER,
             new WorldRequirement(true),
-            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN) // Note: Based on comment, adding Children of the Sun
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
     ),
     LUNAMIS_AXE_SHOP(
             InventoryID.LUNAMI_AXE_STORE,
