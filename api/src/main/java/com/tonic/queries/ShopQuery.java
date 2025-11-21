@@ -1,6 +1,5 @@
 package com.tonic.queries;
 
-import com.tonic.Static;
 import com.tonic.data.locatables.NpcLocations;
 import com.tonic.data.trading.Shop;
 import com.tonic.data.wrappers.PlayerEx;
@@ -63,7 +62,7 @@ public class ShopQuery extends AbstractQuery<Shop, ShopQuery> {
 
     /**
      * Filter shops by shopkeeper name containing substring (case-insensitive).
-     * Useful for finding all shops with shopkeepers like "BANKER", "TRADER", etc.
+     * Useful for finding all shops with shopkeepers like "BARTENDER", "TRADER", etc.
      * @param namePart substring to search for in shopkeeper enum name
      * @return this ShopQuery for method chaining
      */
@@ -167,11 +166,9 @@ public class ShopQuery extends AbstractQuery<Shop, ShopQuery> {
             WorldPoint location = shop.getLocation();
             if (location == null) return false;
 
-            return Static.invoke(() -> {
-                WorldPoint playerLocation = getPlayerLocation();
-                if (playerLocation == null) return false;
-                return Distance.euclidean(playerLocation, location) <= distance;
-            });
+            WorldPoint playerLocation = getPlayerLocation();
+            if (playerLocation == null) return false;
+            return Distance.euclidean(playerLocation, location) <= distance;
         });
     }
 
