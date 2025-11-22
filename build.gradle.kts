@@ -9,7 +9,7 @@ plugins {
 }
 
 val vitaVersion = "0"
-val runeliteVersion = "1.12.5.2"
+val runeliteVersion = "1.12.6"
 
 group = "com.tonic"
 version = runeliteVersion + "_" + vitaVersion

@@ -3,12 +3,6 @@ package com.tonic.api;
 public interface TClient
 {
     /**
-     * Gets the client revision number.
-     * @return the revision number
-     */
-    int getRevision();
-
-    /**
      * Gets the packet writer for sending packets.
      *
      * @return the packet writer
