@@ -101,18 +101,6 @@ public class Delays
      */
     public static boolean waitUntil(Supplier<Boolean> condition, int ticks)
     {
-        NpcEx npc = NpcAPI.search()
-                .withName("")
-                .isReachable()
-                .first();
-        if(npc == null)
-        {
-            System.out.println("No dice");
-        }
-        else
-        {
-            System.out.println("Found npc: " + npc.getName());
-        }
         int end = GameManager.getTickCount() + ticks;
         while(!condition.get())
         {
