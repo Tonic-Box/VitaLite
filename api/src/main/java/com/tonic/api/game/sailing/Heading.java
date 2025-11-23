@@ -30,6 +30,12 @@ public enum Heading
     SOUTH_SOUTH_EAST(15)
     ;
 
+    /**
+     * Get the optimal heading from the current player location to the target location
+     *
+     * @param target The target WorldPoint
+     * @return The optimal Heading
+     */
     public static Heading getOptimalHeading(WorldPoint target) {
         WorldPoint current = WorldPointUtil.getTopWorldViewLocation();
 

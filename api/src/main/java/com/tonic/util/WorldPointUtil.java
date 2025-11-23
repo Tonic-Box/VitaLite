@@ -6,6 +6,7 @@ import com.tonic.data.wrappers.ActorEx;
 import com.tonic.data.wrappers.PlayerEx;
 import net.runelite.api.Client;
 import net.runelite.api.Projection;
+import net.runelite.api.WorldEntity;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
@@ -14,6 +15,7 @@ import net.runelite.api.coords.WorldPoint;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static net.runelite.api.Constants.*;
 
@@ -316,11 +318,23 @@ public class WorldPointUtil {
         return other.getX() >= x && other.getX() <= maxX && other.getY() >= y && other.getY() <= maxY;
     }
 
+    /**
+     * Checks if two WorldAreas overlap.
+     * @param a the first WorldArea
+     * @param b the second WorldArea
+     * @return true if the areas overlap, false otherwise
+     */
     public static boolean overlaps(WorldArea a, WorldArea b)
     {
         return a.toWorldPointList().stream().anyMatch(b.toWorldPointList()::contains);
     }
 
+    /**
+     * Gets the relative position of a WorldPoint to a WorldArea.
+     * @param area the WorldArea
+     * @param point the WorldPoint
+     * @return the relative position
+     */
     public static RelativePosition getRelativePosition(WorldArea area, WorldPoint point) {
         // Check if planes differ - could return null or a special value
         if (area.getPlane() != point.getPlane()) {
@@ -359,62 +373,69 @@ public class WorldPointUtil {
         return RelativePosition.WEST;
     }
 
+    /**
+     * Gets the WorldPoint of the local player in the top-level worldview from a sub worldview
+     * @return the WorldPoint in the top-level worldview
+     */
     public static WorldPoint getTopWorldViewLocation()
     {
         return getTopWorldViewLocation(PlayerEx.getLocal());
     }
+
+    /**
+     * Gets the WorldPoint of the given actor in the top-level worldview from a sub worldview
+     * @param actor the actor
+     * @return the WorldPoint in the top-level worldview
+     */
     public static WorldPoint getTopWorldViewLocation(ActorEx<?> actor) {
         if (actor == null)
             return null;
 
-        WorldPoint rawWp = actor.getWorldPoint();
-        if (!SailingAPI.isOnBoat())
-            return rawWp;
-
-        WorldView playerWorldView = actor.getWorldView();
-        if (playerWorldView.getId() == -1)
-            return rawWp;
-
-        LocalPoint playerLocalPoint = actor.getLocalPoint();
-        if (playerLocalPoint == null)
-            return rawWp;
-        Projection mainWorldProj = playerWorldView.getMainWorldProjection();
-        if (mainWorldProj == null)
-            return rawWp;
-
-        float[] projectedToMainWorld = mainWorldProj.project(playerLocalPoint.getX(), 0, playerLocalPoint.getY());
-        Client client = Static.getClient();
-        WorldView topLevelWorldView = client.getTopLevelWorldView();
-
-        float xWithDecimals = (projectedToMainWorld[0] / 128f) + topLevelWorldView.getBaseX();
-        float yWithDecimals = (projectedToMainWorld[2] / 128f) + topLevelWorldView.getBaseY();
-        return new WorldPoint(Math.round(xWithDecimals), Math.round(yWithDecimals), topLevelWorldView.getPlane());
+        return getTopWorldViewLocation(actor.getLocalPoint());
     }
 
-    public static WorldPoint getTopWorldViewLocation(WorldPoint worldPoint) {
-        if (worldPoint == null)
+    /**
+     * Gets the WorldPoint in the top-level worldview from a sub worldview
+     * @param worldView the actor's worldview
+     * @param worldPoint the actor's worldpoint
+     * @return the WorldPoint in the top-level worldview
+     */
+    public static WorldPoint getTopWorldViewLocation(WorldView worldView, WorldPoint worldPoint) {
+        if (worldView.getId() == -1)
+            return worldPoint;
+
+        LocalPoint localPt = LocalPoint.fromWorld(worldView, worldPoint);
+        if( localPt == null)
+            return worldPoint;
+
+        return getTopWorldViewLocation(localPt);
+    }
+
+    /**
+     * Gets the WorldPoint in the top-level worldview from a local point
+     * @param localPt the local point
+     * @return the WorldPoint in the top-level worldview
+     */
+    public static WorldPoint getTopWorldViewLocation(LocalPoint localPt) {
+        Client client = Static.getClient();
+        LocalPoint projected = getTopWorldViewPoint(localPt);
+        return WorldPoint.fromLocal(client, Objects.requireNonNullElse(projected, localPt));
+    }
+
+    /**
+     * Gets the LocalPoint in the top-level worldview from a local point
+     * @param localPt the local point
+     * @return the LocalPoint in the top-level worldview
+     */
+    public static LocalPoint getTopWorldViewPoint(LocalPoint localPt) {
+        if( localPt == null)
             return null;
 
-        if (!SailingAPI.isOnBoat())
-            return worldPoint;
-
-        WorldView wv = PlayerEx.getLocal().getWorldView();
-        if (wv.getId() == -1)
-            return worldPoint;
-
-        LocalPoint lp = LocalPoint.fromWorld(wv, worldPoint);
-        if (lp == null)
-            return worldPoint;
-        Projection mainWorldProj = wv.getMainWorldProjection();
-        if (mainWorldProj == null)
-            return worldPoint;
-
-        float[] projectedToMainWorld = mainWorldProj.project(lp.getX(), 0, lp.getY());
         Client client = Static.getClient();
-        WorldView topLevelWorldView = client.getTopLevelWorldView();
-
-        float xWithDecimals = (projectedToMainWorld[0] / 128f) + topLevelWorldView.getBaseX();
-        float yWithDecimals = (projectedToMainWorld[2] / 128f) + topLevelWorldView.getBaseY();
-        return new WorldPoint(Math.round(xWithDecimals), Math.round(yWithDecimals), topLevelWorldView.getPlane());
+        WorldEntity we = client
+                .getTopLevelWorldView()
+                .worldEntities()
+                .byIndex(localPt.getWorldView());
+        return we.transformToMainWorld(localPt);
     }
 }
