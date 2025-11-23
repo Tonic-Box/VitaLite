@@ -206,6 +206,16 @@ public abstract class TPacketWriterMixin implements TPacketWriter
 
     @Inject
     @Override
+    public void setHeadingPacket(int heading)
+    {
+        MapEntry entry = PacketMapReader.get("OP_SET_HEADING");
+        Map<String,Object> args = new HashMap<>();
+        args.put("heading", heading);
+        this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
+    }
+
+    @Inject
+    @Override
     public void chatPacket(int type, String text) {
         if (text.length() >= 80)
             text = text.substring(0, 79);

@@ -118,6 +118,13 @@ public interface TPacketWriter
     void walkPacket(int x, int y, boolean ctrl);
 
     /**
+     * Sets the heading packet.
+     *
+     * @param heading the heading value
+     */
+    void setHeadingPacket(int heading);
+
+    /**
      * Sends a widget on game object packet.
      *
      * @param selectedWidgetId the selected widget id

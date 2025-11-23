@@ -10,8 +10,9 @@ import net.runelite.api.gameval.VarbitID;
 @RequiredArgsConstructor
 public enum MoveMode
 {
-    NONE(0),
-    NORMAL(2),
+    STILL(0),
+    ON_BOAT(1),
+    FORWARD(2),
     REVERSE(3)
 
     ;
