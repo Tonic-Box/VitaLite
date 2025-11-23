@@ -15,12 +15,6 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 
 import net.runelite.api.gameval.*;
-import net.runelite.api.gameval.AnimationID;
-import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.gameval.InventoryID;
-import net.runelite.api.gameval.ItemID;
-import net.runelite.api.gameval.NpcID;
-import net.runelite.api.gameval.ObjectID;
 import net.runelite.client.events.*;
 import net.runelite.client.game.*;
 
