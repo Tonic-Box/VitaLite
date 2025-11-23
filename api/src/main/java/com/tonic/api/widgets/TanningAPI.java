@@ -3,13 +3,7 @@ package com.tonic.api.widgets;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.game.GameAPI;
-import com.tonic.api.game.SkillAPI;
-import net.runelite.api.Skill;
 import net.runelite.api.gameval.ItemID;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * API for interacting with the Tanner interface (widget group 324).
@@ -24,30 +18,27 @@ public class TanningAPI {
      * Each type contains metadata about input/output items, costs, and requirements.
      */
     public enum LeatherType {
-        SOFT_LEATHER(92, "Soft leather", ItemID.COW_HIDE, ItemID.LEATHER, 1, 1),
-        HARD_LEATHER(93, "Hard leather", ItemID.COW_HIDE, ItemID.HARD_LEATHER, 3, 28),
-        SNAKESKIN(94, "Snakeskin", ItemID.VILLAGE_SNAKE_HIDE, ItemID.VILLAGE_SNAKE_SKIN, 15, 45),
-        SNAKESKIN_SWAMP(95, "Snakeskin", ItemID.TEMPLETREK_SWAMP_SNAKE_HIDE, ItemID.VILLAGE_SNAKE_SKIN, 20, 45),
-        GREEN_DHIDE(96, "Green d'hide", ItemID.DRAGONHIDE_GREEN, ItemID.DRAGON_LEATHER, 20, 57),
-        BLUE_DHIDE(97, "Blue d'hide", ItemID.DRAGONHIDE_BLUE, ItemID.DRAGON_LEATHER_BLUE, 20, 66),
-        RED_DHIDE(98, "Red d'hide", ItemID.DRAGONHIDE_RED, ItemID.DRAGON_LEATHER_RED, 20, 73),
-        BLACK_DHIDE(99, "Black d'hide", ItemID.DRAGONHIDE_BLACK, ItemID.DRAGON_LEATHER_BLACK, 20, 79);
+        SOFT_LEATHER(92, "Soft leather", ItemID.COW_HIDE, ItemID.LEATHER, 1),
+        HARD_LEATHER(93, "Hard leather", ItemID.COW_HIDE, ItemID.HARD_LEATHER, 3),
+        SNAKESKIN(94, "Snakeskin", ItemID.VILLAGE_SNAKE_HIDE, ItemID.VILLAGE_SNAKE_SKIN, 15),
+        SNAKESKIN_SWAMP(95, "Snakeskin", ItemID.TEMPLETREK_SWAMP_SNAKE_HIDE, ItemID.VILLAGE_SNAKE_SKIN, 20),
+        GREEN_DHIDE(96, "Green d'hide", ItemID.DRAGONHIDE_GREEN, ItemID.DRAGON_LEATHER, 20),
+        BLUE_DHIDE(97, "Blue d'hide", ItemID.DRAGONHIDE_BLUE, ItemID.DRAGON_LEATHER_BLUE, 20),
+        RED_DHIDE(98, "Red d'hide", ItemID.DRAGONHIDE_RED, ItemID.DRAGON_LEATHER_RED, 20),
+        BLACK_DHIDE(99, "Black d'hide", ItemID.DRAGONHIDE_BLACK, ItemID.DRAGON_LEATHER_BLACK, 20);
 
         private final int slotRoot;
         private final String displayName;
         private final int inputItemId;
         private final int outputItemId;
         private final int standardCostPerHide;
-        private final int requiredCraftingLevel;
 
-        LeatherType(int slotRoot, String displayName, int inputItemId, int outputItemId,
-                    int standardCostPerHide, int requiredCraftingLevel) {
+        LeatherType(int slotRoot, String displayName, int inputItemId, int outputItemId, int standardCostPerHide) {
             this.slotRoot = slotRoot;
             this.displayName = displayName;
             this.inputItemId = inputItemId;
             this.outputItemId = outputItemId;
             this.standardCostPerHide = standardCostPerHide;
-            this.requiredCraftingLevel = requiredCraftingLevel;
         }
 
         public int getSlotRoot() { return slotRoot; }
@@ -55,7 +46,6 @@ public class TanningAPI {
         public int getInputItemId() { return inputItemId; }
         public int getOutputItemId() { return outputItemId; }
         public int getCostPerHide() { return standardCostPerHide; }
-        public int getRequiredCraftingLevel() { return requiredCraftingLevel; }
     }
 
     /**
@@ -174,35 +164,13 @@ public class TanningAPI {
     }
 
     /**
-     * Check if the player meets the Crafting level requirement for this leather type.
-     * @param type The leather type to check
-     * @return true if the player meets the requirement
-     */
-    public static boolean meetsRequirement(LeatherType type) {
-        return SkillAPI.getLevel(Skill.CRAFTING) >= type.getRequiredCraftingLevel();
-    }
-
-    /**
-     * Get all leather types the player can currently tan based on Crafting level.
-     * @return List of available leather types
-     */
-    public static List<LeatherType> getAvailableLeatherTypes() {
-        int craftingLevel = SkillAPI.getLevel(Skill.CRAFTING);
-        return Arrays.stream(LeatherType.values())
-                .filter(type -> craftingLevel >= type.getRequiredCraftingLevel())
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Check if a player can afford and has the skill to tan.
      * @param type The leather type to tan
      * @param amount The quantity to tan
      * @return true if all requirements are met
      */
     public static boolean canTan(LeatherType type, int amount) {
-        return meetsRequirement(type)
-                && hasEnoughCoinsToPay(type, amount)
-                && hasInputItems(type, amount);
+        return hasEnoughCoinsToPay(type, amount) && hasInputItems(type, amount);
     }
 
     /**
