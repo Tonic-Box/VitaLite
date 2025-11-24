@@ -25,6 +25,7 @@ import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.services.stratpath.StratPathOverlay;
+import com.tonic.util.Profiler;
 import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
 import com.tonic.util.WorldPointUtil;
@@ -609,7 +610,9 @@ public class GameManager extends Overlay {
                     .setIdentifier(event.getIdentifier())
                     .setType(MenuAction.RUNELITE)
                     .onClick(e -> ThreadPool.submit(() -> {
+                        Profiler.Start("FindSailPath");
                         testPoints = SailPathing.findFullPath(null, BoatCollisionAPI.getPlayerBoatWorldPoint(), wp);
+                        Profiler.StopMS();
                     }));
             color = "<col=FF0000>";
             if(testPoints != null)
