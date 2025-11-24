@@ -4,7 +4,7 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.api.game.sailing.BoatCollisionAPI;
-import com.tonic.api.game.sailing.SailPathing;
+import com.tonic.api.game.sailing.BoatPathing;
 import com.tonic.api.game.sailing.SailingAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.MiniMapAPI;
@@ -587,7 +587,11 @@ public class GameManager extends Overlay {
                         .setParam1(event.getActionParam1())
                         .setIdentifier(event.getIdentifier())
                         .setType(MenuAction.RUNELITE)
-                        .onClick(e -> sailingPath = SailPathing.travelTo(wp));
+                        .onClick(e -> {
+                            ThreadPool.submit(() -> {
+                                sailingPath = BoatPathing.travelTo(wp);
+                            });
+                        });
             }
             else
             {
@@ -598,7 +602,11 @@ public class GameManager extends Overlay {
                         .setParam1(event.getActionParam1())
                         .setIdentifier(event.getIdentifier())
                         .setType(MenuAction.RUNELITE)
-                        .onClick(e -> sailingPath = null);
+                        .onClick(e -> {
+                            sailingPath = null;
+                            SailingAPI.unSetSails();
+                            clearPathPoints();
+                        });
             }
 
             color = "<col=9B59B6>";
@@ -611,7 +619,7 @@ public class GameManager extends Overlay {
                     .setType(MenuAction.RUNELITE)
                     .onClick(e -> ThreadPool.submit(() -> {
                         Profiler.Start("FindSailPath");
-                        testPoints = SailPathing.findFullPath(null, BoatCollisionAPI.getPlayerBoatWorldPoint(), wp);
+                        testPoints = BoatPathing.findFullPath(null, BoatCollisionAPI.getPlayerBoatWorldPoint(), wp);
                         Profiler.StopMS();
                     }));
             color = "<col=FF0000>";
