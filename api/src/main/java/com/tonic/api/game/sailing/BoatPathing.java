@@ -124,6 +124,10 @@ public class BoatPathing
                         context.put("POINTER", pointer + 1);
                         return false;
                     }
+                    if(SailingAPI.trimSails())
+                    {
+                        return false;
+                    }
                     SailingAPI.sailTo(waypoint.getPosition());
                     return false;
                 })
