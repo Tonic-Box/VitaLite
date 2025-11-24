@@ -5,6 +5,8 @@ import com.tonic.Static;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.game.SceneAPI;
+import com.tonic.api.game.sailing.BoatPathing;
+import com.tonic.api.game.sailing.SailingAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.mouse.ClickVisualizationOverlay;
@@ -15,6 +17,7 @@ import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.services.pathfinder.objects.ObjectMap;
 import com.tonic.util.IntPair;
 import com.tonic.util.Location;
+import com.tonic.util.handler.StepHandler;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.coords.WorldArea;
@@ -55,6 +58,22 @@ public class Walker
 
         public static int toggleRunThreshold = toggleRunRange.randomEnclosed();
         public static int consumeStaminaThreshold = consumeStaminaRange.randomEnclosed();
+    }
+
+    public static void sailTo(WorldPoint target)
+    {
+        StepHandler handler = BoatPathing.travelTo(target);
+        running = true;
+        while(!handler.step())
+        {
+            if(!running)
+            {
+                GameManager.clearPathPoints();
+                SailingAPI.unSetSails();
+                return;
+            }
+            Delays.tick();
+        }
     }
 
     /**

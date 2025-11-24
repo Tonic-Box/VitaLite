@@ -1,11 +1,9 @@
 package com.tonic.api.game.sailing;
 
-import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.VarAPI;
-import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.SailingConstants;
 import com.tonic.data.wrappers.TileObjectEx;
@@ -76,6 +74,7 @@ public class SailingAPI
         Static.invoke(() -> {
             ClickManager.click(ClickType.MOVEMENT);
             client.getPacketWriter().setHeadingPacket(heading.getValue());
+            System.out.println("Heading changed: " + getHeading() + " -> " + heading);
         });
     }
 
@@ -86,9 +85,8 @@ public class SailingAPI
      */
     public static boolean directHeading(WorldPoint target)
     {
-        System.out.println(SailingAPI.getHeading());
         Heading optimalHeading = Heading.getOptimalHeading(target);
-        if (optimalHeading == null) {
+        if (optimalHeading == null || optimalHeading == getHeading()) {
             return false;
         }
         setHeading(optimalHeading);
@@ -107,7 +105,7 @@ public class SailingAPI
             int headingValue = client.getShipHeading();
             if(headingValue < 0)
                 headingValue = VarAPI.getVar(VarbitID.SAILING_BOAT_SPAWNED_ANGLE);
-            return headingValue / 128;
+            return headingValue > 15 ? headingValue / 128 : headingValue;
         });
     }
 
