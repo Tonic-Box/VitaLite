@@ -207,7 +207,7 @@ public class WorldMapAPI
         }
 
         Widget mapWidget = client.getWidget(InterfaceID.Worldmap.MAP_CONTAINER);
-        return mapWidget != null && !mapWidget.isHidden();
+        return WidgetAPI.isVisible(mapWidget);
     }
 
     /**
@@ -262,11 +262,11 @@ public class WorldMapAPI
 
         Area clipArea = new Area(baseRectangle);
 
-        if (overview != null && !overview.isHidden()) {
+        if (WidgetAPI.isVisible(overview)) {
             clipArea.subtract(new Area(overview.getBounds()));
         }
 
-        if (surfaceSelector != null && !surfaceSelector.isHidden()) {
+        if (WidgetAPI.isVisible(surfaceSelector)) {
             clipArea.subtract(new Area(surfaceSelector.getBounds()));
         }
 
@@ -390,7 +390,7 @@ public class WorldMapAPI
 
         // Check if world map is open
         Widget mapWidget = client.getWidget(InterfaceID.Worldmap.MAP_CONTAINER);
-        if (mapWidget == null || mapWidget.isHidden()) {
+        if (!WidgetAPI.isVisible(mapWidget)) {
             return;
         }
 
@@ -474,7 +474,7 @@ public class WorldMapAPI
 
         // Check if world map is open
         Widget mapWidget = client.getWidget(InterfaceID.Worldmap.MAP_CONTAINER);
-        if (mapWidget == null || mapWidget.isHidden()) {
+        if (!WidgetAPI.isVisible(mapWidget)) {
             return;
         }
 

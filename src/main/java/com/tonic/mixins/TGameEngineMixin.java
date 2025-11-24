@@ -19,11 +19,11 @@ public class TGameEngineMixin implements TGameEngine
     @FieldHook("graphicsGuard")
     public static boolean onGuardSet(boolean bool)
     {
-        if(Static.isHeadless())
-        {
-            graphicsGuard = false;
-            return false;
-        }
+//        if(Static.isHeadless())
+//        {
+//            graphicsGuard = false;
+//            return false;
+//        }
         return true;
     }
 

@@ -45,7 +45,7 @@ public enum GrandExchangeSlot
                 return false;
             }
             Widget child = widget.getChild(22);
-            if(child == null || child.isHidden())
+            if(child == null || !WidgetAPI.isVisible(child))
             {
                 return false;
             }

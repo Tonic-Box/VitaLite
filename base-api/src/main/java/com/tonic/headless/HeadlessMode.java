@@ -2,7 +2,6 @@ package com.tonic.headless;
 
 import com.tonic.Logger;
 import com.tonic.util.ReflectBuilder;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -41,6 +40,7 @@ public class HeadlessMode {
         clientPanel.setVisible(!headless);
         if(headless)
         {
+
             if(!sidebar.isVisible() || sidebar.getSelectedIndex() < 0)
             {
                 ReflectBuilder.of(clientUI)
