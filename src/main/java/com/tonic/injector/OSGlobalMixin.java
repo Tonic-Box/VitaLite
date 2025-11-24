@@ -41,7 +41,7 @@ public class OSGlobalMixin
         {
             randomDat(classNode, method);
             mouseFlag(method);
-            isHidden(method);
+            isHidden(classNode, method);
 
             if(!Static.getCliArgs().isIncognito())
             {
@@ -57,7 +57,7 @@ public class OSGlobalMixin
     /**
      * Hack to child-proof side effects of headless mode
      */
-    public static void isHidden(MethodNode method)
+    public static void isHidden(ClassNode cn, MethodNode method)
     {
         if(!method.name.equals("isHidden") || !method.desc.equals("()Z"))
             return;
@@ -67,7 +67,7 @@ public class OSGlobalMixin
                         ConditionType.FALSE,  // If not equal to 0 (i.e., if true)
                         b -> b.invokeStatic("com/tonic/Static", "isHeadless", "()Z"),
                         b -> b.pushThis()
-                                .invokeVirtual("net/runelite/api/widgets/Widget", "isSelfHidden", "()Z")
+                                .invokeVirtual(cn.name, "isSelfHidden", "()Z")
                                 .returnValue(Opcodes.IRETURN)
                 ).build();
 
