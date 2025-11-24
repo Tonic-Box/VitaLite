@@ -38,11 +38,21 @@ public enum Heading
      */
     public static Heading getOptimalHeading(WorldPoint target) {
         WorldPoint current = WorldPointUtil.getTopWorldViewLocation();
+        return getOptimalHeading(current, target);
+    }
 
-        int deltaX = target.getX() - current.getX();
-        int deltaY = target.getY() - current.getY();
+    /**
+     * Get the optimal heading from a start point to a target point
+     *
+     * @param start The starting WorldPoint
+     * @param target The target WorldPoint
+     * @return The optimal Heading
+     */
+    public static Heading getOptimalHeading(WorldPoint start, WorldPoint target) {
+        int deltaX = target.getX() - start.getX();
+        int deltaY = target.getY() - start.getY();
 
-        // Calculate angle from current to target using atan2
+        // Calculate angle from start to target using atan2
         // atan2 returns angle in radians where:
         // 0 = East, π/2 = North, π = West, -π/2 = South
         double angleRadians = Math.atan2(deltaY, deltaX);

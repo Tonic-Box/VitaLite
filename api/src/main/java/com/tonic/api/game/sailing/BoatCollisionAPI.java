@@ -2,6 +2,9 @@ package com.tonic.api.game.sailing;
 
 import com.tonic.Static;
 import com.tonic.api.TClient;
+import com.tonic.services.pathfinder.Walker;
+import com.tonic.services.pathfinder.collision.CollisionMap;
+import com.tonic.services.pathfinder.collision.GlobalCollisionMap;
 import net.runelite.api.Client;
 import net.runelite.api.CollisionData;
 import net.runelite.api.CollisionDataFlag;
@@ -11,8 +14,6 @@ import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.gameval.VarbitID;
-
 import java.util.*;
 
 /**
@@ -495,6 +496,80 @@ public class BoatCollisionAPI
     }
 
     /**
+     * Gets the boat's hull projected at a specific position with a specific heading.
+     * @param boat the WorldEntity (boat)
+     * @param targetPoint the WorldPoint in main world to center the boat at
+     * @param targetHeading the desired heading/orientation
+     * @return collection of WorldPoints where the boat hull would be, or empty if invalid
+     */
+    public static Collection<WorldPoint> getBoatHullAtPointWithHeading(WorldEntity boat, WorldPoint targetPoint, Heading targetHeading)
+    {
+        return Static.invoke(() -> {
+            if (boat == null || targetPoint == null || targetHeading == null) {
+                return Collections.emptyList();
+            }
+
+            // Get boat's current position and heading
+            LocalPoint currentBoatLocal = boat.getLocalLocation();
+            if (currentBoatLocal == null) {
+                return Collections.emptyList();
+            }
+
+            Client client = Static.getClient();
+            WorldPoint currentBoatPos = WorldPoint.fromLocal(client, currentBoatLocal);
+
+            // Get current boat collision footprint
+            Collection<WorldPoint> currentCollision = getBoatCollisionInMainWorld(boat);
+            if (currentCollision.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            // Get current and target heading values
+            int currentHeadingValue = SailingAPI.getHeadingValue();
+            if (currentHeadingValue == -1) {
+                return Collections.emptyList(); // Not on boat
+            }
+
+            int targetHeadingValue = targetHeading.getValue();
+
+            // Calculate rotation difference in heading units
+            int headingDiff = targetHeadingValue - currentHeadingValue;
+
+            // Normalize to -8 to 7 range (shortest rotation)
+            while (headingDiff > 8) headingDiff -= 16;
+            while (headingDiff < -8) headingDiff += 16;
+
+            // Convert heading difference to degrees (each heading = 22.5°)
+            double rotationDegrees = headingDiff * 22.5;
+            double rotationRadians = Math.toRadians(rotationDegrees);
+
+            // Precompute sin/cos for rotation
+            double cos = Math.cos(rotationRadians);
+            double sin = Math.sin(rotationRadians);
+
+            // Calculate projected hull
+            List<WorldPoint> projectedHull = new ArrayList<>();
+            for (WorldPoint collisionTile : currentCollision) {
+                // Calculate offset from current boat center
+                int dx = collisionTile.getX() - currentBoatPos.getX();
+                int dy = collisionTile.getY() - currentBoatPos.getY();
+
+                // Rotate the offset around the center
+                int rotatedDx = (int) Math.round(dx * cos - dy * sin);
+                int rotatedDy = (int) Math.round(dx * sin + dy * cos);
+
+                // Apply rotated offset to target position (plane 0)
+                int worldX = targetPoint.getX() + rotatedDx;
+                int worldY = targetPoint.getY() + rotatedDy;
+
+                projectedHull.add(new WorldPoint(worldX, worldY, 0));
+            }
+
+            return projectedHull;
+        });
+    }
+
+    /**
      * Checks if the boat can fit centered at the given WorldPoint with a specific heading.
      * @param boat the WorldEntity (boat)
      * @param targetPoint the WorldPoint in main world to center the boat at
@@ -520,12 +595,14 @@ public class BoatCollisionAPI
             // Get current boat collision footprint
             Collection<WorldPoint> currentCollision = getBoatCollisionInMainWorld(boat);
             if (currentCollision.isEmpty()) {
+                System.out.println("BoatCollisionAPI.canBoatFitAtPoint: Boat collision footprint is empty!");
                 return false;
             }
 
             // Get current and target heading values
             int currentHeadingValue = SailingAPI.getHeadingValue();
             if (currentHeadingValue == -1) {
+                System.out.println("BoatCollisionAPI.canBoatFitAtPoint: Not on boat (headingValue=-1)");
                 return false; // Not on boat
             }
 
@@ -546,10 +623,10 @@ public class BoatCollisionAPI
             double cos = Math.cos(rotationRadians);
             double sin = Math.sin(rotationRadians);
 
-            // Get main world collision data
-            WorldView mainWorld = client.getTopLevelWorldView();
-            CollisionData[] mainWorldCollisionMaps = mainWorld.getCollisionMaps();
-            if (mainWorldCollisionMaps == null) {
+            // Get global collision map
+            CollisionMap collisionMap = Walker.getCollisionMap();
+            if (collisionMap == null) {
+                System.out.println("BoatCollisionAPI.canBoatFitAtPoint: GlobalCollisionMap is null!");
                 return false;
             }
 
@@ -563,27 +640,14 @@ public class BoatCollisionAPI
                 int rotatedDx = (int) Math.round(dx * cos - dy * sin);
                 int rotatedDy = (int) Math.round(dx * sin + dy * cos);
 
-                // Apply rotated offset to target position
-                WorldPoint projectedTile = new WorldPoint(
-                        targetPoint.getX() + rotatedDx,
-                        targetPoint.getY() + rotatedDy,
-                        targetPoint.getPlane()
-                );
+                // Apply rotated offset to target position (ONLY plane 0)
+                int worldX = targetPoint.getX() + rotatedDx;
+                int worldY = targetPoint.getY() + rotatedDy;
 
-                // Convert to scene coordinates
-                LocalPoint checkLocal = LocalPoint.fromWorld(mainWorld, projectedTile);
-                if (checkLocal == null) {
-                    // Point is outside the loaded scene
-                    return false;
-                }
-
-                int sceneX = checkLocal.getSceneX();
-                int sceneY = checkLocal.getSceneY();
-                int plane = projectedTile.getPlane();
-
-                // Check if there's collision in the main world at this point
-                if (hasCollision(mainWorldCollisionMaps, plane, sceneX, sceneY)) {
-                    // Collision detected - boat won't fit
+                // Check collision ONLY on plane 0 (boat sails at water level)
+                // GlobalCollisionMap.walkable() returns true if walkable (no collision)
+                if (!collisionMap.walkable((short) worldX, (short) worldY, (byte) 0)) {
+                    // Collision detected - boat hull would hit land/rocks
                     return false;
                 }
             }

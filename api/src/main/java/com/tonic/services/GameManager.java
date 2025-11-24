@@ -2,8 +2,10 @@ package com.tonic.services;
 
 import com.tonic.Logger;
 import com.tonic.Static;
-import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.SceneAPI;
+import com.tonic.api.game.sailing.BoatCollisionAPI;
+import com.tonic.api.game.sailing.SailPathing;
+import com.tonic.api.game.sailing.SailingAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.MiniMapAPI;
 import com.tonic.api.widgets.WidgetAPI;
@@ -26,6 +28,7 @@ import com.tonic.services.stratpath.StratPathOverlay;
 import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
 import com.tonic.util.WorldPointUtil;
+import com.tonic.util.handler.StepHandler;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import lombok.Getter;
@@ -73,6 +76,7 @@ public class GameManager extends Overlay {
     private static final List<PlayerEx> players = new ArrayList<>();
     private static final List<TileItemEx> tileItemCache = new CopyOnWriteArrayList<>();
     private static WalkerPath walkerPath;
+    private static volatile StepHandler sailingPath;
     private static final TIntSet reachableTiles = new TIntHashSet();
     private static final Set<Integer> worldViews = ConcurrentHashMap.newKeySet();
 
@@ -486,6 +490,8 @@ public class GameManager extends Overlay {
     private volatile List<WorldPoint> pathPoints = null;
     @Getter
     private volatile List<WorldPoint> testPoints = null;
+    @Getter
+    private volatile List<WorldPoint> sailingPoints = null;
 
     public static void setPathPoints(List<WorldPoint> points)
     {
@@ -504,6 +510,11 @@ public class GameManager extends Overlay {
         if(walkerPath != null && !walkerPath.step())
         {
             walkerPath = null;
+        }
+
+        if(sailingPath != null && !sailingPath.step())
+        {
+            sailingPath = null;
         }
 
         Widget gameframe = LayoutView.GAMEFRAME.getWidget();
@@ -563,6 +574,59 @@ public class GameManager extends Overlay {
         }
 
         String color = "<col=00ff00>";
+
+        if (SailingAPI.isNavigating())
+        {
+            if(sailingPath == null)
+            {
+                client.getMenu().createMenuEntry(0)
+                        .setOption("Sail ")
+                        .setTarget(color + wp.toString() + " ")
+                        .setParam0(event.getActionParam0())
+                        .setParam1(event.getActionParam1())
+                        .setIdentifier(event.getIdentifier())
+                        .setType(MenuAction.RUNELITE)
+                        .onClick(e -> sailingPath = SailPathing.travelTo(wp));
+            }
+            else
+            {
+                client.getMenu().createMenuEntry(0)
+                        .setOption("Cancel ")
+                        .setTarget(color + "Sailer ")
+                        .setParam0(event.getActionParam0())
+                        .setParam1(event.getActionParam1())
+                        .setIdentifier(event.getIdentifier())
+                        .setType(MenuAction.RUNELITE)
+                        .onClick(e -> sailingPath = null);
+            }
+
+            color = "<col=9B59B6>";
+            client.getMenu().createMenuEntry(0)
+                    .setOption("Test Sail Path ")
+                    .setTarget(color + wp.toString() + " ")
+                    .setParam0(event.getActionParam0())
+                    .setParam1(event.getActionParam1())
+                    .setIdentifier(event.getIdentifier())
+                    .setType(MenuAction.RUNELITE)
+                    .onClick(e -> ThreadPool.submit(() -> {
+                        testPoints = SailPathing.findFullPath(null, BoatCollisionAPI.getPlayerBoatWorldPoint(), wp);
+                    }));
+            color = "<col=FF0000>";
+            if(testPoints != null)
+            {
+                client.getMenu().createMenuEntry(0)
+                        .setOption("Clear ")
+                        .setTarget(color + "Test Sail Path ")
+                        .setParam0(event.getActionParam0())
+                        .setParam1(event.getActionParam1())
+                        .setIdentifier(event.getIdentifier())
+                        .setType(MenuAction.RUNELITE)
+                        .onClick(e -> testPoints = null);
+            }
+
+            return;
+        }
+
         if(walkerPath == null)
         {
             client.getMenu().createMenuEntry(0)
