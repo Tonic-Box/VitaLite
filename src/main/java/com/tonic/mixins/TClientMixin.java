@@ -16,6 +16,16 @@ public abstract class TClientMixin implements TClient
     @Shadow("MouseHandler_instance")
     private static TMouseHandler mouseHandler;
 
+    @Shadow("heading")
+    private static int shipHeading;
+
+    @Inject
+    @Override
+    public int getShipHeading()
+    {
+        return shipHeading;
+    }
+
     @Inject
     @Override
     public TPacketWriter getPacketWriter()

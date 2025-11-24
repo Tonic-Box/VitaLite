@@ -10992,7 +10992,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "heading",
         "obfuscatedName": "uj",
         "owner": "Client",
         "ownerObfuscatedName": "client",

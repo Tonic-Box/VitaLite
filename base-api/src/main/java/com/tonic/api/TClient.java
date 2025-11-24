@@ -148,4 +148,6 @@ public interface TClient
     void setAccountTypeLegacy();
 
     void setAccountTypeJagex();
+
+    int getShipHeading();
 }

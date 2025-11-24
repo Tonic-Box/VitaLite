@@ -81,5 +81,17 @@ public enum Heading
         return Heading.SOUTH;
     }
 
+    public static Heading fromValue(int value)
+    {
+        for(Heading heading : values())
+        {
+            if(heading.getValue() == value)
+            {
+                return heading;
+            }
+        }
+        return null;
+    }
+
     private final int value;
 }
