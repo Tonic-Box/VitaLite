@@ -658,12 +658,6 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
     public void onPacketSent(PacketSent event)
     {
-        if(event.getId() == 88)
-        {
-            String packetInfo = event.toString();
-            System.out.println(packetInfo + event.getLength());
-            return;
-        }
         int isMouse = event.isMouse();
         if(isMouse != 0)
         {
