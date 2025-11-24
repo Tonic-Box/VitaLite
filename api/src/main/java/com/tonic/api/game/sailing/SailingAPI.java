@@ -1,17 +1,16 @@
 package com.tonic.api.game.sailing;
 
+import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.entities.TileObjectAPI;
-import com.tonic.api.game.GameAPI;
 import com.tonic.api.game.VarAPI;
+import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.SailingConstants;
-import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
-import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
@@ -70,6 +69,8 @@ public class SailingAPI
      */
     public static void setHeading(Heading heading)
     {
+        if(heading == null || getHeading() == heading)
+            return;
         TClient client = Static.getClient();
         Static.invoke(() -> {
             ClickManager.click(ClickType.MOVEMENT);
@@ -84,6 +85,7 @@ public class SailingAPI
      */
     public static boolean directHeading(WorldPoint target)
     {
+        System.out.println(SailingAPI.getHeading());
         Heading optimalHeading = Heading.getOptimalHeading(target);
         if (optimalHeading == null) {
             return false;
@@ -92,15 +94,28 @@ public class SailingAPI
         return true;
     }
 
+    public static Heading getHeading()
+    {
+        return Heading.fromValue(getHeadingValue());
+    }
+
+    public static int getHeadingValue()
+    {
+        return Static.invoke(() -> {
+            TClient client = Static.getClient();
+            int headingValue = client.getShipHeading();
+            if(headingValue < 0)
+                headingValue = VarAPI.getVar(VarbitID.SAILING_BOAT_SPAWNED_ANGLE);
+            return headingValue / 128;
+        });
+    }
+
     /**
      * Sails the boat towards a target WorldPoint
      * @param target Target WorldPoint
      * @return true if sailing action was initiated, false otherwise
      */
     public static boolean sailTo(WorldPoint target) {
-        if (!isOnBoat()) {
-            return false;
-        }
         if (!isNavigating()) {
             return false;
         }
@@ -108,7 +123,7 @@ public class SailingAPI
         directHeading(target);
 
         if (!isMovingForward()) {
-            setSails();
+            return setSails();
         }
         return true;
     }
