@@ -170,6 +170,7 @@ public class SailingAPI
         }
         TileObjectEx sail = TileObjectAPI.search()
                 .withId(SailingConstants.SAILS)
+                .withAction("Trim")
                 .nearest();
 
         if(sail != null) {
