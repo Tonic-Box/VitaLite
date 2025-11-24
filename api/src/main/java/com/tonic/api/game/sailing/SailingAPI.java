@@ -9,6 +9,7 @@ import com.tonic.data.SailingConstants;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
+import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
