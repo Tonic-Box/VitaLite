@@ -1,10 +1,10 @@
-package com.tonic.api.game.sailing;
+package com.tonic.services.pathfinder.sailing;
 
 import com.tonic.Static;
-import com.tonic.api.TClient;
+import com.tonic.api.game.sailing.Heading;
+import com.tonic.api.game.sailing.SailingAPI;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.collision.CollisionMap;
-import com.tonic.services.pathfinder.collision.GlobalCollisionMap;
 import net.runelite.api.Client;
 import net.runelite.api.CollisionData;
 import net.runelite.api.CollisionDataFlag;
