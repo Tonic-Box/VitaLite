@@ -428,7 +428,7 @@ public class WorldPointUtil {
      * @return the LocalPoint in the top-level worldview
      */
     public static LocalPoint getTopWorldViewPoint(LocalPoint localPt) {
-        if( localPt == null)
+        if(localPt == null)
             return null;
 
         Client client = Static.getClient();
