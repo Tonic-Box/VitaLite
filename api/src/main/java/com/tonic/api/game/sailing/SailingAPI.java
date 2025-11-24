@@ -26,6 +26,7 @@ public class SailingAPI
      */
     public static boolean setSails()
     {
+        System.out.println(BoatCollisionAPI.canPlayerBoatFitAtPoint(new WorldPoint(2836, 3332, 0)));
         if(!isNavigating())
             return false;
 
@@ -60,7 +61,7 @@ public class SailingAPI
      */
     public static boolean isNavigating()
     {
-        return VarAPI.getVar(VarbitID.SAILING_SIDEPANEL_PLAYER_AT_HELM) == 1;
+        return isOnBoat() && VarAPI.getVar(VarbitID.SAILING_SIDEPANEL_PLAYER_AT_HELM) == 1;
     }
 
     /**
@@ -134,7 +135,7 @@ public class SailingAPI
      */
     public static boolean isOnBoat()
     {
-        return MoveMode.getCurrent() == MoveMode.ON_BOAT;
+        return VarAPI.getVar(VarbitID.SAILING_PLAYER_IS_ON_PLAYER_BOAT) == 1;
     }
 
     /**
