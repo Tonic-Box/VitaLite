@@ -550,6 +550,10 @@ public class WidgetAPI
      */
     public static boolean isVisible(Widget widget)
     {
+        if(Static.isHeadless())
+        {
+            return Static.invoke(() -> widget != null && !widget.isSelfHidden());
+        }
         return Static.invoke(() -> widget != null && !widget.isHidden() && !widget.isSelfHidden());
     }
 

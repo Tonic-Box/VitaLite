@@ -31,7 +31,7 @@ public class GrandExchangeAPI
         TClient tclient = Static.getClient();
         Static.invoke(() -> {
             Widget w = client.getWidget(289, 8);
-            if(w == null || w.isHidden() || w.isSelfHidden())
+            if(w == null || !WidgetAPI.isVisible(w))
                 return;
 
             ClickManager.click(ClickType.WIDGET);

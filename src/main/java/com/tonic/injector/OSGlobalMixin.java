@@ -5,6 +5,7 @@ import com.tonic.injector.util.BytecodeBuilder;
 import com.tonic.injector.util.LdcRewriter;
 import com.tonic.injector.util.MappingProvider;
 import com.tonic.injector.util.expreditor.impls.*;
+import com.tonic.model.ConditionType;
 import com.tonic.util.dto.JClass;
 import com.tonic.util.dto.JField;
 import com.tonic.vitalite.Main;
@@ -40,6 +41,7 @@ public class OSGlobalMixin
         {
             randomDat(classNode, method);
             mouseFlag(method);
+            isHidden(method);
 
             if(!Static.getCliArgs().isIncognito())
             {
@@ -50,6 +52,26 @@ public class OSGlobalMixin
                 );
             }
         }
+    }
+
+    /**
+     * Hack to child-proof side effects of headless mode
+     */
+    public static void isHidden(MethodNode method)
+    {
+        if(!method.name.equals("isHidden") || !method.desc.equals("()Z"))
+            return;
+
+        InsnList code = BytecodeBuilder.create()
+                .ifBlock(
+                        ConditionType.FALSE,  // If not equal to 0 (i.e., if true)
+                        b -> b.invokeStatic("com/tonic/Static", "isHeadless", "()Z"),
+                        b -> b.pushThis()
+                                .invokeVirtual("net/runelite/api/widgets/Widget", "isSelfHidden", "()Z")
+                                .returnValue(Opcodes.IRETURN)
+                ).build();
+
+        method.instructions.insert(code);
     }
 
     public static void mouseFlag(MethodNode method)

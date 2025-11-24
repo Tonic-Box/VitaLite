@@ -8,6 +8,7 @@ import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.MiniMapAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.api.widgets.WorldMapAPI;
+import com.tonic.data.LayoutView;
 import com.tonic.data.LoginResponse;
 import com.tonic.data.wrappers.NpcEx;
 import com.tonic.data.wrappers.PlayerEx;
@@ -71,6 +72,10 @@ public class GameManager extends Overlay {
     private static final List<NpcEx> npcs = new ArrayList<>();
     private static final List<PlayerEx> players = new ArrayList<>();
     private static final List<TileItemEx> tileItemCache = new CopyOnWriteArrayList<>();
+    private static WalkerPath walkerPath;
+    private static final TIntSet reachableTiles = new TIntHashSet();
+    private static final Set<Integer> worldViews = ConcurrentHashMap.newKeySet();
+
     public static Stream<PlayerEx> playerStream()
     {
         return  playerList().stream();
@@ -80,9 +85,6 @@ public class GameManager extends Overlay {
     {
         return npcList().stream();
     }
-    private static WalkerPath walkerPath;
-    private static final TIntSet reachableTiles = new TIntHashSet();
-    private static final Set<Integer> worldViews = ConcurrentHashMap.newKeySet();
 
     public static List<PlayerEx> playerList()
     {
@@ -402,10 +404,10 @@ public class GameManager extends Overlay {
         setPriority(PRIORITY_LOW);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
 
-        this.tileOverlays = new TileOverlays(this);
+        TileOverlays tileOverlays = new TileOverlays(this);
         overlayManager.add(tileOverlays);
 
-        this.distanceOverlays = new DistanceOverlays();
+        DistanceOverlays distanceOverlays = new DistanceOverlays();
         overlayManager.add(distanceOverlays);
 
         Static.getRuneLite()
@@ -475,9 +477,8 @@ public class GameManager extends Overlay {
             client.changeWorld(rsWorld);
             return;
         }
-        net.runelite.api.World quickHopTargetWorld = rsWorld;
         client.openWorldHopper();
-        client.hopToWorld(quickHopTargetWorld);
+        client.hopToWorld(rsWorld);
     }
 
     private int tickCount = 0;
@@ -485,9 +486,6 @@ public class GameManager extends Overlay {
     private volatile List<WorldPoint> pathPoints = null;
     @Getter
     private volatile List<WorldPoint> testPoints = null;
-
-    private final TileOverlays tileOverlays;
-    private final DistanceOverlays distanceOverlays;
 
     public static void setPathPoints(List<WorldPoint> points)
     {
@@ -506,6 +504,19 @@ public class GameManager extends Overlay {
         if(walkerPath != null && !walkerPath.step())
         {
             walkerPath = null;
+        }
+
+        Widget gameframe = LayoutView.GAMEFRAME.getWidget();
+        if(gameframe == null)
+            return;
+
+        if(WidgetAPI.isVisible(gameframe) && Static.isHeadless())
+        {
+            gameframe.setHidden(true);
+        }
+        else if(!WidgetAPI.isVisible(gameframe) && !Static.isHeadless())
+        {
+            gameframe.setHidden(false);
         }
     }
 

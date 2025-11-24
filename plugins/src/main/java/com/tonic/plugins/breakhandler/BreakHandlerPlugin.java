@@ -234,13 +234,13 @@ public class BreakHandlerPlugin extends Plugin
     private boolean isLogoutButtonVisible()
     {
         Widget logoutButton = client.getWidget(InterfaceID.Logout.LOGOUT);
-        return logoutButton != null && !logoutButton.isHidden();
+        return WidgetAPI.isVisible(logoutButton);
     }
 
     private boolean isLogoutDoorVisible()
     {
         Widget logoutDoorButton = client.getWidget(InterfaceID.Worldswitcher.LOGOUT);
-        return logoutDoorButton != null && !logoutDoorButton.isHidden();
+        return WidgetAPI.isVisible(logoutDoorButton);
     }
 
     private void update()
