@@ -44,14 +44,13 @@ public class MiniMapAPI {
     public static void RenderNode(Graphics2D graphics, WorldPoint point, Color color)
     {
         final Client client = Static.getClient();
-        final WorldView wv = client.getTopLevelWorldView();
         WorldPoint playerLocation = WorldPointUtil.getTopWorldViewLocation();
         if (point.distanceTo(playerLocation) >= 16)
         {
             return;
         }
 
-        LocalPoint lp = LocalPoint.fromWorld(wv, point);
+        LocalPoint lp = LocalPoint.fromWorld(client, point);
         if (lp == null)
         {
             return;
