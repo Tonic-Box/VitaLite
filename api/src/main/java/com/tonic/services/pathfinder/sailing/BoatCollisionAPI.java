@@ -85,25 +85,41 @@ public class BoatCollisionAPI
             Client client = Static.getClient();
             int plane = boatView.getPlane();
 
-            // Iterate through all tiles in the boat's worldview
+            // Get boat view size (actual usable area, not including padding)
             int sizeX = boatView.getSizeX();
             int sizeY = boatView.getSizeY();
 
+            // Iterate through boat view area only (skip boundary padding)
+            // The collision map has padding, but boat view tiles start at offset (1,1)
             for (int x = 0; x < sizeX; x++) {
                 for (int y = 0; y < sizeY; y++) {
-                    // Check if this tile has collision
-                    if (hasCollision(collisionMaps, plane, x, y)) {
-                        // Create LocalPoint in boat's worldview
-                        LocalPoint boatLocal = LocalPoint.fromScene(x, y, boatView);
+                    // Skip boundary markers (flag 0x00FFFFFF)
+                    if (plane >= collisionMaps.length || collisionMaps[plane] == null) {
+                        continue;
+                    }
 
-                        // Transform to main world
-                        LocalPoint mainWorldLocal = boat.transformToMainWorld(boatLocal);
+                    int[][] flagArray = collisionMaps[plane].getFlags();
+                    if (x + 1 >= flagArray.length || y + 1 >= flagArray[0].length) {
+                        continue;
+                    }
 
-                        if (mainWorldLocal != null) {
-                            // Convert to WorldPoint
-                            WorldPoint mainWorldPoint = WorldPoint.fromLocal(client, mainWorldLocal);
-                            collisionTiles.add(mainWorldPoint);
-                        }
+                    int flag = flagArray[x + 1][y + 1]; // Offset by 1 to skip boundary
+
+                    // Skip boundary markers (0x00FFFFFF) and check for actual collision
+                    if (flag == 0x00FFFFFF || !hasCollision(collisionMaps, plane, x + 1, y + 1)) {
+                        continue;
+                    }
+
+                    // Create LocalPoint in boat's worldview
+                    LocalPoint boatLocal = LocalPoint.fromScene(x, y, boatView);
+
+                    // Transform to main world
+                    LocalPoint mainWorldLocal = boat.transformToMainWorld(boatLocal);
+
+                    if (mainWorldLocal != null) {
+                        // Convert to WorldPoint
+                        WorldPoint mainWorldPoint = WorldPoint.fromLocal(client, mainWorldLocal);
+                        collisionTiles.add(mainWorldPoint);
                     }
                 }
             }
@@ -176,20 +192,37 @@ public class BoatCollisionAPI
             List<WorldPoint> hullTiles = new ArrayList<>();
             Client client = Static.getClient();
             int plane = boatView.getPlane();
+
+            // Get boat view size (actual usable area, not including padding)
             int sizeX = boatView.getSizeX();
             int sizeY = boatView.getSizeY();
 
+            // Iterate through boat view area only (skip boundary padding)
             for (int x = 0; x < sizeX; x++) {
                 for (int y = 0; y < sizeY; y++) {
-                    // Check only for object collision (boat hull)
-                    if (hasObjectCollision(collisionMaps, plane, x, y)) {
-                        LocalPoint boatLocal = LocalPoint.fromScene(x, y, boatView);
-                        LocalPoint mainWorldLocal = boat.transformToMainWorld(boatLocal);
+                    // Skip boundary markers (flag 0x00FFFFFF)
+                    if (plane >= collisionMaps.length || collisionMaps[plane] == null) {
+                        continue;
+                    }
 
-                        if (mainWorldLocal != null) {
-                            WorldPoint mainWorldPoint = WorldPoint.fromLocal(client, mainWorldLocal);
-                            hullTiles.add(mainWorldPoint);
-                        }
+                    int[][] flagArray = collisionMaps[plane].getFlags();
+                    if (x + 1 >= flagArray.length || y + 1 >= flagArray[0].length) {
+                        continue;
+                    }
+
+                    int flag = flagArray[x + 1][y + 1]; // Offset by 1 to skip boundary
+
+                    // Skip boundary markers and check for ANY collision (boat hull includes all collision tiles)
+                    if (flag == 0x00FFFFFF || !hasCollision(collisionMaps, plane, x + 1, y + 1)) {
+                        continue;
+                    }
+
+                    LocalPoint boatLocal = LocalPoint.fromScene(x, y, boatView);
+                    LocalPoint mainWorldLocal = boat.transformToMainWorld(boatLocal);
+
+                    if (mainWorldLocal != null) {
+                        WorldPoint mainWorldPoint = WorldPoint.fromLocal(client, mainWorldLocal);
+                        hullTiles.add(mainWorldPoint);
                     }
                 }
             }
@@ -210,6 +243,83 @@ public class BoatCollisionAPI
                 return Collections.emptyList();
             }
             return getBoatHullCached(boat);
+        });
+    }
+
+    /**
+     * Gets only the outer perimeter (OBJECT collision tiles) of the player's boat
+     * Used for heading calculation - excludes interior FULL/FLOOR tiles
+     * @return collection of WorldPoints of the outer hull perimeter only
+     */
+    public static Collection<WorldPoint> getPlayerBoatPerimeter()
+    {
+        return Static.invoke(() -> {
+            WorldEntity boat = getPlayerBoat();
+            if (boat == null) {
+                return Collections.emptyList();
+            }
+            return getBoatPerimeterInMainWorld(boat);
+        });
+    }
+
+    /**
+     * Gets outer perimeter tiles (OBJECT collision only) in main world
+     * @param boat the WorldEntity (boat)
+     * @return collection of WorldPoints of outer hull perimeter
+     */
+    public static Collection<WorldPoint> getBoatPerimeterInMainWorld(WorldEntity boat)
+    {
+        return Static.invoke(() -> {
+            if (boat == null) {
+                return Collections.emptyList();
+            }
+
+            WorldView boatView = boat.getWorldView();
+            if (boatView == null) {
+                return Collections.emptyList();
+            }
+
+            CollisionData[] collisionMaps = boatView.getCollisionMaps();
+            if (collisionMaps == null) {
+                return Collections.emptyList();
+            }
+
+            List<WorldPoint> perimeterTiles = new ArrayList<>();
+            Client client = Static.getClient();
+            int plane = boatView.getPlane();
+
+            int sizeX = boatView.getSizeX();
+            int sizeY = boatView.getSizeY();
+
+            for (int x = 0; x < sizeX; x++) {
+                for (int y = 0; y < sizeY; y++) {
+                    if (plane >= collisionMaps.length || collisionMaps[plane] == null) {
+                        continue;
+                    }
+
+                    int[][] flagArray = collisionMaps[plane].getFlags();
+                    if (x + 1 >= flagArray.length || y + 1 >= flagArray[0].length) {
+                        continue;
+                    }
+
+                    int flag = flagArray[x + 1][y + 1];
+
+                    // Only OBJECT collision (outer perimeter only, not FULL/FLOOR)
+                    if (flag == 0x00FFFFFF || !hasObjectCollision(collisionMaps, plane, x + 1, y + 1)) {
+                        continue;
+                    }
+
+                    LocalPoint boatLocal = LocalPoint.fromScene(x, y, boatView);
+                    LocalPoint mainWorldLocal = boat.transformToMainWorld(boatLocal);
+
+                    if (mainWorldLocal != null) {
+                        WorldPoint mainWorldPoint = WorldPoint.fromLocal(client, mainWorldLocal);
+                        perimeterTiles.add(mainWorldPoint);
+                    }
+                }
+            }
+
+            return perimeterTiles;
         });
     }
 
@@ -239,6 +349,7 @@ public class BoatCollisionAPI
 
     /**
      * Gets walkable deck tiles of the boat in main world
+     * Deck = tiles enclosed/surrounded by hull collision, not outside tiles
      * @param boat the WorldEntity (boat)
      * @return collection of WorldPoints where you can walk on the boat
      */
@@ -259,23 +370,108 @@ public class BoatCollisionAPI
                 return Collections.emptyList();
             }
 
-            List<WorldPoint> deckTiles = new ArrayList<>();
             Client client = Static.getClient();
             int plane = boatView.getPlane();
             int sizeX = boatView.getSizeX();
             int sizeY = boatView.getSizeY();
 
+            if (plane >= collisionMaps.length || collisionMaps[plane] == null) {
+                return Collections.emptyList();
+            }
+
+            int[][] flagArray = collisionMaps[plane].getFlags();
+
+            // Step 1: Build barrier tile set (tiles with ANY collision - these block flood-fill)
+            Set<String> barrierTiles = new HashSet<>();
             for (int x = 0; x < sizeX; x++) {
                 for (int y = 0; y < sizeY; y++) {
-                    // Only tiles WITHOUT collision (walkable deck)
-                    if (!hasCollision(collisionMaps, plane, x, y)) {
-                        LocalPoint boatLocal = LocalPoint.fromScene(x, y, boatView);
-                        LocalPoint mainWorldLocal = boat.transformToMainWorld(boatLocal);
+                    if (x + 1 >= flagArray.length || y + 1 >= flagArray[0].length) {
+                        continue;
+                    }
+                    int flag = flagArray[x + 1][y + 1];
+                    if (flag == 0x00FFFFFF) {
+                        continue;
+                    }
+                    // ANY collision (OBJECT, FULL, or FLOOR) acts as barrier for flood-fill
+                    if (hasCollision(collisionMaps, plane, x + 1, y + 1)) {
+                        barrierTiles.add(x + "," + y);
+                    }
+                }
+            }
 
-                        if (mainWorldLocal != null) {
-                            WorldPoint mainWorldPoint = WorldPoint.fromLocal(client, mainWorldLocal);
-                            deckTiles.add(mainWorldPoint);
+            // Step 2: Flood-fill from edges to find "outside" tiles
+            // Only spread through tiles with NO collision
+            Set<String> outsideTiles = new HashSet<>();
+            Set<String> visited = new HashSet<>();
+            Queue<int[]> queue = new java.util.LinkedList<>();
+
+            // Start flood-fill from all edge tiles that are NOT barriers
+            for (int x = 0; x < sizeX; x++) {
+                for (int y = 0; y < sizeY; y++) {
+                    // Only process edge tiles
+                    if (x == 0 || y == 0 || x == sizeX - 1 || y == sizeY - 1) {
+                        String key = x + "," + y;
+                        if (!barrierTiles.contains(key) && !visited.contains(key)) {
+                            queue.offer(new int[]{x, y});
+                            visited.add(key);
                         }
+                    }
+                }
+            }
+
+            // Flood-fill to mark all outside tiles (spread only through non-barriers)
+            while (!queue.isEmpty()) {
+                int[] pos = queue.poll();
+                int x = pos[0];
+                int y = pos[1];
+                String key = x + "," + y;
+                outsideTiles.add(key);
+
+                // Check 4 adjacent tiles
+                int[][] neighbors = {{x-1, y}, {x+1, y}, {x, y-1}, {x, y+1}};
+                for (int[] neighbor : neighbors) {
+                    int nx = neighbor[0];
+                    int ny = neighbor[1];
+
+                    if (nx < 0 || ny < 0 || nx >= sizeX || ny >= sizeY) {
+                        continue;
+                    }
+
+                    String nkey = nx + "," + ny;
+                    // Only spread through non-barrier tiles
+                    if (!barrierTiles.contains(nkey) && !visited.contains(nkey)) {
+                        queue.offer(new int[]{nx, ny});
+                        visited.add(nkey);
+                    }
+                }
+            }
+
+            // Step 3: Deck = tiles NOT outside AND NOT hull/structure
+            // Deck = only empty interior tiles enclosed by hull
+            List<WorldPoint> deckTiles = new ArrayList<>();
+            for (int x = 0; x < sizeX; x++) {
+                for (int y = 0; y < sizeY; y++) {
+                    String key = x + "," + y;
+
+                    // Skip outside tiles
+                    if (outsideTiles.contains(key)) {
+                        continue;
+                    }
+
+                    // Skip ALL collision tiles (those are hull/structure, rendered separately as orange)
+                    if (x + 1 < flagArray.length && y + 1 < flagArray[0].length) {
+                        if (hasCollision(collisionMaps, plane, x + 1, y + 1)) {
+                            continue;
+                        }
+                    }
+
+                    // This tile is empty and enclosed by hull = walkable deck
+                    LocalPoint boatLocal = LocalPoint.fromScene(x, y, boatView);
+                    LocalPoint mainWorldLocal = boat.transformToMainWorld(boatLocal);
+
+                    if (mainWorldLocal != null) {
+                        WorldPoint mainWorldPoint = WorldPoint.fromLocal(client, mainWorldLocal);
+                        deckTiles.add(mainWorldPoint);
                     }
                 }
             }
@@ -881,6 +1077,42 @@ public class BoatCollisionAPI
 
             // Only object collision (boat structure)
             return (flag & CollisionDataFlag.BLOCK_MOVEMENT_OBJECT) != 0;
+        });
+    }
+
+    /**
+     * Checks if a tile has deck collision (walkable boat deck)
+     * Deck tiles have FULL or FLOOR collision flags but not OBJECT flags
+     * @param collisionMaps collision data array
+     * @param plane the plane
+     * @param sceneX scene X coordinate
+     * @param sceneY scene Y coordinate
+     * @return true if the tile is walkable boat deck
+     */
+    private static boolean hasDeckCollision(CollisionData[] collisionMaps, int plane, int sceneX, int sceneY)
+    {
+        return Static.invoke(() -> {
+            if (plane < 0 || plane >= collisionMaps.length) {
+                return false;
+            }
+
+            CollisionData collision = collisionMaps[plane];
+            if (collision == null) {
+                return false;
+            }
+
+            int[][] flags = collision.getFlags();
+            if (sceneX < 0 || sceneX >= flags.length || sceneY < 0 || sceneY >= flags[0].length) {
+                return false;
+            }
+
+            int flag = flags[sceneX][sceneY];
+
+            // Deck = FULL or FLOOR collision (walkable boat deck)
+            boolean hasFull = (flag & CollisionDataFlag.BLOCK_MOVEMENT_FULL) != 0;
+            boolean hasFloor = (flag & CollisionDataFlag.BLOCK_MOVEMENT_FLOOR) != 0;
+
+            return hasFull || hasFloor;
         });
     }
 
