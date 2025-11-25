@@ -150,4 +150,6 @@ public interface TClient
     void setAccountTypeJagex();
 
     int getShipHeading();
+
+    void setShipHeading(int heading);
 }
