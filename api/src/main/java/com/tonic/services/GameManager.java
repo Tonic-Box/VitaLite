@@ -723,4 +723,16 @@ public class GameManager extends Overlay {
             Logger.error("LoginResponse: Account is banned!" );
         }
     }
+
+    @Subscribe
+    public void onChatMessage(ChatMessage event)
+    {
+        if(event.getType() == ChatMessageType.GAMEMESSAGE)
+        {
+            if(event.getMessage().contains("You feel a gust of wind."))
+            {
+                SailingAPI.setSailsNeedTrimming(true);
+            }
+        }
+    }
 }

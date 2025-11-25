@@ -10,6 +10,8 @@ import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
+import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
@@ -19,6 +21,9 @@ import net.runelite.api.gameval.VarbitID;
  */
 public class SailingAPI
 {
+    @Setter
+    @Getter
+    private static volatile boolean sailsNeedTrimming = false;
     /**
      * Sets sails to start navigating
      * @return true if sails were set, false otherwise
@@ -166,16 +171,16 @@ public class SailingAPI
      * @return true if sails were trimmed, false otherwise
      */
     public static boolean trimSails() {
-        if (!isOnBoat()) {
+        if (!isOnBoat() || !sailsNeedTrimming) {
             return false;
         }
         TileObjectEx sail = TileObjectAPI.search()
                 .withId(SailingConstants.SAILS)
-                .withAction("Trim")
                 .nearest();
 
         if(sail != null) {
             TileObjectAPI.interact(sail, "Trim");
+            sailsNeedTrimming = false;
             return true;
         }
         return false;
