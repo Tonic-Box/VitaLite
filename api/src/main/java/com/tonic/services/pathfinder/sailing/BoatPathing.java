@@ -70,6 +70,8 @@ public class BoatPathing
                     {
                         context.remove("PATH");
                         context.remove("POINTER");
+                        SailingAPI.unSetSails();
+                        GameManager.clearPathPoints();
                         return true;
                     }
 
@@ -93,10 +95,6 @@ public class BoatPathing
                         context.put("LAST_HEADING", optimalHeading);
                     }
                     return false;
-                })
-                .add(() -> {
-                    SailingAPI.unSetSails();
-                    GameManager.clearPathPoints();
                 })
                 .build();
     }
