@@ -51,6 +51,11 @@ public class BoatPathing
                         WorldEntity boat = BoatCollisionAPI.getPlayerBoat();
                         WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
                         List<WorldPoint> fullPath = findFullPath(boat, start, worldPoint);
+                        if(fullPath == null || fullPath.isEmpty())
+                        {
+                            System.out.println("BoatPathing: No path found to " + worldPoint);
+                            return true;
+                        }
                         GameManager.setPathPoints(fullPath);
                         List<Waypoint> waypoints = convertToWaypoints(fullPath);
                         context.put("PATH", waypoints);
