@@ -7,7 +7,6 @@ import com.tonic.api.handlers.GenericHandlerBuilder;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.collision.CollisionMap;
-import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
 import com.tonic.util.Distance;
 import com.tonic.util.WorldPointUtil;
 import com.tonic.util.handler.StepHandler;
@@ -62,7 +61,29 @@ public class BoatPathing
                         context.put("POINTER", 0);
                         context.put("LAST_HEADING", null);
                     }
-
+                    List<Waypoint> waypoints = context.get("PATH");
+                    Waypoint first = waypoints.get(1);
+                    WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
+                    Heading heading = Heading.getOptimalHeading(start, first.getPosition());
+                    int dif = heading.getValue() - SailingAPI.getHeadingValue();
+                    if(dif <= 1 && dif >= -1)
+                    {
+                        return true;
+                    }
+                    boolean headingInitSet = context.getOrDefault("HEADING_INIT_SET", false);
+                    if(headingInitSet)
+                    {
+                        return false;
+                    }
+                    SailingAPI.setHeading(heading);
+                    context.put("HEADING_INIT_SET", true);
+                    return false;
+                })
+                .addDelayUntil(context -> {
+                    if(!context.contains("PATH"))
+                    {
+                        return true;
+                    }
                     List<Waypoint> waypoints = context.get("PATH");
                     int pointer = context.get("POINTER");
 
@@ -77,8 +98,19 @@ public class BoatPathing
 
                     Waypoint waypoint = waypoints.get(pointer);
                     Waypoint end = waypoints.get(waypoints.size() - 1);
+
+                    if(BoatCollisionAPI.playerBoatContainsPoint(end.getPosition()))
+                    {
+                        context.remove("PATH");
+                        context.remove("POINTER");
+                        SailingAPI.unSetSails();
+                        GameManager.clearPathPoints();
+                        return true;
+                    }
+
                     WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
-                    if((end != waypoint && Distance.chebyshev(start, waypoint.getPosition()) <= 5) || Distance.chebyshev(start, end.getPosition()) <= 2)
+
+                    if((end != waypoint && Distance.chebyshev(start, waypoint.getPosition()) <= 3))
                     {
                         context.put("POINTER", pointer + 1);
                         return false;
@@ -390,9 +422,17 @@ public class BoatPathing
             Heading nextHeading = Heading.getOptimalHeading(currentPos, nextPos);
             if(nextHeading != currentHeading)
             {
-                waypoints.add(new Waypoint(currentPos, nextHeading));
+                waypoints.add(new Waypoint(currentPos, currentHeading));
                 currentHeading = nextHeading;
+                currentPos = nextPos;
+                continue;
             }
+
+            if(i == path.size() - 1)
+            {
+                waypoints.add(new Waypoint(nextPos, nextHeading));
+            }
+
             currentPos = nextPos;
         }
 

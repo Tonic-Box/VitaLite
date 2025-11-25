@@ -101,22 +101,6 @@ public class SailingAPI
         return true;
     }
 
-    public static Heading getHeading()
-    {
-        return Heading.fromValue(getHeadingValue());
-    }
-
-    public static int getHeadingValue()
-    {
-        return Static.invoke(() -> {
-            TClient client = Static.getClient();
-            int headingValue = client.getShipHeading();
-            if(headingValue < 0)
-                headingValue = VarAPI.getVar(VarbitID.SAILING_BOAT_SPAWNED_ANGLE);
-            return headingValue > 15 ? headingValue / 128 : headingValue;
-        });
-    }
-
     public static void setHeadingValue(int heading)
     {
         Static.invoke(() -> {
@@ -141,15 +125,6 @@ public class SailingAPI
             return setSails();
         }
         return true;
-    }
-
-    /**
-     * Checks if the player is currently on a boat
-     * @return true if on boat, false otherwise
-     */
-    public static boolean isOnBoat()
-    {
-        return VarAPI.getVar(VarbitID.SAILING_PLAYER_IS_ON_PLAYER_BOAT) == 1;
     }
 
     /**
@@ -214,5 +189,148 @@ public class SailingAPI
             return true;
         }
         return false;
+    }
+
+    /**
+     * Checks if the player is on a sailing boat using direct WorldEntity check.
+     * More reliable than varbit-based isOnBoat() as it checks the actual boat entity.
+     *
+     * @return true if player is on a sailing boat, false otherwise
+     */
+    public static boolean isOnBoat()
+    {
+        return Static.invoke(() -> BoatCollisionAPI.getPlayerBoat() != null);
+    }
+
+    /**
+     * Gets the true real-time heading by analyzing the boat's collision footprint geometry.
+     * This method calculates the heading based on which direction the hull tiles are oriented.
+     * Works in real-time during rotation, not just when rotation completes.
+     *
+     * Algorithm:
+     * 1. Get boat center and hull collision tiles
+     * 2. Find the "forward" tiles (furthest from center in one direction)
+     * 3. Calculate angle from center to forward point
+     * 4. Convert to heading value (0-15)
+     *
+     * @return raw heading in JAU (0-2047), or -1 if not on boat
+     */
+    public static int getHeadingRaw()
+    {
+        return Static.invoke(() -> {
+            if (!isOnBoat()) {
+                return -1;
+            }
+
+            var boatCenter = BoatCollisionAPI.getPlayerBoatWorldPoint();
+            var hullTiles = BoatCollisionAPI.getPlayerBoatCollision();
+
+            if (boatCenter == null || hullTiles == null || hullTiles.isEmpty()) {
+                // Fallback to varbit if hull analysis fails
+                return VarAPI.getVar(VarbitID.SAILING_BOAT_SPAWNED_ANGLE);
+            }
+
+            // Calculate center of mass weighted toward tiles furthest from center
+            // This gives us the "nose" direction of the boat
+            double sumX = 0;
+            double sumY = 0;
+            double maxDist = 0;
+            int count = 0;
+
+            // Find the maximum distance to determine which tiles are "forward"
+            for (var tile : hullTiles) {
+                int dx = tile.getX() - boatCenter.getX();
+                int dy = tile.getY() - boatCenter.getY();
+                double dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > maxDist) {
+                    maxDist = dist;
+                }
+            }
+
+            // Weight tiles by distance - tiles further from center contribute more
+            // This finds the "nose" of the boat
+            double threshold = maxDist * 0.6; // Consider tiles in forward 60% of hull
+            for (var tile : hullTiles) {
+                int dx = tile.getX() - boatCenter.getX();
+                int dy = tile.getY() - boatCenter.getY();
+                double dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist >= threshold) {
+                    // Weight by distance squared to emphasize forward tiles
+                    double weight = dist * dist;
+                    sumX += dx * weight;
+                    sumY += dy * weight;
+                    count++;
+                }
+            }
+
+            if (count == 0) {
+                // Fallback to varbit if calculation fails
+                return VarAPI.getVar(VarbitID.SAILING_BOAT_SPAWNED_ANGLE);
+            }
+
+            // Calculate angle from center to weighted forward point
+            double angle = Math.atan2(sumY, sumX);
+
+            // Convert from math angle (radians, 0=East) to JAU (0=South)
+            // Math: 0=East, π/2=North, π=West, -π/2=South
+            // JAU: 0=South, 512=West, 1024=North, 1536=East
+            double degrees = Math.toDegrees(angle);
+
+            // Transform: rotate 270° to align 0=South
+            double jauDegrees = 270 - degrees;
+
+            // Normalize to 0-360
+            while (jauDegrees < 0) jauDegrees += 360;
+            while (jauDegrees >= 360) jauDegrees -= 360;
+
+            // Convert to JAU (2048 units = 360 degrees)
+            int jau = (int) Math.round((jauDegrees / 360.0) * 2048);
+            jau = jau % 2048; // Ensure 0-2047 range
+
+            return jau;
+        });
+    }
+
+    /**
+     * Gets the true real-time heading as a Heading enum (0-15).
+     * Uses hull geometry analysis for real-time tracking during rotation.
+     * Updates every frame as the boat rotates, not just when rotation completes.
+     *
+     * @return Heading enum representing the boat's current visual direction, or null if not on boat
+     */
+    public static Heading getHeading()
+    {
+        return Static.invoke(() -> {
+            int rawValue = getHeadingRaw();
+            if (rawValue == -1) {
+                return null;
+            }
+
+            // Convert raw varbit value (0-2047) to heading value (0-15)
+            // The varbit stores orientation in JAU (Jagex Angle Units) where 2048 = 360 degrees
+            // Each heading = 128 JAU = 22.5 degrees
+            int headingValue = rawValue / 128; // Integer division for heading index
+            headingValue = headingValue % 16; // Ensure 0-15 range
+
+            return Heading.fromValue(headingValue);
+        });
+    }
+
+    /**
+     * Gets the true real-time heading value (0-15) directly.
+     * Convenience method using hull geometry for real-time rotation tracking.
+     *
+     * @return heading value (0-15), or -1 if not on boat
+     */
+    public static int getHeadingValue()
+    {
+        Heading heading = getHeading();
+        return heading != null ? heading.getValue() : -1;
+    }
+
+    public static int getResolvedHeading()
+    {
+        return VarAPI.getVar(VarbitID.SAILING_BOAT_SPAWNED_ANGLE) / 128;
     }
 }

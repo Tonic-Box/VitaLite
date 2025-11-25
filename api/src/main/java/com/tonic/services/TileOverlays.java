@@ -2,18 +2,12 @@ package com.tonic.services;
 
 import com.tonic.Static;
 import com.tonic.api.TObjectComposition;
-import com.tonic.api.entities.TileObjectAPI;
-import com.tonic.api.game.SceneAPI;
-import com.tonic.api.threaded.Delays;
 import com.tonic.data.ObjectBlockAccessFlags;
 import com.tonic.data.Walls;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.pathfinder.collision.Flags;
-import com.tonic.services.pathfinder.local.CollisionUtil;
 import com.tonic.services.pathfinder.local.LocalCollisionMap;
-import com.tonic.util.RelativePosition;
-import com.tonic.util.ThreadPool;
 import com.tonic.util.TileDrawingUtil;
 import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
@@ -22,9 +16,6 @@ import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-import net.runelite.api.events.GameTick;
-import net.runelite.client.eventbus.EventBus;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -32,9 +23,7 @@ import net.runelite.client.ui.overlay.OverlayUtil;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class TileOverlays extends Overlay
 {
@@ -49,6 +38,7 @@ public class TileOverlays extends Overlay
 
     @Override
     public Dimension render(Graphics2D graphics) {
+
         if(Static.getVitaConfig().shouldDrawInteractable())
         {
             drawInteractableFrom(graphics);
