@@ -638,6 +638,9 @@ public class GameManager extends Overlay {
             return;
         }
 
+        if(SailingAPI.isOnBoat())
+            return;
+
         if(walkerPath == null)
         {
             client.getMenu().createMenuEntry(0)
