@@ -3,16 +3,19 @@ package com.tonic.api.game.sailing;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.entities.TileObjectAPI;
+import com.tonic.api.game.GameAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.SailingConstants;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
 import lombok.Getter;
 import lombok.Setter;
+import net.runelite.api.MenuAction;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
@@ -77,13 +80,14 @@ public class SailingAPI
     {
         if(heading == null || getHeading() == heading)
             return;
-        TClient client = Static.getClient();
-        Static.invoke(() -> {
-            ClickManager.click(ClickType.MOVEMENT);
-            setHeadingValue(heading.getValue());
-            client.getPacketWriter().setHeadingPacket(heading.getValue());
-            System.out.println("Heading changed: " + getHeading() + " -> " + heading);
-        });
+
+        //Menu action also sets some client side tracking stuff we care about
+        GameAPI.invokeMenuAction(
+                heading.getValue(),
+                MenuAction.SET_HEADING.getId(),
+                0, 0, 0,
+                PlayerEx.getLocal().getWorldViewId()
+        );
     }
 
     /**
@@ -99,14 +103,6 @@ public class SailingAPI
         }
         setHeading(optimalHeading);
         return true;
-    }
-
-    public static void setHeadingValue(int heading)
-    {
-        Static.invoke(() -> {
-            TClient client = Static.getClient();
-            client.setShipHeading(heading);
-        });
     }
 
     /**
