@@ -1,6 +1,7 @@
 package com.tonic.api.widgets;
 
 import com.tonic.Static;
+import com.tonic.util.WorldPointUtil;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
@@ -44,7 +45,7 @@ public class MiniMapAPI {
     {
         final Client client = Static.getClient();
         final WorldView wv = client.getTopLevelWorldView();
-        WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
+        WorldPoint playerLocation = WorldPointUtil.getTopWorldViewLocation();
         if (point.distanceTo(playerLocation) >= 16)
         {
             return;

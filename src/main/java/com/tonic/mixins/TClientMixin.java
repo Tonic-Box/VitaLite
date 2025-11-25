@@ -28,6 +28,13 @@ public abstract class TClientMixin implements TClient
 
     @Inject
     @Override
+    public void setShipHeading(int heading)
+    {
+        shipHeading = heading;
+    }
+
+    @Inject
+    @Override
     public TPacketWriter getPacketWriter()
     {
         return packetWriter;

@@ -4,6 +4,7 @@ import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.VarAPI;
+import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.SailingConstants;
 import com.tonic.data.wrappers.TileObjectEx;
@@ -79,6 +80,7 @@ public class SailingAPI
         TClient client = Static.getClient();
         Static.invoke(() -> {
             ClickManager.click(ClickType.MOVEMENT);
+            setHeadingValue(heading.getValue());
             client.getPacketWriter().setHeadingPacket(heading.getValue());
             System.out.println("Heading changed: " + getHeading() + " -> " + heading);
         });
@@ -112,6 +114,14 @@ public class SailingAPI
             if(headingValue < 0)
                 headingValue = VarAPI.getVar(VarbitID.SAILING_BOAT_SPAWNED_ANGLE);
             return headingValue > 15 ? headingValue / 128 : headingValue;
+        });
+    }
+
+    public static void setHeadingValue(int heading)
+    {
+        Static.invoke(() -> {
+            TClient client = Static.getClient();
+            client.setShipHeading(heading);
         });
     }
 

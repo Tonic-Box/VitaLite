@@ -83,8 +83,7 @@ public class TileOverlays extends Overlay
             return;
 
         final Client client = Static.getClient();
-        final WorldView worldView = PlayerEx.getLocal().getWorldView();
-        final WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
+        final WorldPoint playerLocation = WorldPointUtil.getTopWorldViewLocation();
         final int MAX_DRAW_DISTANCE = 32;
 
         Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 50);
@@ -95,7 +94,7 @@ public class TileOverlays extends Overlay
             if(point.distanceTo(playerLocation) >= MAX_DRAW_DISTANCE)
                 continue;
 
-            LocalPoint localPoint = LocalPoint.fromWorld(worldView, point);
+            LocalPoint localPoint = LocalPoint.fromWorld(client, point);
             if(localPoint == null)
                 continue;
 
