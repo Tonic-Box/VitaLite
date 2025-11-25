@@ -60,6 +60,7 @@ public class BoatPathing
                         List<Waypoint> waypoints = convertToWaypoints(fullPath);
                         context.put("PATH", waypoints);
                         context.put("POINTER", 0);
+                        context.put("LAST_HEADING", null);
                     }
 
                     List<Waypoint> waypoints = context.get("PATH");
@@ -75,7 +76,7 @@ public class BoatPathing
                     Waypoint waypoint = waypoints.get(pointer);
                     Waypoint end = waypoints.get(waypoints.size() - 1);
                     WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
-                    if(Distance.chebyshev(start, waypoint.getPosition()) <= 5 || Distance.chebyshev(start, end.getPosition()) <= 3)
+                    if((end != waypoint && Distance.chebyshev(start, waypoint.getPosition()) <= 5) || Distance.chebyshev(start, end.getPosition()) <= 2)
                     {
                         context.put("POINTER", pointer + 1);
                         return false;
@@ -84,7 +85,13 @@ public class BoatPathing
                     {
                         return false;
                     }
-                    SailingAPI.sailTo(waypoint.getPosition());
+                    Heading optimalHeading = Heading.getOptimalHeading(waypoint.getPosition());
+                    Heading lastHeading = context.get("LAST_HEADING");
+                    if(optimalHeading != lastHeading)
+                    {
+                        SailingAPI.sailTo(waypoint.getPosition());
+                        context.put("LAST_HEADING", optimalHeading);
+                    }
                     return false;
                 })
                 .add(() -> {
