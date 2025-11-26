@@ -15,6 +15,7 @@ import java.util.concurrent.FutureTask;
 
 import com.tonic.Static;
 import com.tonic.model.ui.components.VitaFrame;
+import com.tonic.plugins.codeeval.completion.*;
 import com.tonic.services.GameManager;
 import com.tonic.util.ThreadPool;
 import net.runelite.client.ui.ClientToolbar;
@@ -32,6 +33,8 @@ public class CodeEvalFrame extends VitaFrame {
     private final JTextArea outputArea;
     private final JButton runButton;
     private Future<?> future;
+    private AutoCompletion autoCompletion;
+    private volatile boolean completionInitialized = false;
 
     public static CodeEvalFrame get() {
         if (INSTANCE == null) {
@@ -194,8 +197,65 @@ public class CodeEvalFrame extends VitaFrame {
 
         setAlwaysOnTop(true);
 
+        // Initialize autocompletion in background
+        setupAutoCompletion();
+
         pack();
         setLocationRelativeTo(null);
+    }
+
+    /**
+     * Sets up IntelliJ-style autocompletion
+     */
+    private void setupAutoCompletion() {
+        // Run indexing in background to avoid blocking UI
+        ThreadPool.submit(() -> {
+            try {
+                // Parse template imports
+                ImportScanner importScanner = new ImportScanner();
+                InputStream templateStream = getClass().getResourceAsStream("code_template.java");
+                if (templateStream != null) {
+                    importScanner.parseTemplate(templateStream);
+                    templateStream.close();
+                }
+
+                // Create class cache and index packages
+                ClassLoader rlClassLoader = GameManager.class.getClassLoader();
+                ClassCache classCache = new ClassCache(rlClassLoader);
+                classCache.indexPackages(importScanner.getPackagesToScan());
+
+                // Create type inference engine
+                TypeInference typeInference = new TypeInference(classCache, importScanner);
+                typeInference.rebuildContext();
+
+                // Create the completion provider
+                VitaCompletionProvider provider = new VitaCompletionProvider(
+                        classCache, typeInference, importScanner
+                );
+
+                // Install on EDT
+                SwingUtilities.invokeLater(() -> {
+                    autoCompletion = new AutoCompletion(provider);
+
+                    // IntelliJ-style behavior
+                    autoCompletion.setAutoActivationEnabled(true);
+                    autoCompletion.setAutoActivationDelay(150);
+                    autoCompletion.setShowDescWindow(true);
+                    autoCompletion.setAutoCompleteSingleChoices(false);
+                    autoCompletion.setParameterAssistanceEnabled(true);
+
+                    autoCompletion.install(codeArea);
+                    completionInitialized = true;
+
+                    System.out.println("CodeEval autocompletion initialized with " +
+                            classCache.getClassCount() + " classes indexed");
+                });
+
+            } catch (Exception e) {
+                System.err.println("Failed to initialize autocompletion: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
     }
 
     private void runCode() {

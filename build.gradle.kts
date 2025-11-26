@@ -245,6 +245,8 @@ dependencies {
     implementation(group = "com.fifesoft", name = "autocomplete", version = "3.1.1")
     implementation("io.sigpipe:jbsdiff:1.0")
 
+    implementation("com.github.javaparser:javaparser-symbol-solver-core:3.25.5")
+
 //    implementation("com.lmax:disruptor:3.4.4")
 //    implementation("org.jctools:jctools-core:4.0.5")
 //    implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
