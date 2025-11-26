@@ -65,14 +65,19 @@ public class BoatPathing
                     Waypoint first = waypoints.get(1);
                     WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
                     Heading heading = Heading.getOptimalHeading(start, first.getPosition());
-                    int dif = heading.getValue() - SailingAPI.getHeadingValue();
-                    if(dif <= 1 && dif >= -1)
-                    {
-                        return true;
-                    }
+
                     boolean headingInitSet = context.getOrDefault("HEADING_INIT_SET", false);
                     if(headingInitSet)
                     {
+                        int dif = heading.getValue() - SailingAPI.getHeading().getValue();
+                        if(dif <= 2 && dif >= -2)
+                        {
+                            SailingAPI.setSails();
+                            return true;
+                        }
+                        if (SailingAPI.isMovingForward()) {
+                            SailingAPI.unSetSails();
+                        }
                         return false;
                     }
                     SailingAPI.setHeading(heading);
@@ -110,7 +115,7 @@ public class BoatPathing
 
                     WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
 
-                    if((end != waypoint && Distance.chebyshev(start, waypoint.getPosition()) <= 3))
+                    if((end != waypoint && Distance.chebyshev(start, waypoint.getPosition()) <= 4))
                     {
                         context.put("POINTER", pointer + 1);
                         return false;
