@@ -61,29 +61,10 @@ public class VitaCompletionProvider extends DefaultCompletionProvider {
 
     @Override
     public boolean isAutoActivateOkay(JTextComponent tc) {
-        String text = tc.getText();
-        int caret = tc.getCaretPosition();
-        if (caret == 0) return false;
-
-        // Get character just typed
-        char ch = text.charAt(caret - 1);
-
-        // Activate after dot (member access)
-        if (ch == '.') return true;
-
-        // Activate after typing letters (for class/identifier completion)
-        // Only if we have at least 1 character of an identifier
-        if (Character.isLetter(ch)) {
-            // Find start of current identifier
-            int start = caret - 1;
-            while (start > 0 && Character.isJavaIdentifierPart(text.charAt(start - 1))) {
-                start--;
-            }
-            // Require at least 1 letter typed before showing completions
-            return (caret - start) >= 1;
-        }
-
-        return false;
+        // Always allow auto-activation - the AutoCompletion framework handles
+        // trigger characters via setAutoActivationRules(true, ".")
+        // We just need to say "yes, it's okay to show completions"
+        return true;
     }
 
     @Override
@@ -92,7 +73,12 @@ public class VitaCompletionProvider extends DefaultCompletionProvider {
         int caretPos = comp.getCaretPosition();
         String textBefore = text.substring(0, Math.min(caretPos, text.length()));
 
+        System.out.println("[Completion DEBUG] getCompletions called, textBefore ends with: '..." +
+            (textBefore.length() > 30 ? textBefore.substring(textBefore.length() - 30) : textBefore) + "'");
+
         CompletionContext ctx = analyzeContext(textBefore);
+        System.out.println("[Completion DEBUG]   Context type: " + ctx.type + ", expression: '" + ctx.expression + "', prefix: '" + ctx.prefix + "'");
+
         List<Completion> completions = new ArrayList<>();
 
         switch (ctx.type) {
@@ -115,6 +101,7 @@ public class VitaCompletionProvider extends DefaultCompletionProvider {
                 }
         }
 
+        System.out.println("[Completion DEBUG]   Returning " + completions.size() + " completions");
         return completions;
     }
 
@@ -122,16 +109,20 @@ public class VitaCompletionProvider extends DefaultCompletionProvider {
      * Analyzes text to determine completion context
      */
     private CompletionContext analyzeContext(String textBefore) {
+        System.out.println("[Completion DEBUG] analyzeContext, textBefore ends with: '" +
+            (textBefore.length() > 50 ? textBefore.substring(textBefore.length() - 50) : textBefore) + "'");
+
         // Check for "new ClassName"
         Matcher newMatcher = AFTER_NEW.matcher(textBefore);
         if (newMatcher.find()) {
             return new CompletionContext(ContextType.NEW_STATEMENT, newMatcher.group(1));
         }
 
-        // Check for expression followed by dot
+        // Check for expression followed by dot (ends with .)
         Matcher dotMatcher = AFTER_DOT.matcher(textBefore);
         if (dotMatcher.find()) {
             String expression = dotMatcher.group(1);
+            System.out.println("[Completion DEBUG]   AFTER_DOT matched: '" + expression + "'");
             return new CompletionContext(ContextType.AFTER_DOT, expression, "");
         }
 
@@ -139,12 +130,16 @@ public class VitaCompletionProvider extends DefaultCompletionProvider {
         int lastDot = textBefore.lastIndexOf('.');
         if (lastDot >= 0) {
             String afterDot = textBefore.substring(lastDot + 1);
+            System.out.println("[Completion DEBUG]   Found dot at " + lastDot + ", afterDot: '" + afterDot + "'");
             // Check if afterDot is just identifier characters (no spaces, operators)
             if (afterDot.matches("\\w*")) {
                 String beforeDot = textBefore.substring(0, lastDot);
                 Matcher exprMatcher = Pattern.compile("([\\w.()]+)$").matcher(beforeDot);
                 if (exprMatcher.find()) {
+                    System.out.println("[Completion DEBUG]   Expression before dot: '" + exprMatcher.group(1) + "'");
                     return new CompletionContext(ContextType.AFTER_DOT, exprMatcher.group(1), afterDot);
+                } else {
+                    System.out.println("[Completion DEBUG]   No expression match before dot");
                 }
             }
         }
@@ -164,12 +159,24 @@ public class VitaCompletionProvider extends DefaultCompletionProvider {
     private List<Completion> getMemberCompletions(String expression, String prefix, String fullCode) {
         List<Completion> completions = new ArrayList<>();
 
+        System.out.println("[Completion DEBUG] getMemberCompletions called");
+        System.out.println("[Completion DEBUG]   expression: '" + expression + "'");
+        System.out.println("[Completion DEBUG]   prefix: '" + prefix + "'");
+
         // Resolve the type of the expression
         String type = typeInference.resolveExpressionType(expression, fullCode);
 
+        System.out.println("[Completion DEBUG]   resolved type: " + type);
+
         if (type != null) {
+            System.out.println("[Completion DEBUG]   Loading class for type: " + type);
             ClassInfo classInfo = classCache.get(type);
+
             if (classInfo != null) {
+                System.out.println("[Completion DEBUG]   ClassInfo loaded: " + classInfo.getFullName());
+                System.out.println("[Completion DEBUG]   Methods: " + classInfo.getMethods().size() + " instance, " + classInfo.getStaticMethods().size() + " static");
+                System.out.println("[Completion DEBUG]   Fields: " + classInfo.getFields().size() + " instance, " + classInfo.getStaticFields().size() + " static");
+
                 // Determine if this is static or instance access
                 boolean isStaticAccess = isStaticAccess(expression);
 
@@ -204,8 +211,14 @@ public class VitaCompletionProvider extends DefaultCompletionProvider {
                         completions.add(createFieldCompletion(field));
                     }
                 }
+            } else {
+                System.out.println("[Completion DEBUG]   ClassInfo is NULL - failed to load class!");
             }
+        } else {
+            System.out.println("[Completion DEBUG]   Type resolution returned NULL");
         }
+
+        System.out.println("[Completion DEBUG]   Total completions: " + completions.size());
 
         // Sort by name
         completions.sort(Comparator.comparing(Completion::getInputText));
