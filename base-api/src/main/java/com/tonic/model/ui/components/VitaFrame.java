@@ -310,13 +310,41 @@ public class VitaFrame extends JFrame {
             isMaximized = true;
             setExtendedState(JFrame.NORMAL); // Keep as NORMAL to prevent OS maximize
 
-            // Get maximum usable screen bounds (excludes taskbar/dock/menu bar)
-            GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            Rectangle maxBounds = env.getMaximumWindowBounds();
+            // Get maximum usable screen bounds for the monitor the window is currently on
+            Rectangle maxBounds = getMaximumBoundsForCurrentScreen();
             setBounds(maxBounds);
 
             maximizeBtn.setText("[=]"); // Maximized state shows restore icon
         }
+    }
+
+    /**
+     * Gets the maximum usable bounds for the screen the window is currently on.
+     * This excludes taskbar/dock/menu bar and works correctly with multiple monitors.
+     */
+    private Rectangle getMaximumBoundsForCurrentScreen() {
+        // Get the graphics configuration for the screen the window center is on
+        GraphicsConfiguration gc = getGraphicsConfiguration();
+
+        if (gc != null) {
+            // Get the full screen bounds
+            Rectangle screenBounds = gc.getBounds();
+
+            // Get screen insets (taskbar, dock, menu bar, etc.)
+            Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
+
+            // Calculate usable bounds by subtracting insets
+            return new Rectangle(
+                screenBounds.x + insets.left,
+                screenBounds.y + insets.top,
+                screenBounds.width - insets.left - insets.right,
+                screenBounds.height - insets.top - insets.bottom
+            );
+        }
+
+        // Fallback to primary screen if somehow gc is null
+        GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        return env.getMaximumWindowBounds();
     }
 
     private void addResizeListeners() {
