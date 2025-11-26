@@ -428,8 +428,8 @@ public class WorldPointUtil {
      * @return the LocalPoint in the top-level worldview
      */
     public static LocalPoint getTopWorldViewPoint(LocalPoint localPt) {
-        if(localPt == null)
-            return null;
+        if(localPt == null || !SailingAPI.isOnBoat())
+            return PlayerEx.getLocal().getLocalPoint();
 
         Client client = Static.getClient();
         WorldEntity we = client

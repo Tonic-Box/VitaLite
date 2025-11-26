@@ -57,6 +57,7 @@ public class CodeEvalFrame extends VitaFrame {
         refreshContext();
         setVisible(true);
         toFront();
+        codeArea.requestFocusInWindow();
         repaint();
     }
 
@@ -100,7 +101,11 @@ public class CodeEvalFrame extends VitaFrame {
         JPanel codePanel = new JPanel(new BorderLayout());
         codePanel.setBorder(BorderFactory.createTitledBorder("Code (Ctrl+Enter to run)"));
 
-        codeArea = new RSyntaxTextArea(20, 120);
+        // Use IsolatedRSyntaxTextArea to prevent conflicts with other RSyntaxTextArea instances
+        // loaded by different classloaders (fixes read-only bug when both CodeEval and
+        // external plugins using RSyntaxTextArea are opened)
+        // See: https://github.com/bobbylight/RSyntaxTextArea/issues/269
+        codeArea = new IsolatedRSyntaxTextArea(20, 120);
         codeArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         codeArea.setCodeFoldingEnabled(true);
         codeArea.setAntiAliasingEnabled(true);
