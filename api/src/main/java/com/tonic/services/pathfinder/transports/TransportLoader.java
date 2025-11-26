@@ -194,6 +194,13 @@ public class TransportLoader
                     transports.add(npcTransport(new WorldPoint(2130, 3899, 2), new WorldPoint(2222, 3796, 2), NpcID.CAPTAIN_BENTLEY_6650, "Travel"));
                 }
 
+                if(QuestAPI.isCompleted(Quest.PANDEMONIUM) && InventoryAPI.count(ItemID.COINS_995) >= 30)
+                {
+                    transports.add(npcTransport(new WorldPoint(3027, 3217, 0), new WorldPoint(3065, 3002, 0), NpcID.CAPTAIN_TOBIAS, "The Pandemonium"));
+                    transports.add(npcTransport(new WorldPoint(3064, 3002, 0), new WorldPoint(3029, 3217, 0), NpcID.SEAMAN_MORRIS, "Port Sarim"));
+                    transports.add(npcTransport(new WorldPoint(3064, 3002, 0), new WorldPoint(2956, 3146, 0), NpcID.SEAMAN_MORRIS, "Musa Point"));
+                }
+
                 if (QuestAPI.isCompleted(Quest.THE_LOST_TRIBE) || !filter)
                 {
                     transports.add(npcTransport(new WorldPoint(3229, 9610, 0), new WorldPoint(3316, 9613, 0), "Kazgar",
