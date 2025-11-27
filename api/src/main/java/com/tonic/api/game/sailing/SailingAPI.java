@@ -294,11 +294,12 @@ public class SailingAPI
     public static boolean isRotating()
     {
         return Static.invoke(() -> {
-            if (!isOnBoat()) {
+            if (!isOnBoat() || !isNavigating()) {
                 return false;
             }
 
-            return getTargetHeadingValue() != getResolvedHeadingValue();
+            int targetHeading = getTargetHeadingValue();
+            return targetHeading >= 0 && targetHeading <= 15 && targetHeading != getResolvedHeadingValue();
         });
     }
 
