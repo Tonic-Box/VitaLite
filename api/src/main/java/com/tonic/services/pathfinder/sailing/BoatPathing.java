@@ -835,8 +835,8 @@ public class BoatPathing
      * - Smooths wobble (EAST/SE alternation averages to ESE over the window)
      * - Detects actual turns quickly (within window size tiles)
      *
-     * Compares current local heading to the heading at segment start (not previous iteration)
-     * to detect when the path has turned significantly from its original direction.
+     * Also checks path deviation - if any path tile strays too far from the straight line
+     * between segment start and current position, forces a waypoint to keep boat on path.
      */
     public static List<Waypoint> convertToWaypoints(List<WorldPoint> path)
     {
@@ -848,6 +848,10 @@ public class BoatPathing
 
         // Window size for smoothing wobble while detecting turns quickly
         final int WINDOW_SIZE = 4;
+        // Maximum distance any path tile can be from the straight line before forcing a waypoint
+        final int MAX_DEVIATION = 3;
+        // Maximum segment length before forcing a waypoint
+        final int MAX_SEGMENT_LENGTH = 25;
 
         // Add starting waypoint so boat starts in correct direction
         Heading startHeading = Heading.getOptimalHeading(path.get(0), path.get(Math.min(WINDOW_SIZE, path.size() - 1)));
@@ -862,22 +866,26 @@ public class BoatPathing
             int windowStart = i - WINDOW_SIZE;
             Heading localHeading = Heading.getOptimalHeading(path.get(windowStart), path.get(i));
 
-            // Compare current local heading to segment START heading (not previous iteration!)
-            // This detects when we've turned away from our original direction
+            // Compare current local heading to segment START heading
             int diff = getHeadingDifference(localHeading, segmentStartHeading);
 
-            // Threshold of 1 unit (22.5°) - catches turns while still smoothing single-tile wobble
-            if (diff > 1) {
-                // Place waypoint at position where turn was detected
+            // Check if segment is too long
+            int segmentLength = i - segmentStartIndex;
+
+            // Check path deviation - does the actual path stray from straight line?
+            boolean deviationExceeded = checkPathDeviation(path, segmentStartIndex, i, MAX_DEVIATION);
+
+            // Create waypoint if: heading changed significantly, segment too long, or path deviates
+            if (diff > 1 || segmentLength >= MAX_SEGMENT_LENGTH || deviationExceeded) {
+                // Place waypoint at position where turn/deviation was detected
                 WorldPoint turnPoint = path.get(windowStart);
                 Heading segmentHeading = Heading.getOptimalHeading(path.get(segmentStartIndex), turnPoint);
                 waypoints.add(new Waypoint(turnPoint, segmentHeading));
 
-                // Start new segment - reset the segment start heading
+                // Start new segment
                 segmentStartIndex = windowStart;
                 segmentStartHeading = localHeading;
             }
-            // NOTE: Do NOT update segmentStartHeading here - it stays fixed until a turn is detected
         }
 
         // Final waypoint
@@ -886,6 +894,40 @@ public class BoatPathing
         waypoints.add(new Waypoint(last, finalHeading));
 
         return waypoints;
+    }
+
+    /**
+     * Checks if any path tile between start and end deviates more than maxDist
+     * from the straight line between those two points.
+     */
+    private static boolean checkPathDeviation(List<WorldPoint> path, int startIdx, int endIdx, int maxDist)
+    {
+        WorldPoint start = path.get(startIdx);
+        WorldPoint end = path.get(endIdx);
+
+        // Line vector
+        double dx = end.getX() - start.getX();
+        double dy = end.getY() - start.getY();
+        double lineLength = Math.sqrt(dx * dx + dy * dy);
+
+        if (lineLength < 1) {
+            return false;  // Start and end are same point
+        }
+
+        // Check each intermediate point
+        for (int i = startIdx + 1; i < endIdx; i++) {
+            WorldPoint p = path.get(i);
+
+            // Calculate perpendicular distance from point to line
+            // Using formula: |((y2-y1)*px - (x2-x1)*py + x2*y1 - y2*x1)| / sqrt((y2-y1)^2 + (x2-x1)^2)
+            double dist = Math.abs(dy * p.getX() - dx * p.getY() + end.getX() * start.getY() - end.getY() * start.getX()) / lineLength;
+
+            if (dist > maxDist) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
