@@ -73,7 +73,7 @@ public class BoatPathing
 
     // Number of parents to look back for cumulative turn calculation
     // 4 steps catches 3-step split turns (e.g., 30° + 30° + 30° = 90°)
-    private static final int TURN_LOOKBACK_DEPTH = 4;
+    private static final int TURN_LOOKBACK_DEPTH = 3;
 
     // Turn cost penalties indexed by heading difference (0-8)
     // Heading diff: 0=same, 2=45°, 4=90°, 6=135°, 8=180°
@@ -109,6 +109,9 @@ public class BoatPathing
                         context.put("PATH", waypoints);
                         context.put("POINTER", 0);
                         context.put("LAST_HEADING", null);
+
+                        BoatPathingDebug.printPath(fullPath);
+                        BoatPathingDebug.printWaypoints(waypoints);
                     }
                     List<Waypoint> waypoints = context.get("PATH");
                     Waypoint first = waypoints.get(1);
@@ -152,8 +155,9 @@ public class BoatPathing
 
                     Waypoint waypoint = waypoints.get(pointer);
                     Waypoint end = waypoints.get(waypoints.size() - 1);
+                    WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
 
-                    if(BoatCollisionAPI.playerBoatContainsPoint(end.getPosition()))
+                    if(Distance.chebyshev(start, end.getPosition()) <= 3)
                     {
                         context.remove("PATH");
                         context.remove("POINTER");
@@ -161,8 +165,6 @@ public class BoatPathing
                         GameManager.clearPathPoints();
                         return true;
                     }
-
-                    WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
 
                     if((end != waypoint && Distance.chebyshev(start, waypoint.getPosition()) <= 4))
                     {
@@ -827,8 +829,14 @@ public class BoatPathing
     }
 
     /**
-     * Converts full tile path to waypoints.
-     * TEMPORARILY returns waypoint for EVERY tile to debug path quality.
+     * Converts full tile path to waypoints using sliding window heading detection.
+     *
+     * Uses a sliding window to calculate "local direction" over recent tiles. This:
+     * - Smooths wobble (EAST/SE alternation averages to ESE over the window)
+     * - Detects actual turns quickly (within window size tiles)
+     *
+     * Compares current local heading to the heading at segment start (not previous iteration)
+     * to detect when the path has turned significantly from its original direction.
      */
     public static List<Waypoint> convertToWaypoints(List<WorldPoint> path)
     {
@@ -838,30 +846,58 @@ public class BoatPathing
 
         List<Waypoint> waypoints = new ArrayList<>();
 
-        WorldPoint currentPos = path.get(0);
-        Heading currentHeading = Heading.getOptimalHeading(currentPos, path.get(1));
-        waypoints.add(new Waypoint(currentPos, currentHeading));
-        currentPos = path.get(1);
-        for(int i = 2; i < path.size(); i++)
-        {
-            WorldPoint nextPos = path.get(i);
-            Heading nextHeading = Heading.getOptimalHeading(currentPos, nextPos);
-            if(nextHeading != currentHeading)
-            {
-                waypoints.add(new Waypoint(currentPos, currentHeading));
-                currentHeading = nextHeading;
-                currentPos = nextPos;
-                continue;
-            }
+        // Window size for smoothing wobble while detecting turns quickly
+        final int WINDOW_SIZE = 4;
 
-            if(i == path.size() - 1)
-            {
-                waypoints.add(new Waypoint(nextPos, nextHeading));
-            }
+        // Add starting waypoint so boat starts in correct direction
+        Heading startHeading = Heading.getOptimalHeading(path.get(0), path.get(Math.min(WINDOW_SIZE, path.size() - 1)));
+        waypoints.add(new Waypoint(path.get(0), startHeading));
 
-            currentPos = nextPos;
+        // Track segment start for heading calculation
+        int segmentStartIndex = 0;
+        Heading segmentStartHeading = startHeading;
+
+        for (int i = WINDOW_SIZE; i < path.size(); i++) {
+            // Calculate local heading over sliding window
+            int windowStart = i - WINDOW_SIZE;
+            Heading localHeading = Heading.getOptimalHeading(path.get(windowStart), path.get(i));
+
+            // Compare current local heading to segment START heading (not previous iteration!)
+            // This detects when we've turned away from our original direction
+            int diff = getHeadingDifference(localHeading, segmentStartHeading);
+
+            // Threshold of 1 unit (22.5°) - catches turns while still smoothing single-tile wobble
+            if (diff > 1) {
+                // Place waypoint at position where turn was detected
+                WorldPoint turnPoint = path.get(windowStart);
+                Heading segmentHeading = Heading.getOptimalHeading(path.get(segmentStartIndex), turnPoint);
+                waypoints.add(new Waypoint(turnPoint, segmentHeading));
+
+                // Start new segment - reset the segment start heading
+                segmentStartIndex = windowStart;
+                segmentStartHeading = localHeading;
+            }
+            // NOTE: Do NOT update segmentStartHeading here - it stays fixed until a turn is detected
         }
 
+        // Final waypoint
+        WorldPoint last = path.get(path.size() - 1);
+        Heading finalHeading = Heading.getOptimalHeading(path.get(segmentStartIndex), last);
+        waypoints.add(new Waypoint(last, finalHeading));
+
         return waypoints;
+    }
+
+    /**
+     * Calculates the minimum heading difference (0-8) accounting for wrap-around.
+     * Heading values are 0-15 in a circle, so diff of 15 is actually 1 step.
+     */
+    private static int getHeadingDifference(Heading a, Heading b)
+    {
+        int diff = Math.abs(a.getValue() - b.getValue());
+        if (diff > 8) {
+            diff = 16 - diff;  // Wrap around the circle
+        }
+        return diff;
     }
 }
