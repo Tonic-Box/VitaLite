@@ -559,7 +559,11 @@ public class BoatPathing
             // Uses multi-parent lookback to detect "split turn" exploits
             int turnCost = getTurnCost(parents, current, dir);
 
-            int edgeCost = baseCost * proximityCost + turnCost;
+            // Anti-wobble penalty: discourage alternating between adjacent directions
+            // E.g., EAST→SE→EAST pattern gets penalized to prefer clean 8-direction paths
+            int alternationCost = getAlternationCost(parents, current, dir);
+
+            int edgeCost = baseCost * proximityCost + turnCost + alternationCost;
             int tentativeG = currentG + edgeCost;
 
             // Only update if this path is better
@@ -823,6 +827,68 @@ public class BoatPathing
         }
 
         return TURN_COSTS[headingDiff];
+    }
+
+    /**
+     * Penalizes alternating between adjacent directions (anti-wobble).
+     * Detects patterns like EAST → SE → EAST where we alternate back to a previous direction.
+     * This discourages 2:1 slope wobble patterns, preferring clean 8-direction paths.
+     *
+     * @param parents Parent map for path reconstruction
+     * @param current Current node's packed coordinates
+     * @param nextDir Direction index (0-7) for the next move
+     * @return Alternation penalty (0 if no wobble pattern detected)
+     */
+    private static int getAlternationCost(Int2IntOpenHashMap parents, int current, int nextDir)
+    {
+        // Get parent to find the direction we just came from
+        int parent = parents.get(current);
+        if (parent == -1 || parent == -2) {
+            return 0;  // No parent, no alternation possible
+        }
+
+        // Get grandparent to find direction before that
+        int grandparent = parents.get(parent);
+        if (grandparent == -1 || grandparent == -2) {
+            return 0;  // Not enough history
+        }
+
+        // Calculate the previous two directions
+        int prevDir = getDirectionIndex(
+            WorldPointUtil.getCompressedX(grandparent),
+            WorldPointUtil.getCompressedY(grandparent),
+            WorldPointUtil.getCompressedX(parent),
+            WorldPointUtil.getCompressedY(parent)
+        );
+
+        int currentDir = getDirectionIndex(
+            WorldPointUtil.getCompressedX(parent),
+            WorldPointUtil.getCompressedY(parent),
+            WorldPointUtil.getCompressedX(current),
+            WorldPointUtil.getCompressedY(current)
+        );
+
+        if (prevDir == -1 || currentDir == -1) {
+            return 0;
+        }
+
+        // Check for alternation pattern: prevDir != currentDir, but nextDir == prevDir
+        // This catches: EAST → SE → EAST (alternating back to previous direction)
+        if (prevDir != currentDir && nextDir == prevDir) {
+            // Check if they're adjacent directions (within 45° of each other)
+            int prevHeading = DIRECTION_TO_HEADING[prevDir];
+            int currentHeading = DIRECTION_TO_HEADING[currentDir];
+            int headingDiff = Math.abs(prevHeading - currentHeading);
+            if (headingDiff > 8) {
+                headingDiff = 16 - headingDiff;  // Shortest path around circle
+            }
+
+            if (headingDiff <= 2) {  // Adjacent directions (within 45°)
+                return 8;  // Moderate penalty for wobble pattern
+            }
+        }
+
+        return 0;
     }
 
     /**
