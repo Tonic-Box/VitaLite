@@ -196,9 +196,9 @@ public class TransportLoader
 
                 if(QuestAPI.isCompleted(Quest.PANDEMONIUM) && InventoryAPI.count(ItemID.COINS_995) >= 30)
                 {
-                    transports.add(npcTransport(new WorldPoint(3027, 3217, 0), new WorldPoint(3065, 3002, 0), NpcID.CAPTAIN_TOBIAS, "The Pandemonium"));
-                    transports.add(npcTransport(new WorldPoint(3064, 3002, 0), new WorldPoint(3029, 3217, 0), NpcID.SEAMAN_MORRIS, "Port Sarim"));
-                    transports.add(npcTransport(new WorldPoint(3064, 3002, 0), new WorldPoint(2956, 3146, 0), NpcID.SEAMAN_MORRIS, "Musa Point"));
+                    transports.add(npcTransport(new WorldPoint(3027, 3217, 0), new WorldPoint(3065, 3002, 0), "Captain Tobias", "The Pandemonium"));
+                    transports.add(npcTransport(new WorldPoint(3064, 3002, 0), new WorldPoint(3029, 3217, 0), "Seaman Morris", "Port Sarim"));
+                    transports.add(npcTransport(new WorldPoint(3064, 3002, 0), new WorldPoint(2956, 3146, 0), "Seaman Morris", "Musa Point"));
                 }
 
                 if (QuestAPI.isCompleted(Quest.THE_LOST_TRIBE) || !filter)
