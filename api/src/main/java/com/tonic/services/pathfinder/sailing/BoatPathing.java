@@ -46,21 +46,8 @@ import java.util.*;
  */
 public class BoatPathing
 {
-    // Direction indices for 8 neighbors
-    private static final int DIR_WEST = 0;
-    private static final int DIR_EAST = 1;
-    private static final int DIR_SOUTH = 2;
-    private static final int DIR_NORTH = 3;
-    private static final int DIR_SOUTHWEST = 4;
-    private static final int DIR_SOUTHEAST = 5;
-    private static final int DIR_NORTHWEST = 6;
-    private static final int DIR_NORTHEAST = 7;
-
-    // Direction offsets (matching DIR_* constants order)
     private static final int[] DX = {-1, 1, 0, 0, -1, 1, -1, 1};
     private static final int[] DY = {0, 0, -1, 1, -1, -1, 1, 1};
-
-    // Base movement costs (10 for orthogonal, 14 for diagonal ≈ √2 × 10)
     private static final int[] BASE_COSTS = {10, 10, 10, 10, 14, 14, 14, 14};
 
     // Proximity costs (index = distance to nearest collision)
@@ -110,7 +97,6 @@ public class BoatPathing
                 .addDelayUntil(context -> {
                     if(!context.contains("PATH"))
                     {
-                        WorldEntity boat = BoatCollisionAPI.getPlayerBoat();
                         WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
                         List<WorldPoint> fullPath = findFullPath(start, worldPoint);
                         if(fullPath == null || fullPath.isEmpty())
@@ -373,7 +359,7 @@ public class BoatPathing
         Collection<WorldPoint> hull = BoatCollisionAPI.getPlayerBoatCollision();
 
         if (hull == null || hull.isEmpty()) {
-            System.out.println("SailPathing: Empty boat hull (" + (hull == null ? "null" : hull.size()) + " tiles)");
+            System.out.println("SailPathing: Empty boat hull (" + (hull == null ? "null" : 0) + " tiles)");
             return null;
         }
 
@@ -718,7 +704,7 @@ public class BoatPathing
             return cached;
         }
 
-        int dist = calculateMinDistanceToCollisionInt(collisionMap, x, y, plane, MAX_PROXIMITY_SCAN);
+        int dist = calculateMinDistanceToCollisionInt(collisionMap, x, y, plane);
         cache.put(packed, dist);
         return dist;
     }
@@ -729,12 +715,12 @@ public class BoatPathing
      * Checks cardinals first (most likely collision direction).
      * OPTIMIZED: Uses primitive ints, casts to short only at collision check.
      */
-    private static int calculateMinDistanceToCollisionInt(CollisionMap collisionMap, int x, int y, int plane, int maxRadius)
+    private static int calculateMinDistanceToCollisionInt(CollisionMap collisionMap, int x, int y, int plane)
     {
         byte p = (byte) plane;
 
         // Spiral out from center, early termination on first collision
-        for (int r = 1; r <= maxRadius; r++) {
+        for (int r = 1; r <= BoatPathing.MAX_PROXIMITY_SCAN; r++) {
             // Check cardinals first (most common collision direction)
             if (!collisionMap.walkable((short) x, (short)(y + r), p)) return r;  // N
             if (!collisionMap.walkable((short) x, (short)(y - r), p)) return r;  // S
@@ -761,7 +747,7 @@ public class BoatPathing
                 if (!collisionMap.walkable((short)(x - r), (short)(y - i), p)) return r;
             }
         }
-        return maxRadius + 1;  // No collision within scan range (open water)
+        return BoatPathing.MAX_PROXIMITY_SCAN + 1;  // No collision within scan range (open water)
     }
 
     // ==================== Turn Cost Calculation ====================
