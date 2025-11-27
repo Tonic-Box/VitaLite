@@ -8,6 +8,7 @@ import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.collision.CollisionMap;
 import com.tonic.util.Distance;
+import com.tonic.util.Profiler;
 import com.tonic.util.WorldPointUtil;
 import com.tonic.util.handler.StepHandler;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
@@ -19,12 +20,12 @@ import java.util.*;
 
 /**
  * Dijkstra-based boat pathfinding with proximity-weighted costs.
- * Generates tile-by-tile paths preferring 4-5 tile clearance from obstacles,
+ * Generates tile-by-tile paths preferring 6-7 tile clearance from obstacles,
  * naturally centers in corridors, and falls back to tighter paths when needed.
  *
  * ALGORITHM: Weighted Dijkstra with cost = baseCost × proximityMultiplier
  * - Base costs: 10 (orthogonal), 14 (diagonal ≈ √2 × 10)
- * - Proximity multipliers: 50× at 1 tile, 20× at 2, 8× at 3, 1× at 4+
+ * - Proximity multipliers: 50× at 1 tile, 25× at 2, 12× at 3, 6× at 4, 3× at 5, 1× at 6+
  * - Natural centering: equidistant from walls = lowest combined cost
  *
  * OPTIMIZATION: Highly optimized hot path with:
@@ -56,19 +57,21 @@ public class BoatPathing
     private static final int[] BASE_COSTS = {10, 10, 10, 10, 14, 14, 14, 14};
 
     // Proximity costs (index = distance to nearest collision)
-    // 0=blocked, 1=very close, 2=close, 3=moderate, 4+=ideal
+    // 0=blocked, 1-5=penalized, 6-7=ideal buffer
     private static final int[] PROXIMITY_COSTS = {
             Integer.MAX_VALUE,  // 0: blocked (hull collision handled separately)
             50,                 // 1: very close - emergency only
-            20,                 // 2: close - avoid if possible
-            8,                  // 3: moderate penalty
-            1,                  // 4: ideal - base cost
-            1,                  // 5: ideal - base cost
-            1                   // 6+: open water
+            25,                 // 2: close - avoid if possible
+            12,                 // 3: moderate penalty
+            6,                  // 4: slight penalty
+            3,                  // 5: minor penalty
+            1,                  // 6: ideal - base cost
+            1,                  // 7: ideal - base cost
+            1                   // 8+: open water
     };
 
     // Maximum radius to scan for proximity calculation
-    private static final int MAX_PROXIMITY_SCAN = 6;
+    private static final int MAX_PROXIMITY_SCAN = 8;
 
     public static StepHandler travelTo(WorldPoint worldPoint)
     {
@@ -401,7 +404,8 @@ public class BoatPathing
      */
     public static List<WorldPoint> findFullPath(WorldPoint start, WorldPoint target)
     {
-        return Static.invoke(() -> {
+        Profiler.Start("BoatPathing");
+        List<WorldPoint> path = Static.invoke(() -> {
             CollisionMap collisionMap = Walker.getCollisionMap();
             if (collisionMap == null) {
                 System.out.println("SailPathing: CollisionMap is null");
@@ -466,6 +470,9 @@ public class BoatPathing
             System.out.println("SailPathing: No path found after " + iterations + " iterations");
             return null;
         });
+
+        Profiler.StopMS();
+        return path;
     }
 
     /**
