@@ -109,9 +109,6 @@ public class BoatPathing
                         context.put("PATH", waypoints);
                         context.put("POINTER", 0);
                         context.put("LAST_HEADING", null);
-
-                        BoatPathingDebug.printPath(fullPath);
-                        BoatPathingDebug.printWaypoints(waypoints);
                     }
                     List<Waypoint> waypoints = context.get("PATH");
                     Waypoint first = waypoints.get(1);
