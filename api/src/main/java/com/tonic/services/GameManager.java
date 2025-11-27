@@ -619,7 +619,7 @@ public class GameManager extends Overlay {
                     .setType(MenuAction.RUNELITE)
                     .onClick(e -> ThreadPool.submit(() -> {
                         Profiler.Start("FindSailPath");
-                        testPoints = BoatPathing.findFullPath(null, BoatCollisionAPI.getPlayerBoatWorldPoint(), wp);
+                        testPoints = BoatPathing.findFullPath(BoatCollisionAPI.getPlayerBoatWorldPoint(), wp);
                         Profiler.StopMS();
                     }));
             color = "<col=FF0000>";
