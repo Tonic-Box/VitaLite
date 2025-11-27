@@ -11,6 +11,7 @@ import net.runelite.api.events.*;
 import net.runelite.api.widgets.*;
 import com.tonic.data.wrappers.*;
 import com.tonic.api.game.sailing.*;
+import com.tonic.data.locatables.sailing.*;
 
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
