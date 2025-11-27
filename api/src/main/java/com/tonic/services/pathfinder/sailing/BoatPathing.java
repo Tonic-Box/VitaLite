@@ -84,6 +84,10 @@ public class BoatPathing
     // West=4, East=12, South=0, North=8, SW=2, SE=14, NW=6, NE=10
     private static final int[] DIRECTION_TO_HEADING = {4, 12, 0, 8, 2, 14, 6, 10};
 
+    // Number of parents to look back for cumulative turn calculation
+    // 4 steps catches 3-step split turns (e.g., 30° + 30° + 30° = 90°)
+    private static final int TURN_LOOKBACK_DEPTH = 4;
+
     // Turn cost penalties indexed by heading difference (0-8)
     // Heading diff: 0=same, 2=45°, 4=90°, 6=135°, 8=180°
     // Boats can't make sharp turns while moving - they need curved arcs
@@ -538,9 +542,6 @@ public class BoatPathing
         int y = WorldPointUtil.getCompressedY(current);
         int plane = WorldPointUtil.getCompressedPlane(current);
 
-        // Get parent for turn cost calculation
-        int parentPacked = parents.get(current);
-
         // Expand in all 8 directions
         for (int dir = 0; dir < 8; dir++) {
             int nx = x + DX[dir];
@@ -570,7 +571,8 @@ public class BoatPathing
             }
 
             // Calculate turn cost penalty (discourages sharp direction changes)
-            int turnCost = getTurnCost(parents, parentPacked, current, dir);
+            // Uses multi-parent lookback to detect "split turn" exploits
+            int turnCost = getTurnCost(parents, current, dir);
 
             int edgeCost = baseCost * proximityCost + turnCost;
             int tentativeG = currentG + edgeCost;
@@ -783,38 +785,54 @@ public class BoatPathing
     }
 
     /**
-     * Calculates turn cost penalty for changing direction.
-     * Uses parent lookup to derive incoming direction - avoids state space expansion.
+     * Calculates turn cost penalty based on cumulative heading change over recent steps.
+     * Looks back TURN_LOOKBACK_DEPTH parents to detect "split turns" where a boat
+     * gradually turns (e.g., North->NW->West = 90° split into two 45° turns).
+     *
+     * This prevents the exploit where a 90° turn (cost 40) could be split into
+     * multiple smaller turns with lower total cost.
      *
      * @param parents Parent map for path reconstruction
-     * @param parentPacked Parent node's packed coordinates (-1 for start node)
-     * @param currentPacked Current node's packed coordinates
+     * @param current Current node's packed coordinates
      * @param nextDir Direction index (0-7) for the next move
-     * @return Turn cost penalty (0 if no parent or small turn)
+     * @return Turn cost penalty based on cumulative turn over lookback window
      */
-    private static int getTurnCost(Int2IntOpenHashMap parents, int parentPacked,
-                                   int currentPacked, int nextDir)
+    private static int getTurnCost(Int2IntOpenHashMap parents, int current, int nextDir)
     {
-        if (parentPacked == -1) {
-            return 0;  // No turn cost for first move from start
+        // Walk back TURN_LOOKBACK_DEPTH parents to find ancestor
+        int ancestor = current;
+        int prevAncestor = current;
+
+        for (int i = 0; i < TURN_LOOKBACK_DEPTH; i++) {
+            int parent = parents.get(ancestor);
+            if (parent == -1 || parent == -2) {
+                break;  // Reached start or not enough history
+            }
+            prevAncestor = ancestor;
+            ancestor = parent;
         }
 
-        // Derive incoming direction from parent -> current movement
-        int parentX = WorldPointUtil.getCompressedX(parentPacked);
-        int parentY = WorldPointUtil.getCompressedY(parentPacked);
-        int currentX = WorldPointUtil.getCompressedX(currentPacked);
-        int currentY = WorldPointUtil.getCompressedY(currentPacked);
-
-        int incomingDir = getDirectionIndex(parentX, parentY, currentX, currentY);
-        if (incomingDir == -1) {
-            return 0;  // Same position (shouldn't happen)
+        // If we didn't move back at all, no turn cost
+        if (ancestor == current) {
+            return 0;
         }
 
-        // Calculate heading difference using game's 16-heading system
-        int inHeading = DIRECTION_TO_HEADING[incomingDir];
-        int outHeading = DIRECTION_TO_HEADING[nextDir];
+        // Calculate direction from ancestor -> prevAncestor (outgoing direction at ancestor)
+        int ancestorX = WorldPointUtil.getCompressedX(ancestor);
+        int ancestorY = WorldPointUtil.getCompressedY(ancestor);
+        int prevX = WorldPointUtil.getCompressedX(prevAncestor);
+        int prevY = WorldPointUtil.getCompressedY(prevAncestor);
 
-        int headingDiff = Math.abs(outHeading - inHeading);
+        int startDir = getDirectionIndex(ancestorX, ancestorY, prevX, prevY);
+        if (startDir == -1) {
+            return 0;
+        }
+
+        // Compare start heading (from N steps ago) to next heading
+        int startHeading = DIRECTION_TO_HEADING[startDir];
+        int endHeading = DIRECTION_TO_HEADING[nextDir];
+
+        int headingDiff = Math.abs(endHeading - startHeading);
         if (headingDiff > 8) {
             headingDiff = 16 - headingDiff;  // Shortest path around circle
         }
