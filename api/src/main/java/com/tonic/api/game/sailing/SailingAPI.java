@@ -5,11 +5,17 @@ import com.tonic.api.TClient;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.GameAPI;
 import com.tonic.api.game.VarAPI;
+import com.tonic.api.threaded.Delays;
+import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.SailingConstants;
+import com.tonic.data.locatables.sailing.CargoHoldAPI;
+import com.tonic.data.locatables.sailing.CourierTaskData;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileObjectEx;
+import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
+import com.tonic.util.handler.StepHandler;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.MenuAction;
@@ -145,46 +151,6 @@ public class SailingAPI
      */
     public static boolean isStandingStill() {
         return MoveMode.getCurrent() == MoveMode.STILL;
-    }
-
-    /**
-     * Trims the sails on the boat
-     * @return true if sails were trimmed, false otherwise
-     */
-    public static boolean trimSails() {
-        if (!isOnBoat() || !sailsNeedTrimming) {
-            return false;
-        }
-        TileObjectEx sail = TileObjectAPI.search()
-                .withId(SailingConstants.SAILS)
-                .nearest();
-
-        if(sail != null) {
-            TileObjectAPI.interact(sail, "Trim");
-            sailsNeedTrimming = false;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Opens the cargo hold on the boat
-     * @return true if cargo hold was opened, false otherwise
-     */
-    public static boolean openCargo() {
-        if (!isOnBoat()) {
-            return false;
-        }
-
-        TileObjectEx cargo = TileObjectAPI.search()
-                .withId(SailingConstants.CARGO_HOLDS)
-                .nearest();
-
-        if(cargo != null) {
-            TileObjectAPI.interact(cargo, "open");
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -352,5 +318,84 @@ public class SailingAPI
 
             return (int) Math.round(jau);
         });
+    }
+
+    /**
+     * Trims the sails on the boat
+     * @return true if sails were trimmed, false otherwise
+     */
+    public static boolean trimSails() {
+        if (!isOnBoat() || !sailsNeedTrimming) {
+            return false;
+        }
+        TileObjectEx sail = TileObjectAPI.search()
+                .withId(SailingConstants.SAILS)
+                .nearest();
+
+        if(sail != null) {
+            TileObjectAPI.interact(sail, "Trim");
+            sailsNeedTrimming = false;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Opens the cargo hold on the boat
+     * @return true if cargo hold was opened, false otherwise
+     */
+    public static boolean openCargo() {
+        if (!isOnBoat()) {
+            return false;
+        }
+
+        TileObjectEx cargo = TileObjectAPI.search()
+                .withId(SailingConstants.CARGO_HOLDS)
+                .nearest();
+
+        if(cargo != null) {
+            TileObjectAPI.interact(cargo, "open");
+            return true;
+        }
+        return false;
+    }
+
+    // interactions
+    public static boolean navigate()
+    {
+        if(!isOnBoat())
+            return false;
+
+        if(isNavigating())
+            return true;
+
+        TileObjectEx helm = TileObjectAPI.search()
+                .withNameContains("Helm")
+                .nearest();
+        if(helm != null)
+        {
+            helm.interact("Navigate");
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean stopNavigate()
+    {
+        if(!isOnBoat())
+            return false;
+
+        if(isNavigating())
+            return true;
+
+        TileObjectEx helm = TileObjectAPI.search()
+                .withNameContains("Helm")
+                .nearest();
+        if(helm != null)
+        {
+            helm.interact("Stop-navigating");
+            return true;
+        }
+        return false;
     }
 }

@@ -4,9 +4,14 @@ import com.tonic.Static;
 import com.tonic.api.game.SkillAPI;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.WidgetAPI;
+import com.tonic.data.wrappers.PlayerEx;
+import com.tonic.services.pathfinder.sailing.BoatPathing;
+import com.tonic.util.Distance;
 import com.tonic.util.TextUtil;
+import com.tonic.util.handler.StepHandler;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.Skill;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 
@@ -27,7 +32,7 @@ public enum NoticeBoardPosting
 
     public boolean accept()
     {
-        if(!WidgetAPI.isVisible(InterfaceID.PortTaskBoard.CONTAINER) || getTaskData().isActive())
+        if(!WidgetAPI.isVisible(InterfaceID.PortTaskBoard.CONTAINER) || isAccepted())
         {
             return false;
         }
@@ -38,7 +43,7 @@ public enum NoticeBoardPosting
 
     public boolean cancel()
     {
-        if(!WidgetAPI.isVisible(InterfaceID.PortTaskBoard.CONTAINER) || !getTaskData().isActive())
+        if(!WidgetAPI.isVisible(InterfaceID.PortTaskBoard.CONTAINER) || !isAccepted())
         {
             return false;
         }
@@ -66,14 +71,44 @@ public enum NoticeBoardPosting
         });
     }
 
+    public boolean isAccepted()
+    {
+        return Static.invoke(() -> {
+            Widget noticeBoard = WidgetAPI.get(InterfaceID.PortTaskBoard.CONTAINER);
+            if(noticeBoard == null)
+            {
+                return false;
+            }
+
+            Widget acceptedWidget = noticeBoard.getChild(startIndex + 3);
+            if(acceptedWidget == null)
+            {
+                return false;
+            }
+
+            return WidgetAPI.isVisible(acceptedWidget);
+        });
+    }
+
     public CourierTaskData getTaskData()
     {
         return CourierTaskData.fromName(getTaskName());
     }
 
+    public boolean startsFromCurrentPort()
+    {
+        CourierTaskData data = getTaskData();
+        if(data == null)
+        {
+            return false;
+        }
+        WorldPoint player = PlayerEx.getLocal().getWorldPoint();
+        return Distance.chebyshev(getStartingPoint(), player) <= 50;
+    }
+
     public boolean hasLevelFor()
     {
-        return SkillAPI.getLevel(Skill.SAILING) >= getRequiredLevel();
+        return 10 >= getRequiredLevel(); //SkillAPI.getLevel(Skill.SAILING) >= getRequiredLevel();
     }
 
     public int getRequiredLevel()
@@ -92,5 +127,35 @@ public enum NoticeBoardPosting
             }
             return Integer.parseInt(reqWidget.getText());
         });
+    }
+
+    public WorldPoint getDestination()
+    {
+        CourierTaskData data = getTaskData();
+        if(data == null)
+        {
+            return null;
+        }
+        return data.getDestination();
+    }
+
+    public WorldPoint getStartingPoint()
+    {
+        CourierTaskData data = getTaskData();
+        if(data == null)
+        {
+            return null;
+        }
+        return data.getStartingPoint();
+    }
+
+    public StepHandler getPath()
+    {
+        CourierTaskData data = getTaskData();
+        if(data == null)
+        {
+            return null;
+        }
+        return data.getPath();
     }
 }
