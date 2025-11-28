@@ -2,6 +2,8 @@ package com.tonic.services;
 
 import com.tonic.Static;
 import com.tonic.api.TObjectComposition;
+import com.tonic.api.game.sailing.SailingAPI;
+import com.tonic.api.game.sailing.SailingRenderUtil;
 import com.tonic.data.ObjectBlockAccessFlags;
 import com.tonic.data.Walls;
 import com.tonic.data.wrappers.PlayerEx;
@@ -38,7 +40,18 @@ public class TileOverlays extends Overlay
 
     @Override
     public Dimension render(Graphics2D graphics) {
+        if(SailingAPI.isOnBoat())
+        {
+            if(Static.getVitaConfig().getDrawBoatHull())
+            {
+                SailingRenderUtil.renderPlayerBoatHull(graphics);
+            }
 
+            if(Static.getVitaConfig().getDrawBoatDeck())
+            {
+                SailingRenderUtil.renderPlayerBoatDeck(graphics);
+            }
+        }
         if(Static.getVitaConfig().shouldDrawInteractable())
         {
             drawInteractableFrom(graphics);

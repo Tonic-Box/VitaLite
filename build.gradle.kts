@@ -147,7 +147,8 @@ tasks {
             val whitelist = setOf(
                 "net/runelite/api/gameval/ItemID.class",
                 "net/runelite/api/gameval/InterfaceID.class",
-                "net/runelite/api/gameval/ObjectID.class"
+                "net/runelite/api/gameval/ObjectID.class",
+                "net/runelite/api/gameval/ObjectID1.class"
             )
 
             // Exclude if it's in api package (any level) but NOT in whitelist
