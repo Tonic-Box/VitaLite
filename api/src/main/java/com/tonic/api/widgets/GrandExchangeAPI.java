@@ -46,9 +46,28 @@ public class GrandExchangeAPI
     public static void cancel(GrandExchangeSlot slot)
     {
         WidgetAPI.interact(2, slot.getId(), 2, -1);
-        WidgetAPI.interact(1, slot.getId(), 2, -1);
         Delays.tick(2);
-        WidgetAPI.interact(2, InterfaceID.GeOffers.DETAILS_COLLECT, 2, ItemID.COINS);
+    }
+
+    /**
+     * Collects items from a canceled or completed Grand Exchange offer in the specified slot.
+     * @param slot The GrandExchangeSlot to collect from.
+     * @param noted True to collect noted items, false to collect unnoted items.
+     */
+    public static void collectAs(GrandExchangeSlot slot, boolean noted)
+    {
+        if(slot == null)
+            return;
+        int itemId = slot.getItemId();
+        Static.invoke(() -> {
+            if(!isOfferDetailsOpenForItem(itemId))
+            {
+                WidgetAPI.interact(1, slot.getId(), 2, -1);
+            }
+            int option = noted ? 1 : 2;
+            WidgetAPI.interact(option, InterfaceID.GeOffers.DETAILS_COLLECT, 2, itemId);
+            WidgetAPI.interact(1, InterfaceID.GeOffers.DETAILS_COLLECT, 3, ItemID.COINS);
+        });
     }
 
     /**
@@ -278,5 +297,14 @@ public class GrandExchangeAPI
     public static void collectAll()
     {
         WidgetAPI.interact(1, InterfaceID.GeOffers.COLLECTALL, 0, -1);
+    }
+
+    private static boolean isOfferDetailsOpenForItem(int itemId)
+    {
+        Client client = Static.getClient();
+        return Static.invoke(() -> {
+            Widget detailsWidget = client.getWidget(InterfaceID.GeOffers.DETAILS_COLLECT, 2);
+            return WidgetAPI.isVisible(detailsWidget) && detailsWidget.getItemId() == itemId;
+        });
     }
 }
