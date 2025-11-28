@@ -1,9 +1,17 @@
 package com.tonic.data;
 
+import static net.runelite.api.gameval.InventoryID.*;
 import static net.runelite.api.gameval.ObjectID.*;
 
 public class SailingConstants
 {
+    public static final int[] CARGO_HOLD_INVENTORIES = {
+            SAILING_BOAT_1_CARGOHOLD,
+            SAILING_BOAT_2_CARGOHOLD,
+            SAILING_BOAT_3_CARGOHOLD,
+            SAILING_BOAT_4_CARGOHOLD,
+            SAILING_BOAT_5_CARGOHOLD
+    };
     public static final int[] CARGO_HOLDS = {
             SAILING_BOAT_CARGO_HOLD_REGULAR_RAFT,
             SAILING_BOAT_CARGO_HOLD_REGULAR_RAFT_OPEN,

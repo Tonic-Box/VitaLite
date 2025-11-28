@@ -61,7 +61,7 @@ public class Walker
     {
         StepHandler handler = BoatPathing.travelTo(target);
         running = true;
-        while(!handler.step())
+        while(handler.step())
         {
             if(!running)
             {

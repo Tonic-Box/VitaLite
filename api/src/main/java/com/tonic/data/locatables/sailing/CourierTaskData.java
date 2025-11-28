@@ -39,6 +39,7 @@ import com.tonic.services.pathfinder.sailing.BoatPathing;
 import com.tonic.util.handler.StepHandler;
 import lombok.Getter;
 import net.runelite.api.Client;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
 
 @Getter
@@ -512,33 +513,62 @@ public enum CourierTaskData
         this.cargoAmount = cargoAmount;
     }
 
+    //TODO: fix
+//    public boolean isActive()
+//    {
+//        return getTaskState() != null;
+//    }
+//
+//    public PortTaskTrigger.TaskType getTaskState()
+//    {
+//        return Static.invoke(() -> {
+//            final Client client = Static.getClient();
+//            final int[] varPlayers = client.getVarps().clone();
+//            for (PortTaskTrigger varbit : PortTaskTrigger.values())
+//            {
+//                int value = client.getVarbitValue(varPlayers, varbit.getId());
+//                CourierTaskData data = CourierTaskData.fromId(value);
+//                if(data == this)
+//                {
+//                    return varbit.getType();
+//                }
+//            }
+//            return null;
+//        });
+//    }
+
+    public WorldPoint getDestination()
+    {
+        if(isReversePath())
+        {
+            return getTravelPath().getStart().getNavigationLocation();
+        }
+        else
+        {
+            return getTravelPath().getEnd().getNavigationLocation();
+        }
+    }
+
+    public WorldPoint getStartingPoint()
+    {
+        if(isReversePath())
+        {
+            return getTravelPath().getEnd().getNavigationLocation();
+        }
+        else
+        {
+            return getTravelPath().getStart().getNavigationLocation();
+        }
+    }
+
     public StepHandler getPath()
     {
-        var path = travelPath.getWaypointPath(reversePath);
-        return BoatPathing.travelTo(path);
-    }
-
-    public boolean isActive()
-    {
-        return getTaskState() != null;
-    }
-
-    public PortTaskTrigger.TaskType getTaskState()
-    {
-        return Static.invoke(() -> {
-            final Client client = Static.getClient();
-            final int[] varPlayers = client.getVarps().clone();
-            for (PortTaskTrigger varbit : PortTaskTrigger.values())
-            {
-                int value = client.getVarbitValue(varPlayers, varbit.getId());
-                CourierTaskData data = CourierTaskData.fromId(value);
-                if(data == this)
-                {
-                    return varbit.getType();
-                }
-            }
+        WorldPoint destination = getDestination();
+        if(destination == null)
+        {
             return null;
-        });
+        }
+        return BoatPathing.travelTo(destination);
     }
 
     static

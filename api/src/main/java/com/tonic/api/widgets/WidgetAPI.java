@@ -14,6 +14,9 @@ import net.runelite.api.TileObject;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 
+import java.awt.*;
+import java.awt.event.KeyEvent;
+
 /**
  * Widget API
  */
@@ -576,5 +579,37 @@ public class WidgetAPI
     public static boolean isVisible(int interfaceId)
     {
         return isVisible(get(interfaceId));
+    }
+
+    /**
+     * Closes the currently open interface by simulating an ESC key press
+     * TODO: Hack until I get un-lazy and add close int packet to mappings
+     */
+    public static void closeInterface()
+    {
+        Client client = Static.getClient();
+        Canvas canvas = client.getCanvas();
+        long when = System.currentTimeMillis();
+
+        KeyEvent pressed = new KeyEvent(
+                canvas,
+                KeyEvent.KEY_PRESSED,
+                when,
+                0,
+                KeyEvent.VK_ESCAPE,
+                KeyEvent.CHAR_UNDEFINED
+        );
+
+        KeyEvent released = new KeyEvent(
+                canvas,
+                KeyEvent.KEY_RELEASED,
+                when + 50,
+                0,
+                KeyEvent.VK_ESCAPE,
+                KeyEvent.CHAR_UNDEFINED
+        );
+
+        canvas.dispatchEvent(pressed);
+        canvas.dispatchEvent(released);
     }
 }

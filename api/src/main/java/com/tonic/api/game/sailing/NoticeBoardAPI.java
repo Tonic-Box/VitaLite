@@ -1,17 +1,11 @@
 package com.tonic.api.game.sailing;
 
 import com.tonic.Static;
-import com.tonic.api.game.SkillAPI;
-import com.tonic.api.widgets.DialogueAPI;
+import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.widgets.WidgetAPI;
-import com.tonic.data.locatables.sailing.CourierTaskData;
 import com.tonic.data.locatables.sailing.NoticeBoardPosting;
-import com.tonic.util.TextUtil;
-import lombok.RequiredArgsConstructor;
-import net.runelite.api.Skill;
+import com.tonic.data.wrappers.TileObjectEx;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.widgets.Widget;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +14,27 @@ import java.util.List;
  */
 public class NoticeBoardAPI
 {
+    public static NoticeBoardPosting getBestTask()
+    {
+        return Static.invoke(() -> {
+            NoticeBoardPosting bestTask = null;
+            if(!WidgetAPI.isVisible(InterfaceID.PortTaskBoard.CONTAINER))
+            {
+                return null;
+            }
+            for(NoticeBoardPosting posting : NoticeBoardPosting.values())
+            {
+                if(posting.getTaskData() != null && posting.hasLevelFor() && posting.startsFromCurrentPort())
+                {
+                    if(bestTask == null || posting.getRequiredLevel() > bestTask.getRequiredLevel())
+                    {
+                        bestTask = posting;
+                    }
+                }
+            }
+            return bestTask;
+        });
+    }
     /**
      * Gets a list of all available tasks on the Notice Board that the player meets the level requirements for.
      *
@@ -35,7 +50,7 @@ public class NoticeBoardAPI
             }
             for(NoticeBoardPosting posting : NoticeBoardPosting.values())
             {
-                if(posting.getTaskData() != null && posting.hasLevelFor() && !posting.getTaskData().isActive())
+                if(posting.getTaskData() != null && posting.hasLevelFor() && !posting.isAccepted())
                 {
                     availableTasks.add(posting);
                 }
@@ -59,7 +74,7 @@ public class NoticeBoardAPI
             }
             for(NoticeBoardPosting posting : NoticeBoardPosting.values())
             {
-                if(posting.getTaskData() != null && posting.getTaskData().isActive())
+                if(posting.getTaskData() != null && posting.isAccepted())
                 {
                     availableTasks.add(posting);
                 }
@@ -90,5 +105,33 @@ public class NoticeBoardAPI
             }
             return availableTasks;
         });
+    }
+
+    public static boolean openNoticeBoard()
+    {
+        TileObjectEx board = TileObjectAPI.search()
+                .withName("Notice board")
+                .nearest();
+
+        if(board == null)
+        {
+            return false;
+        }
+
+        board.interact("Inspect");
+        return true;
+    }
+
+    public static boolean isOpen()
+    {
+        return WidgetAPI.isVisible(InterfaceID.PortTaskBoard.CONTAINER);
+    }
+
+    public static void closeNoticeBoard()
+    {
+        if(!isOpen())
+            return;
+
+        WidgetAPI.closeInterface();
     }
 }
