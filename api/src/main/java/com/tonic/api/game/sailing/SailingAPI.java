@@ -39,7 +39,7 @@ public class SailingAPI
             return false;
 
         SailingTab.FACILITIES.open();
-        if(MoveMode.getCurrent() != MoveMode.STILL)
+        if(MoveMode.getCurrent() != MoveMode.STILL && MoveMode.getCurrent() != MoveMode.STILL_WITH_WIND_CATCHER)
             return false;
 
         WidgetAPI.interact(1, InterfaceID.SailingSidepanel.FACILITIES_CONTENT_CLICKLAYER, 0);
