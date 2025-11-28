@@ -15,7 +15,6 @@ import com.tonic.services.ClickManager;
 import com.tonic.util.ClickManagerUtil;
 import com.tonic.util.Location;
 import com.tonic.util.handler.AbstractHandlerBuilder;
-import com.tonic.util.handler.HandlerBuilder;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
@@ -60,7 +59,7 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
         add(context -> {
             if(BankAPI.isOpen())
             {
-                return HandlerBuilder.END_EXECUTION;
+                jump("end", context);
             }
             NpcEx banker = new NpcQuery()
                     .withNameContains("Banker")
@@ -125,7 +124,7 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
             }
             return step;
         });
-        addDelayUntil(BankAPI::isOpen);
+        addDelayUntil("end", BankAPI::isOpen);
         return this;
     }
 
