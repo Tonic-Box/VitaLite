@@ -271,6 +271,43 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         contentPanel.add(walkerPanel);
         contentPanel.add(Box.createVerticalStrut(10));
 
+        //Boat Settings
+        CollapsiblePanel boatPanel = new CollapsiblePanel("Boat Debug");
+
+        ToggleSlider drawHull = new ToggleSlider();
+        drawHull.setSelected(Static.getVitaConfig().getDrawBoatHull());
+        boatPanel.addContent(createToggleOption(
+                "Draw Boat Hull",
+                "Draw the Boat hull collision when on a boat",
+                drawHull,
+                () -> Static.getVitaConfig().setDrawBoatHull(drawHull.isSelected())
+        ));
+
+        walkerPanel.addVerticalStrut(12);
+
+        ToggleSlider drawDeck = new ToggleSlider();
+        drawDeck.setSelected(Static.getVitaConfig().getDrawBoatDeck());
+        boatPanel.addContent(createToggleOption(
+                "Draw Boat Deck",
+                "Draw the Boat Deck collision when on a boat",
+                drawDeck,
+                () -> Static.getVitaConfig().setDrawBoatDeck(drawDeck.isSelected())
+        ));
+
+        boatPanel.addVerticalStrut(12);
+
+        ToggleSlider drawDebug = new ToggleSlider();
+        drawDebug.setSelected(Static.getVitaConfig().getDrawBoatDebug());
+        boatPanel.addContent(createToggleOption(
+                "Boat Debug Overlay",
+                "Draw boat stats overlay when on a boat",
+                drawDebug,
+                () -> Static.getVitaConfig().setDrawBoatDebug(drawDebug.isSelected())
+        ));
+
+        contentPanel.add(boatPanel);
+        contentPanel.add(Box.createVerticalStrut(10));
+
         // Scene Settings
         CollapsiblePanel scenePanel = new CollapsiblePanel("Scene");
 

@@ -100,4 +100,20 @@ public interface ClientConfig extends VitaConfig {
     boolean getDrawStratPath();
     @ConfigKey(value = "drawStratPath")
     void setDrawStratPath(boolean draw);
+
+    //boat
+    @ConfigKey(value = "boatHull", defaultValue = "false")
+    boolean getDrawBoatHull();
+    @ConfigKey(value = "boatHull")
+    void setDrawBoatHull(boolean draw);
+
+    @ConfigKey(value = "boatDeck", defaultValue = "false")
+    boolean getDrawBoatDeck();
+    @ConfigKey(value = "boatDeck")
+    void setDrawBoatDeck(boolean draw);
+
+    @ConfigKey(value = "boatDebug", defaultValue = "false")
+    boolean getDrawBoatDebug();
+    @ConfigKey(value = "boatDebug")
+    void setDrawBoatDebug(boolean draw);
 }

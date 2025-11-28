@@ -93,20 +93,25 @@ public class BoatPathing
 
     public static StepHandler travelTo(WorldPoint worldPoint)
     {
+        WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
+        List<WorldPoint> fullPath = findFullPath(start, worldPoint);
+        if(fullPath == null || fullPath.isEmpty())
+        {
+            System.out.println("BoatPathing: No path found to " + worldPoint);
+            return GenericHandlerBuilder.get().build();
+        }
+        GameManager.setPathPoints(fullPath);
+        List<Waypoint> waypoints = convertToWaypoints(fullPath);
+        return travelTo(waypoints);
+    }
+
+    public static StepHandler travelTo(List<Waypoint> path)
+    {
         return GenericHandlerBuilder.get()
                 .addDelayUntil(context -> {
                     if(!context.contains("PATH"))
                     {
-                        WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
-                        List<WorldPoint> fullPath = findFullPath(start, worldPoint);
-                        if(fullPath == null || fullPath.isEmpty())
-                        {
-                            System.out.println("BoatPathing: No path found to " + worldPoint);
-                            return true;
-                        }
-                        GameManager.setPathPoints(fullPath);
-                        List<Waypoint> waypoints = convertToWaypoints(fullPath);
-                        context.put("PATH", waypoints);
+                        context.put("PATH", path);
                         context.put("POINTER", 0);
                         context.put("LAST_HEADING", null);
                     }
@@ -162,97 +167,6 @@ public class BoatPathing
                         GameManager.clearPathPoints();
                         return true;
                     }
-
-                    if((end != waypoint && Distance.chebyshev(start, waypoint.getPosition()) <= 4))
-                    {
-                        context.put("POINTER", pointer + 1);
-                        return false;
-                    }
-                    if(SailingAPI.trimSails())
-                    {
-                        return false;
-                    }
-                    Heading optimalHeading = Heading.getOptimalHeading(waypoint.getPosition());
-                    Heading lastHeading = context.get("LAST_HEADING");
-                    if(optimalHeading != lastHeading)
-                    {
-                        SailingAPI.sailTo(waypoint.getPosition());
-                        context.put("LAST_HEADING", optimalHeading);
-                    }
-                    return false;
-                })
-                .build();
-    }
-
-    public static StepHandler travelTo(List<Waypoint> path)
-    {
-        return GenericHandlerBuilder.get()
-                .addDelayUntil(context -> {
-                    if(!context.contains("PATH"))
-                    {
-                        WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
-                        if(Distance.chebyshev(start, path.get(0).getPosition()) > 10)
-                        {
-                            System.out.println("BoatPathing: Start too far from first waypoint");
-                            return true;
-                        }
-                        context.put("PATH", path);
-                        context.put("POINTER", 0);
-                        context.put("LAST_HEADING", null);
-                    }
-                    List<Waypoint> waypoints = context.get("PATH");
-                    Waypoint first = waypoints.get(1);
-                    WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
-                    Heading heading = Heading.getOptimalHeading(start, first.getPosition());
-
-                    boolean headingInitSet = context.getOrDefault("HEADING_INIT_SET", false);
-                    if(headingInitSet)
-                    {
-                        int dif = heading.getValue() - SailingAPI.getHeading().getValue();
-                        if(dif <= 2 && dif >= -2)
-                        {
-                            SailingAPI.setSails();
-                            return true;
-                        }
-                        if (SailingAPI.isMovingForward()) {
-                            SailingAPI.unSetSails();
-                        }
-                        return false;
-                    }
-                    SailingAPI.setHeading(heading);
-                    context.put("HEADING_INIT_SET", true);
-                    return false;
-                })
-                .addDelayUntil(context -> {
-                    if(!context.contains("PATH"))
-                    {
-                        return true;
-                    }
-                    List<Waypoint> waypoints = context.get("PATH");
-                    int pointer = context.get("POINTER");
-
-                    if(waypoints == null || waypoints.isEmpty() || pointer >= waypoints.size())
-                    {
-                        context.remove("PATH");
-                        context.remove("POINTER");
-                        SailingAPI.unSetSails();
-                        GameManager.clearPathPoints();
-                        return true;
-                    }
-
-                    Waypoint waypoint = waypoints.get(pointer);
-                    Waypoint end = waypoints.get(waypoints.size() - 1);
-
-                    if(BoatCollisionAPI.playerBoatContainsPoint(end.getPosition()))
-                    {
-                        context.remove("PATH");
-                        context.remove("POINTER");
-                        SailingAPI.unSetSails();
-                        GameManager.clearPathPoints();
-                        return true;
-                    }
-
-                    WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
 
                     if((end != waypoint && Distance.chebyshev(start, waypoint.getPosition()) <= 4))
                     {
@@ -936,7 +850,7 @@ public class BoatPathing
             int segmentLength = i - segmentStartIndex;
 
             // Check path deviation - does the actual path stray from straight line?
-            boolean deviationExceeded = checkPathDeviation(path, segmentStartIndex, i, MAX_DEVIATION);
+            boolean deviationExceeded = checkPathDeviation(path, segmentStartIndex, i);
 
             // Create waypoint if: heading changed significantly, segment too long, or path deviates
             if (diff > 1 || segmentLength >= MAX_SEGMENT_LENGTH || deviationExceeded) {
@@ -963,7 +877,7 @@ public class BoatPathing
      * Checks if any path tile between start and end deviates more than maxDist
      * from the straight line between those two points.
      */
-    private static boolean checkPathDeviation(List<WorldPoint> path, int startIdx, int endIdx, int maxDist)
+    private static boolean checkPathDeviation(List<WorldPoint> path, int startIdx, int endIdx)
     {
         WorldPoint start = path.get(startIdx);
         WorldPoint end = path.get(endIdx);
@@ -985,7 +899,7 @@ public class BoatPathing
             // Using formula: |((y2-y1)*px - (x2-x1)*py + x2*y1 - y2*x1)| / sqrt((y2-y1)^2 + (x2-x1)^2)
             double dist = Math.abs(dy * p.getX() - dx * p.getY() + end.getX() * start.getY() - end.getY() * start.getX()) / lineLength;
 
-            if (dist > maxDist) {
+            if (dist > 2) {
                 return true;
             }
         }

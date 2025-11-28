@@ -3,6 +3,7 @@ package com.tonic.services;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
+import com.tonic.api.game.sailing.Heading;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
 import com.tonic.services.pathfinder.sailing.BoatPathing;
 import com.tonic.api.game.sailing.SailingAPI;
@@ -25,6 +26,7 @@ import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.services.stratpath.StratPathOverlay;
+import com.tonic.ui.VitaOverlay;
 import com.tonic.util.Profiler;
 import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
@@ -493,6 +495,7 @@ public class GameManager extends Overlay {
     private volatile List<WorldPoint> testPoints = null;
     @Getter
     private volatile List<WorldPoint> sailingPoints = null;
+    private final BoatOverlay boatOverlay = new BoatOverlay();
 
     public static void setPathPoints(List<WorldPoint> points)
     {
@@ -518,6 +521,15 @@ public class GameManager extends Overlay {
             sailingPath = null;
         }
 
+        if(Static.getVitaConfig().getDrawBoatDebug() && boatOverlay.isHidden() && SailingAPI.isOnBoat())
+        {
+            boatOverlay.show();
+        }
+        else if(!Static.getVitaConfig().getDrawBoatDebug() && !boatOverlay.isHidden())
+        {
+            boatOverlay.hide();
+        }
+
         Widget gameframe = LayoutView.GAMEFRAME.getWidget();
         if(gameframe == null)
             return;
@@ -529,6 +541,19 @@ public class GameManager extends Overlay {
         else if(!WidgetAPI.isVisible(gameframe) && !Static.isHeadless())
         {
             gameframe.setHidden(false);
+        }
+    }
+
+    @Subscribe
+    public void onClientTick(ClientTick event)
+    {
+        Client client = Static.getClient();
+        if(client.getGameState() != GameState.LOGGED_IN)
+            return;
+
+        if(Static.getVitaConfig().getDrawBoatDebug() && !boatOverlay.isHidden() && SailingAPI.isOnBoat())
+        {
+            boatOverlay.update();
         }
     }
 
