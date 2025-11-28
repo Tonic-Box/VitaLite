@@ -39,6 +39,11 @@ public class ItemEx implements Interactable, Identifiable
         return Static.invoke(() -> client.getItemDefinition(item.getId()).getPlaceholderTemplateId() >= 0);
     }
 
+    public boolean isTradeable() {
+        ItemManager itemManager = Static.getInjector().getInstance(ItemManager.class);
+        return Static.invoke(() -> itemManager.getItemComposition(item.getId()).isTradeable());
+    }
+
     public int getCanonicalId() {
         ItemManager itemManager = Static.getInjector().getInstance(ItemManager.class);
         return Static.invoke(() -> itemManager.canonicalize(item.getId()));
