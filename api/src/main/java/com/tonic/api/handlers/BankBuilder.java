@@ -57,6 +57,10 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
     {
         int step2 = currentStep;
         add(context -> {
+            if(BankAPI.isOpen())
+            {
+                jump("end", context);
+            }
             NpcEx banker = new NpcQuery()
                     .withNameContains("Banker")
                     .keepIf(n -> SceneAPI.losTileNextTo(n.getWorldPoint()) != null)
@@ -120,7 +124,7 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
             }
             return step;
         });
-        addDelayUntil(BankAPI::isOpen);
+        addDelayUntil("end", BankAPI::isOpen);
         return this;
     }
 
