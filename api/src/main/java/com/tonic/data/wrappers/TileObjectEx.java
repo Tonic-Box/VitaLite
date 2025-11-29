@@ -59,6 +59,51 @@ public class TileObjectEx implements Entity
         });
     }
 
+    public int getAnimation()
+    {
+        return Static.invoke(() -> {
+            if(tileObject instanceof GameObject) {
+                GameObject gameObject = (GameObject) tileObject;
+                Animation animation = getAnimationFromRenderable(gameObject.getRenderable());
+                if(animation != null) {
+                    return animation.getId();
+                }
+            } else if (tileObject instanceof WallObject) {
+                WallObject wallObject = (WallObject) tileObject;
+                Animation animation1 = getAnimationFromRenderable(wallObject.getRenderable1());
+                if(animation1 != null) {
+                    return animation1.getId();
+                }
+                Animation animation2 = getAnimationFromRenderable(wallObject.getRenderable2());
+                if(animation2 != null) {
+                    return animation2.getId();
+                }
+            } else if (tileObject instanceof DecorativeObject) {
+                DecorativeObject decorativeObject = (DecorativeObject) tileObject;
+                Animation animation = getAnimationFromRenderable(decorativeObject.getRenderable());
+                if(animation != null) {
+                    return animation.getId();
+                }
+            } else if (tileObject instanceof GroundObject) {
+                GroundObject groundObject = (GroundObject) tileObject;
+                Animation animation = getAnimationFromRenderable(groundObject.getRenderable());
+                if(animation != null) {
+                    return animation.getId();
+                }
+            }
+            return -1;
+        });
+    }
+
+    private static Animation getAnimationFromRenderable(Renderable renderable)
+    {
+        if(renderable instanceof DynamicObject)
+        {
+            return ((DynamicObject) renderable).getAnimation();
+        }
+        return null;
+    }
+
     public boolean hasAction(String action) {
         return getActionIndex(action) != -1;
     }
