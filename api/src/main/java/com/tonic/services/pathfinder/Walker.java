@@ -13,6 +13,7 @@ import com.tonic.services.pathfinder.collision.CollisionMap;
 import com.tonic.services.pathfinder.collision.GlobalCollisionMap;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.services.pathfinder.objects.ObjectMap;
+import com.tonic.services.pathfinder.tiletype.TileTypeMap;
 import com.tonic.util.IntPair;
 import com.tonic.util.handler.StepHandler;
 import lombok.Getter;
@@ -31,6 +32,7 @@ public class Walker
         try {
             collisionMap = GlobalCollisionMap.load();
             objectMap = ObjectMap.load();
+            tileTypeMap = TileTypeMap.load();
         } catch (Exception e) {
             Logger.error("[Pathfinder] Failed to load collision map: " + e.getMessage());
             e.printStackTrace();
@@ -41,6 +43,9 @@ public class Walker
     private static CollisionMap collisionMap;
     @Getter
     private static ObjectMap objectMap;
+    @Getter
+    private static TileTypeMap tileTypeMap;
+
     private static boolean running = false;
 
     private Walker()
