@@ -2,10 +2,7 @@ package com.tonic.api.threaded;
 
 import com.tonic.Logger;
 import com.tonic.api.game.ClientScriptAPI;
-import com.tonic.api.handlers.GrandExchangeHandler;
 import com.tonic.data.GrandExchangeSlot;
-import com.tonic.util.handler.StepHandler;
-import net.runelite.api.gameval.ItemID;
 
 import static com.tonic.api.widgets.GrandExchangeAPI.*;
 
@@ -144,6 +141,7 @@ public class GrandExchange
         if(!slot.isDone())
         {
             cancel(slot);
+            collectFromSlot(slot.getSlot());
             return false;
         }
         return true;
