@@ -113,12 +113,10 @@ public class ClassCache {
     private boolean matchesAnyPackage(String className, Set<String> packages) {
         for (String pkg : packages) {
             if (className.startsWith(pkg + ".")) {
-                // Make sure it's directly in the package (not a subpackage)
-                // or allow subpackages if the package ends with the class
-                String remainder = className.substring(pkg.length() + 1);
-                if (!remainder.contains(".")) {
-                    return true;
-                }
+                // Include classes in this package and all subpackages
+                // This ensures enums in subpackages (e.g., net.runelite.api.events.*)
+                // are indexed when the parent package is imported
+                return true;
             }
         }
         return false;

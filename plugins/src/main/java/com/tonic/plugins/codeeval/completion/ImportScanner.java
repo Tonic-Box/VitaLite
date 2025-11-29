@@ -160,6 +160,14 @@ public class ImportScanner {
             return "java.lang." + simpleName;
         } catch (ClassNotFoundException ignored) {}
 
+        // Search wildcard-imported packages (e.g., import net.runelite.api.*;)
+        for (String pkg : importedPackages) {
+            try {
+                Class.forName(pkg + "." + simpleName);
+                return pkg + "." + simpleName;
+            } catch (ClassNotFoundException ignored) {}
+        }
+
         return null;
     }
 

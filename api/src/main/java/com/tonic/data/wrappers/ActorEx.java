@@ -39,14 +39,16 @@ public abstract class ActorEx<T extends Actor> implements Entity
 
     public ActorEx<?> getInteracting()
     {
-        Actor interacting = actor.getInteracting();
-        if(interacting == null)
-            return null;
+        return Static.invoke(() -> {
+            Actor interacting = actor.getInteracting();
+            if(interacting == null)
+                return null;
 
-        if(interacting instanceof Player)
-            return new PlayerEx((Player) interacting);
+            if(interacting instanceof Player)
+                return new PlayerEx((Player) interacting);
 
-        return new NpcEx((NPC) interacting);
+            return new NpcEx((NPC) interacting);
+        });
     }
 
     @Override

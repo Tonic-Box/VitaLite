@@ -4,9 +4,11 @@ import com.tonic.Static;
 import com.tonic.api.game.sailing.Heading;
 import com.tonic.api.game.sailing.SailingAPI;
 import com.tonic.api.handlers.GenericHandlerBuilder;
+import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.collision.CollisionMap;
+import com.tonic.services.pathfinder.tiletype.TileType;
 import com.tonic.util.Distance;
 import com.tonic.util.Profiler;
 import com.tonic.util.WorldPointUtil;
@@ -90,6 +92,9 @@ public class BoatPathing
             250,  // 7: 157.5° - near-reversal
             400   // 8: 180° - full reversal (needs 6+ tile swing)
     };
+
+    // Tile type cost penalties - high cost to strongly avoid hazardous water types
+    private static final int DISEASE_WATER_COST = 10000;
 
     public static StepHandler travelTo(WorldPoint worldPoint)
     {
@@ -477,7 +482,10 @@ public class BoatPathing
             // E.g., EAST→SE→EAST pattern gets penalized to prefer clean 8-direction paths
             int alternationCost = getAlternationCost(parents, current, dir);
 
-            int edgeCost = baseCost * proximityCost + turnCost + alternationCost;
+            // Tile type penalty: strongly avoid hazardous water types (disease water, etc.)
+            int tileTypeCost = getTileTypeCost(nx, ny, plane);
+
+            int edgeCost = baseCost * proximityCost + turnCost + alternationCost + tileTypeCost;
             int tentativeG = currentG + edgeCost;
 
             // Only update if this path is better
@@ -802,6 +810,18 @@ public class BoatPathing
             }
         }
 
+        return 0;
+    }
+
+    /**
+     * Gets tile type cost penalty for hazardous water types.
+     * Uses static byte constant for maximum performance in hot path.
+     */
+    private static int getTileTypeCost(int x, int y, int plane) {
+        byte tileType = Walker.getTileTypeMap().getTileType(x, y, plane);
+        if (tileType == TileType.F_DISEASE_WATER) {
+            return DISEASE_WATER_COST;
+        }
         return 0;
     }
 

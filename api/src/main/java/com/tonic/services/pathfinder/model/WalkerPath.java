@@ -294,14 +294,16 @@ public class WalkerPath
                 .first();
         if(widget != null)
         {
-            Widget universe = widget.getParent();
-            int id = universe.getId();
-            String name = StaticIntFinder.find(InterfaceID.class, id);
-            if(name != null && name.toLowerCase().contains("universe"))
-            {
-                ClickManagerUtil.queueClickBoxInterface(id);
-                DialogueAPI.resumePause(id, 1);
-            }
+            Static.invoke(() -> {
+                Widget universe = widget.getParent();
+                int id = universe.getId();
+                String name = StaticIntFinder.find(InterfaceID.class, id);
+                if(name != null && name.toLowerCase().contains("universe"))
+                {
+                    ClickManagerUtil.queueClickBoxInterface(id);
+                    DialogueAPI.resumePause(id, 1);
+                }
+            });
         }
 
         IStep step = steps.get(0);
