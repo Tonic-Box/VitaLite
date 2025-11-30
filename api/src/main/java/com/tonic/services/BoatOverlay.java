@@ -1,12 +1,14 @@
 package com.tonic.services;
 
 import com.tonic.Static;
+import com.tonic.api.game.sailing.BoatStatsAPI;
 import com.tonic.api.game.sailing.Heading;
 import com.tonic.api.game.sailing.SailingAPI;
 import com.tonic.ui.VitaOverlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayManager;
-import net.runelite.client.ui.overlay.OverlayPosition;
+
+import java.awt.*;
 
 public class BoatOverlay extends VitaOverlay
 {
@@ -15,7 +17,7 @@ public class BoatOverlay extends VitaOverlay
         super();
         setLayer(OverlayLayer.ABOVE_WIDGETS);
         setWidth(250);
-        setHeight(100);
+        setHeight(200);
         setHidden(false);
     }
 
@@ -51,5 +53,20 @@ public class BoatOverlay extends VitaOverlay
         newLineEx("Sails Need Trimming: ", SailingAPI.isSailsNeedTrimming() ? "Yes" : "No", 12);
         newLineEx("Is Navigating: ", SailingAPI.isNavigating() ? "Yes" : "No", 12);
         newLineEx("Movement: ", SailingAPI.isMovingForward() ? "Forward" : (SailingAPI.isMovingBackward() ? "Backward" : "Still"), 12);
+        newLine("# Sailing Boat Stats", 14);
+        buildStatsLine("Rapid");
+        buildStatsLine("Storm");
+        buildStatsLine("Fetid water");
+        buildStatsLine("Crystal");
+        buildStatsLine("Tangled kelp");
+        buildStatsLine("Ice");
+    }
+
+    private void buildStatsLine(String name)
+    {
+        int value = BoatStatsAPI.readStat(name);
+        Color color = value < 1 ? Color.RED : Color.GREEN;
+        String valueStr = value < 1 ? "None" : String.valueOf(value);
+        newLineEx(name + " resistance: ", valueStr, 12, Color.CYAN, color);
     }
 }
