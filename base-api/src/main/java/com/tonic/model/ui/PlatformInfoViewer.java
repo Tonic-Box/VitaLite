@@ -91,7 +91,19 @@ public class PlatformInfoViewer extends VitaFrame {
      */
     public static PlatformInfoViewer getInstance() {
         if (instance == null) {
-            instance = new PlatformInfoViewer();
+            if (SwingUtilities.isEventDispatchThread()) {
+                instance = new PlatformInfoViewer();
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(() -> {
+                        if (instance == null) {
+                            instance = new PlatformInfoViewer();
+                        }
+                    });
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to create PlatformInfoViewer on EDT", e);
+                }
+            }
         }
         return instance;
     }

@@ -90,11 +90,8 @@ public class TypeInference {
      * Resolves a method call chain like Static.getClient().getLocalPlayer()
      */
     private String resolveMethodChain(String expression, String fullCode) {
-        System.out.println("[TypeInference DEBUG] resolveMethodChain: '" + expression + "'");
-
         // Split by dots, respecting parentheses
         String[] parts = splitMethodChain(expression);
-        System.out.println("[TypeInference DEBUG]   Split into " + parts.length + " parts: " + java.util.Arrays.toString(parts));
 
         if (parts.length == 0) return null;
 
@@ -104,17 +101,13 @@ public class TypeInference {
             String part = parts[i];
             if (part.isEmpty()) continue;
 
-            System.out.println("[TypeInference DEBUG]   Processing part[" + i + "]: '" + part + "', currentType=" + currentType);
-
             if (part.contains("(")) {
                 // It's a method call
                 String methodName = part.substring(0, part.indexOf('('));
-                System.out.println("[TypeInference DEBUG]     Method call: " + methodName);
 
                 if (currentType == null) {
                     // First part - could be a static method on a class
                     // Check if previous part was a class name
-                    System.out.println("[TypeInference DEBUG]     Skipping - no currentType yet");
                     continue;
                 }
 
@@ -124,64 +117,47 @@ public class TypeInference {
                     MethodInfo method = classInfo.getMethod(methodName);
                     if (method != null) {
                         String returnType = method.getReturnType();
-                        System.out.println("[TypeInference DEBUG]     Method found! Return type: " + returnType);
                         currentType = returnType;
                         // Load the return type class on-demand
-                        ClassInfo loadedReturnType = classCache.get(currentType);
-                        System.out.println("[TypeInference DEBUG]     Loaded return type class: " + (loadedReturnType != null ? loadedReturnType.getFullName() : "NULL"));
+                        classCache.get(currentType);
                     } else {
-                        System.out.println("[TypeInference DEBUG]     Method NOT found: " + methodName + " in " + classInfo.getFullName());
                         return null;
                     }
                 } else {
-                    System.out.println("[TypeInference DEBUG]     ClassInfo is NULL for type: " + currentType);
                     return null;
                 }
             } else {
                 // It's a class or variable name
                 if (currentType == null) {
-                    System.out.println("[TypeInference DEBUG]     Identifier (no currentType): " + part);
                     // Try as class name first
                     ClassInfo classInfo = classCache.getBySimpleName(part);
                     if (classInfo != null) {
                         currentType = classInfo.getFullName();
-                        System.out.println("[TypeInference DEBUG]       Found as class: " + currentType);
                     } else {
                         // Try as variable
                         String varType = findVariableType(part, fullCode);
-                        System.out.println("[TypeInference DEBUG]       Variable type lookup: " + varType);
                         if (varType != null) {
                             currentType = resolveTypeName(varType);
-                            System.out.println("[TypeInference DEBUG]       Resolved variable type: " + currentType);
                         } else {
                             // Check template context
                             currentType = templateContext.get(part);
-                            System.out.println("[TypeInference DEBUG]       Template context: " + currentType);
                         }
                     }
                 } else {
                     // Field access
-                    System.out.println("[TypeInference DEBUG]     Field access: " + part + " on " + currentType);
                     ClassInfo classInfo = classCache.get(currentType);
                     if (classInfo != null) {
-                        boolean found = false;
                         for (FieldInfo field : classInfo.getFields()) {
                             if (field.getName().equals(part)) {
                                 currentType = resolveTypeName(field.getType());
-                                System.out.println("[TypeInference DEBUG]       Found field, type: " + currentType);
-                                found = true;
                                 break;
                             }
-                        }
-                        if (!found) {
-                            System.out.println("[TypeInference DEBUG]       Field NOT found!");
                         }
                     }
                 }
             }
         }
 
-        System.out.println("[TypeInference DEBUG]   Final result: " + currentType);
         return currentType;
     }
 

@@ -76,7 +76,26 @@ public class DistanceDebugger extends VitaFrame
     {
         if (instance == null)
         {
-            instance = new DistanceDebugger();
+            if (SwingUtilities.isEventDispatchThread())
+            {
+                instance = new DistanceDebugger();
+            }
+            else
+            {
+                try
+                {
+                    SwingUtilities.invokeAndWait(() -> {
+                        if (instance == null)
+                        {
+                            instance = new DistanceDebugger();
+                        }
+                    });
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException("Failed to create DistanceDebugger on EDT", e);
+                }
+            }
         }
         return instance;
     }

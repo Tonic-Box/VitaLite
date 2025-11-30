@@ -62,7 +62,26 @@ public class TrajectorySettingsPanel extends VitaFrame
     {
         if (instance == null)
         {
-            instance = new TrajectorySettingsPanel();
+            if (SwingUtilities.isEventDispatchThread())
+            {
+                instance = new TrajectorySettingsPanel();
+            }
+            else
+            {
+                try
+                {
+                    SwingUtilities.invokeAndWait(() -> {
+                        if (instance == null)
+                        {
+                            instance = new TrajectorySettingsPanel();
+                        }
+                    });
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException("Failed to create TrajectorySettingsPanel on EDT", e);
+                }
+            }
         }
         return instance;
     }

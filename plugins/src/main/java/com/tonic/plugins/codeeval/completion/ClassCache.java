@@ -173,35 +173,27 @@ public class ClassCache {
     public ClassInfo get(String className) {
         if (className == null || className.isEmpty()) return null;
 
-        System.out.println("[ClassCache DEBUG] get('" + className + "')");
-
         // Try full name first
         ClassInfo info = classInfoByFullName.get(className);
         if (info != null) {
-            System.out.println("[ClassCache DEBUG]   Found in fullName cache");
             return info;
         }
 
         // Try simple name from cache
         info = classInfoBySimpleName.get(className);
         if (info != null) {
-            System.out.println("[ClassCache DEBUG]   Found in simpleName cache");
             return info;
         }
 
         // If it looks like a fully qualified name, try loading directly
         if (className.contains(".")) {
-            System.out.println("[ClassCache DEBUG]   Trying to load fully qualified: " + className);
             info = loadClass(className);
             if (info != null) {
-                System.out.println("[ClassCache DEBUG]   Successfully loaded: " + info.getFullName());
                 return info;
             }
-            System.out.println("[ClassCache DEBUG]   Failed to load: " + className);
         }
 
         // Try loading by simple name from common packages
-        System.out.println("[ClassCache DEBUG]   Trying to load by simple name...");
         return tryLoadBySimpleName(className);
     }
 
@@ -220,8 +212,6 @@ public class ClassCache {
      * Attempts to load a class by simple name from known packages
      */
     private ClassInfo tryLoadBySimpleName(String simpleName) {
-        System.out.println("[ClassCache DEBUG] tryLoadBySimpleName('" + simpleName + "')");
-
         // Common package prefixes to try (in priority order)
         String[] commonPackages = {
                 "net.runelite.api.",
@@ -244,23 +234,19 @@ public class ClassCache {
             String fullName = pkg + simpleName;
             ClassInfo info = loadClass(fullName);
             if (info != null) {
-                System.out.println("[ClassCache DEBUG]   Found in package: " + fullName);
                 return info;
             }
         }
 
         // Also try indexed packages
-        System.out.println("[ClassCache DEBUG]   Trying " + indexedPackages.size() + " indexed packages...");
         for (String pkg : indexedPackages) {
             String fullName = pkg + "." + simpleName;
             ClassInfo info = loadClass(fullName);
             if (info != null) {
-                System.out.println("[ClassCache DEBUG]   Found in indexed package: " + fullName);
                 return info;
             }
         }
 
-        System.out.println("[ClassCache DEBUG]   NOT FOUND anywhere: " + simpleName);
         return null;
     }
 
