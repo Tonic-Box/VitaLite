@@ -3,6 +3,7 @@ package com.tonic.data.trading;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.widgets.ShopAPI;
+import com.tonic.data.AccountType;
 import com.tonic.data.locatables.NpcLocations;
 import com.tonic.services.pathfinder.requirements.*;
 
@@ -1471,6 +1472,27 @@ public enum Shop {
             NpcLocations.TOCI,
             new WorldRequirement(true),
             new QuestRequirement(Quest.CHILDREN_OF_THE_SUN)
+    ),
+    TOCI_GEM_STORE_IRONMAN(
+            InventoryID.ALDARIN_GEM_STORE_IM,
+            NpcLocations.TOCI,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN),
+            accountTypeReq(AccountType.IRONMAN)
+    ),
+    TOCI_GEM_STORE_ULTRA_IRONMAN(
+            InventoryID.ALDARIN_GEM_STORE_UIM,
+            NpcLocations.TOCI,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN),
+            accountTypeReq(AccountType.ULTIMATE_IRONMAN)
+    ),
+    TOCI_GEM_STORE_GROUP_IRONMAN(
+            InventoryID.ALDARIN_GEM_STORE_GIM,
+            NpcLocations.TOCI,
+            new WorldRequirement(true),
+            new QuestRequirement(Quest.CHILDREN_OF_THE_SUN),
+            accountTypeReq(AccountType.GROUP_IRONMAN)
     ),
     ERCOS_FARMING_SUPPLIES(
             InventoryID.FARMER_SUPPLIES,
