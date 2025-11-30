@@ -1,6 +1,10 @@
 package com.tonic.services.pathfinder.tiletype;
 
+import com.tonic.api.game.sailing.BoatAPI;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public enum TileType {
@@ -45,4 +49,42 @@ public enum TileType {
     public static final byte F_NE_PURPLE_GRAY_WATER = 10;
     public static final byte F_NW_GRAY_WATER = 11;
     public static final byte F_SE_PURPLE_WATER = 12;
+
+    public static byte[] getAvoidTileTypes()
+    {
+        List<Byte> badTypes = new ArrayList<>();
+        if(!BoatAPI.isRapidResistant() || !BoatAPI.isStormResistant())
+        {
+            badTypes.add(TileType.F_TEMPOR_STORM_WATER);
+        }
+        if(!BoatAPI.isCrystalFleckedResistant())
+        {
+            badTypes.add(TileType.F_SHARP_CRYSTAL_WATER);
+        }
+        if(!BoatAPI.isTangledKelpResistant())
+        {
+            badTypes.add(TileType.F_KELP_WATER);
+        }
+        if(!BoatAPI.isIceResistant())
+        {
+            badTypes.add(TileType.F_ICE_WATER);
+        }
+        if(!BoatAPI.isFetidWaterResistant())
+        {
+            badTypes.add(TileType.F_DISEASE_WATER);
+        }
+        badTypes.add(TileType.F_CRANDOR_SMEGMA_WATER);
+        badTypes.add(TileType.F_JAGGED_REEFS_WATER);
+        badTypes.add(TileType.F_NE_PURPLE_GRAY_WATER);
+        badTypes.add(TileType.F_NW_GRAY_WATER);
+        badTypes.add(TileType.F_SE_PURPLE_WATER);
+        badTypes.add(TileType.F_SUNBAKED_WATER);
+
+        byte[] arr = new byte[badTypes.size()];
+        for(int i = 0; i < badTypes.size(); i++)
+        {
+            arr[i] = badTypes.get(i);
+        }
+        return arr;
+    }
 }
