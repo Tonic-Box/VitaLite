@@ -96,6 +96,11 @@ public class BoatPathing
     // Tile type cost penalties - high cost to strongly avoid hazardous water types
     private static final int DISEASE_WATER_COST = 10000;
 
+    // Cloud avoidance configuration
+    private static final int CLOUD_AVOIDANCE_RADIUS = 5;   // tiles around cloud center to avoid
+    private static final int CLOUD_COST = 15000;           // pathfinder cost (higher than DISEASE_WATER)
+    private static final int REROUTE_COOLDOWN_TICKS = 10;  // ticks between reroute attempts
+
     public static StepHandler travelTo(WorldPoint worldPoint)
     {
         WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
@@ -119,6 +124,8 @@ public class BoatPathing
                         context.put("PATH", path);
                         context.put("POINTER", 0);
                         context.put("LAST_HEADING", null);
+                        context.put("FINAL_DESTINATION", path.get(path.size() - 1).getPosition());
+                        context.put("REROUTE_COOLDOWN", 0);
                     }
                     List<Waypoint> waypoints = context.get("PATH");
                     Waypoint first = waypoints.get(1);
@@ -144,7 +151,7 @@ public class BoatPathing
                     return false;
                 })
                 .addDelayUntil(context -> {
-                    if(!context.contains("PATH"))
+                    if(!context.contains("PATH") || !SailingAPI.isOnBoat())
                     {
                         return true;
                     }
@@ -163,6 +170,33 @@ public class BoatPathing
                     Waypoint waypoint = waypoints.get(pointer);
                     Waypoint end = waypoints.get(waypoints.size() - 1);
                     WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
+
+                    // === CLOUD AVOIDANCE CHECK ===
+                    int rerouteCooldown = context.getOrDefault("REROUTE_COOLDOWN", 0);
+                    if (rerouteCooldown > 0) {
+                        context.put("REROUTE_COOLDOWN", rerouteCooldown - 1);
+                    } else {
+                        List<WorldPoint> clouds = SailingAPI.getClouds();
+                        if (isCloudBlockingPath(start, waypoint.getPosition(), clouds, CLOUD_AVOIDANCE_RADIUS)) {
+                            WorldPoint finalDest = context.get("FINAL_DESTINATION");
+                            IntOpenHashSet cloudTiles = expandCloudTiles(clouds, CLOUD_AVOIDANCE_RADIUS);
+
+                            List<WorldPoint> newPath = findFullPath(start, finalDest, cloudTiles);
+                            if (newPath != null && !newPath.isEmpty()) {
+                                List<Waypoint> newWaypoints = convertToWaypoints(newPath);
+                                context.put("PATH", newWaypoints);
+                                context.put("POINTER", 0);
+                                context.put("REROUTE_COOLDOWN", REROUTE_COOLDOWN_TICKS);
+                                context.put("LAST_HEADING", null);
+                                GameManager.setPathPoints(newPath);
+                                System.out.println("BoatPathing: Rerouting around " + clouds.size() + " cloud(s)");
+                                return false;  // Restart navigation with new path
+                            }
+                            // No valid path around clouds - continue original (fallback)
+                            System.out.println("BoatPathing: No path around clouds, continuing original");
+                        }
+                    }
+                    // === END CLOUD AVOIDANCE ===
 
                     if(Distance.chebyshev(start, end.getPosition()) <= 3)
                     {
@@ -338,12 +372,33 @@ public class BoatPathing
      */
     public static List<WorldPoint> findFullPath(WorldPoint start, WorldPoint target)
     {
+        return findFullPath(start, target, null);
+    }
+
+    /**
+     * Uses A* with proximity costs to find optimal path from start to target,
+     * with optional tiles to avoid (e.g., cloud positions during reactive rerouting).
+     */
+    public static List<WorldPoint> findFullPath(WorldPoint start, WorldPoint target, IntOpenHashSet avoidTiles)
+    {
         Profiler.Start("BoatPathing");
         List<WorldPoint> path = Static.invoke(() -> {
             CollisionMap collisionMap = Walker.getCollisionMap();
             if (collisionMap == null) {
                 System.out.println("SailPathing: CollisionMap is null");
                 return null;
+            }
+
+            // Validate target - if boat can't fit, find nearest valid position
+            WorldPoint adjustedTarget = target;
+            WorldPoint validTarget = BoatCollisionAPI.findNearestValidPlayerBoatPosition(target, 10);
+            if (validTarget == null) {
+                System.out.println("SailPathing: No valid boat position within 10 tiles of " + target);
+                return null;
+            }
+            if (!validTarget.equals(target)) {
+                System.out.println("SailPathing: Target adjusted " + target + " -> " + validTarget);
+                adjustedTarget = validTarget;
             }
 
             // Initialize cache with hull offsets and pre-computed rotations
@@ -369,7 +424,7 @@ public class BoatPathing
             proximityCache.defaultReturnValue(-1);  // -1 = not cached
 
             int startPacked = WorldPointUtil.compress(start);
-            int targetPacked = WorldPointUtil.compress(target);
+            int targetPacked = WorldPointUtil.compress(adjustedTarget);
             int targetX = WorldPointUtil.getCompressedX(targetPacked);
             int targetY = WorldPointUtil.getCompressedY(targetPacked);
             int startX = WorldPointUtil.getCompressedX(startPacked);
@@ -407,7 +462,7 @@ public class BoatPathing
                 // Expand neighbors with A* scoring (f = g + h)
                 heapSize = expandNeighborsAStar(cache, collisionMap, current, currentG,
                         targetX, targetY, gScores, parents, proximityCache, closedSet,
-                        heapNodes, heapCosts, heapSize);
+                        heapNodes, heapCosts, heapSize, avoidTiles, startPacked);
             }
 
             System.out.println("SailPathing: No path found after " + iterations + " iterations");
@@ -439,7 +494,9 @@ public class BoatPathing
             int targetX, int targetY,
             Int2IntOpenHashMap gScores, Int2IntOpenHashMap parents,
             Int2IntOpenHashMap proximityCache, IntOpenHashSet closedSet,
-            int[] heapNodes, int[] heapCosts, int heapSize)
+            int[] heapNodes, int[] heapCosts, int heapSize,
+            IntOpenHashSet avoidTiles,
+            int startPacked)
     {
         // Extract as ints to avoid repeated casts
         int x = WorldPointUtil.getCompressedX(current);
@@ -460,7 +517,8 @@ public class BoatPathing
             }
 
             // Skip if boat doesn't fit at this position/direction
-            if (!canBoatFitAtDirection(cache, (short) nx, (short) ny, dir)) {
+            // EXCEPTION: When expanding from start position, skip check (boat is physically there)
+            if (current != startPacked && !canBoatFitAtDirection(cache, (short) nx, (short) ny, dir)) {
                 continue;
             }
 
@@ -485,7 +543,13 @@ public class BoatPathing
             // Tile type penalty: strongly avoid hazardous water types (disease water, etc.)
             int tileTypeCost = getTileTypeCost(nx, ny, plane);
 
-            int edgeCost = baseCost * proximityCost + turnCost + alternationCost + tileTypeCost;
+            // Cloud avoidance cost: high penalty for tiles in cloud danger zones
+            int cloudCost = 0;
+            if (avoidTiles != null && avoidTiles.contains(neighborPacked)) {
+                cloudCost = CLOUD_COST;
+            }
+
+            int edgeCost = baseCost * proximityCost + turnCost + alternationCost + tileTypeCost + cloudCost;
             int tentativeG = currentG + edgeCost;
 
             // Only update if this path is better
@@ -823,6 +887,62 @@ public class BoatPathing
             return DISEASE_WATER_COST;
         }
         return 0;
+    }
+
+    // ==================== Cloud Avoidance ====================
+
+    /**
+     * Expands cloud center points into avoid-tiles with radius buffer.
+     * Returns packed int coordinates for O(1) lookup in pathfinder hot path.
+     */
+    private static IntOpenHashSet expandCloudTiles(List<WorldPoint> clouds, int radius) {
+        IntOpenHashSet tiles = new IntOpenHashSet();
+        for (WorldPoint cloud : clouds) {
+            int cx = cloud.getX();
+            int cy = cloud.getY();
+            int plane = cloud.getPlane();
+
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dy = -radius; dy <= radius; dy++) {
+                    tiles.add(WorldPointUtil.compress(cx + dx, cy + dy, plane));
+                }
+            }
+        }
+        return tiles;
+    }
+
+    /**
+     * Checks if the line segment from current position to next waypoint
+     * passes through any cloud's danger zone.
+     */
+    private static boolean isCloudBlockingPath(WorldPoint from, WorldPoint to,
+                                               List<WorldPoint> clouds, int radius) {
+        if (clouds == null || clouds.isEmpty()) {
+            return false;
+        }
+
+        int dx = to.getX() - from.getX();
+        int dy = to.getY() - from.getY();
+        double dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 1) return false;
+
+        // Check points along path at 1-tile intervals
+        int steps = (int) Math.ceil(dist);
+        for (int i = 0; i <= steps; i++) {
+            double t = (double) i / steps;
+            int px = from.getX() + (int)(dx * t);
+            int py = from.getY() + (int)(dy * t);
+
+            for (WorldPoint cloud : clouds) {
+                int cdist = Math.max(Math.abs(px - cloud.getX()),
+                                     Math.abs(py - cloud.getY()));
+                if (cdist <= radius) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
