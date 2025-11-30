@@ -54,17 +54,16 @@ public class BoatOverlay extends VitaOverlay
         newLineEx("Is Navigating: ", SailingAPI.isNavigating() ? "Yes" : "No", 12);
         newLineEx("Movement: ", SailingAPI.isMovingForward() ? "Forward" : (SailingAPI.isMovingBackward() ? "Backward" : "Still"), 12);
         newLine("# Sailing Boat Stats", 14);
-        buildStatsLine("Rapid");
-        buildStatsLine("Storm");
-        buildStatsLine("Fetid water");
-        buildStatsLine("Crystal");
-        buildStatsLine("Tangled kelp");
-        buildStatsLine("Ice");
+        buildStatsLine("Rapid", BoatStatsAPI.getRapidResistance());
+        buildStatsLine("Storm", BoatStatsAPI.getStormResistance());
+        buildStatsLine("Fetid water", BoatStatsAPI.getFetidWaterResistance());
+        buildStatsLine("Crystal", BoatStatsAPI.getCrystalFleckedResistance());
+        buildStatsLine("Tangled kelp", BoatStatsAPI.getTangledKelpResistance());
+        buildStatsLine("Ice", BoatStatsAPI.getIceResistance());
     }
 
-    private void buildStatsLine(String name)
+    private void buildStatsLine(String name, int value)
     {
-        int value = BoatStatsAPI.readStat(name);
         Color color = value < 1 ? Color.RED : Color.GREEN;
         String valueStr = value < 1 ? "None" : String.valueOf(value);
         newLineEx(name + " resistance: ", valueStr, 12, Color.CYAN, color);

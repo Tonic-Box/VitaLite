@@ -3,6 +3,7 @@ package com.tonic.services;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
+import com.tonic.api.game.sailing.BoatStatsAPI;
 import com.tonic.api.game.sailing.Heading;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
 import com.tonic.services.pathfinder.sailing.BoatPathing;
@@ -765,5 +766,11 @@ public class GameManager extends Overlay {
                 SailingAPI.setSailsNeedTrimming(true);
             }
         }
+    }
+
+    @Subscribe
+    public void onVarbitChanged(VarbitChanged event)
+    {
+        BoatStatsAPI.update(event);
     }
 }
