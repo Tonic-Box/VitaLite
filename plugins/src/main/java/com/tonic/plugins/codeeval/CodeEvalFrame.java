@@ -38,7 +38,19 @@ public class CodeEvalFrame extends VitaFrame {
 
     public static CodeEvalFrame get() {
         if (INSTANCE == null) {
-            INSTANCE = new CodeEvalFrame();
+            if (SwingUtilities.isEventDispatchThread()) {
+                INSTANCE = new CodeEvalFrame();
+            } else {
+                try {
+                    SwingUtilities.invokeAndWait(() -> {
+                        if (INSTANCE == null) {
+                            INSTANCE = new CodeEvalFrame();
+                        }
+                    });
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to create CodeEvalFrame on EDT", e);
+                }
+            }
         }
         return INSTANCE;
     }

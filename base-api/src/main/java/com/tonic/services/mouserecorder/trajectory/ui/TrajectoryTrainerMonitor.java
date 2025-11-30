@@ -40,7 +40,26 @@ public class TrajectoryTrainerMonitor extends VitaFrame
     {
         if (instance == null)
         {
-            instance = new TrajectoryTrainerMonitor();
+            if (SwingUtilities.isEventDispatchThread())
+            {
+                instance = new TrajectoryTrainerMonitor();
+            }
+            else
+            {
+                try
+                {
+                    SwingUtilities.invokeAndWait(() -> {
+                        if (instance == null)
+                        {
+                            instance = new TrajectoryTrainerMonitor();
+                        }
+                    });
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException("Failed to create TrajectoryTrainerMonitor on EDT", e);
+                }
+            }
         }
         return instance;
     }
