@@ -108,7 +108,7 @@ public enum NoticeBoardPosting
 
     public boolean hasLevelFor()
     {
-        return 10 >= getRequiredLevel();
+        return SkillAPI.getLevel(Skill.SAILING) >= getRequiredLevel();
     }
 
     public int getRequiredLevel()
