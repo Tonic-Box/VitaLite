@@ -157,7 +157,7 @@ public abstract class ActorEx<T extends Actor> implements Entity
                 return true;
             }
 
-            if(healthBarVisible())
+            if(!healthBarVisible())
                 return true;
 
             Client client = Static.getClient();
