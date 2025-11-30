@@ -70,13 +70,16 @@ public class MovementAPI {
      */
     public static boolean isMoving()
     {
-        Client client = Static.getClient();
-        WorldPoint wp = client.getLocalPlayer().getWorldLocation();
-        WorldPoint dest = getDestinationWorldPoint();
-        if(dest == null)
-            return false;
+        return Static.invoke(() -> {
+            Client client = Static.getClient();
+            WorldPoint wp = client.getLocalPlayer().getWorldLocation();
+            WorldPoint dest = getDestinationWorldPoint();
+            if(dest == null)
+                return false;
 
-        return !wp.equals(dest);
+            return !wp.equals(dest);
+        });
+
     }
 
     /**
