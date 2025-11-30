@@ -1,7 +1,6 @@
 package com.tonic.services.pathfinder.sailing;
 
 import com.tonic.Static;
-import com.tonic.api.game.sailing.BoatAPI;
 import com.tonic.api.game.sailing.Heading;
 import com.tonic.api.game.sailing.SailingAPI;
 import com.tonic.api.handlers.GenericHandlerBuilder;
