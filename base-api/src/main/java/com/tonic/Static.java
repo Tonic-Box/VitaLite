@@ -46,6 +46,11 @@ public class Static
         return (T) CLIENT_OBJECT;
     }
 
+    public static ClassLoader getClientClassLoader()
+    {
+        return CLIENT_OBJECT.getClass().getClassLoader();
+    }
+
     /**
      * get runelite wrapper instance
      * @return runelite wrapper instance

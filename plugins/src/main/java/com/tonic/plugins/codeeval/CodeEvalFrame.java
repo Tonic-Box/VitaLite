@@ -27,14 +27,21 @@ import org.fife.ui.rsyntaxtextarea.Theme;
 import org.fife.ui.autocomplete.*;
 
 public class CodeEvalFrame extends VitaFrame {
+    public enum EvalContext { API, CLIENT }
+
     private static CodeEvalFrame INSTANCE;
-    private SimpleCodeEvaluator evaluator;
     private final RSyntaxTextArea codeArea;
     private final JTextArea outputArea;
     private final JButton runButton;
     private Future<?> future;
     private AutoCompletion autoCompletion;
-    private volatile boolean completionInitialized = false;
+
+    // Dual-context fields
+    private EvalContext currentContext = EvalContext.API;
+    private CompletionContext apiContext;
+    private CompletionContext clientContext;
+    private ImportScanner sharedImportScanner;
+    private JToggleButton contextToggle;
 
     public static CodeEvalFrame get() {
         if (INSTANCE == null) {
@@ -79,14 +86,51 @@ public class CodeEvalFrame extends VitaFrame {
     }
 
     private void refreshContext() {
-        ClassLoader rlClassLoader = com.tonic.services.GameManager.class.getClassLoader();
-        outputArea.append(">>> Using RLClassLoader: " + rlClassLoader.getClass().getName() + "\n");
-        outputArea.append(">>> RLClassLoader toString: " + rlClassLoader + "\n");
-        if (evaluator == null || !evaluator.getParentClassLoader().equals(rlClassLoader)) {
-            outputArea.append(">>> Refreshing classloader context...\n");
-            evaluator = new SimpleCodeEvaluator(rlClassLoader);
-            outputArea.append(">>> Ready for code evaluation.\n");
+        CompletionContext ctx = getCurrentCompletionContext();
+        if (ctx != null && ctx.isInitialized()) {
+            outputArea.append(">>> Using " + currentContext + " context (" +
+                    ctx.getClassLoader().getClass().getName() + ")\n");
+        } else {
+            outputArea.append(">>> " + currentContext + " context initializing...\n");
         }
+    }
+
+    private CompletionContext getCurrentCompletionContext() {
+        return currentContext == EvalContext.API ? apiContext : clientContext;
+    }
+
+    private void switchContext(EvalContext newContext) {
+        if (currentContext == newContext) return;
+
+        currentContext = newContext;
+        CompletionContext ctx = getCurrentCompletionContext();
+
+        if (ctx != null && ctx.isInitialized()) {
+            installCompletion(ctx);
+            outputArea.append(">>> Switched to " + newContext + " context\n");
+        } else {
+            outputArea.append(">>> " + newContext + " context still initializing...\n");
+        }
+    }
+
+    private void installCompletion(CompletionContext context) {
+        SwingUtilities.invokeLater(() -> {
+            // Uninstall previous if exists
+            if (autoCompletion != null) {
+                autoCompletion.uninstall();
+            }
+
+            autoCompletion = new AutoCompletion(context.getCompletionProvider());
+            autoCompletion.setAutoActivationEnabled(true);
+            autoCompletion.setAutoActivationDelay(150);
+            autoCompletion.setShowDescWindow(true);
+            autoCompletion.setAutoCompleteSingleChoices(false);
+            autoCompletion.setParameterAssistanceEnabled(true);
+            autoCompletion.install(codeArea);
+
+            System.out.println("Installed " + context.getName() + " context with " +
+                    context.getClassCache().getClassCount() + " classes");
+        });
     }
 
     private void clearOutput() {
@@ -96,7 +140,6 @@ public class CodeEvalFrame extends VitaFrame {
     public CodeEvalFrame() {
         super("VitaLite Code Evaluator");
         JPanel contentPanel = getContentPanel();
-        this.evaluator = new SimpleCodeEvaluator(GameManager.class.getClassLoader());
 
         setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         contentPanel.setLayout(new BorderLayout());
@@ -200,8 +243,22 @@ public class CodeEvalFrame extends VitaFrame {
         JCheckBox alwaysOnTopCheckbox = new JCheckBox("Always on Top", true);
         alwaysOnTopCheckbox.addActionListener(e -> setAlwaysOnTop(alwaysOnTopCheckbox.isSelected()));
 
+        // Context toggle button
+        contextToggle = new JToggleButton("API");
+        contextToggle.setToolTipText("Toggle between API (VitaLite) and Client (obfuscated) classloader context");
+        contextToggle.addActionListener(e -> {
+            if (contextToggle.isSelected()) {
+                contextToggle.setText("Client");
+                switchContext(EvalContext.CLIENT);
+            } else {
+                contextToggle.setText("API");
+                switchContext(EvalContext.API);
+            }
+        });
+
         buttonPanel.add(runButton);
         buttonPanel.add(clearButton);
+        buttonPanel.add(contextToggle);
         buttonPanel.add(alwaysOnTopCheckbox);
 
         codePanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -222,51 +279,44 @@ public class CodeEvalFrame extends VitaFrame {
     }
 
     /**
-     * Sets up IntelliJ-style autocompletion
+     * Sets up IntelliJ-style autocompletion with dual-context support
      */
     private void setupAutoCompletion() {
-        // Run indexing in background to avoid blocking UI
         ThreadPool.submit(() -> {
             try {
-                // Parse template imports
-                ImportScanner importScanner = new ImportScanner();
+                // Parse template imports ONCE - shared between contexts
+                sharedImportScanner = new ImportScanner();
                 InputStream templateStream = getClass().getResourceAsStream("code_template.java");
                 if (templateStream != null) {
-                    importScanner.parseTemplate(templateStream);
+                    sharedImportScanner.parseTemplate(templateStream);
                     templateStream.close();
                 }
 
-                // Create class cache and index packages
-                ClassLoader rlClassLoader = GameManager.class.getClassLoader();
-                ClassCache classCache = new ClassCache(rlClassLoader);
-                classCache.indexPackages(importScanner.getPackagesToScan());
+                java.util.Set<String> packagesToScan = sharedImportScanner.getPackagesToScan();
 
-                // Create type inference engine
-                TypeInference typeInference = new TypeInference(classCache, importScanner);
-                typeInference.rebuildContext();
-
-                // Create the completion provider
-                VitaCompletionProvider provider = new VitaCompletionProvider(
-                        classCache, typeInference, importScanner
-                );
-
-                // Install on EDT
-                SwingUtilities.invokeLater(() -> {
-                    autoCompletion = new AutoCompletion(provider);
-
-                    // IntelliJ-style behavior
-                    autoCompletion.setAutoActivationEnabled(true);
-                    autoCompletion.setAutoActivationDelay(150);
-                    autoCompletion.setShowDescWindow(true);
-                    autoCompletion.setAutoCompleteSingleChoices(false);
-                    autoCompletion.setParameterAssistanceEnabled(true);
-
-                    autoCompletion.install(codeArea);
-                    completionInitialized = true;
-
-                    System.out.println("CodeEval autocompletion initialized with " +
-                            classCache.getClassCount() + " classes indexed");
+                // Initialize API context (VitaLite API classes)
+                ClassLoader apiClassLoader = GameManager.class.getClassLoader();
+                apiContext = new CompletionContext("API", apiClassLoader, sharedImportScanner);
+                apiContext.initializeAsync(packagesToScan, () -> {
+                    if (currentContext == EvalContext.API) {
+                        installCompletion(apiContext);
+                    }
                 });
+
+                // Initialize Client context (obfuscated game client classes + template imports)
+                ClassLoader clientClassLoader = Static.getClientClassLoader();
+                if (clientClassLoader != null) {
+                    clientContext = new CompletionContext("Client", clientClassLoader, sharedImportScanner);
+                    clientContext.initializeAsync(packagesToScan, () -> {
+                        // Also index root package classes (obfuscated classes like a.class, b.class)
+                        clientContext.indexRootPackageClasses();
+                        if (currentContext == EvalContext.CLIENT) {
+                            installCompletion(clientContext);
+                        }
+                    });
+                } else {
+                    System.err.println("Client classloader not available yet");
+                }
 
             } catch (Exception e) {
                 System.err.println("Failed to initialize autocompletion: " + e.getMessage());
@@ -276,8 +326,15 @@ public class CodeEvalFrame extends VitaFrame {
     }
 
     private void runCode() {
+        CompletionContext ctx = getCurrentCompletionContext();
+        if (ctx == null || !ctx.isInitialized()) {
+            outputArea.append(">>> Context not initialized yet, please wait...\n");
+            runButton.setText("Run Code (Ctrl+Enter)");
+            return;
+        }
+
         future = ThreadPool.submit(() -> {
-            outputArea.append(">>> Running code...\n");
+            outputArea.append(">>> Running code in " + currentContext + " context...\n");
 
             PrintStream originalOut = System.out;
             PrintStream originalErr = System.err;
@@ -315,7 +372,7 @@ public class CodeEvalFrame extends VitaFrame {
                 System.setOut(customOut);
                 System.setErr(customOut);
 
-                Object result = evaluator.evaluate(codeArea.getText());
+                Object result = ctx.getEvaluator().evaluate(codeArea.getText());
 
                 if (result != null) {
                     System.out.println("Result: " + result);

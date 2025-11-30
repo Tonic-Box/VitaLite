@@ -4,7 +4,6 @@ import com.tonic.Static;
 import com.tonic.api.game.sailing.Heading;
 import com.tonic.api.game.sailing.SailingAPI;
 import com.tonic.api.handlers.GenericHandlerBuilder;
-import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.collision.CollisionMap;
@@ -95,11 +94,7 @@ public class BoatPathing
 
     // Tile type cost penalties - high cost to strongly avoid hazardous water types
     private static final int DISEASE_WATER_COST = 10000;
-
-    // Cloud avoidance configuration
-    private static final int CLOUD_AVOIDANCE_RADIUS = 5;   // tiles around cloud center to avoid
-    private static final int CLOUD_COST = 15000;           // pathfinder cost (higher than DISEASE_WATER)
-    private static final int REROUTE_COOLDOWN_TICKS = 10;  // ticks between reroute attempts
+    private static final int AVOID_COST = 100;
 
     public static StepHandler travelTo(WorldPoint worldPoint)
     {
@@ -125,7 +120,6 @@ public class BoatPathing
                         context.put("POINTER", 0);
                         context.put("LAST_HEADING", null);
                         context.put("FINAL_DESTINATION", path.get(path.size() - 1).getPosition());
-                        context.put("REROUTE_COOLDOWN", 0);
                     }
                     List<Waypoint> waypoints = context.get("PATH");
                     Waypoint first = waypoints.get(1);
@@ -170,33 +164,6 @@ public class BoatPathing
                     Waypoint waypoint = waypoints.get(pointer);
                     Waypoint end = waypoints.get(waypoints.size() - 1);
                     WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
-
-                    // === CLOUD AVOIDANCE CHECK ===
-                    int rerouteCooldown = context.getOrDefault("REROUTE_COOLDOWN", 0);
-                    if (rerouteCooldown > 0) {
-                        context.put("REROUTE_COOLDOWN", rerouteCooldown - 1);
-                    } else {
-                        List<WorldPoint> clouds = SailingAPI.getClouds();
-                        if (isCloudBlockingPath(start, waypoint.getPosition(), clouds, CLOUD_AVOIDANCE_RADIUS)) {
-                            WorldPoint finalDest = context.get("FINAL_DESTINATION");
-                            IntOpenHashSet cloudTiles = expandCloudTiles(clouds, CLOUD_AVOIDANCE_RADIUS);
-
-                            List<WorldPoint> newPath = findFullPath(start, finalDest, cloudTiles);
-                            if (newPath != null && !newPath.isEmpty()) {
-                                List<Waypoint> newWaypoints = convertToWaypoints(newPath);
-                                context.put("PATH", newWaypoints);
-                                context.put("POINTER", 0);
-                                context.put("REROUTE_COOLDOWN", REROUTE_COOLDOWN_TICKS);
-                                context.put("LAST_HEADING", null);
-                                GameManager.setPathPoints(newPath);
-                                System.out.println("BoatPathing: Rerouting around " + clouds.size() + " cloud(s)");
-                                return false;  // Restart navigation with new path
-                            }
-                            // No valid path around clouds - continue original (fallback)
-                            System.out.println("BoatPathing: No path around clouds, continuing original");
-                        }
-                    }
-                    // === END CLOUD AVOIDANCE ===
 
                     if(Distance.chebyshev(start, end.getPosition()) <= 3)
                     {
@@ -554,7 +521,7 @@ public class BoatPathing
             // Cloud avoidance cost: high penalty for tiles in cloud danger zones
             int cloudCost = 0;
             if (avoidTiles != null && avoidTiles.contains(neighborPacked)) {
-                cloudCost = CLOUD_COST;
+                cloudCost = AVOID_COST;
             }
 
             int edgeCost = baseCost * proximityCost + turnCost + alternationCost + tileTypeCost + cloudCost;
@@ -917,40 +884,6 @@ public class BoatPathing
             }
         }
         return tiles;
-    }
-
-    /**
-     * Checks if the line segment from current position to next waypoint
-     * passes through any cloud's danger zone.
-     */
-    private static boolean isCloudBlockingPath(WorldPoint from, WorldPoint to,
-                                               List<WorldPoint> clouds, int radius) {
-        if (clouds == null || clouds.isEmpty()) {
-            return false;
-        }
-
-        int dx = to.getX() - from.getX();
-        int dy = to.getY() - from.getY();
-        double dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < 1) return false;
-
-        // Check points along path at 1-tile intervals
-        int steps = (int) Math.ceil(dist);
-        for (int i = 0; i <= steps; i++) {
-            double t = (double) i / steps;
-            int px = from.getX() + (int)(dx * t);
-            int py = from.getY() + (int)(dy * t);
-
-            for (WorldPoint cloud : clouds) {
-                int cdist = Math.max(Math.abs(px - cloud.getX()),
-                                     Math.abs(py - cloud.getY()));
-                if (cdist <= radius) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     /**

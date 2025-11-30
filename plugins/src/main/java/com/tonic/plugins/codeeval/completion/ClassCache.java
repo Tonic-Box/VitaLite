@@ -308,4 +308,56 @@ public class ClassCache {
     public ClassLoader getClassLoader() {
         return classLoader;
     }
+
+    /**
+     * Indexes root package classes (classes with no package, like obfuscated client classes).
+     * These are classes like a.class, b.class, etc. from the gamepack JAR.
+     */
+    public void indexRootPackageClasses() {
+        if (classLoader instanceof URLClassLoader) {
+            URLClassLoader urlClassLoader = (URLClassLoader) classLoader;
+            for (URL url : urlClassLoader.getURLs()) {
+                indexRootPackageFromUrl(url);
+            }
+        }
+
+        // Also scan classpath for root package classes
+        String classpath = System.getProperty("java.class.path");
+        if (classpath != null) {
+            for (String path : classpath.split(File.pathSeparator)) {
+                try {
+                    File file = new File(path);
+                    if (file.exists()) {
+                        indexRootPackageFromUrl(file.toURI().toURL());
+                    }
+                } catch (Exception ignored) {}
+            }
+        }
+    }
+
+    private void indexRootPackageFromUrl(URL url) {
+        try {
+            String path = url.getPath();
+            if (path.endsWith(".jar")) {
+                File jarFile = new File(url.toURI());
+                if (!jarFile.exists() || !jarFile.canRead()) return;
+
+                try (JarFile jar = new JarFile(jarFile)) {
+                    Enumeration<JarEntry> entries = jar.entries();
+                    while (entries.hasMoreElements()) {
+                        JarEntry entry = entries.nextElement();
+                        String name = entry.getName();
+
+                        // Root package: no '/' in name, ends with .class, not inner class
+                        if (name.endsWith(".class") && !name.contains("/") && !name.contains("$")) {
+                            String className = name.replace(".class", "");
+                            cacheClassInfo(className);
+                        }
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+            // Silently skip problematic URLs
+        }
+    }
 }
