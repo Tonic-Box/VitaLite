@@ -104,26 +104,6 @@ public class BoatPathing
     public static StepHandler travelTo(WorldPoint worldPoint)
     {
         WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
-        System.out.println("[DEBUG] === BOAT START POSITION ===");
-        System.out.println("[DEBUG] Start: " + start);
-        System.out.println("[DEBUG] Target: " + worldPoint);
-        System.out.println("[DEBUG] Current heading: " + SailingAPI.getHeadingValue());
-
-        // Check if start position itself has collision issues
-        Collection<WorldPoint> hull = BoatCollisionAPI.getPlayerBoatCollision();
-        System.out.println("[DEBUG] Hull size: " + (hull == null ? "null" : hull.size()) + " tiles");
-
-        CollisionMap cm = Walker.getCollisionMap();
-        if (cm != null && hull != null) {
-            int blockedTiles = 0;
-            for (WorldPoint hp : hull) {
-                if (!cm.walkable((short)hp.getX(), (short)hp.getY(), (byte)hp.getPlane())) {
-                    blockedTiles++;
-                }
-            }
-            System.out.println("[DEBUG] Hull tiles currently on collision: " + blockedTiles + "/" + hull.size());
-        }
-
         List<WorldPoint> fullPath = findFullPath(start, worldPoint);
         if(fullPath == null || fullPath.isEmpty())
         {
@@ -458,7 +438,6 @@ public class BoatPathing
 
             int maxIterations = 1_000_000;
             int iterations = 0;
-            int nodesExpanded = 0;
 
             // A* search
             while (heapSize > 0 && iterations++ < maxIterations) {
@@ -471,14 +450,6 @@ public class BoatPathing
                     continue;
                 }
                 closedSet.add(current);
-                nodesExpanded++;
-
-                // Debug first 5 expansions
-                if (nodesExpanded <= 5) {
-                    int cx = WorldPointUtil.getCompressedX(current);
-                    int cy = WorldPointUtil.getCompressedY(current);
-                    System.out.println("[DEBUG] Expansion #" + nodesExpanded + ": (" + cx + "," + cy + ") heapSize=" + heapSize);
-                }
 
                 // Check if reached target
                 if (current == targetPacked) {
