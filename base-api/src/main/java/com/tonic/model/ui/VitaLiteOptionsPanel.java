@@ -283,7 +283,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 () -> Static.getVitaConfig().setDrawBoatHull(drawHull.isSelected())
         ));
 
-        walkerPanel.addVerticalStrut(12);
+        boatPanel.addVerticalStrut(12);
 
         ToggleSlider drawDeck = new ToggleSlider();
         drawDeck.setSelected(Static.getVitaConfig().getDrawBoatDeck());

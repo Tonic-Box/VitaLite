@@ -496,6 +496,7 @@ public class GameManager extends Overlay {
     @Getter
     private volatile List<WorldPoint> sailingPoints = null;
     private final BoatOverlay boatOverlay = new BoatOverlay();
+    private boolean boatDebugShowing = false;
 
     public static void setPathPoints(List<WorldPoint> points)
     {
@@ -521,13 +522,15 @@ public class GameManager extends Overlay {
             sailingPath = null;
         }
 
-        if(Static.getVitaConfig().getDrawBoatDebug() && boatOverlay.isHidden() && SailingAPI.isOnBoat())
+        if(Static.getVitaConfig().getDrawBoatDebug() && !boatDebugShowing && SailingAPI.isOnBoat())
         {
             boatOverlay.show();
+            boatDebugShowing = true;
         }
-        else if(!Static.getVitaConfig().getDrawBoatDebug() && !boatOverlay.isHidden())
+        else if(!Static.getVitaConfig().getDrawBoatDebug() && boatDebugShowing)
         {
             boatOverlay.hide();
+            boatDebugShowing = false;
         }
 
         Widget gameframe = LayoutView.GAMEFRAME.getWidget();

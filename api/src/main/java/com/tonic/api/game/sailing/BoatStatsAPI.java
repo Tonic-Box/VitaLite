@@ -17,36 +17,36 @@ public class BoatStatsAPI
     public static boolean isRapidResistant()
     {
         //TileType.F_TEMPOR_STORM_WATER
-        return readRes("Rapid") > 0;
+        return readStat("Rapid") > 0;
     }
 
     public static boolean isStormResistant()
     {
         //TileType.F_TEMPOR_STORM_WATER
-        return readRes("Storm") > 0;
+        return readStat("Storm") > 0;
     }
 
     public static boolean isFetidWaterResistant()
     {
-        return readRes("Fetid water") > 0;
+        return readStat("Fetid water") > 0;
     }
 
     public static boolean isCrystalFleckedResistant()
     {
-        return readRes("Crystal") > 0;
+        return readStat("Crystal") > 0;
     }
 
     public static boolean isTangledKelpResistant()
     {
-        return readRes("Tangled kelp") > 0;
+        return readStat("Tangled kelp") > 0;
     }
 
     public static boolean isIceResistant()
     {
-        return readRes("Ice") > 0;
+        return readStat("Ice") > 0;
     }
 
-    private static int readRes(String title)
+    public static int readStat(String title)
     {
         title += " resistance";
         String finalTitle = title;
@@ -58,20 +58,19 @@ public class BoatStatsAPI
                     return -1;
                 for(int i = 0; i < stats.getChildren().length; i++)
                 {
-                    Widget row = stats.getChild(i);
-                    if(row == null)
+                    Widget w = stats.getChildren()[i];
+                    if(w == null)
                         continue;
-                    if(finalTitle.contains(TextUtil.sanitize(row.getText())))
+                    if(TextUtil.sanitize(w.getText()).contains(finalTitle))
                     {
-                        Widget value = stats.getChild(i + 1);
-                        if(value == null)
-                            return -1;
-                        return Integer.parseInt(value.getText().trim());
+                        Widget value = stats.getChildren()[i + 1];
+                        return Integer.parseInt(TextUtil.sanitize(value.getText()));
                     }
                 }
             }
             catch (Exception e)
             {
+                e.printStackTrace();
                 return -1;
             }
             return -1;
