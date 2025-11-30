@@ -1,15 +1,17 @@
 package com.tonic.api.game.sailing;
 
 import com.tonic.Static;
-import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.queries.WidgetQuery;
 import com.tonic.util.TextUtil;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 
-public class BoatAPI
+/**
+ * API for retrieving boat statistics in sailing.
+ * NOTE: These will only work if currently on a boat.
+ */
+public class BoatStatsAPI
 {
     // === Boat Resistances ===
     public static boolean isRapidResistant()

@@ -1,6 +1,6 @@
 package com.tonic.services.pathfinder.tiletype;
 
-import com.tonic.api.game.sailing.BoatAPI;
+import com.tonic.api.game.sailing.BoatStatsAPI;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -53,23 +53,23 @@ public enum TileType {
     public static byte[] getAvoidTileTypes()
     {
         List<Byte> badTypes = new ArrayList<>();
-        if(!BoatAPI.isRapidResistant() || !BoatAPI.isStormResistant())
+        if(!BoatStatsAPI.isRapidResistant() || !BoatStatsAPI.isStormResistant())
         {
             badTypes.add(TileType.F_TEMPOR_STORM_WATER);
         }
-        if(!BoatAPI.isCrystalFleckedResistant())
+        if(!BoatStatsAPI.isCrystalFleckedResistant())
         {
             badTypes.add(TileType.F_SHARP_CRYSTAL_WATER);
         }
-        if(!BoatAPI.isTangledKelpResistant())
+        if(!BoatStatsAPI.isTangledKelpResistant())
         {
             badTypes.add(TileType.F_KELP_WATER);
         }
-        if(!BoatAPI.isIceResistant())
+        if(!BoatStatsAPI.isIceResistant())
         {
             badTypes.add(TileType.F_ICE_WATER);
         }
-        if(!BoatAPI.isFetidWaterResistant())
+        if(!BoatStatsAPI.isFetidWaterResistant())
         {
             badTypes.add(TileType.F_DISEASE_WATER);
         }
