@@ -35,7 +35,12 @@ public class NpcEx extends ActorEx<NPC>
     }
 
     public int getId() {
-        return Static.invoke(() -> getComposition().getId());
+        return Static.invoke(() -> {
+            NPCComposition composition = getComposition();
+            if(composition == null)
+                return actor.getId();
+            return composition.getId();
+        });
     }
 
     public int getHealth() {

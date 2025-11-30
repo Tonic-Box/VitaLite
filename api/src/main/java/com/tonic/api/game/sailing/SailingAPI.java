@@ -5,19 +5,13 @@ import com.tonic.api.TClient;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.GameAPI;
 import com.tonic.api.game.VarAPI;
-import com.tonic.api.threaded.Delays;
-import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.SailingConstants;
-import com.tonic.data.locatables.sailing.CargoHoldAPI;
-import com.tonic.data.locatables.sailing.CourierTaskData;
 import com.tonic.data.wrappers.NpcEx;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.GameManager;
-import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
-import com.tonic.util.handler.StepHandler;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.MenuAction;
@@ -27,6 +21,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.NpcID;
+import net.runelite.api.gameval.ObjectID;
 import net.runelite.api.gameval.VarbitID;
 
 import java.util.ArrayList;
@@ -403,20 +398,5 @@ public class SailingAPI
             return true;
         }
         return false;
-    }
-
-    public static List<WorldPoint> getClouds()
-    {
-        return Static.invoke(() -> {
-            List<WorldPoint> clouds = new ArrayList<>();
-            for(NpcEx npc : GameManager.npcList())
-            {
-                if(npc.getId() == NpcID.SAILING_SEA_STORMY_CLOUD)
-                {
-                    clouds.add(npc.getWorldPoint());
-                }
-            }
-            return clouds;
-        });
     }
 }
