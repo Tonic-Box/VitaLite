@@ -1,6 +1,7 @@
 package com.tonic.services.pathfinder.sailing;
 
 import com.tonic.Static;
+import com.tonic.api.game.sailing.BoatAPI;
 import com.tonic.api.game.sailing.Heading;
 import com.tonic.api.game.sailing.SailingAPI;
 import com.tonic.api.handlers.GenericHandlerBuilder;
@@ -17,6 +18,7 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import lombok.Getter;
 import net.runelite.api.WorldEntity;
 import net.runelite.api.coords.WorldPoint;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
 
@@ -93,7 +95,8 @@ public class BoatPathing
     };
 
     // Tile type cost penalties - high cost to strongly avoid hazardous water types
-    private static final int DISEASE_WATER_COST = 10000;
+    private static final int BAD_WATER_COST = 10000;
+    private static byte[] BAD_TILE_TYPES;
     private static final int AVOID_COST = 100;
 
     public static StepHandler travelTo(WorldPoint worldPoint)
@@ -349,6 +352,7 @@ public class BoatPathing
     public static List<WorldPoint> findFullPath(WorldPoint start, WorldPoint target, IntOpenHashSet avoidTiles)
     {
         Profiler.Start("BoatPathing");
+        BAD_TILE_TYPES = TileType.getAvoidTileTypes();
         List<WorldPoint> path = Static.invoke(() -> {
             CollisionMap collisionMap = Walker.getCollisionMap();
             if (collisionMap == null) {
@@ -858,32 +862,10 @@ public class BoatPathing
      */
     private static int getTileTypeCost(int x, int y, int plane) {
         byte tileType = Walker.getTileTypeMap().getTileType(x, y, plane);
-        if (tileType == TileType.F_DISEASE_WATER) {
-            return DISEASE_WATER_COST;
+        if (ArrayUtils.contains(BAD_TILE_TYPES, tileType)) {
+            return BAD_WATER_COST;
         }
         return 0;
-    }
-
-    // ==================== Cloud Avoidance ====================
-
-    /**
-     * Expands cloud center points into avoid-tiles with radius buffer.
-     * Returns packed int coordinates for O(1) lookup in pathfinder hot path.
-     */
-    private static IntOpenHashSet expandCloudTiles(List<WorldPoint> clouds, int radius) {
-        IntOpenHashSet tiles = new IntOpenHashSet();
-        for (WorldPoint cloud : clouds) {
-            int cx = cloud.getX();
-            int cy = cloud.getY();
-            int plane = cloud.getPlane();
-
-            for (int dx = -radius; dx <= radius; dx++) {
-                for (int dy = -radius; dy <= radius; dy++) {
-                    tiles.add(WorldPointUtil.compress(cx + dx, cy + dy, plane));
-                }
-            }
-        }
-        return tiles;
     }
 
     /**
