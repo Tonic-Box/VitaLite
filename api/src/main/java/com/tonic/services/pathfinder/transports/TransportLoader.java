@@ -519,7 +519,9 @@ public class TransportLoader
                         })
                         .addDelayUntil(2, () -> WidgetAPI.get(InterfaceID.Fairyrings.CONFIRM) != null)
                         .addDelayUntil(3, () -> !destination.travel())
-                        .addDelay(4, 7);
+                        .addDelay(4, 7)
+                        .add(5, () -> MovementAPI.walkToWorldPoint(destination.getLocation()))
+                        .addDelay(6, 1);
 
                 Requirements merged = new Requirements();
                 merged.addRequirements(ring.getRequirements().getAll());
