@@ -110,3 +110,4 @@ bin/
 /src/main/resources/com/tonic/plugins.jarData
 /plugins/src/main/java/com/tonic/plugins/mcp/
 /api/src/main/resources/com/tonic/services/pathfinder/transports.backup.json
+*.hprof

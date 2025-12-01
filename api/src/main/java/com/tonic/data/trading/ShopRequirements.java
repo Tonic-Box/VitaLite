@@ -1,6 +1,7 @@
 package com.tonic.data.trading;
 
 import com.tonic.api.game.SkillAPI;
+import com.tonic.data.AccountType;
 import com.tonic.services.pathfinder.requirements.*;
 import net.runelite.api.Skill;
 import net.runelite.api.gameval.ItemID;
@@ -66,6 +67,21 @@ public final class ShopRequirements {
                 VarType.VARP,
                 VarPlayerID.QP,
                 amount
+        );
+    }
+
+    /**
+     * Creates an account type requirement.
+     *
+     * @param type the required account type
+     * @return a VarRequirement for the specified account type
+     */
+    public static VarRequirement accountTypeReq(AccountType type) {
+        return new VarRequirement(
+                Comparison.EQUAL,
+                VarType.VARBIT,
+                VarbitID.IRONMAN,
+                type.getVarbitValue()
         );
     }
 }
