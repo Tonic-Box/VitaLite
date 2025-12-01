@@ -13,7 +13,8 @@ public enum MoveMode
     STILL(0),
     ON_BOAT(1),
     FORWARD(2),
-    REVERSE(3)
+    REVERSE(3),
+    STILL_WITH_WIND_CATCHER(4)
 
     ;
 
