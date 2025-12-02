@@ -7,6 +7,7 @@ import com.tonic.api.game.WorldsAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.data.wrappers.ItemEx;
+import com.tonic.data.wrappers.PlayerEx;
 import net.runelite.api.Client;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarPlayerID;
@@ -34,7 +35,7 @@ public class TeleportLoader {
             Client client = Static.getClient();
 
             for (TeleportItem tele : TeleportItem.values()) {
-                if (tele.canUse() && tele.getDestination().distanceTo(client.getLocalPlayer().getWorldLocation()) > 20) {
+                if (tele.canUse() && tele.getDestination().distanceTo(PlayerEx.getLocal().getWorldPoint()) > 20) {
                     if(!membersCheck(tele.getItemId()))
                         continue;
 

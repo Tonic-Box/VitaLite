@@ -82,7 +82,7 @@ public class Cannon
     public static boolean place()
     {
         Client client = Static.getClient();
-        return place(client.getLocalPlayer().getWorldLocation());
+        return place(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -156,7 +156,7 @@ public class Cannon
 
         WorldPoint location = getLocation();
         Client client = Static.getClient();
-        if(!client.getLocalPlayer().getWorldLocation().equals(location))
+        if(!PlayerEx.getLocal().getWorldPoint().equals(location))
             Walker.walkTo(location);
 
         TileObjectEx cannon = new TileObjectQuery()
@@ -186,8 +186,7 @@ public class Cannon
         }
 
         WorldPoint location = getLocation();
-        Client client = Static.getClient();
-        if(!client.getLocalPlayer().getWorldLocation().equals(location))
+        if(!PlayerEx.getLocal().getWorldPoint().equals(location))
             Walker.walkTo(location);
 
         //RSTileObject cannon = TileObject.findObjectWithin(client, 3, "Broken multicannon");

@@ -3,6 +3,7 @@ package com.tonic.data.locatables;
 import com.tonic.Static;
 import com.tonic.api.game.QuestAPI;
 import com.tonic.api.game.SkillAPI;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.util.WorldPointUtil;
@@ -127,8 +128,7 @@ public enum BankLocations {
 
     public static BankLocations getNearest()
     {
-        Client client = Static.getClient();
-        WorldPoint source = client.getLocalPlayer().getWorldLocation();
+        WorldPoint source = PlayerEx.getLocal().getWorldPoint();
         return Arrays.stream(values())
                 .filter(BankLocations::test)
                 .min(Comparator.comparingInt(x -> x.getArea().distanceTo2D(source)))

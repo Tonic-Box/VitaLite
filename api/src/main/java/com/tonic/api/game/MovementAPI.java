@@ -3,6 +3,7 @@ package com.tonic.api.game;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.widgets.WidgetAPI;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
 import com.tonic.services.mouse.ClickVisualizationOverlay;
@@ -133,8 +134,7 @@ public class MovementAPI {
      */
     public static void walkRelativeToWorldPoint(int offsetX, int offsetY)
     {
-        Client client = Static.getClient();
-        WorldPoint wp = client.getLocalPlayer().getWorldLocation();
+        WorldPoint wp = PlayerEx.getLocal().getWorldPoint();
         walkToWorldPoint(wp.getX() + offsetX, wp.getY() + offsetY);
     }
 
@@ -149,10 +149,10 @@ public class MovementAPI {
         Client client = Static.getClient();
         if(client.getLocalPlayer() == null || worldPoint == null)
             return false;
-        if (client.getLocalPlayer().getWorldLocation().distanceTo(worldPoint) > 100) {
+        if (PlayerEx.getLocal().getWorldPoint().distanceTo(worldPoint) > 100) {
             WorldView worldView = client.getTopLevelWorldView();
-            WorldPoint local = client.getLocalPlayer().getWorldLocation();
-            int distance = client.getLocalPlayer().getWorldLocation().distanceTo(worldPoint);
+            WorldPoint local = PlayerEx.getLocal().getWorldPoint();
+            int distance = local.distanceTo(worldPoint);
             int ratio = 100 / distance;
             int xDiff = worldPoint.getX() - local.getX();
             int yDiff = worldPoint.getY() - local.getY();
@@ -172,8 +172,7 @@ public class MovementAPI {
      */
     public static void cardinalWalk(WorldPoint target)
     {
-        Client client = Static.getClient();
-        WorldPoint local = client.getLocalPlayer().getWorldLocation();
+        WorldPoint local = PlayerEx.getLocal().getWorldPoint();
         int x = target.getX();
         int y = target.getY();
         int plane = local.getPlane();
@@ -207,8 +206,7 @@ public class MovementAPI {
      * @param distance The distance to walk away from the target area
      */
     public static void cardinalWalk(WorldArea target, int distance) {
-        Client client = Static.getClient();
-        WorldPoint localPlayer = client.getLocalPlayer().getWorldLocation();
+        WorldPoint localPlayer = PlayerEx.getLocal().getWorldPoint();
         int x = target.getX();
         int y = target.getY();
         int width = target.getWidth();
@@ -276,8 +274,7 @@ public class MovementAPI {
      * @return True if there is a path, false otherwise
      */
     public static boolean canPathTo(WorldPoint target) {
-        Client client = Static.getClient();
-        WorldPoint current = client.getLocalPlayer().getWorldLocation();
+        WorldPoint current = PlayerEx.getLocal().getWorldPoint();
         return canPathTo(current, target);
     }
 }

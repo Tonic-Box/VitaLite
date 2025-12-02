@@ -124,7 +124,7 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
      */
     public TileObjectQuery within(int distance)
     {
-        return within(client.getLocalPlayer().getWorldLocation(), distance);
+        return within(PlayerEx.getLocal().getWorldPoint(), distance);
     }
 
     /**
@@ -187,7 +187,7 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
      */
     public TileObjectQuery sortFurthest()
     {
-        return sortFurthest(client.getLocalPlayer().getWorldLocation());
+        return sortFurthest(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -210,7 +210,7 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
      */
     public TileObjectQuery sortShortestPath()
     {
-        return sortShortestPath(client.getLocalPlayer().getWorldLocation());
+        return sortShortestPath(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -235,7 +235,7 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
      */
     public TileObjectQuery sortLongestPath()
     {
-        return sortLongestPath(client.getLocalPlayer().getWorldLocation());
+        return sortLongestPath(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**

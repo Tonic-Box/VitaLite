@@ -357,7 +357,7 @@ public class WalkerPath
     }
 
     private boolean shouldHandleDialogue(List<? extends IStep> steps) {
-        return DialogueAPI.dialoguePresent() && !steps.isEmpty() && !SceneAPI.isReachable(client.getLocalPlayer().getWorldLocation(), steps.get(steps.size() - 1).getPosition());
+        return DialogueAPI.dialoguePresent() && !steps.isEmpty() && !SceneAPI.isReachable(PlayerEx.getLocal().getWorldPoint(), steps.get(steps.size() - 1).getPosition());
     }
 
     private void handleDialogue() {

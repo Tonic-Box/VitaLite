@@ -2,6 +2,7 @@ package com.tonic.util.handler;
 
 import com.tonic.Static;
 import com.tonic.api.game.MovementAPI;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import net.runelite.api.Client;
 import net.runelite.api.coords.WorldArea;
@@ -270,8 +271,7 @@ public class HandlerBuilder
     {
         HandlerBuilder builder = HandlerBuilder.get()
                 .addDelayUntil(0, context -> {
-                    Client client = Static.getClient();
-                    if(location.contains(client.getLocalPlayer().getWorldLocation()))
+                    if(location.contains(PlayerEx.getLocal().getWorldPoint()))
                     {
                         context.remove("PATH");
                         return true;
@@ -303,8 +303,7 @@ public class HandlerBuilder
                         location = locationSupplier.get();
                         context.put("TARGET_AREA", location);
                     }
-                    Client client = Static.getClient();
-                    if(location.contains(client.getLocalPlayer().getWorldLocation()))
+                    if(location.contains(PlayerEx.getLocal().getWorldPoint()))
                     {
                         context.remove("TARGET_AREA");
                         context.remove("PATH");

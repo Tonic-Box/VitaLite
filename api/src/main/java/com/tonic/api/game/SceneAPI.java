@@ -1,6 +1,7 @@
 package com.tonic.api.game;
 
 import com.tonic.Static;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.util.Location;
 import com.tonic.util.WorldPointUtil;
 import gnu.trove.set.TIntSet;
@@ -28,7 +29,7 @@ public class SceneAPI {
     public static List<WorldPoint> reachableTiles()
     {
         Client client = Static.getClient();
-        return reachableTiles(client.getLocalPlayer().getWorldLocation());
+        return reachableTiles(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -737,9 +738,7 @@ public class SceneAPI {
      */
     public static boolean isReachable(WorldPoint to)
     {
-        Client client = Static.getClient();
-        WorldPoint from = client.getLocalPlayer().getWorldLocation();
-        return isReachable(from, to);
+        return isReachable(PlayerEx.getLocal().getWorldPoint(), to);
     }
 
     public static boolean hasLineOfSightTo(WorldPoint source, WorldPoint other)

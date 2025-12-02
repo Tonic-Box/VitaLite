@@ -816,8 +816,7 @@ public class TransportLoader
                     return 0;
                 })
                 .addDelayUntil(1, () -> {
-                    Client client = Static.getClient();
-                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
                     return Distance.pathDistanceTo(worldPoint, destination) < 5;
                 });
 
@@ -921,8 +920,7 @@ public class TransportLoader
                     return 0;
                 })
                 .addDelayUntil(1, () -> {
-                    Client client = Static.getClient();
-                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
                     return Distance.pathDistanceTo(worldPoint, destination) < 5;
                 });
         return new Transport(source, destination, 10, 0, builder.build(), -1);
@@ -949,8 +947,7 @@ public class TransportLoader
                     return 0;
                 })
                 .addDelayUntil(1, () -> {
-                    Client client = Static.getClient();
-                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
                     return Distance.pathDistanceTo(worldPoint, destination) < 5;
                 });
         return new Transport(source, destination, 10, 0, builder.build(), -1);
@@ -981,7 +978,7 @@ public class TransportLoader
                 .addDelay(2, delay)
                 .add(3, () -> {
                     Client client = Static.getClient();
-                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
                     if(worldPoint.getPlane() != 1)
                     {
                         return 99;
@@ -1025,8 +1022,7 @@ public class TransportLoader
                 .addDelayUntil(1, () -> !MovementAPI.isMoving())
                 .addDelay(2, delay)
                 .add(3, () -> {
-                    Client client = Static.getClient();
-                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
                     if(worldPoint.getPlane() != 1)
                     {
                         return 99;
@@ -1105,8 +1101,7 @@ public class TransportLoader
                     return  1;
                 })
                 .addDelayUntil(1, () -> {
-                    Client client = Static.getClient();
-                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
                     return Distance.pathDistanceTo(worldPoint, destination) < 5;
                 });
         return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), -1);
@@ -1145,8 +1140,7 @@ public class TransportLoader
                     return 2;
                 })
                 .addDelayUntil(1, () -> {
-                    Client client = Static.getClient();
-                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
                     return Distance.pathDistanceTo(worldPoint, destination) < 5;
                 });
         return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), requirements, objId);
@@ -1203,8 +1197,7 @@ public class TransportLoader
                     return 2;
                 })
                 .addDelayUntil(1, () -> {
-                    Client client = Static.getClient();
-                    WorldPoint worldPoint = client.getLocalPlayer().getWorldLocation();
+                    WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
                     return Distance.pathDistanceTo(worldPoint, destination) < 3;
                 });
         return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), -1);

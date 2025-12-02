@@ -3,6 +3,7 @@ package com.tonic.services.pathfinder.implimentations.bidirbfs;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.collections.HybridIntQueue;
@@ -101,7 +102,7 @@ public class BiDirBFSAlgo implements IPathfinder
                 localMap = new LocalCollisionMap();
             }
 
-            startPoints.add(0, WorldPointUtil.compress(client.getLocalPlayer().getWorldLocation()));
+            startPoints.add(0, WorldPointUtil.compress(PlayerEx.getLocal().getWorldPoint()));
 
             for(final Teleport teleport : teleports) {
                 if(!filterTeleports(teleport.getDestination()))
@@ -537,8 +538,7 @@ public class BiDirBFSAlgo implements IPathfinder
     {
         return Static.invoke(() ->
         {
-            Client client = Static.getClient();
-            WorldPoint local = client.getLocalPlayer().getWorldLocation();
+            WorldPoint local = PlayerEx.getLocal().getWorldPoint();
             List<WorldPoint> path = SceneAPI.pathTo(local, dest);
             return path != null && path.size() < 20 && SceneAPI.isReachable(local, dest);
         });
