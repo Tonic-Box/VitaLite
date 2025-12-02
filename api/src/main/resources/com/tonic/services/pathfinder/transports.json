@@ -15296,7 +15296,17 @@
       "plane": 0
     },
     "action": "Use",
-    "objectId": 20786
+    "objectId": 20786,
+    "requirements": {
+      "varRequirements": [
+        {
+          "comparison": "EQUAL",
+          "type": "VARBIT",
+          "var": 2309,
+          "value": 1
+        }
+      ]
+    }
   },
   {
     "source": {
@@ -15422,7 +15432,17 @@
       "plane": 0
     },
     "action": "Use",
-    "objectId": 19005
+    "objectId": 19005,
+    "requirements": {
+      "varRequirements": [
+        {
+          "comparison": "EQUAL",
+          "type": "VARBIT",
+          "var": 2310,
+          "value": 1
+        }
+      ]
+    }
   },
   {
     "source": {
@@ -15464,7 +15484,17 @@
       "plane": 0
     },
     "action": "Use",
-    "objectId": 23707
+    "objectId": 23707,
+    "requirements": {
+      "varRequirements": [
+        {
+          "comparison": "EQUAL",
+          "type": "VARBIT",
+          "var": 2311,
+          "value": 1
+        }
+      ]
+    }
   },
   {
     "source": {
@@ -15506,7 +15536,17 @@
       "plane": 0
     },
     "action": "Use",
-    "objectId": 23707
+    "objectId": 23707,
+    "requirements": {
+      "varRequirements": [
+        {
+          "comparison": "EQUAL",
+          "type": "VARBIT",
+          "var": 2311,
+          "value": 1
+        }
+      ]
+    }
   },
   {
     "source": {
@@ -15534,7 +15574,17 @@
       "plane": 0
     },
     "action": "Use",
-    "objectId": 23707
+    "objectId": 23707,
+    "requirements": {
+      "varRequirements": [
+        {
+          "comparison": "EQUAL",
+          "type": "VARBIT",
+          "var": 2311,
+          "value": 1
+        }
+      ]
+    }
   },
   {
     "source": {
@@ -15646,7 +15696,17 @@
       "plane": 0
     },
     "action": "Use",
-    "objectId": 23922
+    "objectId": 23922,
+    "requirements": {
+      "varRequirements": [
+        {
+          "comparison": "EQUAL",
+          "type": "VARBIT",
+          "var": 2312,
+          "value": 1
+        }
+      ]
+    }
   },
   {
     "source": {
