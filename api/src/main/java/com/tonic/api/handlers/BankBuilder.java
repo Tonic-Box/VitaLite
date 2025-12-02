@@ -7,6 +7,7 @@ import com.tonic.api.game.SceneAPI;
 import com.tonic.api.widgets.BankAPI;
 import com.tonic.data.LayoutView;
 import com.tonic.data.wrappers.NpcEx;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.data.locatables.BankLocations;
 import com.tonic.queries.NpcQuery;
@@ -111,8 +112,7 @@ public class BankBuilder extends AbstractHandlerBuilder<BankBuilder>
                     .withNamesContains("Bank booth", "Bank chest")
                     .sortNearest()
                     .first();
-            Client client = Static.getClient();
-            if(bank != null && bank.getWorldPoint().distanceTo(client.getLocalPlayer().getWorldLocation())  < 10)
+            if(bank != null && bank.getWorldPoint().distanceTo(PlayerEx.getLocal().getWorldPoint())  < 10)
             {
                 ClickManagerUtil.queueClickBox(bank);
                 if(bank.getName().contains("Bank booth"))

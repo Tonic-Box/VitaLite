@@ -156,7 +156,7 @@ public class Walker
                 Delays.tick();
             }
             int timeout = 50;
-            WorldPoint worldPoint = Static.invoke(() -> client.getLocalPlayer().getWorldLocation());
+            WorldPoint worldPoint = Static.invoke(() -> PlayerEx.getLocal().getWorldPoint());
             while(!worldPoint.equals(end) && timeout > 0)
             {
                 if(stopCondition.getAsBoolean())
@@ -168,7 +168,7 @@ public class Walker
                 if(PlayerEx.getLocal().isIdle())
                 {
                     timeout--;
-                    if(!SceneAPI.isReachable(client.getLocalPlayer().getWorldLocation(), end))
+                    if(!SceneAPI.isReachable(PlayerEx.getLocal().getWorldPoint(), end))
                     {
                         walkTo(end);
                         GameManager.clearPathPoints();
@@ -177,7 +177,7 @@ public class Walker
                     MovementAPI.walkToWorldPoint(end);
                     Delays.tick();
                 }
-                worldPoint = Static.invoke(() -> client.getLocalPlayer().getWorldLocation());
+                worldPoint = Static.invoke(() -> PlayerEx.getLocal().getWorldPoint());
                 if(!running)
                 {
                     walkerPath.shutdown();

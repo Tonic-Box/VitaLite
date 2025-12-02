@@ -6,6 +6,7 @@ import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.WidgetAPI;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileObjectEx;
 import lombok.Getter;
 import net.runelite.api.Client;
@@ -135,13 +136,12 @@ public enum StrongholdSecurityQuestion {
             return false;
 
         Logger.info("[Pathfinder] Interacting with '" + door.getName() + "'");
-        Client client = Static.getClient();
         TileObjectAPI.interact(door, 0);
-        WorldPoint wp = client.getLocalPlayer().getWorldLocation();
+        WorldPoint wp = PlayerEx.getLocal().getWorldPoint();
         while (!DialogueAPI.dialoguePresent())
         {
             Delays.tick();
-            if(!wp.equals(client.getLocalPlayer().getWorldLocation()))
+            if(!wp.equals(PlayerEx.getLocal().getWorldPoint()))
             {
                 return false;
             }

@@ -3,6 +3,7 @@ package com.tonic.services.pathfinder.implimentations.astar;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.collision.Flags;
@@ -114,7 +115,7 @@ public class AStarAlgo implements IPathfinder
                 localMap = new LocalCollisionMap();
             }
 
-            playerStartPos = WorldPointUtil.compress(client.getLocalPlayer().getWorldLocation());
+            playerStartPos = WorldPointUtil.compress(PlayerEx.getLocal().getWorldPoint());
             this.startX = WorldPointUtil.getCompressedX(playerStartPos);
             this.startY = WorldPointUtil.getCompressedY(playerStartPos);
             this.startPlane = WorldPointUtil.getCompressedPlane(playerStartPos);
@@ -997,8 +998,7 @@ public class AStarAlgo implements IPathfinder
 
     private boolean filterTeleports(WorldPoint dest) {
         return Static.invoke(() -> {
-            Client client = Static.getClient();
-            WorldPoint local = client.getLocalPlayer().getWorldLocation();
+            WorldPoint local = PlayerEx.getLocal().getWorldPoint();
             List<WorldPoint> path = SceneAPI.pathTo(local, dest);
             return path != null && path.size() < 20 && SceneAPI.isReachable(local, dest);
         });

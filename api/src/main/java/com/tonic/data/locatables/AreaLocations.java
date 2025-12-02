@@ -1,6 +1,7 @@
 package com.tonic.data.locatables;
 
 import com.tonic.Static;
+import com.tonic.data.wrappers.PlayerEx;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.api.Client;
@@ -43,6 +44,6 @@ public enum AreaLocations {
         if(client.getGameState() != GameState.LOGGED_IN)
             return false;
 
-        return area.contains(client.getLocalPlayer().getWorldLocation());
+        return area.contains(PlayerEx.getLocal().getWorldPoint());
     }
 }

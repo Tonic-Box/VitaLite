@@ -92,10 +92,7 @@ public abstract class AbstractActorQuery<T extends ActorEx<?>, Q extends Abstrac
      * @return ActorQuery
      */
     public Q within(int distance) {
-        return keepIf(o -> {
-            WorldPoint playerLoc = client.getLocalPlayer().getWorldLocation();
-            return Distance.chebyshev(playerLoc, o.getWorldPoint()) <= distance;
-        });
+        return keepIf(o -> Distance.chebyshev(PlayerEx.getLocal().getWorldPoint(), o.getWorldPoint()) <= distance);
     }
 
     /**
@@ -125,7 +122,7 @@ public abstract class AbstractActorQuery<T extends ActorEx<?>, Q extends Abstrac
      */
     public Q sortNearest()
     {
-        return sortNearest(client.getLocalPlayer().getWorldLocation());
+        return sortNearest(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -149,7 +146,7 @@ public abstract class AbstractActorQuery<T extends ActorEx<?>, Q extends Abstrac
      */
     public Q sortFurthest()
     {
-        return sortFurthest(client.getLocalPlayer().getWorldLocation());
+        return sortFurthest(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -173,7 +170,7 @@ public abstract class AbstractActorQuery<T extends ActorEx<?>, Q extends Abstrac
      */
     public Q sortShortestPath()
     {
-        return sortShortestPath(client.getLocalPlayer().getWorldLocation());
+        return sortShortestPath(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -198,7 +195,7 @@ public abstract class AbstractActorQuery<T extends ActorEx<?>, Q extends Abstrac
      */
     public Q sortLongestPath()
     {
-        return sortLongestPath(client.getLocalPlayer().getWorldLocation());
+        return sortLongestPath(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**

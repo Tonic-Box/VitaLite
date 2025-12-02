@@ -1,6 +1,7 @@
 package com.tonic.services.stratpath;
 
 import com.tonic.Static;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.StrategicPathing;
 import com.tonic.util.WorldPointUtil;
@@ -85,7 +86,7 @@ public class StratPathOverlay extends Overlay
 
         final Client client = Static.getClient();
         final WorldView worldView = client.getTopLevelWorldView();
-        final WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
+        final WorldPoint playerLocation = PlayerEx.getLocal().getWorldPoint();
         final int MAX_DRAW_DISTANCE = 32;
 
         Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 50);

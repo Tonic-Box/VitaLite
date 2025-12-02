@@ -4,6 +4,7 @@ import com.tonic.Static;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.data.wrappers.NpcEx;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.util.DialogueNode;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.util.handler.StepHandler;
@@ -75,7 +76,7 @@ public class LongTransport extends Transport
 
                     Client client = Static.getClient();
 
-                    if((client.getLocalPlayer().getWorldLocation().distanceTo(obj.getWorldPoint()) > 2) && objectID != 190)
+                    if((PlayerEx.getLocal().getWorldPoint().distanceTo(obj.getWorldPoint()) > 2) && objectID != 190)
                         return 0;
 
                     if(NumberUtils.isCreatable(action))

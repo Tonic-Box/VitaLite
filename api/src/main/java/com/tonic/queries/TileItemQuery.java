@@ -206,7 +206,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery sortNearest()
     {
-        return sortNearest(client.getLocalPlayer().getWorldLocation());
+        return sortNearest(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -230,7 +230,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery sortFurthest()
     {
-        return sortFurthest(client.getLocalPlayer().getWorldLocation());
+        return sortFurthest(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -254,7 +254,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery sortShortestPath()
     {
-        return sortShortestPath(client.getLocalPlayer().getWorldLocation());
+        return sortShortestPath(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -279,7 +279,7 @@ public class TileItemQuery extends AbstractQuery<TileItemEx, TileItemQuery>
      */
     public TileItemQuery sortLongestPath()
     {
-        return sortLongestPath(client.getLocalPlayer().getWorldLocation());
+        return sortLongestPath(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**

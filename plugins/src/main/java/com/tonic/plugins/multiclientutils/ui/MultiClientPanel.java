@@ -1,6 +1,7 @@
 package com.tonic.plugins.multiclientutils.ui;
 
 import com.tonic.Static;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.model.ui.components.FancyButton;
 import com.tonic.model.ui.components.FancyCard;
 import com.tonic.model.ui.components.OptionPanel;
@@ -46,7 +47,7 @@ public class MultiClientPanel extends PluginPanel
             Client client = Static.getClient();
             if(client.getLocalPlayer() == null)
                 return;
-            plugin.sendMessage("PATHFIND", WorldPointUtil.compress(client.getLocalPlayer().getWorldLocation()), client.getWorld());
+            plugin.sendMessage("PATHFIND", WorldPointUtil.compress(PlayerEx.getLocal().getWorldPoint()), client.getWorld());
         }, "Have all available clients hop to and pathfind to this clients world and location");
 
         buttonFactory(c, "DD", () -> plugin.sendMessage("DD"), "All clients in this clients area DD under this character.");

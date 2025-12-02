@@ -120,10 +120,10 @@ public class Minigames
                 return false;
             }
 
-            WorldPoint wp = client.getLocalPlayer().getWorldLocation();
+            WorldPoint wp = PlayerEx.getLocal().getWorldPoint();
             WidgetAPI.interact(1, InterfaceID.Grouping.TELEPORT_TEXT1, destination.index);
             Delays.tick();
-            while(wp.equals(client.getLocalPlayer().getWorldLocation()) || !PlayerEx.getLocal().isIdle())
+            while(wp.equals(PlayerEx.getLocal().getWorldPoint()) || !PlayerEx.getLocal().isIdle())
             {
                 Delays.tick();
             }

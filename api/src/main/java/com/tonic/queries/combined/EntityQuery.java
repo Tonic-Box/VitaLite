@@ -187,7 +187,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
      */
     public EntityQuery sortNearest()
     {
-        return sortNearest(client.getLocalPlayer().getWorldLocation());
+        return sortNearest(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -210,7 +210,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
      */
     public EntityQuery sortFurthest()
     {
-        return sortFurthest(client.getLocalPlayer().getWorldLocation());
+        return sortFurthest(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -233,7 +233,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
      */
     public EntityQuery sortShortestPath()
     {
-        return sortShortestPath(client.getLocalPlayer().getWorldLocation());
+        return sortShortestPath(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**
@@ -258,7 +258,7 @@ public class EntityQuery extends AbstractQuery<Entity, EntityQuery> {
      */
     public EntityQuery sortLongestPath()
     {
-        return sortLongestPath(client.getLocalPlayer().getWorldLocation());
+        return sortLongestPath(PlayerEx.getLocal().getWorldPoint());
     }
 
     /**

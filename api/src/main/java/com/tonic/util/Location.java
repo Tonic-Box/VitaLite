@@ -2,6 +2,7 @@ package com.tonic.util;
 
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.pathfinder.LocalPathfinder;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.implimentations.hybridbfs.HybridBFSStep;
@@ -69,7 +70,7 @@ public class Location {
         Client client = Static.getClient();
         if (!client.getGameState().equals(GameState.LOGGED_IN) && !client.getGameState().equals(GameState.LOADING))
             return false;
-        WorldPoint player = client.getLocalPlayer().getWorldLocation();
+        WorldPoint player = PlayerEx.getLocal().getWorldPoint();
         return player.getX() > x1_sw && player.getX() < x2_ne && player.getY() > y1_sw && player.getY() < y2_ne;
     }
 

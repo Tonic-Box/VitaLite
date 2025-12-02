@@ -5,6 +5,7 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.api.threaded.Delays;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.pathfinder.model.TransportDto;
 import com.tonic.services.pathfinder.transports.Transport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
@@ -111,7 +112,7 @@ public class TransportOverlay extends Overlay
     {
         Client client = Static.getClient();
         WorldView wv = client.getTopLevelWorldView();
-        WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
+        WorldPoint playerLocation = PlayerEx.getLocal().getWorldPoint();
 
         if (point.distanceTo(playerLocation) >= MAX_DRAW_DISTANCE)
         {
@@ -156,7 +157,7 @@ public class TransportOverlay extends Overlay
         Tile tile;
         WorldPoint point;
 
-        WorldPoint player = client.getLocalPlayer().getWorldLocation();
+        WorldPoint player = PlayerEx.getLocal().getWorldPoint();
         int px = player.getX() - wv.getBaseX();
         int py = player.getY() - wv.getBaseY();
 

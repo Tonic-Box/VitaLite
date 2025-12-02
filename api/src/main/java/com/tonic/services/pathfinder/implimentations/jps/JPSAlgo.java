@@ -2,6 +2,7 @@ package com.tonic.services.pathfinder.implimentations.jps;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.collision.CollisionMap;
@@ -97,8 +98,7 @@ public class JPSAlgo implements IPathfinder
         }
 
         try {
-            Client client = Static.getClient();
-            playerStartPos = WorldPointUtil.compress(client.getLocalPlayer().getWorldLocation());
+            playerStartPos = WorldPointUtil.compress(PlayerEx.getLocal().getWorldPoint());
 
             List<Teleport> teleports = Teleport.buildTeleportLinks();
             List<Integer> startPoints = new ArrayList<>();
