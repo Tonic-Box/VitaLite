@@ -9,9 +9,7 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 /**
  * PrayerAPI provides methods to interact with and manage prayers in the game.
@@ -261,6 +259,22 @@ public enum PrayerAPI {
 
         return null;
     }
+
+
+    /**
+     * @return A list of all the currently active prayers
+     */
+    public static List<PrayerAPI> getActivePrayers() {
+        List<PrayerAPI> active = new ArrayList<>();
+
+        for (PrayerAPI prayer : PrayerAPI.values()) {
+            if (prayer.isActive()) {
+                active.add(prayer);
+            }
+        }
+        return active;
+    }
+
 
     /**
      * Flicks the given prayers
