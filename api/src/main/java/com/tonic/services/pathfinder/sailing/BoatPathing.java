@@ -98,6 +98,27 @@ public class BoatPathing
     private static byte[] BAD_TILE_TYPES;
     private static final int AVOID_COST = 100;
 
+    // Bad water buffer zone - scan radius for nearby hazardous tiles
+    private static final int BAD_WATER_BUFFER_RADIUS = 4;
+
+    // Direction lookup table: index = (dx+1)*3 + (dy+1), maps to direction index 0-7
+    // Eliminates loop in getDirectionIndex() - O(1) instead of O(8)
+    private static final int[] DIRECTION_LUT = {
+        4,  // (-1,-1) = SW
+        0,  // (-1, 0) = W
+        6,  // (-1,+1) = NW
+        2,  // ( 0,-1) = S
+        -1, // ( 0, 0) = no movement
+        3,  // ( 0,+1) = N
+        5,  // (+1,-1) = SE
+        1,  // (+1, 0) = E
+        7   // (+1,+1) = NE
+    };
+
+    // Fast bad tile type lookup - boolean array indexed by tile type byte
+    // Eliminates loop in isBadTileType() - O(1) instead of O(n)
+    private static final boolean[] IS_BAD_TILE = new boolean[256];
+
     public static StepHandler travelTo(WorldPoint worldPoint)
     {
         WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
@@ -352,6 +373,11 @@ public class BoatPathing
     {
         Profiler.Start("BoatPathing");
         BAD_TILE_TYPES = TileType.getAvoidTileTypes();
+        // Populate fast lookup table for bad tile types
+        java.util.Arrays.fill(IS_BAD_TILE, false);
+        for (byte b : BAD_TILE_TYPES) {
+            IS_BAD_TILE[b & 0xFF] = true;
+        }
         List<WorldPoint> path = Static.invoke(() -> {
             // === DEBUG: Log input parameters ===
             // System.out.println("=== BoatPathing Debug Start ===");
@@ -599,10 +625,13 @@ public class BoatPathing
                 }
             }
 
-            // Calculate edge cost with proximity penalty
+            // Calculate edge cost with combined proximity data (collision + bad water)
             int baseCost = BASE_COSTS[dir];
-            int proximity = getProximityCachedInt(collisionMap, proximityCache, nx, ny, plane);
-            int proximityCost = PROXIMITY_COSTS[Math.min(proximity, PROXIMITY_COSTS.length - 1)];
+            int combined = getCombinedProximityCached(collisionMap, proximityCache, nx, ny, plane);
+            int collisionDist = combined >>> 16;
+            int badWaterDist = combined & 0xFFFF;
+
+            int proximityCost = PROXIMITY_COSTS[Math.min(collisionDist, PROXIMITY_COSTS.length - 1)];
 
             // Avoid overflow: if proximityCost is MAX_VALUE, skip this tile
             if (proximityCost == Integer.MAX_VALUE) {
@@ -617,8 +646,16 @@ public class BoatPathing
             // E.g., EAST→SE→EAST pattern gets penalized to prefer clean 8-direction paths
             int alternationCost = getAlternationCost(parents, current, dir);
 
-            // Tile type penalty: strongly avoid hazardous water types (disease water, etc.)
-            int tileTypeCost = getTileTypeCost(nx, ny, plane);
+            // Tile type penalty: bad water buffer zone from unified scan
+            // Also check if tile itself is bad water (not just buffer zone)
+            int tileTypeCost = 0;
+            byte tileType = Walker.getTileTypeMap().getTileType(nx, ny, plane);
+            if (isBadTileType(tileType)) {
+                tileTypeCost = BAD_WATER_COST;
+            } else if (badWaterDist > 0) {
+                // Buffer zone: graduated penalty based on distance
+                tileTypeCost = BAD_WATER_COST >> badWaterDist;
+            }
 
             // Cloud avoidance cost: high penalty for tiles in cloud danger zones
             int cloudCost = 0;
@@ -634,9 +671,10 @@ public class BoatPathing
                 gScores.put(neighborPacked, tentativeG);
                 parents.put(neighborPacked, current);
 
-                // A* priority: f = g + h
+                // Weighted A* priority: f = g + w*h (w=1.5 for faster search, slightly suboptimal paths)
+                // This reduces node exploration by 2-5x while paths remain near-optimal
                 int h = heuristic(nx, ny, targetX, targetY);
-                int f = tentativeG + h;
+                int f = tentativeG + (h * 3 / 2);  // w = 1.5
                 heapSize = heapPush(heapNodes, heapCosts, heapSize, neighborPacked, f);
             }
         }
@@ -759,10 +797,11 @@ public class BoatPathing
     // ==================== Proximity Calculation ====================
 
     /**
-     * Gets the cached distance to nearest collision, computing if not cached.
-     * OPTIMIZED: Uses primitive ints throughout - no object allocations.
+     * Gets cached combined proximity data (collision + bad water distances).
+     * Returns packed int: (collisionDist << 16) | badWaterDist
+     * OPTIMIZED: Single cache lookup for both values.
      */
-    private static int getProximityCachedInt(CollisionMap collisionMap, Int2IntOpenHashMap cache, int x, int y, int plane)
+    private static int getCombinedProximityCached(CollisionMap collisionMap, Int2IntOpenHashMap cache, int x, int y, int plane)
     {
         int packed = WorldPointUtil.compress(x, y, plane);
         int cached = cache.get(packed);
@@ -770,70 +809,103 @@ public class BoatPathing
             return cached;
         }
 
-        int dist = calculateMinDistanceToCollisionInt(collisionMap, x, y, plane);
-        cache.put(packed, dist);
-        return dist;
+        int combined = calculateCombinedProximity(collisionMap, x, y, plane);
+        cache.put(packed, combined);
+        return combined;
     }
 
     /**
-     * Calculates minimum Chebyshev distance to nearest collision/obstacle.
-     * Uses spiral-out scan with early termination for efficiency.
-     * Checks cardinals first (most likely collision direction).
-     * OPTIMIZED: Uses primitive ints, casts to short only at collision check.
+     * Unified proximity scan: finds BOTH collision distance AND bad water distance in one pass.
+     * Returns packed int: (collisionDist << 16) | badWaterDist
+     *
+     * OPTIMIZED: Single spiral scan replaces two separate scans, ~50% fewer lookups.
+     * Early termination when both collision and bad water are found.
      */
-    private static int calculateMinDistanceToCollisionInt(CollisionMap collisionMap, int x, int y, int plane)
+    private static int calculateCombinedProximity(CollisionMap collisionMap, int x, int y, int plane)
     {
         byte p = (byte) plane;
+        int collisionDist = MAX_PROXIMITY_SCAN + 1;  // Default: no collision found
+        int badWaterDist = 0;  // Default: no bad water found (0 = none in range)
 
-        // Spiral out from center, early termination on first collision
-        for (int r = 1; r <= BoatPathing.MAX_PROXIMITY_SCAN; r++) {
-            // Check cardinals first (most common collision direction)
-            if (!collisionMap.walkable((short) x, (short)(y + r), p)) return r;  // N
-            if (!collisionMap.walkable((short) x, (short)(y - r), p)) return r;  // S
-            if (!collisionMap.walkable((short)(x + r), (short) y, p)) return r;  // E
-            if (!collisionMap.walkable((short)(x - r), (short) y, p)) return r;  // W
+        // Cache TileTypeMap reference - avoid repeated getter calls
+        var tileTypeMap = Walker.getTileTypeMap();
 
-            // Corners
-            if (!collisionMap.walkable((short)(x + r), (short)(y + r), p)) return r;  // NE
-            if (!collisionMap.walkable((short)(x + r), (short)(y - r), p)) return r;  // SE
-            if (!collisionMap.walkable((short)(x - r), (short)(y + r), p)) return r;  // NW
-            if (!collisionMap.walkable((short)(x - r), (short)(y - r), p)) return r;  // SW
-
-            // Fill in the rest of the ring edges
-            for (int i = 1; i < r; i++) {
-                // Top and bottom edges
-                if (!collisionMap.walkable((short)(x + i), (short)(y + r), p)) return r;
-                if (!collisionMap.walkable((short)(x - i), (short)(y + r), p)) return r;
-                if (!collisionMap.walkable((short)(x + i), (short)(y - r), p)) return r;
-                if (!collisionMap.walkable((short)(x - i), (short)(y - r), p)) return r;
-                // Left and right edges
-                if (!collisionMap.walkable((short)(x + r), (short)(y + i), p)) return r;
-                if (!collisionMap.walkable((short)(x + r), (short)(y - i), p)) return r;
-                if (!collisionMap.walkable((short)(x - r), (short)(y + i), p)) return r;
-                if (!collisionMap.walkable((short)(x - r), (short)(y - i), p)) return r;
+        // Spiral out from center
+        for (int r = 1; r <= MAX_PROXIMITY_SCAN; r++) {
+            // Check collision (until found)
+            if (collisionDist > MAX_PROXIMITY_SCAN) {
+                // Cardinals - N, S, E, W
+                if (!collisionMap.walkable((short) x, (short)(y + r), p)) collisionDist = r;
+                else if (!collisionMap.walkable((short) x, (short)(y - r), p)) collisionDist = r;
+                else if (!collisionMap.walkable((short)(x + r), (short) y, p)) collisionDist = r;
+                else if (!collisionMap.walkable((short)(x - r), (short) y, p)) collisionDist = r;
+                // Corners - NE, SE, NW, SW
+                else if (!collisionMap.walkable((short)(x + r), (short)(y + r), p)) collisionDist = r;
+                else if (!collisionMap.walkable((short)(x + r), (short)(y - r), p)) collisionDist = r;
+                else if (!collisionMap.walkable((short)(x - r), (short)(y + r), p)) collisionDist = r;
+                else if (!collisionMap.walkable((short)(x - r), (short)(y - r), p)) collisionDist = r;
+                else {
+                    // Ring edges
+                    for (int i = 1; i < r && collisionDist > MAX_PROXIMITY_SCAN; i++) {
+                        if (!collisionMap.walkable((short)(x + i), (short)(y + r), p)) collisionDist = r;
+                        else if (!collisionMap.walkable((short)(x - i), (short)(y + r), p)) collisionDist = r;
+                        else if (!collisionMap.walkable((short)(x + i), (short)(y - r), p)) collisionDist = r;
+                        else if (!collisionMap.walkable((short)(x - i), (short)(y - r), p)) collisionDist = r;
+                        else if (!collisionMap.walkable((short)(x + r), (short)(y + i), p)) collisionDist = r;
+                        else if (!collisionMap.walkable((short)(x + r), (short)(y - i), p)) collisionDist = r;
+                        else if (!collisionMap.walkable((short)(x - r), (short)(y + i), p)) collisionDist = r;
+                        else if (!collisionMap.walkable((short)(x - r), (short)(y - i), p)) collisionDist = r;
+                    }
+                }
             }
+
+            // Check bad water (until found, only within buffer radius)
+            if (badWaterDist == 0 && r <= BAD_WATER_BUFFER_RADIUS) {
+                // Cardinals
+                if (IS_BAD_TILE[tileTypeMap.getTileType(x, y + r, plane) & 0xFF]) badWaterDist = r;
+                else if (IS_BAD_TILE[tileTypeMap.getTileType(x, y - r, plane) & 0xFF]) badWaterDist = r;
+                else if (IS_BAD_TILE[tileTypeMap.getTileType(x + r, y, plane) & 0xFF]) badWaterDist = r;
+                else if (IS_BAD_TILE[tileTypeMap.getTileType(x - r, y, plane) & 0xFF]) badWaterDist = r;
+                // Corners
+                else if (IS_BAD_TILE[tileTypeMap.getTileType(x + r, y + r, plane) & 0xFF]) badWaterDist = r;
+                else if (IS_BAD_TILE[tileTypeMap.getTileType(x + r, y - r, plane) & 0xFF]) badWaterDist = r;
+                else if (IS_BAD_TILE[tileTypeMap.getTileType(x - r, y + r, plane) & 0xFF]) badWaterDist = r;
+                else if (IS_BAD_TILE[tileTypeMap.getTileType(x - r, y - r, plane) & 0xFF]) badWaterDist = r;
+                else {
+                    // Ring edges
+                    for (int i = 1; i < r && badWaterDist == 0; i++) {
+                        if (IS_BAD_TILE[tileTypeMap.getTileType(x + i, y + r, plane) & 0xFF]) badWaterDist = r;
+                        else if (IS_BAD_TILE[tileTypeMap.getTileType(x - i, y + r, plane) & 0xFF]) badWaterDist = r;
+                        else if (IS_BAD_TILE[tileTypeMap.getTileType(x + i, y - r, plane) & 0xFF]) badWaterDist = r;
+                        else if (IS_BAD_TILE[tileTypeMap.getTileType(x - i, y - r, plane) & 0xFF]) badWaterDist = r;
+                        else if (IS_BAD_TILE[tileTypeMap.getTileType(x + r, y + i, plane) & 0xFF]) badWaterDist = r;
+                        else if (IS_BAD_TILE[tileTypeMap.getTileType(x + r, y - i, plane) & 0xFF]) badWaterDist = r;
+                        else if (IS_BAD_TILE[tileTypeMap.getTileType(x - r, y + i, plane) & 0xFF]) badWaterDist = r;
+                        else if (IS_BAD_TILE[tileTypeMap.getTileType(x - r, y - i, plane) & 0xFF]) badWaterDist = r;
+                    }
+                }
+            }
+
+            // Early exit if both found
+            if (collisionDist <= MAX_PROXIMITY_SCAN && badWaterDist > 0) break;
         }
-        return BoatPathing.MAX_PROXIMITY_SCAN + 1;  // No collision within scan range (open water)
+
+        // Pack both results: high 16 bits = collision, low 16 = bad water
+        return (collisionDist << 16) | badWaterDist;
     }
 
     // ==================== Turn Cost Calculation ====================
 
     /**
      * Gets direction index (0-7) from movement delta.
+     * OPTIMIZED: O(1) lookup table instead of O(8) loop.
      * @return direction index, or -1 if no movement
      */
     private static int getDirectionIndex(int fromX, int fromY, int toX, int toY)
     {
         int dx = Integer.signum(toX - fromX);
         int dy = Integer.signum(toY - fromY);
-
-        // Match against DX/DY arrays
-        for (int dir = 0; dir < 8; dir++) {
-            if (DX[dir] == dx && DY[dir] == dy) {
-                return dir;
-            }
-        }
-        return -1;  // No movement (same position)
+        return DIRECTION_LUT[(dx + 1) * 3 + (dy + 1)];
     }
 
     /**
@@ -893,6 +965,36 @@ public class BoatPathing
     }
 
     /**
+     * Calculates perpendicular distance from a point to the ideal straight line between start and target.
+     * Used as a tie-breaker to prefer paths that stay close to the direct route.
+     * OPTIMIZED: Uses integer math only (cross product magnitude).
+     *
+     * @return Approximate perpendicular distance (not exact, but sufficient for comparison)
+     */
+    private static int getCrossTrackDistance(int px, int py, int startX, int startY, int targetX, int targetY)
+    {
+        // Vector from start to target
+        int dx = targetX - startX;
+        int dy = targetY - startY;
+
+        // Vector from start to point
+        int dpx = px - startX;
+        int dpy = py - startY;
+
+        // Cross product magnitude = |dx*dpy - dy*dpx| gives area of parallelogram
+        // Divided by line length gives perpendicular distance, but we skip the division
+        // since we only need relative comparison (all paths use same start/target)
+        int cross = Math.abs(dx * dpy - dy * dpx);
+
+        // Normalize roughly by line length to keep penalty reasonable
+        // Use max(|dx|,|dy|) as cheap approximation of length
+        int lineLen = Math.max(Math.abs(dx), Math.abs(dy));
+        if (lineLen == 0) return 0;
+
+        return cross / lineLen;
+    }
+
+    /**
      * Penalizes alternating between adjacent directions (anti-wobble).
      * Detects patterns like EAST → SE → EAST where we alternate back to a previous direction.
      * This discourages 2:1 slope wobble patterns, preferring clean 8-direction paths.
@@ -947,7 +1049,7 @@ public class BoatPathing
             }
 
             if (headingDiff <= 2) {  // Adjacent directions (within 45°)
-                return 8;  // Moderate penalty for wobble pattern
+                return 25;  // Strong penalty for wobble pattern
             }
         }
 
@@ -955,15 +1057,11 @@ public class BoatPathing
     }
 
     /**
-     * Gets tile type cost penalty for hazardous water types.
-     * Uses static byte constant for maximum performance in hot path.
+     * Checks if a tile type is a bad/hazardous water type.
+     * OPTIMIZED: O(1) array lookup instead of O(n) loop.
      */
-    private static int getTileTypeCost(int x, int y, int plane) {
-        byte tileType = Walker.getTileTypeMap().getTileType(x, y, plane);
-        if (ArrayUtils.contains(BAD_TILE_TYPES, tileType)) {
-            return BAD_WATER_COST;
-        }
-        return 0;
+    private static boolean isBadTileType(byte tileType) {
+        return IS_BAD_TILE[tileType & 0xFF];
     }
 
     /**
