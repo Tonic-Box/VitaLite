@@ -34,8 +34,9 @@ public class BoatHullCache
     final double[] directionCos;
     final double[] directionSin;
 
-    // Pre-computed rotated hull offsets for all 8 directions
+    // Pre-computed rotated hull offsets for all 8 directions + 1 unrotated (index 8)
     // Eliminates Math.round() from hot path - computed once at initialization
+    // Index 8 = unrotated hull (current heading) for use near start position
     final int[][] rotatedXOffsets;  // [direction][hullTile]
     final int[][] rotatedYOffsets;  // [direction][hullTile]
 
@@ -50,10 +51,10 @@ public class BoatHullCache
         this.directionCos = new double[8];
         this.directionSin = new double[8];
 
-        // Pre-compute rotated hull offsets for all 8 directions
+        // Pre-compute rotated hull offsets for all 8 directions + 1 unrotated
         int hullSize = xOffsets.length;
-        this.rotatedXOffsets = new int[8][hullSize];
-        this.rotatedYOffsets = new int[8][hullSize];
+        this.rotatedXOffsets = new int[9][hullSize];  // 9 = 8 directions + 1 unrotated
+        this.rotatedYOffsets = new int[9][hullSize];
 
         for (int dir = 0; dir < 8; dir++) {
             int targetHeadingValue = DIRECTION_HEADINGS[dir];
@@ -76,6 +77,13 @@ public class BoatHullCache
                 rotatedXOffsets[dir][i] = (int) Math.round(xOffsets[i] * cos - yOffsets[i] * sin);
                 rotatedYOffsets[dir][i] = (int) Math.round(xOffsets[i] * sin + yOffsets[i] * cos);
             }
+        }
+
+        // Index 8 = unrotated hull (current heading)
+        // Used for checking positions near start where boat is at its actual current heading
+        for (int i = 0; i < hullSize; i++) {
+            rotatedXOffsets[8][i] = xOffsets[i];
+            rotatedYOffsets[8][i] = yOffsets[i];
         }
     }
 }

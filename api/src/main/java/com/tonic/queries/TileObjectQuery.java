@@ -103,6 +103,20 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
         return keepIf(o -> o.getActions() != null && TextUtil.containsIgnoreCaseInverse(action, o.getActions()));
     }
 
+    public TileObjectQuery withAnyOfActions(String... actions)
+    {
+        return keepIf(o -> {
+            if(o.getActions() == null)
+                return false;
+            for(String action : actions)
+            {
+                if(TextUtil.containsIgnoreCaseInverse(action, o.getActions()))
+                    return true;
+            }
+            return false;
+        });
+    }
+
     /**
      * Filters the query to only include objects within the specified distance from the local player.
      * @param distance The distance to filter by.

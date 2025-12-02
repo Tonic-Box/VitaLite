@@ -528,7 +528,7 @@ public class GameManager extends Overlay {
             boatOverlay.show();
             boatDebugShowing = true;
         }
-        else if(!Static.getVitaConfig().getDrawBoatDebug() && boatDebugShowing)
+        else if((!Static.getVitaConfig().getDrawBoatDebug() && boatDebugShowing) || !SailingAPI.isOnBoat())
         {
             boatOverlay.hide();
             boatDebugShowing = false;
