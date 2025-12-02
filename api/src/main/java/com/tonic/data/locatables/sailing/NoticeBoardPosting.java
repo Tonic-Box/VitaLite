@@ -103,7 +103,11 @@ public enum NoticeBoardPosting
             return false;
         }
         WorldPoint player = PlayerEx.getLocal().getWorldPoint();
-        return Distance.chebyshev(getStartingPoint(), player) <= 50;
+        if(getDestination() == null || getStartingPoint() == null)
+        {
+            throw new IllegalStateException("Task data is incomplete for task: " + getTaskName());
+        }
+        return Distance.chebyshev(getStartingPoint(), player) < Distance.chebyshev(getDestination(), player);
     }
 
     public boolean hasLevelFor()

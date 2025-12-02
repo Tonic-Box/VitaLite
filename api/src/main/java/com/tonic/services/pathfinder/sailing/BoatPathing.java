@@ -353,31 +353,71 @@ public class BoatPathing
         Profiler.Start("BoatPathing");
         BAD_TILE_TYPES = TileType.getAvoidTileTypes();
         List<WorldPoint> path = Static.invoke(() -> {
+            // === DEBUG: Log input parameters ===
+            // System.out.println("=== BoatPathing Debug Start ===");
+            // System.out.println("  Input start: " + start);
+            // System.out.println("  Input target: " + target);
+            // int straightLineDist = Distance.chebyshev(start, target);
+            // System.out.println("  Straight-line distance: " + straightLineDist);
+
             CollisionMap collisionMap = Walker.getCollisionMap();
             if (collisionMap == null) {
-                System.out.println("SailPathing: CollisionMap is null");
+                // System.out.println("  ERROR: CollisionMap is null");
                 return null;
             }
+
+            // === DEBUG: Check start tile walkability ===
+            // boolean startWalkable = collisionMap.walkable((short) start.getX(), (short) start.getY(), (byte) 0);
+            // System.out.println("  Start tile walkable: " + startWalkable);
 
             // Validate target - if boat can't fit, find nearest valid position
             WorldPoint adjustedTarget = target;
             WorldPoint validTarget = BoatCollisionAPI.findNearestValidPlayerBoatPosition(target, 10);
             if (validTarget == null) {
-                System.out.println("SailPathing: No valid boat position within 10 tiles of " + target);
+                // System.out.println("  ERROR: No valid boat position within 10 tiles of " + target);
+                // === DEBUG: Check target tile walkability ===
+                // boolean targetWalkable = collisionMap.walkable((short) target.getX(), (short) target.getY(), (byte) 0);
+                // System.out.println("  Target tile walkable: " + targetWalkable);
                 return null;
             }
             if (!validTarget.equals(target)) {
-                System.out.println("SailPathing: Target adjusted " + target + " -> " + validTarget);
+                // System.out.println("  Target adjusted: " + target + " -> " + validTarget);
                 adjustedTarget = validTarget;
             }
+            // else {
+            //     System.out.println("  Target valid (no adjustment needed)");
+            // }
+
+            // === DEBUG: Check adjusted target walkability ===
+            // boolean adjTargetWalkable = collisionMap.walkable((short) adjustedTarget.getX(), (short) adjustedTarget.getY(), (byte) 0);
+            // System.out.println("  Adjusted target walkable: " + adjTargetWalkable);
 
             // Initialize cache with hull offsets and pre-computed rotations
             // Don't pass boat entity - it doesn't survive Static.invoke boundary
             BoatHullCache cache = initializeBoatCache(start, collisionMap);
             if (cache == null) {
-                System.out.println("SailPathing: Failed to initialize boat cache");
+                // System.out.println("  ERROR: Failed to initialize boat cache");
                 return null;
             }
+
+            // === DEBUG: Check if boat can fit at start in any direction ===
+            // int startFitCount = 0;
+            // for (int dir = 0; dir < 8; dir++) {
+            //     if (canBoatFitAtDirection(cache, (short) start.getX(), (short) start.getY(), dir)) {
+            //         startFitCount++;
+            //     }
+            // }
+            // boolean startFitsUnrotated = canBoatFitAtDirection(cache, (short) start.getX(), (short) start.getY(), 8);
+            // System.out.println("  Boat fits at start in " + startFitCount + "/8 directions, unrotated=" + startFitsUnrotated);
+
+            // === DEBUG: Check if boat can fit at target in any direction ===
+            // int targetFitCount = 0;
+            // for (int dir = 0; dir < 8; dir++) {
+            //     if (canBoatFitAtDirection(cache, (short) adjustedTarget.getX(), (short) adjustedTarget.getY(), dir)) {
+            //         targetFitCount++;
+            //     }
+            // }
+            // System.out.println("  Boat fits at target in " + targetFitCount + "/8 directions");
 
             // A* data structures - primitive arrays for heap (stores f-scores)
             int[] heapNodes = new int[100_000];
@@ -409,6 +449,10 @@ public class BoatPathing
             int maxIterations = 1_000_000;
             int iterations = 0;
 
+            // === DEBUG: Track closest point reached ===
+            // int closestDist = Integer.MAX_VALUE;
+            // int closestPacked = startPacked;
+
             // A* search
             while (heapSize > 0 && iterations++ < maxIterations) {
                 // Pop minimum f-score node
@@ -421,9 +465,20 @@ public class BoatPathing
                 }
                 closedSet.add(current);
 
+                // === DEBUG: Track closest point to target ===
+                // int currX = WorldPointUtil.getCompressedX(current);
+                // int currY = WorldPointUtil.getCompressedY(current);
+                // int distToTarget = Math.max(Math.abs(currX - targetX), Math.abs(currY - targetY));
+                // if (distToTarget < closestDist) {
+                //     closestDist = distToTarget;
+                //     closestPacked = current;
+                // }
+
                 // Check if reached target
                 if (current == targetPacked) {
-                    System.out.println("SailPathing: Found target after " + iterations + " iterations (A* with proximity)");
+                    // System.out.println("  SUCCESS: Found target after " + iterations + " iterations");
+                    // System.out.println("  Nodes explored: " + closedSet.size());
+                    // System.out.println("=== BoatPathing Debug End ===");
                     return reconstructFullPath(parents, targetPacked);
                 }
 
@@ -435,7 +490,46 @@ public class BoatPathing
                         heapNodes, heapCosts, heapSize, avoidTiles, startPacked);
             }
 
-            System.out.println("SailPathing: No path found after " + iterations + " iterations");
+            // === DEBUG: Failure analysis ===
+            // System.out.println("  FAILED: No path found");
+            // System.out.println("  Iterations: " + iterations);
+            // System.out.println("  Nodes explored: " + closedSet.size());
+            // System.out.println("  Heap exhausted: " + (heapSize == 0));
+            // System.out.println("  Max iterations hit: " + (iterations >= maxIterations));
+
+            // Report closest point reached
+            // int closestX = WorldPointUtil.getCompressedX(closestPacked);
+            // int closestY = WorldPointUtil.getCompressedY(closestPacked);
+            // byte closestPlane = WorldPointUtil.getCompressedPlane(closestPacked);
+            // WorldPoint closestPoint = new WorldPoint(closestX, closestY, closestPlane);
+            // System.out.println("  Closest point reached: " + closestPoint);
+            // System.out.println("  Closest distance to target: " + closestDist + " tiles");
+            // System.out.println("  Distance from start to closest: " + Distance.chebyshev(start, closestPoint));
+
+            // Check why we couldn't expand from closest point
+            // System.out.println("  --- Analyzing closest point blockage ---");
+            // int blockedDirs = 0;
+            // int closedDirs = 0;
+            // int hullBlockedDirs = 0;
+            // for (int dir = 0; dir < 8; dir++) {
+            //     int nx = closestX + DX[dir];
+            //     int ny = closestY + DY[dir];
+            //     int neighborPacked = WorldPointUtil.compress(nx, ny, closestPlane);
+            //
+            //     if (closedSet.contains(neighborPacked)) {
+            //         closedDirs++;
+            //     } else if (!canBoatFitAtDirection(cache, (short) nx, (short) ny, dir)) {
+            //         hullBlockedDirs++;
+            //     } else {
+            //         // Check other reasons
+            //         int proximity = getProximityCachedInt(collisionMap, proximityCache, nx, ny, closestPlane);
+            //         if (PROXIMITY_COSTS[Math.min(proximity, PROXIMITY_COSTS.length - 1)] == Integer.MAX_VALUE) {
+            //             blockedDirs++;
+            //         }
+            //     }
+            // }
+            // System.out.println("  From closest: " + closedDirs + " dirs already visited, " + hullBlockedDirs + " hull blocked, " + blockedDirs + " proximity blocked");
+            // System.out.println("=== BoatPathing Debug End ===");
             return null;
         });
 
@@ -491,13 +585,18 @@ public class BoatPathing
 
             // Skip if boat doesn't fit at this position/direction
             // EXCEPTIONS:
-            // 1. Near start - boat needs to maneuver out regardless of collision approximation
+            // 1. Near start - use unrotated hull (index 8) since boat is at actual current heading
             // 2. Target tile - already validated with all headings, don't reject based on approach direction
             boolean nearStart = Math.abs(nx - sX) <= 3 && Math.abs(ny - sY) <= 3;
             boolean isTarget = (neighborPacked == targetPacked);
 
-            if (!nearStart && !isTarget && !canBoatFitAtDirection(cache, (short) nx, (short) ny, dir)) {
-                continue;
+            if (!isTarget) {
+                // Near start: use unrotated hull (index 8) to match boat's actual current heading
+                // Elsewhere: use direction-rotated hull (index 0-7)
+                int hullDir = nearStart ? 8 : dir;
+                if (!canBoatFitAtDirection(cache, (short) nx, (short) ny, hullDir)) {
+                    continue;
+                }
             }
 
             // Calculate edge cost with proximity penalty
