@@ -319,10 +319,11 @@ public class SailingAPI
 
     public static boolean sailsNeedTrimming()
     {
-        return TileObjectAPI.search()
+        TileObjectEx sail = TileObjectAPI.search()
                 .withId(SailingConstants.SAILS)
                 .withOpVisible(0)
-                .nearest() != null;
+                .nearest();
+        return sail != null && sail.isOpVisible(0);
     }
 
     /**
@@ -335,10 +336,9 @@ public class SailingAPI
         }
         TileObjectEx sail = TileObjectAPI.search()
                 .withId(SailingConstants.SAILS)
-                .withOpVisible(0)
                 .nearest();
 
-        if(sail != null) {
+        if(sail != null && sail.isOpVisible(0)) {
             TileObjectAPI.interact(sail, "Trim");
             return true;
         }
