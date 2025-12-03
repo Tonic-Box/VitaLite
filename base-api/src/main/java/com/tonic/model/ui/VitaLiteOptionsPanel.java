@@ -5,7 +5,6 @@ import com.tonic.Static;
 import com.tonic.events.PacketReceived;
 import com.tonic.events.PacketSent;
 import com.tonic.model.ui.components.*;
-import com.tonic.packets.PacketBuffer;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
 import com.tonic.services.mouserecorder.DecodedMousePacket;
@@ -16,13 +15,8 @@ import com.tonic.services.mouserecorder.trajectory.ui.TrajectorySettingsPanel;
 import com.tonic.services.pathfinder.PathfinderAlgo;
 import com.tonic.services.mouserecorder.MovementVisualization;
 import com.tonic.services.profiler.ProfilerWindow;
-import com.tonic.util.Profiler;
 import com.tonic.util.ReflectBuilder;
-import com.tonic.util.StaticIntFinder;
 import com.tonic.util.ThreadPool;
-import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.gameval.ItemID;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -705,7 +699,17 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
             if(logMousePacketsToggle.isSelected() || recordTrajectory.isSelected() && isMouse == 2)
             {
-                DecodedMousePacket decodedInfo = MousePacketDecoder.decode(event.getFreshBuffer());
+                DecodedMousePacket decodedInfo;
+                try
+                {
+                    decodedInfo = MousePacketDecoder.decode(event.getFreshBuffer());
+                }
+                catch(Exception e)
+                {
+                    Logger.error("Failed to decode mouse packet: " + e.getMessage());
+                    Logger.error(String.valueOf(event.getId()));
+                    return;
+                }
                 if(recordTrajectory.isSelected())
                 {
                     TrajectoryService.getPacketCapture().submitDecodedPacket(decodedInfo);
