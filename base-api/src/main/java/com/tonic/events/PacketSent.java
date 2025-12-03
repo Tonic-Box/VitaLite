@@ -68,8 +68,6 @@ public class PacketSent {
     //0=false, 1=click, 2=move
     public int isMouse()
     {
-        if(MousePacketDecoder.test(getBuffer()))
-            return 2;
         if(MOUSE_CLICK == -1)
         {
             MapEntry entry = PacketMapReader.get("OP_MOUSE_CLICK");
@@ -79,6 +77,8 @@ public class PacketSent {
                 return MOUSE_CLICK == id ? 1 : 0;
             }
         }
+        if(MousePacketDecoder.test(getBuffer()) && id != MOUSE_CLICK)
+            return 2;
         return MOUSE_CLICK == id ? 1 : 0;
     }
 
