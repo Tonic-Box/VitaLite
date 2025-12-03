@@ -32,16 +32,12 @@ import java.util.List;
  */
 public class SailingAPI
 {
-    @Setter
-    @Getter
-    private static volatile boolean sailsNeedTrimming = false;
     /**
      * Sets sails to start navigating
      * @return true if sails were set, false otherwise
      */
     public static boolean setSails()
     {
-        System.out.println(BoatCollisionAPI.canPlayerBoatFitAtPoint(new WorldPoint(2836, 3332, 0)));
         if(!isNavigating())
             return false;
 
@@ -321,21 +317,29 @@ public class SailingAPI
         });
     }
 
+    public static boolean sailsNeedTrimming()
+    {
+        return TileObjectAPI.search()
+                .withId(SailingConstants.SAILS)
+                .withOpVisible(0)
+                .nearest() != null;
+    }
+
     /**
      * Trims the sails on the boat
      * @return true if sails were trimmed, false otherwise
      */
     public static boolean trimSails() {
-        if (!isOnBoat() || !sailsNeedTrimming) {
+        if (!isOnBoat()) {
             return false;
         }
         TileObjectEx sail = TileObjectAPI.search()
                 .withId(SailingConstants.SAILS)
+                .withOpVisible(0)
                 .nearest();
 
         if(sail != null) {
             TileObjectAPI.interact(sail, "Trim");
-            sailsNeedTrimming = false;
             return true;
         }
         return false;

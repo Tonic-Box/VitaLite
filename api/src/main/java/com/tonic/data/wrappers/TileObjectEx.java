@@ -104,6 +104,33 @@ public class TileObjectEx implements Entity
         return null;
     }
 
+    /**
+     * Checks if the specified action index is visible for this object.
+     *
+     * @param op The action index to check (0-based).
+     * @return True if the action is visible, false otherwise.
+     */
+    public boolean isOpVisible(int op)
+    {
+        return Static.invoke(() -> {
+            try
+            {
+                return tileObject.isOpShown(op);
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        });
+    }
+
+    public boolean isActionVisible(String action) {
+        int index = getActionIndex(action);
+        if(index == -1)
+            return false;
+        return isOpVisible(index);
+    }
+
     public boolean hasAction(String action) {
         return getActionIndex(action) != -1;
     }

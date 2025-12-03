@@ -41,6 +41,7 @@ public enum SpellBook
 
     static
     {
+
         Set<Spell> standard = new HashSet<>();
         standard.add(Standard.WIND_STRIKE);
         standard.add(Standard.WATER_STRIKE);
