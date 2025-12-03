@@ -10,18 +10,17 @@ import com.tonic.services.pathfinder.collision.CollisionMap;
 import com.tonic.services.pathfinder.sailing.graph.GraphNode;
 import com.tonic.services.pathfinder.sailing.graph.NavGraph;
 import com.tonic.services.pathfinder.tiletype.TileType;
+import com.tonic.services.profiler.recording.MethodProfiler;
 import com.tonic.util.Distance;
 import com.tonic.util.Profiler;
 import com.tonic.util.WorldPointUtil;
 import com.tonic.util.handler.StepHandler;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import lombok.Getter;
 import net.runelite.api.WorldEntity;
 import net.runelite.api.coords.WorldPoint;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
 
@@ -114,15 +113,15 @@ public class BoatPathing
     // Direction lookup table: index = (dx+1)*3 + (dy+1), maps to direction index 0-7
     // Eliminates loop in getDirectionIndex() - O(1) instead of O(8)
     private static final int[] DIRECTION_LUT = {
-        4,  // (-1,-1) = SW
-        0,  // (-1, 0) = W
-        6,  // (-1,+1) = NW
-        2,  // ( 0,-1) = S
-        -1, // ( 0, 0) = no movement
-        3,  // ( 0,+1) = N
-        5,  // (+1,-1) = SE
-        1,  // (+1, 0) = E
-        7   // (+1,+1) = NE
+            4,  // (-1,-1) = SW
+            0,  // (-1, 0) = W
+            6,  // (-1,+1) = NW
+            2,  // ( 0,-1) = S
+            -1, // ( 0, 0) = no movement
+            3,  // ( 0,+1) = N
+            5,  // (+1,-1) = SE
+            1,  // (+1, 0) = E
+            7   // (+1,+1) = NE
     };
 
     // Fast bad tile type lookup - boolean array indexed by tile type byte
@@ -332,7 +331,6 @@ public class BoatPathing
             i++;
         }
 
-        System.out.println("SailPathing: Initialized hull cache with " + hull.size() + " tiles, heading=" + currentHeading);
         return new BoatHullCache(xOffsets, yOffsets, currentHeading, collisionMap);
     }
 
@@ -385,208 +383,112 @@ public class BoatPathing
      */
     public static List<WorldPoint> findFullPath(WorldPoint start, WorldPoint target, IntOpenHashSet avoidTiles)
     {
+        MethodProfiler.begin("BoatPathing.findFullPath");
         Profiler.Start("BoatPathing");
-        BAD_TILE_TYPES = TileType.getAvoidTileTypes();
-        // Populate fast lookup table for bad tile types
-        java.util.Arrays.fill(IS_BAD_TILE, false);
-        for (byte b : BAD_TILE_TYPES) {
-            IS_BAD_TILE[b & 0xFF] = true;
-        }
-
-        // Try graph-based pathfinding first
-        NavGraph graph = Walker.getNavGraph();
-        if (graph != null) {
-            List<WorldPoint> graphPath = findFullPathWithGraph(start, target, avoidTiles, graph);
-            if (graphPath != null) {
-                Profiler.StopMS();
-                return graphPath;
-            }
-            // Fallback to original A* if graph path failed
-            System.out.println("BoatPathing: Graph pathfinding failed, falling back to original A*");
-        }
-        List<WorldPoint> path = Static.invoke(() -> {
-            // === DEBUG: Log input parameters ===
-            // System.out.println("=== BoatPathing Debug Start ===");
-            // System.out.println("  Input start: " + start);
-            // System.out.println("  Input target: " + target);
-            // int straightLineDist = Distance.chebyshev(start, target);
-            // System.out.println("  Straight-line distance: " + straightLineDist);
-
-            CollisionMap collisionMap = Walker.getCollisionMap();
-            if (collisionMap == null) {
-                // System.out.println("  ERROR: CollisionMap is null");
-                return null;
+        try {
+            BAD_TILE_TYPES = TileType.getAvoidTileTypes();
+            // Populate fast lookup table for bad tile types
+            java.util.Arrays.fill(IS_BAD_TILE, false);
+            for (byte b : BAD_TILE_TYPES) {
+                IS_BAD_TILE[b & 0xFF] = true;
             }
 
-            // === DEBUG: Check start tile walkability ===
-            // boolean startWalkable = collisionMap.walkable((short) start.getX(), (short) start.getY(), (byte) 0);
-            // System.out.println("  Start tile walkable: " + startWalkable);
-
-            // Validate target - if boat can't fit, find nearest valid position
-            WorldPoint adjustedTarget = target;
-            WorldPoint validTarget = BoatCollisionAPI.findNearestValidPlayerBoatPosition(target, 10);
-            if (validTarget == null) {
-                // System.out.println("  ERROR: No valid boat position within 10 tiles of " + target);
-                // === DEBUG: Check target tile walkability ===
-                // boolean targetWalkable = collisionMap.walkable((short) target.getX(), (short) target.getY(), (byte) 0);
-                // System.out.println("  Target tile walkable: " + targetWalkable);
-                return null;
-            }
-            if (!validTarget.equals(target)) {
-                // System.out.println("  Target adjusted: " + target + " -> " + validTarget);
-                adjustedTarget = validTarget;
-            }
-            // else {
-            //     System.out.println("  Target valid (no adjustment needed)");
-            // }
-
-            // === DEBUG: Check adjusted target walkability ===
-            // boolean adjTargetWalkable = collisionMap.walkable((short) adjustedTarget.getX(), (short) adjustedTarget.getY(), (byte) 0);
-            // System.out.println("  Adjusted target walkable: " + adjTargetWalkable);
-
-            // Initialize cache with hull offsets and pre-computed rotations
-            // Don't pass boat entity - it doesn't survive Static.invoke boundary
-            BoatHullCache cache = initializeBoatCache(start, collisionMap);
-            if (cache == null) {
-                // System.out.println("  ERROR: Failed to initialize boat cache");
-                return null;
-            }
-
-            // === DEBUG: Check if boat can fit at start in any direction ===
-            // int startFitCount = 0;
-            // for (int dir = 0; dir < 8; dir++) {
-            //     if (canBoatFitAtDirection(cache, (short) start.getX(), (short) start.getY(), dir)) {
-            //         startFitCount++;
-            //     }
-            // }
-            // boolean startFitsUnrotated = canBoatFitAtDirection(cache, (short) start.getX(), (short) start.getY(), 8);
-            // System.out.println("  Boat fits at start in " + startFitCount + "/8 directions, unrotated=" + startFitsUnrotated);
-
-            // === DEBUG: Check if boat can fit at target in any direction ===
-            // int targetFitCount = 0;
-            // for (int dir = 0; dir < 8; dir++) {
-            //     if (canBoatFitAtDirection(cache, (short) adjustedTarget.getX(), (short) adjustedTarget.getY(), dir)) {
-            //         targetFitCount++;
-            //     }
-            // }
-            // System.out.println("  Boat fits at target in " + targetFitCount + "/8 directions");
-
-            // A* data structures - primitive arrays for heap (stores f-scores)
-            int[] heapNodes = new int[100_000];
-            int[] heapCosts = new int[100_000];  // f-scores for A*
-            int heapSize = 0;
-
-            // Primitive maps for g-scores, parents, and caches
-            Int2IntOpenHashMap gScores = new Int2IntOpenHashMap();  // actual cost from start
-            Int2IntOpenHashMap parents = new Int2IntOpenHashMap();
-            Int2IntOpenHashMap proximityCache = new Int2IntOpenHashMap();
-            IntOpenHashSet closedSet = new IntOpenHashSet();  // prevents re-expansion
-            gScores.defaultReturnValue(Integer.MAX_VALUE);
-            parents.defaultReturnValue(-2);  // -2 = not visited
-            proximityCache.defaultReturnValue(-1);  // -1 = not cached
-
-            int startPacked = WorldPointUtil.compress(start);
-            int targetPacked = WorldPointUtil.compress(adjustedTarget);
-            int targetX = WorldPointUtil.getCompressedX(targetPacked);
-            int targetY = WorldPointUtil.getCompressedY(targetPacked);
-            int startX = WorldPointUtil.getCompressedX(startPacked);
-            int startY = WorldPointUtil.getCompressedY(startPacked);
-
-            // Initialize start node with f = g(0) + h
-            gScores.put(startPacked, 0);
-            parents.put(startPacked, -1);  // -1 = start node marker
-            int startH = heuristic(startX, startY, targetX, targetY);
-            heapSize = heapPush(heapNodes, heapCosts, heapSize, startPacked, startH);
-
-            int maxIterations = 1_000_000;
-            int iterations = 0;
-
-            // === DEBUG: Track closest point reached ===
-            // int closestDist = Integer.MAX_VALUE;
-            // int closestPacked = startPacked;
-
-            // A* search
-            while (heapSize > 0 && iterations++ < maxIterations) {
-                // Pop minimum f-score node
-                heapSize = heapPop(heapNodes, heapCosts, heapSize);
-                int current = heapNodes[heapSize];
-
-                // Skip if already in closed set (already fully processed)
-                if (closedSet.contains(current)) {
-                    continue;
+            // Try graph-based pathfinding first
+            NavGraph graph = Walker.getNavGraph();
+            if (graph != null) {
+                List<WorldPoint> graphPath = findFullPathWithGraph(start, target, avoidTiles, graph);
+                if (graphPath != null) {
+                    Profiler.StopMS();
+                    return graphPath;
                 }
-                closedSet.add(current);
-
-                // === DEBUG: Track closest point to target ===
-                // int currX = WorldPointUtil.getCompressedX(current);
-                // int currY = WorldPointUtil.getCompressedY(current);
-                // int distToTarget = Math.max(Math.abs(currX - targetX), Math.abs(currY - targetY));
-                // if (distToTarget < closestDist) {
-                //     closestDist = distToTarget;
-                //     closestPacked = current;
-                // }
-
-                // Check if reached target
-                if (current == targetPacked) {
-                    // System.out.println("  SUCCESS: Found target after " + iterations + " iterations");
-                    // System.out.println("  Nodes explored: " + closedSet.size());
-                    // System.out.println("=== BoatPathing Debug End ===");
-                    return reconstructFullPath(parents, targetPacked);
+                // Fallback to original A* if graph path failed
+                System.out.println("BoatPathing: Graph pathfinding failed, falling back to original A*");
+            }
+            List<WorldPoint> path = Static.invoke(() -> {
+                CollisionMap collisionMap = Walker.getCollisionMap();
+                if (collisionMap == null) {
+                    return null;
                 }
 
-                int currentG = gScores.get(current);
+                // Validate target - if boat can't fit, find nearest valid position
+                WorldPoint adjustedTarget = target;
+                WorldPoint validTarget = BoatCollisionAPI.findNearestValidPlayerBoatPosition(target, 10);
+                if (validTarget == null) {
+                    return null;
+                }
+                if (!validTarget.equals(target)) {
+                    adjustedTarget = validTarget;
+                }
+                // Initialize cache with hull offsets and pre-computed rotations
+                // Don't pass boat entity - it doesn't survive Static.invoke boundary
+                BoatHullCache cache = initializeBoatCache(start, collisionMap);
+                if (cache == null) {
+                    // System.out.println("  ERROR: Failed to initialize boat cache");
+                    return null;
+                }
 
-                // Expand neighbors with A* scoring (f = g + h)
-                heapSize = expandNeighborsAStar(cache, collisionMap, current, currentG,
-                        targetX, targetY, gScores, parents, proximityCache, closedSet,
-                        heapNodes, heapCosts, heapSize, avoidTiles, startPacked);
-            }
+                // A* data structures - primitive arrays for heap (stores f-scores)
+                int[] heapNodes = new int[100_000];
+                int[] heapCosts = new int[100_000];  // f-scores for A*
+                int heapSize = 0;
 
-            // === DEBUG: Failure analysis ===
-            // System.out.println("  FAILED: No path found");
-            // System.out.println("  Iterations: " + iterations);
-            // System.out.println("  Nodes explored: " + closedSet.size());
-            // System.out.println("  Heap exhausted: " + (heapSize == 0));
-            // System.out.println("  Max iterations hit: " + (iterations >= maxIterations));
+                // Primitive maps for g-scores, parents, and caches
+                Int2IntOpenHashMap gScores = new Int2IntOpenHashMap();  // actual cost from start
+                Int2IntOpenHashMap parents = new Int2IntOpenHashMap();
+                Int2IntOpenHashMap proximityCache = new Int2IntOpenHashMap();
+                IntOpenHashSet closedSet = new IntOpenHashSet();  // prevents re-expansion
+                gScores.defaultReturnValue(Integer.MAX_VALUE);
+                parents.defaultReturnValue(-2);  // -2 = not visited
+                proximityCache.defaultReturnValue(-1);  // -1 = not cached
 
-            // Report closest point reached
-            // int closestX = WorldPointUtil.getCompressedX(closestPacked);
-            // int closestY = WorldPointUtil.getCompressedY(closestPacked);
-            // byte closestPlane = WorldPointUtil.getCompressedPlane(closestPacked);
-            // WorldPoint closestPoint = new WorldPoint(closestX, closestY, closestPlane);
-            // System.out.println("  Closest point reached: " + closestPoint);
-            // System.out.println("  Closest distance to target: " + closestDist + " tiles");
-            // System.out.println("  Distance from start to closest: " + Distance.chebyshev(start, closestPoint));
+                int startPacked = WorldPointUtil.compress(start);
+                int targetPacked = WorldPointUtil.compress(adjustedTarget);
+                int targetX = WorldPointUtil.getCompressedX(targetPacked);
+                int targetY = WorldPointUtil.getCompressedY(targetPacked);
+                int startX = WorldPointUtil.getCompressedX(startPacked);
+                int startY = WorldPointUtil.getCompressedY(startPacked);
 
-            // Check why we couldn't expand from closest point
-            // System.out.println("  --- Analyzing closest point blockage ---");
-            // int blockedDirs = 0;
-            // int closedDirs = 0;
-            // int hullBlockedDirs = 0;
-            // for (int dir = 0; dir < 8; dir++) {
-            //     int nx = closestX + DX[dir];
-            //     int ny = closestY + DY[dir];
-            //     int neighborPacked = WorldPointUtil.compress(nx, ny, closestPlane);
-            //
-            //     if (closedSet.contains(neighborPacked)) {
-            //         closedDirs++;
-            //     } else if (!canBoatFitAtDirection(cache, (short) nx, (short) ny, dir)) {
-            //         hullBlockedDirs++;
-            //     } else {
-            //         // Check other reasons
-            //         int proximity = getProximityCachedInt(collisionMap, proximityCache, nx, ny, closestPlane);
-            //         if (PROXIMITY_COSTS[Math.min(proximity, PROXIMITY_COSTS.length - 1)] == Integer.MAX_VALUE) {
-            //             blockedDirs++;
-            //         }
-            //     }
-            // }
-            // System.out.println("  From closest: " + closedDirs + " dirs already visited, " + hullBlockedDirs + " hull blocked, " + blockedDirs + " proximity blocked");
-            // System.out.println("=== BoatPathing Debug End ===");
-            return null;
-        });
+                // Initialize start node with f = g(0) + h
+                gScores.put(startPacked, 0);
+                parents.put(startPacked, -1);  // -1 = start node marker
+                int startH = heuristic(startX, startY, targetX, targetY);
+                heapSize = heapPush(heapNodes, heapCosts, heapSize, startPacked, startH);
 
-        Profiler.StopMS();
-        return path;
+                int maxIterations = 1_000_000;
+                int iterations = 0;
+
+                // A* search
+                while (heapSize > 0 && iterations++ < maxIterations) {
+                    // Pop minimum f-score node
+                    heapSize = heapPop(heapNodes, heapCosts, heapSize);
+                    int current = heapNodes[heapSize];
+
+                    // Skip if already in closed set (already fully processed)
+                    if (closedSet.contains(current)) {
+                        continue;
+                    }
+                    closedSet.add(current);
+
+                    // Check if reached target
+                    if (current == targetPacked) {
+                        return reconstructFullPath(parents, targetPacked);
+                    }
+
+                    int currentG = gScores.get(current);
+
+                    // Expand neighbors with A* scoring (f = g + h)
+                    heapSize = expandNeighborsAStar(cache, collisionMap, current, currentG,
+                            targetX, targetY, gScores, parents, proximityCache, closedSet,
+                            heapNodes, heapCosts, heapSize, avoidTiles, startPacked);
+                }
+                return null;
+            });
+
+            Profiler.StopMS();
+            return path;
+        } finally {
+            MethodProfiler.end("BoatPathing.findFullPath");
+        }
     }
 
     // ==================== Graph-Based Pathfinding ====================
@@ -943,7 +845,7 @@ public class BoatPathing
      * @return true if within corridor
      */
     private static boolean isWithinCorridor(int tileX, int tileY, List<Integer> nodePath,
-            int maxDeviation, int startX, int startY, int targetX, int targetY)
+                                            int maxDeviation, int startX, int startY, int targetX, int targetY)
     {
         if (nodePath == null || nodePath.size() < 2) {
             return true; // No corridor constraint
@@ -1284,7 +1186,7 @@ public class BoatPathing
                 else if (!collisionMap.walkable((short) x, (short)(y - r), p)) collisionDist = r;
                 else if (!collisionMap.walkable((short)(x + r), (short) y, p)) collisionDist = r;
                 else if (!collisionMap.walkable((short)(x - r), (short) y, p)) collisionDist = r;
-                // Corners - NE, SE, NW, SW
+                    // Corners - NE, SE, NW, SW
                 else if (!collisionMap.walkable((short)(x + r), (short)(y + r), p)) collisionDist = r;
                 else if (!collisionMap.walkable((short)(x + r), (short)(y - r), p)) collisionDist = r;
                 else if (!collisionMap.walkable((short)(x - r), (short)(y + r), p)) collisionDist = r;
@@ -1311,7 +1213,7 @@ public class BoatPathing
                 else if (IS_BAD_TILE[tileTypeMap.getTileType(x, y - r, plane) & 0xFF]) badWaterDist = r;
                 else if (IS_BAD_TILE[tileTypeMap.getTileType(x + r, y, plane) & 0xFF]) badWaterDist = r;
                 else if (IS_BAD_TILE[tileTypeMap.getTileType(x - r, y, plane) & 0xFF]) badWaterDist = r;
-                // Corners
+                    // Corners
                 else if (IS_BAD_TILE[tileTypeMap.getTileType(x + r, y + r, plane) & 0xFF]) badWaterDist = r;
                 else if (IS_BAD_TILE[tileTypeMap.getTileType(x + r, y - r, plane) & 0xFF]) badWaterDist = r;
                 else if (IS_BAD_TILE[tileTypeMap.getTileType(x - r, y + r, plane) & 0xFF]) badWaterDist = r;
@@ -1465,17 +1367,17 @@ public class BoatPathing
 
         // Calculate the previous two directions
         int prevDir = getDirectionIndex(
-            WorldPointUtil.getCompressedX(grandparent),
-            WorldPointUtil.getCompressedY(grandparent),
-            WorldPointUtil.getCompressedX(parent),
-            WorldPointUtil.getCompressedY(parent)
+                WorldPointUtil.getCompressedX(grandparent),
+                WorldPointUtil.getCompressedY(grandparent),
+                WorldPointUtil.getCompressedX(parent),
+                WorldPointUtil.getCompressedY(parent)
         );
 
         int currentDir = getDirectionIndex(
-            WorldPointUtil.getCompressedX(parent),
-            WorldPointUtil.getCompressedY(parent),
-            WorldPointUtil.getCompressedX(current),
-            WorldPointUtil.getCompressedY(current)
+                WorldPointUtil.getCompressedX(parent),
+                WorldPointUtil.getCompressedY(parent),
+                WorldPointUtil.getCompressedX(current),
+                WorldPointUtil.getCompressedY(current)
         );
 
         if (prevDir == -1 || currentDir == -1) {

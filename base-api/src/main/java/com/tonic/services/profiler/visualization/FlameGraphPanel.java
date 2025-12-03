@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +24,18 @@ public class FlameGraphPanel extends JPanel {
     private FlameGraphNode focusedNode;
     private Map<String, Color> packageColors;
     private int colorIndex = 0;
+
+    // Zoom state
+    private double zoomScale = 1.0;
+    private double zoomOffsetX = 0;
+    private static final double ZOOM_FACTOR = 1.2;
+    private static final double MIN_ZOOM = 1.0;
+    private static final double MAX_ZOOM = 20.0;
+
+    // Panning state (for drag-to-pan when zoomed)
+    private boolean isPanning = false;
+    private int panStartX;
+    private double panStartOffsetX;
 
     private static final Color[] PALETTE = {
         new Color(229, 115, 115),
@@ -45,12 +59,46 @@ public class FlameGraphPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 handleClick(e.getPoint());
             }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                // Middle mouse button starts panning when zoomed
+                if (e.getButton() == MouseEvent.BUTTON2 && zoomScale > 1.01) {
+                    isPanning = true;
+                    panStartX = e.getX();
+                    panStartOffsetX = zoomOffsetX;
+                    setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON2) {
+                    isPanning = false;
+                    setCursor(Cursor.getDefaultCursor());
+                }
+            }
         });
 
         addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
                 handleHover(e.getPoint());
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (isPanning) {
+                    handlePan(e.getX());
+                }
+            }
+        });
+
+        // Mouse wheel zoom - zoom centered on mouse position
+        addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                handleMouseWheelZoom(e);
             }
         });
     }
@@ -60,6 +108,8 @@ public class FlameGraphPanel extends JPanel {
         this.focusedNode = root;
         this.packageColors.clear();
         this.colorIndex = 0;
+        this.zoomScale = 1.0;
+        this.zoomOffsetX = 0;
         repaint();
     }
 
@@ -80,11 +130,16 @@ public class FlameGraphPanel extends JPanel {
         int depth = calculateDepth(focusedNode);
         int totalHeight = depth * FRAME_HEIGHT;
 
-        // Draw focus info at top
+        // Draw focus info at top (includes zoom level)
         drawFocusInfo(g2d);
 
-        // Layout and draw flame graph
-        Rectangle bounds = new Rectangle(5, 35, getWidth() - 10, totalHeight);
+        // Apply zoom transform for layout
+        int baseWidth = getWidth() - 10;
+        int zoomedWidth = (int) (baseWidth * zoomScale);
+        int zoomedX = (int) (5 - zoomOffsetX);
+
+        // Layout and draw flame graph with zoom
+        Rectangle bounds = new Rectangle(zoomedX, 35, zoomedWidth, totalHeight);
         layoutNode(focusedNode, bounds, 0);
         drawFlameGraph(g2d, focusedNode, 0);
 
@@ -113,13 +168,19 @@ public class FlameGraphPanel extends JPanel {
 
         String focusInfo;
         if (focusedNode == root) {
-            focusInfo = "All Stacks (" + root.getSamples() + " samples) - Click frame to zoom";
+            focusInfo = "All Stacks (" + root.getSamples() + " samples) - Click frame to zoom, scroll to magnify";
         } else {
             focusInfo = "Focused: " + focusedNode.getDisplayName() +
                        " (" + focusedNode.getSamples() + " samples) - Click background to reset";
         }
 
-        g2d.drawString(focusInfo, 10, 20);
+        // Show zoom level if zoomed
+        String zoomInfo = "";
+        if (zoomScale > 1.01) {
+            zoomInfo = String.format(" [%.0f%% zoom]", zoomScale * 100);
+        }
+
+        g2d.drawString(focusInfo + zoomInfo, 10, 20);
     }
 
     private int calculateDepth(FlameGraphNode node) {
@@ -321,9 +382,75 @@ public class FlameGraphPanel extends JPanel {
         return new Color(r, g, b);
     }
 
+    /**
+     * Handles panning when middle mouse button is dragged
+     */
+    private void handlePan(int currentX) {
+        int deltaX = panStartX - currentX;
+        double newOffset = panStartOffsetX + deltaX;
+
+        // Clamp offset
+        int baseWidth = getWidth() - 10;
+        double maxOffset = baseWidth * zoomScale - baseWidth;
+        zoomOffsetX = Math.max(0, Math.min(maxOffset, newOffset));
+
+        repaint();
+    }
+
+    /**
+     * Handles mouse wheel zoom - zooms in/out centered on mouse position
+     */
+    private void handleMouseWheelZoom(MouseWheelEvent e) {
+        if (root == null || focusedNode == null) {
+            return;
+        }
+
+        // Get mouse position relative to content area
+        int mouseX = e.getX();
+
+        // Determine zoom direction
+        int rotation = e.getWheelRotation();
+        double oldZoom = zoomScale;
+        double newZoom;
+
+        if (rotation < 0) {
+            // Scroll up = zoom in
+            newZoom = oldZoom * ZOOM_FACTOR;
+        } else {
+            // Scroll down = zoom out
+            newZoom = oldZoom / ZOOM_FACTOR;
+        }
+
+        // Clamp zoom
+        newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
+
+        if (Math.abs(newZoom - oldZoom) < 0.001) {
+            return; // No change
+        }
+
+        // Calculate new offset to keep mouse position fixed
+        // Formula: mouseX = zoomedX + (contentX * zoomScale)
+        // We want: mouseX_old_content == mouseX_new_content
+        // So: (mouseX + oldOffset) / oldZoom == (mouseX + newOffset) / newZoom
+        // newOffset = (mouseX + oldOffset) * newZoom / oldZoom - mouseX
+
+        double contentX = (mouseX + zoomOffsetX - 5) / oldZoom;
+        zoomOffsetX = contentX * newZoom - (mouseX - 5);
+        zoomScale = newZoom;
+
+        // Clamp offset to prevent panning past content
+        int baseWidth = getWidth() - 10;
+        double maxOffset = baseWidth * zoomScale - baseWidth;
+        zoomOffsetX = Math.max(0, Math.min(maxOffset, zoomOffsetX));
+
+        repaint();
+    }
+
     public void resetZoom() {
         if (root != null) {
             focusedNode = root;
+            zoomScale = 1.0;
+            zoomOffsetX = 0;
             repaint();
         }
     }
