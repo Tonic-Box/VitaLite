@@ -260,6 +260,30 @@ dependencies {
 //    implementation("org.conscrypt:conscrypt-openjdk-uber:2.5.2")
 }
 
+tasks.register<Zip>("packageRelease") {
+    dependsOn("shadowJar")
+
+    val shadowJarTask = tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar")
+
+    // Output zip name: VitaLite-1.12.7_1.zip (version without -shaded)
+    archiveBaseName.set("VitaLite")
+    archiveVersion.set(project.version.toString())
+    archiveClassifier.set("")
+    destinationDirectory.set(layout.buildDirectory.dir("libs"))
+
+    // Include the shaded jar, renamed to VitaLite.jar
+    from(shadowJarTask.flatMap { it.archiveFile }) {
+        rename { "VitaLite.jar" }
+    }
+
+    // Include the run scripts from the same directory as the shaded jar
+    from(shadowJarTask.flatMap { it.destinationDirectory }) {
+        include("run-linux.sh")
+        include("run-mac.sh")
+        include("run-windows.bat")
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
 }
