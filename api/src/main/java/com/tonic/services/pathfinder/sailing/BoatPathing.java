@@ -7,12 +7,16 @@ import com.tonic.api.handlers.GenericHandlerBuilder;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.collision.CollisionMap;
+import com.tonic.services.pathfinder.sailing.graph.GraphNode;
+import com.tonic.services.pathfinder.sailing.graph.NavGraph;
 import com.tonic.services.pathfinder.tiletype.TileType;
 import com.tonic.util.Distance;
 import com.tonic.util.Profiler;
 import com.tonic.util.WorldPointUtil;
 import com.tonic.util.handler.StepHandler;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import lombok.Getter;
 import net.runelite.api.WorldEntity;
@@ -100,6 +104,12 @@ public class BoatPathing
 
     // Bad water buffer zone - scan radius for nearby hazardous tiles
     private static final int BAD_WATER_BUFFER_RADIUS = 4;
+
+    // Graph-based pathfinding: maximum deviation from node path corridor (tiles)
+    private static final int CORRIDOR_DEVIATION = 25;
+
+    // Maximum radius to search for nearest graph node (nodes can be sparse)
+    private static final int MAX_NODE_SEARCH_RADIUS = 100;
 
     // Direction lookup table: index = (dx+1)*3 + (dy+1), maps to direction index 0-7
     // Eliminates loop in getDirectionIndex() - O(1) instead of O(8)
@@ -366,8 +376,12 @@ public class BoatPathing
     }
 
     /**
-     * Uses A* with proximity costs to find optimal path from start to target,
-     * with optional tiles to avoid (e.g., cloud positions during reactive rerouting).
+     * Uses graph-based pathfinding with A* tile refinement.
+     * 1. Find nearest graph nodes to start and target via BFS
+     * 2. A* on navigation graph respecting water types
+     * 3. A* tile-by-tile within corridor of node path
+     *
+     * Falls back to original A* if graph not available or no valid path.
      */
     public static List<WorldPoint> findFullPath(WorldPoint start, WorldPoint target, IntOpenHashSet avoidTiles)
     {
@@ -377,6 +391,18 @@ public class BoatPathing
         java.util.Arrays.fill(IS_BAD_TILE, false);
         for (byte b : BAD_TILE_TYPES) {
             IS_BAD_TILE[b & 0xFF] = true;
+        }
+
+        // Try graph-based pathfinding first
+        NavGraph graph = Walker.getNavGraph();
+        if (graph != null) {
+            List<WorldPoint> graphPath = findFullPathWithGraph(start, target, avoidTiles, graph);
+            if (graphPath != null) {
+                Profiler.StopMS();
+                return graphPath;
+            }
+            // Fallback to original A* if graph path failed
+            System.out.println("BoatPathing: Graph pathfinding failed, falling back to original A*");
         }
         List<WorldPoint> path = Static.invoke(() -> {
             // === DEBUG: Log input parameters ===
@@ -561,6 +587,420 @@ public class BoatPathing
 
         Profiler.StopMS();
         return path;
+    }
+
+    // ==================== Graph-Based Pathfinding ====================
+
+    /**
+     * Finds a path using the navigation graph for high-level routing,
+     * then A* for tile-by-tile navigation within the corridor.
+     */
+    private static List<WorldPoint> findFullPathWithGraph(
+            WorldPoint start, WorldPoint target, IntOpenHashSet avoidTiles, NavGraph graph)
+    {
+        return Static.invoke(() -> {
+            int plane = start.getPlane();
+
+            // Debug: Print graph stats and search positions
+            System.out.println("BoatPathing: Graph has " + graph.getNodeCount() + " nodes, " + graph.getEdgeCount() + " edges");
+            System.out.println("BoatPathing: Searching for nodes near start=" + start.getX() + "," + start.getY() +
+                    " (plane " + plane + ") and target=" + target.getX() + "," + target.getY());
+
+            // Step 1: Find nearest graph nodes via BFS (use world coords, not packed - packing formats differ!)
+            int startNode = findNearestNode(graph, start.getX(), start.getY(), plane, MAX_NODE_SEARCH_RADIUS);
+            int endNode = findNearestNode(graph, target.getX(), target.getY(), plane, MAX_NODE_SEARCH_RADIUS);
+
+            if (startNode == -1 || endNode == -1) {
+                System.out.println("BoatPathing: Could not find graph nodes near start/target (startNode=" +
+                        startNode + ", endNode=" + endNode + ", searchRadius=" + MAX_NODE_SEARCH_RADIUS + ")");
+                // Debug: Find the bounding box of all nodes in the graph
+                int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
+                int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
+                for (int node = graph.getNextNode(0); node >= 0; node = graph.getNextNode(node + 1)) {
+                    int nx = GraphNode.getX(node);
+                    int ny = GraphNode.getY(node);
+                    minX = Math.min(minX, nx);
+                    maxX = Math.max(maxX, nx);
+                    minY = Math.min(minY, ny);
+                    maxY = Math.max(maxY, ny);
+                }
+                System.out.println("  Graph bounds: X=[" + minX + ".." + maxX + "], Y=[" + minY + ".." + maxY + "]");
+                System.out.println("  Your position: X=" + start.getX() + ", Y=" + start.getY());
+                return null;
+            }
+
+            int startDist = Math.max(Math.abs(start.getX() - GraphNode.getX(startNode)),
+                    Math.abs(start.getY() - GraphNode.getY(startNode)));
+            int endDist = Math.max(Math.abs(target.getX() - GraphNode.getX(endNode)),
+                    Math.abs(target.getY() - GraphNode.getY(endNode)));
+            System.out.println("BoatPathing: Found start node at " + GraphNode.getX(startNode) + "," +
+                    GraphNode.getY(startNode) + " (dist=" + startDist + ") and end node at " +
+                    GraphNode.getX(endNode) + "," + GraphNode.getY(endNode) + " (dist=" + endDist + ")");
+
+            // Step 2: A* on graph to find node path
+            List<Integer> nodePath = findGraphPath(graph, startNode, endNode, BAD_TILE_TYPES);
+
+            if (nodePath == null || nodePath.isEmpty()) {
+                System.out.println("BoatPathing: No valid graph path found");
+                return null;
+            }
+
+            System.out.println("BoatPathing: Found graph path with " + nodePath.size() + " nodes");
+
+            // Step 3: A* tile-by-tile with corridor constraint
+            return findFullPathWithCorridor(start, target, avoidTiles, nodePath);
+        });
+    }
+
+    /**
+     * Finds the nearest graph node to the given world position via BFS spiral search.
+     *
+     * @param graph The navigation graph
+     * @param worldX World X coordinate
+     * @param worldY World Y coordinate
+     * @param plane Plane (0-3)
+     * @param maxRadius Maximum search radius
+     * @return Packed coordinates of nearest node (using GraphNode packing), or -1 if not found
+     */
+    private static int findNearestNode(NavGraph graph, int worldX, int worldY, int plane, int maxRadius)
+    {
+        // Check center first (pack using GraphNode format which matches the graph)
+        int centerPacked = GraphNode.pack(worldX, worldY, plane);
+        if (graph.hasNode(centerPacked)) {
+            return centerPacked;
+        }
+
+        // Spiral outward
+        for (int r = 1; r <= maxRadius; r++) {
+            // Check ring at radius r
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dy = -r; dy <= r; dy++) {
+                    // Only check tiles on the ring perimeter
+                    if (Math.abs(dx) != r && Math.abs(dy) != r) continue;
+
+                    int packed = GraphNode.pack(worldX + dx, worldY + dy, plane);
+                    if (graph.hasNode(packed)) {
+                        return packed;
+                    }
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * Finds a path through the navigation graph using A*.
+     *
+     * @param graph The navigation graph
+     * @param startNode Packed coordinates of start node
+     * @param endNode Packed coordinates of end node
+     * @param avoidTypes Tile types to avoid
+     * @return List of packed node coordinates forming the path, or null if no path
+     */
+    private static List<Integer> findGraphPath(NavGraph graph, int startNode, int endNode, byte[] avoidTypes)
+    {
+        if (startNode == endNode) {
+            List<Integer> path = new ArrayList<>();
+            path.add(startNode);
+            return path;
+        }
+
+        // A* data structures
+        Int2IntOpenHashMap gScores = new Int2IntOpenHashMap();
+        Int2IntOpenHashMap parents = new Int2IntOpenHashMap();
+        IntOpenHashSet closedSet = new IntOpenHashSet();
+        gScores.defaultReturnValue(Integer.MAX_VALUE);
+        parents.defaultReturnValue(-1);
+
+        // Priority queue (simple array-based for small graphs)
+        int[] heapNodes = new int[10000];
+        int[] heapCosts = new int[10000];
+        int heapSize = 0;
+
+        // Initialize
+        gScores.put(startNode, 0);
+        int h = GraphNode.chebyshevDistance(startNode, endNode);
+        heapSize = heapPush(heapNodes, heapCosts, heapSize, startNode, h);
+
+        int iterations = 0;
+        int maxIterations = 100000;
+
+        while (heapSize > 0 && iterations++ < maxIterations) {
+            heapSize = heapPop(heapNodes, heapCosts, heapSize);
+            int current = heapNodes[heapSize];
+
+            if (closedSet.contains(current)) continue;
+            closedSet.add(current);
+
+            if (current == endNode) {
+                // Reconstruct path
+                List<Integer> path = new ArrayList<>();
+                int node = endNode;
+                while (node != -1) {
+                    path.add(node);
+                    node = parents.get(node);
+                }
+                Collections.reverse(path);
+                return path;
+            }
+
+            int currentG = gScores.get(current);
+            IntList neighbors = graph.getNeighbors(current);
+
+            for (int i = 0; i < neighbors.size(); i++) {
+                int neighbor = neighbors.getInt(i);
+
+                if (closedSet.contains(neighbor)) continue;
+
+                // Check if edge is traversable (doesn't cross bad water types)
+                if (!graph.isEdgeTraversable(current, neighbor, avoidTypes)) {
+                    continue;
+                }
+
+                // Edge cost is Chebyshev distance between nodes
+                int edgeCost = GraphNode.chebyshevDistance(current, neighbor);
+                int tentativeG = currentG + edgeCost;
+
+                if (tentativeG < gScores.get(neighbor)) {
+                    gScores.put(neighbor, tentativeG);
+                    parents.put(neighbor, current);
+
+                    int neighborH = GraphNode.chebyshevDistance(neighbor, endNode);
+                    int f = tentativeG + neighborH;
+                    heapSize = heapPush(heapNodes, heapCosts, heapSize, neighbor, f);
+                }
+            }
+        }
+
+        return null; // No path found
+    }
+
+    /**
+     * Finds a tile-by-tile path constrained to the corridor around the node path.
+     *
+     * @param start Starting world point
+     * @param target Target world point
+     * @param avoidTiles Optional tiles to avoid
+     * @param nodePath List of packed node coordinates defining the corridor
+     * @return Full tile path, or null if not found
+     */
+    private static List<WorldPoint> findFullPathWithCorridor(
+            WorldPoint start, WorldPoint target, IntOpenHashSet avoidTiles, List<Integer> nodePath)
+    {
+        CollisionMap collisionMap = Walker.getCollisionMap();
+        if (collisionMap == null) {
+            return null;
+        }
+
+        // Validate and adjust target
+        WorldPoint adjustedTarget = target;
+        WorldPoint validTarget = BoatCollisionAPI.findNearestValidPlayerBoatPosition(target, 10);
+        if (validTarget == null) {
+            return null;
+        }
+        if (!validTarget.equals(target)) {
+            adjustedTarget = validTarget;
+        }
+
+        // Initialize boat cache
+        BoatHullCache cache = initializeBoatCache(start, collisionMap);
+        if (cache == null) {
+            return null;
+        }
+
+        // A* with corridor constraint
+        int[] heapNodes = new int[100_000];
+        int[] heapCosts = new int[100_000];
+        int heapSize = 0;
+
+        Int2IntOpenHashMap gScores = new Int2IntOpenHashMap();
+        Int2IntOpenHashMap parents = new Int2IntOpenHashMap();
+        Int2IntOpenHashMap proximityCache = new Int2IntOpenHashMap();
+        IntOpenHashSet closedSet = new IntOpenHashSet();
+        gScores.defaultReturnValue(Integer.MAX_VALUE);
+        parents.defaultReturnValue(-2);
+        proximityCache.defaultReturnValue(-1);
+
+        int startPacked = WorldPointUtil.compress(start);
+        int targetPacked = WorldPointUtil.compress(adjustedTarget);
+        int targetX = WorldPointUtil.getCompressedX(targetPacked);
+        int targetY = WorldPointUtil.getCompressedY(targetPacked);
+
+        gScores.put(startPacked, 0);
+        parents.put(startPacked, -1);
+        int startH = heuristic(WorldPointUtil.getCompressedX(startPacked),
+                WorldPointUtil.getCompressedY(startPacked), targetX, targetY);
+        heapSize = heapPush(heapNodes, heapCosts, heapSize, startPacked, startH);
+
+        int maxIterations = 1_000_000;
+        int iterations = 0;
+
+        while (heapSize > 0 && iterations++ < maxIterations) {
+            heapSize = heapPop(heapNodes, heapCosts, heapSize);
+            int current = heapNodes[heapSize];
+
+            if (closedSet.contains(current)) continue;
+            closedSet.add(current);
+
+            if (current == targetPacked) {
+                return reconstructFullPath(parents, targetPacked);
+            }
+
+            int currentG = gScores.get(current);
+            heapSize = expandNeighborsAStarCorridor(cache, collisionMap, current, currentG,
+                    targetX, targetY, gScores, parents, proximityCache, closedSet,
+                    heapNodes, heapCosts, heapSize, avoidTiles, startPacked, nodePath);
+        }
+
+        return null;
+    }
+
+    /**
+     * Expands neighbors with corridor constraint.
+     * Similar to expandNeighborsAStar but skips tiles outside the corridor.
+     */
+    private static int expandNeighborsAStarCorridor(
+            BoatHullCache cache, CollisionMap collisionMap,
+            int current, int currentG,
+            int targetX, int targetY,
+            Int2IntOpenHashMap gScores, Int2IntOpenHashMap parents,
+            Int2IntOpenHashMap proximityCache, IntOpenHashSet closedSet,
+            int[] heapNodes, int[] heapCosts, int heapSize,
+            IntOpenHashSet avoidTiles, int startPacked,
+            List<Integer> nodePath)
+    {
+        int x = WorldPointUtil.getCompressedX(current);
+        int y = WorldPointUtil.getCompressedY(current);
+        int plane = WorldPointUtil.getCompressedPlane(current);
+        int sX = WorldPointUtil.getCompressedX(startPacked);
+        int sY = WorldPointUtil.getCompressedY(startPacked);
+        int targetPacked = WorldPointUtil.compress(targetX, targetY, plane);
+
+        for (int dir = 0; dir < 8; dir++) {
+            int nx = x + DX[dir];
+            int ny = y + DY[dir];
+            int neighborPacked = WorldPointUtil.compress(nx, ny, plane);
+
+            if (closedSet.contains(neighborPacked)) continue;
+
+            // Corridor constraint: skip tiles outside the corridor
+            if (!isWithinCorridor(nx, ny, nodePath, CORRIDOR_DEVIATION)) {
+                continue;
+            }
+
+            // Hull collision check
+            boolean nearStart = Math.abs(nx - sX) <= 3 && Math.abs(ny - sY) <= 3;
+            boolean isTarget = (neighborPacked == targetPacked);
+
+            if (!isTarget) {
+                int hullDir = nearStart ? 8 : dir;
+                if (!canBoatFitAtDirection(cache, (short) nx, (short) ny, hullDir)) {
+                    continue;
+                }
+            }
+
+            // Cost calculation (same as original)
+            int baseCost = BASE_COSTS[dir];
+            int combined = getCombinedProximityCached(collisionMap, proximityCache, nx, ny, plane);
+            int collisionDist = combined >>> 16;
+            int badWaterDist = combined & 0xFFFF;
+
+            int proximityCost = PROXIMITY_COSTS[Math.min(collisionDist, PROXIMITY_COSTS.length - 1)];
+            if (proximityCost == Integer.MAX_VALUE) continue;
+
+            int turnCost = getTurnCost(parents, current, dir);
+            int alternationCost = getAlternationCost(parents, current, dir);
+
+            int tileTypeCost = 0;
+            byte tileType = Walker.getTileTypeMap().getTileType(nx, ny, plane);
+            if (isBadTileType(tileType)) {
+                tileTypeCost = BAD_WATER_COST;
+            } else if (badWaterDist > 0) {
+                tileTypeCost = BAD_WATER_COST >> badWaterDist;
+            }
+
+            int cloudCost = 0;
+            if (avoidTiles != null && avoidTiles.contains(neighborPacked)) {
+                cloudCost = AVOID_COST;
+            }
+
+            int edgeCost = baseCost * proximityCost + turnCost + alternationCost + tileTypeCost + cloudCost;
+            int tentativeG = currentG + edgeCost;
+
+            if (tentativeG < gScores.get(neighborPacked)) {
+                gScores.put(neighborPacked, tentativeG);
+                parents.put(neighborPacked, current);
+
+                int h = heuristic(nx, ny, targetX, targetY);
+                int f = tentativeG + (h * 3 / 2);
+                heapSize = heapPush(heapNodes, heapCosts, heapSize, neighborPacked, f);
+            }
+        }
+
+        return heapSize;
+    }
+
+    /**
+     * Checks if a tile is within the corridor defined by the node path.
+     *
+     * @param tileX Tile X coordinate
+     * @param tileY Tile Y coordinate
+     * @param nodePath List of packed node coordinates
+     * @param maxDeviation Maximum perpendicular distance from path segments
+     * @return true if within corridor
+     */
+    private static boolean isWithinCorridor(int tileX, int tileY, List<Integer> nodePath, int maxDeviation)
+    {
+        if (nodePath == null || nodePath.size() < 2) {
+            return true; // No corridor constraint
+        }
+
+        // Check distance to each segment
+        for (int i = 0; i < nodePath.size() - 1; i++) {
+            int n1 = nodePath.get(i);
+            int n2 = nodePath.get(i + 1);
+
+            int x1 = GraphNode.getX(n1);
+            int y1 = GraphNode.getY(n1);
+            int x2 = GraphNode.getX(n2);
+            int y2 = GraphNode.getY(n2);
+
+            double dist = pointToSegmentDistance(tileX, tileY, x1, y1, x2, y2);
+            if (dist <= maxDeviation) {
+                return true;
+            }
+        }
+
+        // Also check distance to start/end nodes themselves
+        int first = nodePath.get(0);
+        int last = nodePath.get(nodePath.size() - 1);
+        int distToFirst = Math.max(Math.abs(tileX - GraphNode.getX(first)),
+                Math.abs(tileY - GraphNode.getY(first)));
+        int distToLast = Math.max(Math.abs(tileX - GraphNode.getX(last)),
+                Math.abs(tileY - GraphNode.getY(last)));
+
+        return distToFirst <= maxDeviation || distToLast <= maxDeviation;
+    }
+
+    /**
+     * Calculates perpendicular distance from point to line segment.
+     */
+    private static double pointToSegmentDistance(int px, int py, int x1, int y1, int x2, int y2)
+    {
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        double lengthSquared = dx * dx + dy * dy;
+
+        if (lengthSquared == 0) {
+            return Math.sqrt((px - x1) * (px - x1) + (py - y1) * (py - y1));
+        }
+
+        double t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / lengthSquared));
+        double projX = x1 + t * dx;
+        double projY = y1 + t * dy;
+
+        return Math.sqrt((px - projX) * (px - projX) + (py - projY) * (py - projY));
     }
 
     /**

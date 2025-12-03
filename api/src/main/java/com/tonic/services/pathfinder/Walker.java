@@ -13,6 +13,7 @@ import com.tonic.services.pathfinder.collision.CollisionMap;
 import com.tonic.services.pathfinder.collision.GlobalCollisionMap;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.services.pathfinder.objects.ObjectMap;
+import com.tonic.services.pathfinder.sailing.graph.NavGraph;
 import com.tonic.services.pathfinder.tiletype.TileTypeMap;
 import com.tonic.util.IntPair;
 import com.tonic.util.handler.StepHandler;
@@ -33,6 +34,7 @@ public class Walker
             collisionMap = GlobalCollisionMap.load();
             objectMap = ObjectMap.load();
             tileTypeMap = TileTypeMap.load();
+            navGraph = NavGraph.load();
         } catch (Exception e) {
             Logger.error("[Pathfinder] Failed to load collision map: " + e.getMessage());
             e.printStackTrace();
@@ -45,6 +47,8 @@ public class Walker
     private static ObjectMap objectMap;
     @Getter
     private static TileTypeMap tileTypeMap;
+    @Getter
+    private static NavGraph navGraph;
 
     private static boolean running = false;
 
