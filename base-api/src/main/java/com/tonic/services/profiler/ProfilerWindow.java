@@ -17,6 +17,8 @@ import org.jfree.data.time.Millisecond;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 
+import com.tonic.services.profiler.recording.RecordingTab;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -46,6 +48,7 @@ public class ProfilerWindow extends VitaFrame {
     private Timer refreshTimer;
     private Timer metricsTimer;
     private SamplingTab samplingTab;
+    private RecordingTab recordingTab;
     private com.tonic.services.profiler.leak.LeakDetectorTab leakDetectorTab;
 
     // GC Pause Analysis
@@ -153,6 +156,8 @@ public class ProfilerWindow extends VitaFrame {
         tabbedPane.addTab("Resource Monitor", createResourceMonitorPanel());
         samplingTab = new SamplingTab();
         tabbedPane.addTab("Sampling", samplingTab);
+        recordingTab = new RecordingTab();
+        tabbedPane.addTab("Recording", recordingTab);
         leakDetectorTab = new com.tonic.services.profiler.leak.LeakDetectorTab();
         tabbedPane.addTab("Leak Detector", leakDetectorTab);
         timelinePanel = new com.tonic.services.profiler.timeline.TimelinePanel(gcPauseAnalyzer);
@@ -1741,6 +1746,11 @@ public class ProfilerWindow extends VitaFrame {
         // Stop sampling tab samplers
         if (samplingTab != null) {
             samplingTab.cleanup();
+        }
+
+        // Stop recording tab
+        if (recordingTab != null) {
+            recordingTab.cleanup();
         }
 
         // Stop leak detector
