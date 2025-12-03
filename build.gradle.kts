@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion = "1"
+val vitaVersion = "2"
 val runeliteVersion = "1.12.7"
 
 group = "com.tonic"
