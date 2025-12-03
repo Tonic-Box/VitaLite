@@ -61,11 +61,11 @@ fun getRuneLiteArtifacts(): Map<String, String> {
 }
 
 val runeliteVersions by lazy { getRuneLiteArtifacts() }
-val runeLiteVersion = "latest.release"
+val runeliteVersion: String by rootProject.extra
 
 dependencies {
     compileOnly(project(":base-api"))
-    compileOnly("net.runelite:client:$runeLiteVersion")
+    compileOnly("net.runelite:client:$runeliteVersion")
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
     testImplementation(platform("org.junit:junit-bom:5.9.1"))

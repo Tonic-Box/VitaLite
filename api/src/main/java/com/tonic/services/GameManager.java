@@ -4,7 +4,6 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.api.game.sailing.BoatStatsAPI;
-import com.tonic.api.game.sailing.Heading;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
 import com.tonic.services.pathfinder.sailing.BoatPathing;
 import com.tonic.api.game.sailing.SailingAPI;
@@ -753,18 +752,6 @@ public class GameManager extends Overlay {
         if(event.isBanned())
         {
             Logger.error("LoginResponse: Account is banned!" );
-        }
-    }
-
-    @Subscribe
-    public void onChatMessage(ChatMessage event)
-    {
-        if(event.getType() == ChatMessageType.GAMEMESSAGE)
-        {
-            if(event.getMessage().contains("You feel a gust of wind."))
-            {
-                SailingAPI.setSailsNeedTrimming(true);
-            }
         }
     }
 

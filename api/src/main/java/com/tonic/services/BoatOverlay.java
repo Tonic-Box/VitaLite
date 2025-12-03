@@ -50,7 +50,7 @@ public class BoatOverlay extends VitaOverlay
         newLineEx("Heading: ", headingName, 12);
         newLineEx("Target Heading: ", targetHeadingName, 12);
         newLineEx("Resolved Heading: ", resolvedHeadingName, 12);
-        newLineEx("Sails Need Trimming: ", SailingAPI.isSailsNeedTrimming() ? "Yes" : "No", 12);
+        newLineEx("Sails Need Trimming: ", SailingAPI.sailsNeedTrimming() ? "Yes" : "No", 12);
         newLineEx("Is Navigating: ", SailingAPI.isNavigating() ? "Yes" : "No", 12);
         newLineEx("Movement: ", SailingAPI.isMovingForward() ? "Forward" : (SailingAPI.isMovingBackward() ? "Backward" : "Still"), 12);
         newLine("# Sailing Boat Stats", 14);

@@ -103,6 +103,11 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
         return keepIf(o -> o.getActions() != null && TextUtil.containsIgnoreCaseInverse(action, o.getActions()));
     }
 
+    /**
+     * Filters the query to only include objects with any of the specified actions.
+     * @param actions The actions to filter by.
+     * @return TileObjectQuery
+     */
     public TileObjectQuery withAnyOfActions(String... actions)
     {
         return keepIf(o -> {
@@ -115,6 +120,26 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
             }
             return false;
         });
+    }
+
+    /**
+     * Filters the query to only include objects that have the specified op visible.
+     * @param op The op index to filter by.
+     * @return TileObjectQuery
+     */
+    public TileObjectQuery withOpVisible(int op)
+    {
+        return keepIf(o -> o.isOpVisible(op));
+    }
+
+    /**
+     * Filters the query to only include objects that have the specified action visible.
+     * @param action The action to filter by.
+     * @return TileObjectQuery
+     */
+    public TileObjectQuery withActionVisible(String action)
+    {
+        return keepIf(o -> o.isActionVisible(action));
     }
 
     /**

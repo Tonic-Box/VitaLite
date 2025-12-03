@@ -602,17 +602,11 @@ public class BoatPathing
             int plane = start.getPlane();
 
             // Debug: Print graph stats and search positions
-            System.out.println("BoatPathing: Graph has " + graph.getNodeCount() + " nodes, " + graph.getEdgeCount() + " edges");
-            System.out.println("BoatPathing: Searching for nodes near start=" + start.getX() + "," + start.getY() +
-                    " (plane " + plane + ") and target=" + target.getX() + "," + target.getY());
-
             // Step 1: Find nearest graph nodes via BFS (use world coords, not packed - packing formats differ!)
             int startNode = findNearestNode(graph, start.getX(), start.getY(), plane, MAX_NODE_SEARCH_RADIUS);
             int endNode = findNearestNode(graph, target.getX(), target.getY(), plane, MAX_NODE_SEARCH_RADIUS);
 
             if (startNode == -1 || endNode == -1) {
-                System.out.println("BoatPathing: Could not find graph nodes near start/target (startNode=" +
-                        startNode + ", endNode=" + endNode + ", searchRadius=" + MAX_NODE_SEARCH_RADIUS + ")");
                 // Debug: Find the bounding box of all nodes in the graph
                 int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
                 int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
@@ -629,14 +623,6 @@ public class BoatPathing
                 return null;
             }
 
-            int startDist = Math.max(Math.abs(start.getX() - GraphNode.getX(startNode)),
-                    Math.abs(start.getY() - GraphNode.getY(startNode)));
-            int endDist = Math.max(Math.abs(target.getX() - GraphNode.getX(endNode)),
-                    Math.abs(target.getY() - GraphNode.getY(endNode)));
-            System.out.println("BoatPathing: Found start node at " + GraphNode.getX(startNode) + "," +
-                    GraphNode.getY(startNode) + " (dist=" + startDist + ") and end node at " +
-                    GraphNode.getX(endNode) + "," + GraphNode.getY(endNode) + " (dist=" + endDist + ")");
-
             // Step 2: A* on graph to find node path
             List<Integer> nodePath = findGraphPath(graph, startNode, endNode, BAD_TILE_TYPES);
 
@@ -644,8 +630,6 @@ public class BoatPathing
                 System.out.println("BoatPathing: No valid graph path found");
                 return null;
             }
-
-            System.out.println("BoatPathing: Found graph path with " + nodePath.size() + " nodes");
 
             // Step 3: A* tile-by-tile with corridor constraint
             return findFullPathWithCorridor(start, target, avoidTiles, nodePath);
@@ -850,7 +834,8 @@ public class BoatPathing
             int currentG = gScores.get(current);
             heapSize = expandNeighborsAStarCorridor(cache, collisionMap, current, currentG,
                     targetX, targetY, gScores, parents, proximityCache, closedSet,
-                    heapNodes, heapCosts, heapSize, avoidTiles, startPacked, nodePath);
+                    heapNodes, heapCosts, heapSize, avoidTiles, startPacked, nodePath,
+                    start.getX(), start.getY(), adjustedTarget.getX(), adjustedTarget.getY());
         }
 
         return null;
@@ -868,7 +853,8 @@ public class BoatPathing
             Int2IntOpenHashMap proximityCache, IntOpenHashSet closedSet,
             int[] heapNodes, int[] heapCosts, int heapSize,
             IntOpenHashSet avoidTiles, int startPacked,
-            List<Integer> nodePath)
+            List<Integer> nodePath,
+            int startWorldX, int startWorldY, int targetWorldX, int targetWorldY)
     {
         int x = WorldPointUtil.getCompressedX(current);
         int y = WorldPointUtil.getCompressedY(current);
@@ -885,7 +871,8 @@ public class BoatPathing
             if (closedSet.contains(neighborPacked)) continue;
 
             // Corridor constraint: skip tiles outside the corridor
-            if (!isWithinCorridor(nx, ny, nodePath, CORRIDOR_DEVIATION)) {
+            if (!isWithinCorridor(nx, ny, nodePath, CORRIDOR_DEVIATION,
+                    startWorldX, startWorldY, targetWorldX, targetWorldY)) {
                 continue;
             }
 
@@ -943,20 +930,38 @@ public class BoatPathing
 
     /**
      * Checks if a tile is within the corridor defined by the node path.
+     * Also considers the actual start/target positions (which may be far from graph nodes).
      *
      * @param tileX Tile X coordinate
      * @param tileY Tile Y coordinate
      * @param nodePath List of packed node coordinates
      * @param maxDeviation Maximum perpendicular distance from path segments
+     * @param startX Actual start position X (boat position)
+     * @param startY Actual start position Y
+     * @param targetX Actual target position X
+     * @param targetY Actual target position Y
      * @return true if within corridor
      */
-    private static boolean isWithinCorridor(int tileX, int tileY, List<Integer> nodePath, int maxDeviation)
+    private static boolean isWithinCorridor(int tileX, int tileY, List<Integer> nodePath,
+            int maxDeviation, int startX, int startY, int targetX, int targetY)
     {
         if (nodePath == null || nodePath.size() < 2) {
             return true; // No corridor constraint
         }
 
-        // Check distance to each segment
+        // Allow tiles near actual start position (boat may be far from first graph node)
+        int distToStart = Math.max(Math.abs(tileX - startX), Math.abs(tileY - startY));
+        if (distToStart <= maxDeviation) {
+            return true;
+        }
+
+        // Allow tiles near actual target position (target may be far from last graph node)
+        int distToTarget = Math.max(Math.abs(tileX - targetX), Math.abs(tileY - targetY));
+        if (distToTarget <= maxDeviation) {
+            return true;
+        }
+
+        // Check distance to each segment between graph nodes
         for (int i = 0; i < nodePath.size() - 1; i++) {
             int n1 = nodePath.get(i);
             int n2 = nodePath.get(i + 1);
@@ -972,7 +977,7 @@ public class BoatPathing
             }
         }
 
-        // Also check distance to start/end nodes themselves
+        // Also check distance to first/last graph nodes themselves
         int first = nodePath.get(0);
         int last = nodePath.get(nodePath.size() - 1);
         int distToFirst = Math.max(Math.abs(tileX - GraphNode.getX(first)),
