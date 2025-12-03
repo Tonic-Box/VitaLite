@@ -277,7 +277,7 @@ tasks.register<Zip>("packageRelease") {
     }
 
     // Include the run scripts from the same directory as the shaded jar
-    from(shadowJarTask.flatMap { it.destinationDirectory }) {
+    from("scripts") {
         include("run-linux.sh")
         include("run-mac.sh")
         include("run-windows.bat")
