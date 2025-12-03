@@ -176,7 +176,10 @@ public class RLClassLoader extends URLClassLoader {
                         return loadedClass;
                     }
                 }
-            } catch (Exception ignored) {
+            } catch (Exception | ClassFormatError ignored) {
+                System.out.println("Failed to load class " + name + ": " + ignored.getMessage());
+                ignored.printStackTrace();
+                System.exit(0);
             }
         }
         return null;
