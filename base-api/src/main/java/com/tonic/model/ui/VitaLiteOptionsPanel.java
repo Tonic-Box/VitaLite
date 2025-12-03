@@ -697,7 +697,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 Logger.info(event.toString());
             }
 
-            if(logMousePacketsToggle.isSelected() || recordTrajectory.isSelected() && isMouse == 2)
+            if((logMousePacketsToggle.isSelected() || recordTrajectory.isSelected()) && isMouse == 2)
             {
                 DecodedMousePacket decodedInfo;
                 try
