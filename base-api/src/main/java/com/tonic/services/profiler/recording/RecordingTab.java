@@ -83,6 +83,7 @@ public class RecordingTab extends JPanel {
     private JTable exactTimingTable;
     private DefaultTableModel exactTimingModel;
     private JLabel exactTimingSummaryLabel;
+    private JCheckBox methodProfilerEnabledCheckbox;
 
     // State
     private Timer statusTimer;
@@ -448,13 +449,31 @@ public class RecordingTab extends JPanel {
         panel.setBackground(PANEL_BG);
         panel.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-        // Info header
+        // Info header with toggle checkbox
         JPanel infoPanel = new JPanel(new BorderLayout());
         infoPanel.setBackground(new Color(50, 52, 56));
         infoPanel.setBorder(new EmptyBorder(8, 10, 8, 10));
+
         JLabel infoLabel = new JLabel("<html><b>Exact Timing</b> - Use MethodProfiler.begin()/end() in your code for precise measurements</html>");
         infoLabel.setForeground(TEXT_COLOR);
         infoPanel.add(infoLabel, BorderLayout.CENTER);
+
+        // Enable/disable toggle
+        methodProfilerEnabledCheckbox = new JCheckBox("Enable Recording");
+        methodProfilerEnabledCheckbox.setBackground(new Color(50, 52, 56));
+        methodProfilerEnabledCheckbox.setForeground(TEXT_COLOR);
+        methodProfilerEnabledCheckbox.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        methodProfilerEnabledCheckbox.setSelected(MethodProfiler.isEnabled());
+        methodProfilerEnabledCheckbox.addActionListener(e -> {
+            MethodProfiler.setEnabled(methodProfilerEnabledCheckbox.isSelected());
+            if (methodProfilerEnabledCheckbox.isSelected()) {
+                exactTimingSummaryLabel.setText("Recording enabled - MethodProfiler calls will now be tracked");
+            } else {
+                exactTimingSummaryLabel.setText("Recording disabled - MethodProfiler calls are no-op (zero overhead)");
+            }
+        });
+        infoPanel.add(methodProfilerEnabledCheckbox, BorderLayout.EAST);
+
         panel.add(infoPanel, BorderLayout.NORTH);
 
         String[] columns = {"Method", "Calls", "Total Time", "Avg Time", "Min", "Max"};
@@ -496,6 +515,10 @@ public class RecordingTab extends JPanel {
         refreshBtn.setPreferredSize(new Dimension(80, 24));
         refreshBtn.addActionListener(e -> refreshExactTimingTable());
 
+        JButton exportExactBtn = createStyledButton("Export", ACCENT_COLOR);
+        exportExactBtn.setPreferredSize(new Dimension(80, 24));
+        exportExactBtn.addActionListener(e -> exportExactTimingReport());
+
         JButton clearExactBtn = createStyledButton("Clear", WARNING_COLOR);
         clearExactBtn.setPreferredSize(new Dimension(80, 24));
         clearExactBtn.addActionListener(e -> {
@@ -504,6 +527,7 @@ public class RecordingTab extends JPanel {
         });
 
         buttonPanel.add(refreshBtn);
+        buttonPanel.add(exportExactBtn);
         buttonPanel.add(clearExactBtn);
         bottomPanel.add(buttonPanel, BorderLayout.EAST);
 
@@ -766,6 +790,53 @@ public class RecordingTab extends JPanel {
                         getConfidenceLevel(ms.getSelfSamples()),
                         ms.className,
                         ms.methodName);
+                }
+
+                JOptionPane.showMessageDialog(this,
+                    "Exported to: " + chooser.getSelectedFile().getName(),
+                    "Export Complete", JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                    "Export failed: " + e.getMessage(),
+                    "Export Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void exportExactTimingReport() {
+        if (!MethodProfiler.hasData()) {
+            JOptionPane.showMessageDialog(this,
+                "No MethodProfiler data to export.\nEnable recording and run some profiled code first.",
+                "No Data", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        // Ask user for format
+        String[] options = {"Text Report", "CSV", "Cancel"};
+        int choice = JOptionPane.showOptionDialog(this,
+            "Choose export format:",
+            "Export Exact Timing",
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null, options, options[0]);
+
+        if (choice == 2 || choice == JOptionPane.CLOSED_OPTION) return;
+
+        boolean csv = (choice == 1);
+        String extension = csv ? ".csv" : ".txt";
+        String defaultName = "method_profiler_" +
+            new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + extension;
+
+        JFileChooser chooser = new JFileChooser();
+        chooser.setSelectedFile(new File(defaultName));
+
+        if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            try (PrintWriter writer = new PrintWriter(new FileWriter(chooser.getSelectedFile()))) {
+                if (csv) {
+                    writer.print(MethodProfiler.generateCSVReport());
+                } else {
+                    writer.print(MethodProfiler.generateReport());
                 }
 
                 JOptionPane.showMessageDialog(this,

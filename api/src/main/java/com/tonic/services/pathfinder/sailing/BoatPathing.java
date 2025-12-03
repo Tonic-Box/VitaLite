@@ -251,21 +251,26 @@ public class BoatPathing
      */
     public static List<Waypoint> pathTo(WorldPoint target)
     {
-        return Static.invoke(() -> {
-            WorldEntity boat = BoatCollisionAPI.getPlayerBoat();
-            if (boat == null) {
-                System.out.println("SailPathing: No boat found");
-                return null;
-            }
+        MethodProfiler.begin("BoatPathing.pathTo(target)");
+        try {
+            return Static.invoke(() -> {
+                WorldEntity boat = BoatCollisionAPI.getPlayerBoat();
+                if (boat == null) {
+                    System.out.println("SailPathing: No boat found");
+                    return null;
+                }
 
-            WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
-            if (start == null) {
-                System.out.println("SailPathing: No start position");
-                return null;
-            }
+                WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
+                if (start == null) {
+                    System.out.println("SailPathing: No start position");
+                    return null;
+                }
 
-            return pathTo(start, target);
-        });
+                return pathTo(start, target);
+            });
+        } finally {
+            MethodProfiler.end("BoatPathing.pathTo(target)");
+        }
     }
 
     /**
@@ -273,23 +278,28 @@ public class BoatPathing
      */
     public static List<Waypoint> pathTo(WorldPoint start, WorldPoint target)
     {
-        return Static.invoke(() -> {
-            // Find full tile-by-tile path using BFS
-            List<WorldPoint> fullPath = findFullPath(start, target);
+        MethodProfiler.begin("BoatPathing.pathTo(start,target)");
+        try {
+            return Static.invoke(() -> {
+                // Find full tile-by-tile path using BFS
+                List<WorldPoint> fullPath = findFullPath(start, target);
 
-            if (fullPath == null || fullPath.isEmpty()) {
-                System.out.println("SailPathing: No path found from " + start + " to " + target);
-                return null;
-            }
+                if (fullPath == null || fullPath.isEmpty()) {
+                    System.out.println("SailPathing: No path found from " + start + " to " + target);
+                    return null;
+                }
 
-            System.out.println("SailPathing: Found full path with " + fullPath.size() + " tiles");
+                System.out.println("SailPathing: Found full path with " + fullPath.size() + " tiles");
 
-            // Convert to waypoints at turning points
-            List<Waypoint> waypoints = convertToWaypoints(fullPath);
-            System.out.println("SailPathing: Converted to " + waypoints.size() + " waypoints");
+                // Convert to waypoints at turning points
+                List<Waypoint> waypoints = convertToWaypoints(fullPath);
+                System.out.println("SailPathing: Converted to " + waypoints.size() + " waypoints");
 
-            return waypoints;
-        });
+                return waypoints;
+            });
+        } finally {
+            MethodProfiler.end("BoatPathing.pathTo(start,target)");
+        }
     }
 
     /**
@@ -299,39 +309,44 @@ public class BoatPathing
      */
     private static BoatHullCache initializeBoatCache(WorldPoint boatCenter, CollisionMap collisionMap)
     {
-        // Get player boat fresh (don't pass as parameter - doesn't survive Static.invoke)
-        WorldEntity boat = BoatCollisionAPI.getPlayerBoat();
-        if (boat == null) {
-            System.out.println("SailPathing: No player boat found");
-            return null;
+        MethodProfiler.begin("BoatPathing.initializeBoatCache");
+        try {
+            // Get player boat fresh (don't pass as parameter - doesn't survive Static.invoke)
+            WorldEntity boat = BoatCollisionAPI.getPlayerBoat();
+            if (boat == null) {
+                System.out.println("SailPathing: No player boat found");
+                return null;
+            }
+
+            // Get current hull in world coordinates - use player boat method
+            Collection<WorldPoint> hull = BoatCollisionAPI.getPlayerBoatCollision();
+
+            if (hull == null || hull.isEmpty()) {
+                System.out.println("SailPathing: Empty boat hull (" + (hull == null ? "null" : 0) + " tiles)");
+                return null;
+            }
+
+            // Get current heading
+            int currentHeading = SailingAPI.getHeadingValue();
+            if (currentHeading == -1) {
+                System.out.println("SailPathing: Not on boat (headingValue=-1)");
+                return null;
+            }
+
+            // Convert hull to offsets from boat center
+            int[] xOffsets = new int[hull.size()];
+            int[] yOffsets = new int[hull.size()];
+            int i = 0;
+            for (WorldPoint hullTile : hull) {
+                xOffsets[i] = hullTile.getX() - boatCenter.getX();
+                yOffsets[i] = hullTile.getY() - boatCenter.getY();
+                i++;
+            }
+
+            return new BoatHullCache(xOffsets, yOffsets, currentHeading, collisionMap);
+        } finally {
+            MethodProfiler.end("BoatPathing.initializeBoatCache");
         }
-
-        // Get current hull in world coordinates - use player boat method
-        Collection<WorldPoint> hull = BoatCollisionAPI.getPlayerBoatCollision();
-
-        if (hull == null || hull.isEmpty()) {
-            System.out.println("SailPathing: Empty boat hull (" + (hull == null ? "null" : 0) + " tiles)");
-            return null;
-        }
-
-        // Get current heading
-        int currentHeading = SailingAPI.getHeadingValue();
-        if (currentHeading == -1) {
-            System.out.println("SailPathing: Not on boat (headingValue=-1)");
-            return null;
-        }
-
-        // Convert hull to offsets from boat center
-        int[] xOffsets = new int[hull.size()];
-        int[] yOffsets = new int[hull.size()];
-        int i = 0;
-        for (WorldPoint hullTile : hull) {
-            xOffsets[i] = hullTile.getX() - boatCenter.getX();
-            yOffsets[i] = hullTile.getY() - boatCenter.getY();
-            i++;
-        }
-
-        return new BoatHullCache(xOffsets, yOffsets, currentHeading, collisionMap);
     }
 
     /**
@@ -341,23 +356,28 @@ public class BoatPathing
      */
     private static boolean canBoatFitAtDirection(BoatHullCache cache, short targetX, short targetY, int directionIndex)
     {
-        // Use pre-computed rotated offsets - no floating-point math in hot path
-        int[] rotatedX = cache.rotatedXOffsets[directionIndex];
-        int[] rotatedY = cache.rotatedYOffsets[directionIndex];
-        int hullSize = rotatedX.length;
+        MethodProfiler.begin("BoatPathing.canBoatFitAtDirection");
+        try {
+            // Use pre-computed rotated offsets - no floating-point math in hot path
+            int[] rotatedX = cache.rotatedXOffsets[directionIndex];
+            int[] rotatedY = cache.rotatedYOffsets[directionIndex];
+            int hullSize = rotatedX.length;
 
-        // Check each hull tile
-        for (int i = 0; i < hullSize; i++) {
-            short worldX = (short) (targetX + rotatedX[i]);
-            short worldY = (short) (targetY + rotatedY[i]);
+            // Check each hull tile
+            for (int i = 0; i < hullSize; i++) {
+                short worldX = (short) (targetX + rotatedX[i]);
+                short worldY = (short) (targetY + rotatedY[i]);
 
-            // Check collision on plane 0
-            if (!cache.collisionMap.walkable(worldX, worldY, (byte) 0)) {
-                return false;
+                // Check collision on plane 0
+                if (!cache.collisionMap.walkable(worldX, worldY, (byte) 0)) {
+                    return false;
+                }
             }
-        }
 
-        return true;
+            return true;
+        } finally {
+            MethodProfiler.end("BoatPathing.canBoatFitAtDirection");
+        }
     }
 
     /**
@@ -500,8 +520,10 @@ public class BoatPathing
     private static List<WorldPoint> findFullPathWithGraph(
             WorldPoint start, WorldPoint target, IntOpenHashSet avoidTiles, NavGraph graph)
     {
-        return Static.invoke(() -> {
-            int plane = start.getPlane();
+        MethodProfiler.begin("BoatPathing.findFullPathWithGraph");
+        try {
+            return Static.invoke(() -> {
+                int plane = start.getPlane();
 
             // Debug: Print graph stats and search positions
             // Step 1: Find nearest graph nodes via BFS (use world coords, not packed - packing formats differ!)
@@ -535,7 +557,10 @@ public class BoatPathing
 
             // Step 3: A* tile-by-tile with corridor constraint
             return findFullPathWithCorridor(start, target, avoidTiles, nodePath);
-        });
+            });
+        } finally {
+            MethodProfiler.end("BoatPathing.findFullPathWithGraph");
+        }
     }
 
     /**
@@ -550,29 +575,34 @@ public class BoatPathing
      */
     private static int findNearestNode(NavGraph graph, int worldX, int worldY, int plane, int maxRadius)
     {
-        // Check center first (pack using GraphNode format which matches the graph)
-        int centerPacked = GraphNode.pack(worldX, worldY, plane);
-        if (graph.hasNode(centerPacked)) {
-            return centerPacked;
-        }
+        MethodProfiler.begin("BoatPathing.findNearestNode");
+        try {
+            // Check center first (pack using GraphNode format which matches the graph)
+            int centerPacked = GraphNode.pack(worldX, worldY, plane);
+            if (graph.hasNode(centerPacked)) {
+                return centerPacked;
+            }
 
-        // Spiral outward
-        for (int r = 1; r <= maxRadius; r++) {
-            // Check ring at radius r
-            for (int dx = -r; dx <= r; dx++) {
-                for (int dy = -r; dy <= r; dy++) {
-                    // Only check tiles on the ring perimeter
-                    if (Math.abs(dx) != r && Math.abs(dy) != r) continue;
+            // Spiral outward
+            for (int r = 1; r <= maxRadius; r++) {
+                // Check ring at radius r
+                for (int dx = -r; dx <= r; dx++) {
+                    for (int dy = -r; dy <= r; dy++) {
+                        // Only check tiles on the ring perimeter
+                        if (Math.abs(dx) != r && Math.abs(dy) != r) continue;
 
-                    int packed = GraphNode.pack(worldX + dx, worldY + dy, plane);
-                    if (graph.hasNode(packed)) {
-                        return packed;
+                        int packed = GraphNode.pack(worldX + dx, worldY + dy, plane);
+                        if (graph.hasNode(packed)) {
+                            return packed;
+                        }
                     }
                 }
             }
-        }
 
-        return -1;
+            return -1;
+        } finally {
+            MethodProfiler.end("BoatPathing.findNearestNode");
+        }
     }
 
     /**
@@ -586,80 +616,85 @@ public class BoatPathing
      */
     private static List<Integer> findGraphPath(NavGraph graph, int startNode, int endNode, byte[] avoidTypes)
     {
-        if (startNode == endNode) {
-            List<Integer> path = new ArrayList<>();
-            path.add(startNode);
-            return path;
-        }
-
-        // A* data structures
-        Int2IntOpenHashMap gScores = new Int2IntOpenHashMap();
-        Int2IntOpenHashMap parents = new Int2IntOpenHashMap();
-        IntOpenHashSet closedSet = new IntOpenHashSet();
-        gScores.defaultReturnValue(Integer.MAX_VALUE);
-        parents.defaultReturnValue(-1);
-
-        // Priority queue (simple array-based for small graphs)
-        int[] heapNodes = new int[10000];
-        int[] heapCosts = new int[10000];
-        int heapSize = 0;
-
-        // Initialize
-        gScores.put(startNode, 0);
-        int h = GraphNode.chebyshevDistance(startNode, endNode);
-        heapSize = heapPush(heapNodes, heapCosts, heapSize, startNode, h);
-
-        int iterations = 0;
-        int maxIterations = 100000;
-
-        while (heapSize > 0 && iterations++ < maxIterations) {
-            heapSize = heapPop(heapNodes, heapCosts, heapSize);
-            int current = heapNodes[heapSize];
-
-            if (closedSet.contains(current)) continue;
-            closedSet.add(current);
-
-            if (current == endNode) {
-                // Reconstruct path
+        MethodProfiler.begin("BoatPathing.findGraphPath");
+        try {
+            if (startNode == endNode) {
                 List<Integer> path = new ArrayList<>();
-                int node = endNode;
-                while (node != -1) {
-                    path.add(node);
-                    node = parents.get(node);
-                }
-                Collections.reverse(path);
+                path.add(startNode);
                 return path;
             }
 
-            int currentG = gScores.get(current);
-            IntList neighbors = graph.getNeighbors(current);
+            // A* data structures
+            Int2IntOpenHashMap gScores = new Int2IntOpenHashMap();
+            Int2IntOpenHashMap parents = new Int2IntOpenHashMap();
+            IntOpenHashSet closedSet = new IntOpenHashSet();
+            gScores.defaultReturnValue(Integer.MAX_VALUE);
+            parents.defaultReturnValue(-1);
 
-            for (int i = 0; i < neighbors.size(); i++) {
-                int neighbor = neighbors.getInt(i);
+            // Priority queue (simple array-based for small graphs)
+            int[] heapNodes = new int[10000];
+            int[] heapCosts = new int[10000];
+            int heapSize = 0;
 
-                if (closedSet.contains(neighbor)) continue;
+            // Initialize
+            gScores.put(startNode, 0);
+            int h = GraphNode.chebyshevDistance(startNode, endNode);
+            heapSize = heapPush(heapNodes, heapCosts, heapSize, startNode, h);
 
-                // Check if edge is traversable (doesn't cross bad water types)
-                if (!graph.isEdgeTraversable(current, neighbor, avoidTypes)) {
-                    continue;
+            int iterations = 0;
+            int maxIterations = 100000;
+
+            while (heapSize > 0 && iterations++ < maxIterations) {
+                heapSize = heapPop(heapNodes, heapCosts, heapSize);
+                int current = heapNodes[heapSize];
+
+                if (closedSet.contains(current)) continue;
+                closedSet.add(current);
+
+                if (current == endNode) {
+                    // Reconstruct path
+                    List<Integer> path = new ArrayList<>();
+                    int node = endNode;
+                    while (node != -1) {
+                        path.add(node);
+                        node = parents.get(node);
+                    }
+                    Collections.reverse(path);
+                    return path;
                 }
 
-                // Edge cost is Chebyshev distance between nodes
-                int edgeCost = GraphNode.chebyshevDistance(current, neighbor);
-                int tentativeG = currentG + edgeCost;
+                int currentG = gScores.get(current);
+                IntList neighbors = graph.getNeighbors(current);
 
-                if (tentativeG < gScores.get(neighbor)) {
-                    gScores.put(neighbor, tentativeG);
-                    parents.put(neighbor, current);
+                for (int i = 0; i < neighbors.size(); i++) {
+                    int neighbor = neighbors.getInt(i);
 
-                    int neighborH = GraphNode.chebyshevDistance(neighbor, endNode);
-                    int f = tentativeG + neighborH;
-                    heapSize = heapPush(heapNodes, heapCosts, heapSize, neighbor, f);
+                    if (closedSet.contains(neighbor)) continue;
+
+                    // Check if edge is traversable (doesn't cross bad water types)
+                    if (!graph.isEdgeTraversable(current, neighbor, avoidTypes)) {
+                        continue;
+                    }
+
+                    // Edge cost is Chebyshev distance between nodes
+                    int edgeCost = GraphNode.chebyshevDistance(current, neighbor);
+                    int tentativeG = currentG + edgeCost;
+
+                    if (tentativeG < gScores.get(neighbor)) {
+                        gScores.put(neighbor, tentativeG);
+                        parents.put(neighbor, current);
+
+                        int neighborH = GraphNode.chebyshevDistance(neighbor, endNode);
+                        int f = tentativeG + neighborH;
+                        heapSize = heapPush(heapNodes, heapCosts, heapSize, neighbor, f);
+                    }
                 }
             }
-        }
 
-        return null; // No path found
+            return null; // No path found
+        } finally {
+            MethodProfiler.end("BoatPathing.findGraphPath");
+        }
     }
 
     /**
@@ -674,73 +709,78 @@ public class BoatPathing
     private static List<WorldPoint> findFullPathWithCorridor(
             WorldPoint start, WorldPoint target, IntOpenHashSet avoidTiles, List<Integer> nodePath)
     {
-        CollisionMap collisionMap = Walker.getCollisionMap();
-        if (collisionMap == null) {
-            return null;
-        }
-
-        // Validate and adjust target
-        WorldPoint adjustedTarget = target;
-        WorldPoint validTarget = BoatCollisionAPI.findNearestValidPlayerBoatPosition(target, 10);
-        if (validTarget == null) {
-            return null;
-        }
-        if (!validTarget.equals(target)) {
-            adjustedTarget = validTarget;
-        }
-
-        // Initialize boat cache
-        BoatHullCache cache = initializeBoatCache(start, collisionMap);
-        if (cache == null) {
-            return null;
-        }
-
-        // A* with corridor constraint
-        int[] heapNodes = new int[100_000];
-        int[] heapCosts = new int[100_000];
-        int heapSize = 0;
-
-        Int2IntOpenHashMap gScores = new Int2IntOpenHashMap();
-        Int2IntOpenHashMap parents = new Int2IntOpenHashMap();
-        Int2IntOpenHashMap proximityCache = new Int2IntOpenHashMap();
-        IntOpenHashSet closedSet = new IntOpenHashSet();
-        gScores.defaultReturnValue(Integer.MAX_VALUE);
-        parents.defaultReturnValue(-2);
-        proximityCache.defaultReturnValue(-1);
-
-        int startPacked = WorldPointUtil.compress(start);
-        int targetPacked = WorldPointUtil.compress(adjustedTarget);
-        int targetX = WorldPointUtil.getCompressedX(targetPacked);
-        int targetY = WorldPointUtil.getCompressedY(targetPacked);
-
-        gScores.put(startPacked, 0);
-        parents.put(startPacked, -1);
-        int startH = heuristic(WorldPointUtil.getCompressedX(startPacked),
-                WorldPointUtil.getCompressedY(startPacked), targetX, targetY);
-        heapSize = heapPush(heapNodes, heapCosts, heapSize, startPacked, startH);
-
-        int maxIterations = 1_000_000;
-        int iterations = 0;
-
-        while (heapSize > 0 && iterations++ < maxIterations) {
-            heapSize = heapPop(heapNodes, heapCosts, heapSize);
-            int current = heapNodes[heapSize];
-
-            if (closedSet.contains(current)) continue;
-            closedSet.add(current);
-
-            if (current == targetPacked) {
-                return reconstructFullPath(parents, targetPacked);
+        MethodProfiler.begin("BoatPathing.findFullPathWithCorridor");
+        try {
+            CollisionMap collisionMap = Walker.getCollisionMap();
+            if (collisionMap == null) {
+                return null;
             }
 
-            int currentG = gScores.get(current);
-            heapSize = expandNeighborsAStarCorridor(cache, collisionMap, current, currentG,
-                    targetX, targetY, gScores, parents, proximityCache, closedSet,
-                    heapNodes, heapCosts, heapSize, avoidTiles, startPacked, nodePath,
-                    start.getX(), start.getY(), adjustedTarget.getX(), adjustedTarget.getY());
-        }
+            // Validate and adjust target
+            WorldPoint adjustedTarget = target;
+            WorldPoint validTarget = BoatCollisionAPI.findNearestValidPlayerBoatPosition(target, 10);
+            if (validTarget == null) {
+                return null;
+            }
+            if (!validTarget.equals(target)) {
+                adjustedTarget = validTarget;
+            }
 
-        return null;
+            // Initialize boat cache
+            BoatHullCache cache = initializeBoatCache(start, collisionMap);
+            if (cache == null) {
+                return null;
+            }
+
+            // A* with corridor constraint
+            int[] heapNodes = new int[100_000];
+            int[] heapCosts = new int[100_000];
+            int heapSize = 0;
+
+            Int2IntOpenHashMap gScores = new Int2IntOpenHashMap();
+            Int2IntOpenHashMap parents = new Int2IntOpenHashMap();
+            Int2IntOpenHashMap proximityCache = new Int2IntOpenHashMap();
+            IntOpenHashSet closedSet = new IntOpenHashSet();
+            gScores.defaultReturnValue(Integer.MAX_VALUE);
+            parents.defaultReturnValue(-2);
+            proximityCache.defaultReturnValue(-1);
+
+            int startPacked = WorldPointUtil.compress(start);
+            int targetPacked = WorldPointUtil.compress(adjustedTarget);
+            int targetX = WorldPointUtil.getCompressedX(targetPacked);
+            int targetY = WorldPointUtil.getCompressedY(targetPacked);
+
+            gScores.put(startPacked, 0);
+            parents.put(startPacked, -1);
+            int startH = heuristic(WorldPointUtil.getCompressedX(startPacked),
+                    WorldPointUtil.getCompressedY(startPacked), targetX, targetY);
+            heapSize = heapPush(heapNodes, heapCosts, heapSize, startPacked, startH);
+
+            int maxIterations = 1_000_000;
+            int iterations = 0;
+
+            while (heapSize > 0 && iterations++ < maxIterations) {
+                heapSize = heapPop(heapNodes, heapCosts, heapSize);
+                int current = heapNodes[heapSize];
+
+                if (closedSet.contains(current)) continue;
+                closedSet.add(current);
+
+                if (current == targetPacked) {
+                    return reconstructFullPath(parents, targetPacked);
+                }
+
+                int currentG = gScores.get(current);
+                heapSize = expandNeighborsAStarCorridor(cache, collisionMap, current, currentG,
+                        targetX, targetY, gScores, parents, proximityCache, closedSet,
+                        heapNodes, heapCosts, heapSize, avoidTiles, startPacked, nodePath,
+                        start.getX(), start.getY(), adjustedTarget.getX(), adjustedTarget.getY());
+            }
+
+            return null;
+        } finally {
+            MethodProfiler.end("BoatPathing.findFullPathWithCorridor");
+        }
     }
 
     /**
@@ -758,76 +798,81 @@ public class BoatPathing
             List<Integer> nodePath,
             int startWorldX, int startWorldY, int targetWorldX, int targetWorldY)
     {
-        int x = WorldPointUtil.getCompressedX(current);
-        int y = WorldPointUtil.getCompressedY(current);
-        int plane = WorldPointUtil.getCompressedPlane(current);
-        int sX = WorldPointUtil.getCompressedX(startPacked);
-        int sY = WorldPointUtil.getCompressedY(startPacked);
-        int targetPacked = WorldPointUtil.compress(targetX, targetY, plane);
+        MethodProfiler.begin("BoatPathing.expandNeighborsAStarCorridor");
+        try {
+            int x = WorldPointUtil.getCompressedX(current);
+            int y = WorldPointUtil.getCompressedY(current);
+            int plane = WorldPointUtil.getCompressedPlane(current);
+            int sX = WorldPointUtil.getCompressedX(startPacked);
+            int sY = WorldPointUtil.getCompressedY(startPacked);
+            int targetPacked = WorldPointUtil.compress(targetX, targetY, plane);
 
-        for (int dir = 0; dir < 8; dir++) {
-            int nx = x + DX[dir];
-            int ny = y + DY[dir];
-            int neighborPacked = WorldPointUtil.compress(nx, ny, plane);
+            for (int dir = 0; dir < 8; dir++) {
+                int nx = x + DX[dir];
+                int ny = y + DY[dir];
+                int neighborPacked = WorldPointUtil.compress(nx, ny, plane);
 
-            if (closedSet.contains(neighborPacked)) continue;
+                if (closedSet.contains(neighborPacked)) continue;
 
-            // Corridor constraint: skip tiles outside the corridor
-            if (!isWithinCorridor(nx, ny, nodePath, CORRIDOR_DEVIATION,
-                    startWorldX, startWorldY, targetWorldX, targetWorldY)) {
-                continue;
-            }
-
-            // Hull collision check
-            boolean nearStart = Math.abs(nx - sX) <= 3 && Math.abs(ny - sY) <= 3;
-            boolean isTarget = (neighborPacked == targetPacked);
-
-            if (!isTarget) {
-                int hullDir = nearStart ? 8 : dir;
-                if (!canBoatFitAtDirection(cache, (short) nx, (short) ny, hullDir)) {
+                // Corridor constraint: skip tiles outside the corridor
+                if (!isWithinCorridor(nx, ny, nodePath, CORRIDOR_DEVIATION,
+                        startWorldX, startWorldY, targetWorldX, targetWorldY)) {
                     continue;
+                }
+
+                // Hull collision check
+                boolean nearStart = Math.abs(nx - sX) <= 3 && Math.abs(ny - sY) <= 3;
+                boolean isTarget = (neighborPacked == targetPacked);
+
+                if (!isTarget) {
+                    int hullDir = nearStart ? 8 : dir;
+                    if (!canBoatFitAtDirection(cache, (short) nx, (short) ny, hullDir)) {
+                        continue;
+                    }
+                }
+
+                // Cost calculation (same as original)
+                int baseCost = BASE_COSTS[dir];
+                int combined = getCombinedProximityCached(collisionMap, proximityCache, nx, ny, plane);
+                int collisionDist = combined >>> 16;
+                int badWaterDist = combined & 0xFFFF;
+
+                int proximityCost = PROXIMITY_COSTS[Math.min(collisionDist, PROXIMITY_COSTS.length - 1)];
+                if (proximityCost == Integer.MAX_VALUE) continue;
+
+                int turnCost = getTurnCost(parents, current, dir);
+                int alternationCost = getAlternationCost(parents, current, dir);
+
+                int tileTypeCost = 0;
+                byte tileType = Walker.getTileTypeMap().getTileType(nx, ny, plane);
+                if (isBadTileType(tileType)) {
+                    tileTypeCost = BAD_WATER_COST;
+                } else if (badWaterDist > 0) {
+                    tileTypeCost = BAD_WATER_COST >> badWaterDist;
+                }
+
+                int cloudCost = 0;
+                if (avoidTiles != null && avoidTiles.contains(neighborPacked)) {
+                    cloudCost = AVOID_COST;
+                }
+
+                int edgeCost = baseCost * proximityCost + turnCost + alternationCost + tileTypeCost + cloudCost;
+                int tentativeG = currentG + edgeCost;
+
+                if (tentativeG < gScores.get(neighborPacked)) {
+                    gScores.put(neighborPacked, tentativeG);
+                    parents.put(neighborPacked, current);
+
+                    int h = heuristic(nx, ny, targetX, targetY);
+                    int f = tentativeG + (h * 3 / 2);
+                    heapSize = heapPush(heapNodes, heapCosts, heapSize, neighborPacked, f);
                 }
             }
 
-            // Cost calculation (same as original)
-            int baseCost = BASE_COSTS[dir];
-            int combined = getCombinedProximityCached(collisionMap, proximityCache, nx, ny, plane);
-            int collisionDist = combined >>> 16;
-            int badWaterDist = combined & 0xFFFF;
-
-            int proximityCost = PROXIMITY_COSTS[Math.min(collisionDist, PROXIMITY_COSTS.length - 1)];
-            if (proximityCost == Integer.MAX_VALUE) continue;
-
-            int turnCost = getTurnCost(parents, current, dir);
-            int alternationCost = getAlternationCost(parents, current, dir);
-
-            int tileTypeCost = 0;
-            byte tileType = Walker.getTileTypeMap().getTileType(nx, ny, plane);
-            if (isBadTileType(tileType)) {
-                tileTypeCost = BAD_WATER_COST;
-            } else if (badWaterDist > 0) {
-                tileTypeCost = BAD_WATER_COST >> badWaterDist;
-            }
-
-            int cloudCost = 0;
-            if (avoidTiles != null && avoidTiles.contains(neighborPacked)) {
-                cloudCost = AVOID_COST;
-            }
-
-            int edgeCost = baseCost * proximityCost + turnCost + alternationCost + tileTypeCost + cloudCost;
-            int tentativeG = currentG + edgeCost;
-
-            if (tentativeG < gScores.get(neighborPacked)) {
-                gScores.put(neighborPacked, tentativeG);
-                parents.put(neighborPacked, current);
-
-                int h = heuristic(nx, ny, targetX, targetY);
-                int f = tentativeG + (h * 3 / 2);
-                heapSize = heapPush(heapNodes, heapCosts, heapSize, neighborPacked, f);
-            }
+            return heapSize;
+        } finally {
+            MethodProfiler.end("BoatPathing.expandNeighborsAStarCorridor");
         }
-
-        return heapSize;
     }
 
     /**
@@ -935,98 +980,103 @@ public class BoatPathing
             IntOpenHashSet avoidTiles,
             int startPacked)
     {
-        // Extract as ints to avoid repeated casts
-        int x = WorldPointUtil.getCompressedX(current);
-        int y = WorldPointUtil.getCompressedY(current);
-        int plane = WorldPointUtil.getCompressedPlane(current);
-        int sX = WorldPointUtil.getCompressedX(startPacked);
-        int sY = WorldPointUtil.getCompressedY(startPacked);
-        int targetPacked = WorldPointUtil.compress(targetX, targetY, plane);
+        MethodProfiler.begin("BoatPathing.expandNeighborsAStar");
+        try {
+            // Extract as ints to avoid repeated casts
+            int x = WorldPointUtil.getCompressedX(current);
+            int y = WorldPointUtil.getCompressedY(current);
+            int plane = WorldPointUtil.getCompressedPlane(current);
+            int sX = WorldPointUtil.getCompressedX(startPacked);
+            int sY = WorldPointUtil.getCompressedY(startPacked);
+            int targetPacked = WorldPointUtil.compress(targetX, targetY, plane);
 
-        // Expand in all 8 directions
-        for (int dir = 0; dir < 8; dir++) {
-            int nx = x + DX[dir];
-            int ny = y + DY[dir];
+            // Expand in all 8 directions
+            for (int dir = 0; dir < 8; dir++) {
+                int nx = x + DX[dir];
+                int ny = y + DY[dir];
 
-            // Use int overload - no object allocation
-            int neighborPacked = WorldPointUtil.compress(nx, ny, plane);
+                // Use int overload - no object allocation
+                int neighborPacked = WorldPointUtil.compress(nx, ny, plane);
 
-            // Skip if already in closed set (already fully processed)
-            if (closedSet.contains(neighborPacked)) {
-                continue;
-            }
-
-            // Skip if boat doesn't fit at this position/direction
-            // EXCEPTIONS:
-            // 1. Near start - use unrotated hull (index 8) since boat is at actual current heading
-            // 2. Target tile - already validated with all headings, don't reject based on approach direction
-            boolean nearStart = Math.abs(nx - sX) <= 3 && Math.abs(ny - sY) <= 3;
-            boolean isTarget = (neighborPacked == targetPacked);
-
-            if (!isTarget) {
-                // Near start: use unrotated hull (index 8) to match boat's actual current heading
-                // Elsewhere: use direction-rotated hull (index 0-7)
-                int hullDir = nearStart ? 8 : dir;
-                if (!canBoatFitAtDirection(cache, (short) nx, (short) ny, hullDir)) {
+                // Skip if already in closed set (already fully processed)
+                if (closedSet.contains(neighborPacked)) {
                     continue;
+                }
+
+                // Skip if boat doesn't fit at this position/direction
+                // EXCEPTIONS:
+                // 1. Near start - use unrotated hull (index 8) since boat is at actual current heading
+                // 2. Target tile - already validated with all headings, don't reject based on approach direction
+                boolean nearStart = Math.abs(nx - sX) <= 3 && Math.abs(ny - sY) <= 3;
+                boolean isTarget = (neighborPacked == targetPacked);
+
+                if (!isTarget) {
+                    // Near start: use unrotated hull (index 8) to match boat's actual current heading
+                    // Elsewhere: use direction-rotated hull (index 0-7)
+                    int hullDir = nearStart ? 8 : dir;
+                    if (!canBoatFitAtDirection(cache, (short) nx, (short) ny, hullDir)) {
+                        continue;
+                    }
+                }
+
+                // Calculate edge cost with combined proximity data (collision + bad water)
+                int baseCost = BASE_COSTS[dir];
+                int combined = getCombinedProximityCached(collisionMap, proximityCache, nx, ny, plane);
+                int collisionDist = combined >>> 16;
+                int badWaterDist = combined & 0xFFFF;
+
+                int proximityCost = PROXIMITY_COSTS[Math.min(collisionDist, PROXIMITY_COSTS.length - 1)];
+
+                // Avoid overflow: if proximityCost is MAX_VALUE, skip this tile
+                if (proximityCost == Integer.MAX_VALUE) {
+                    continue;
+                }
+
+                // Calculate turn cost penalty (discourages sharp direction changes)
+                // Uses multi-parent lookback to detect "split turn" exploits
+                int turnCost = getTurnCost(parents, current, dir);
+
+                // Anti-wobble penalty: discourage alternating between adjacent directions
+                // E.g., EAST→SE→EAST pattern gets penalized to prefer clean 8-direction paths
+                int alternationCost = getAlternationCost(parents, current, dir);
+
+                // Tile type penalty: bad water buffer zone from unified scan
+                // Also check if tile itself is bad water (not just buffer zone)
+                int tileTypeCost = 0;
+                byte tileType = Walker.getTileTypeMap().getTileType(nx, ny, plane);
+                if (isBadTileType(tileType)) {
+                    tileTypeCost = BAD_WATER_COST;
+                } else if (badWaterDist > 0) {
+                    // Buffer zone: graduated penalty based on distance
+                    tileTypeCost = BAD_WATER_COST >> badWaterDist;
+                }
+
+                // Cloud avoidance cost: high penalty for tiles in cloud danger zones
+                int cloudCost = 0;
+                if (avoidTiles != null && avoidTiles.contains(neighborPacked)) {
+                    cloudCost = AVOID_COST;
+                }
+
+                int edgeCost = baseCost * proximityCost + turnCost + alternationCost + tileTypeCost + cloudCost;
+                int tentativeG = currentG + edgeCost;
+
+                // Only update if this path is better
+                if (tentativeG < gScores.get(neighborPacked)) {
+                    gScores.put(neighborPacked, tentativeG);
+                    parents.put(neighborPacked, current);
+
+                    // Weighted A* priority: f = g + w*h (w=1.5 for faster search, slightly suboptimal paths)
+                    // This reduces node exploration by 2-5x while paths remain near-optimal
+                    int h = heuristic(nx, ny, targetX, targetY);
+                    int f = tentativeG + (h * 3 / 2);  // w = 1.5
+                    heapSize = heapPush(heapNodes, heapCosts, heapSize, neighborPacked, f);
                 }
             }
 
-            // Calculate edge cost with combined proximity data (collision + bad water)
-            int baseCost = BASE_COSTS[dir];
-            int combined = getCombinedProximityCached(collisionMap, proximityCache, nx, ny, plane);
-            int collisionDist = combined >>> 16;
-            int badWaterDist = combined & 0xFFFF;
-
-            int proximityCost = PROXIMITY_COSTS[Math.min(collisionDist, PROXIMITY_COSTS.length - 1)];
-
-            // Avoid overflow: if proximityCost is MAX_VALUE, skip this tile
-            if (proximityCost == Integer.MAX_VALUE) {
-                continue;
-            }
-
-            // Calculate turn cost penalty (discourages sharp direction changes)
-            // Uses multi-parent lookback to detect "split turn" exploits
-            int turnCost = getTurnCost(parents, current, dir);
-
-            // Anti-wobble penalty: discourage alternating between adjacent directions
-            // E.g., EAST→SE→EAST pattern gets penalized to prefer clean 8-direction paths
-            int alternationCost = getAlternationCost(parents, current, dir);
-
-            // Tile type penalty: bad water buffer zone from unified scan
-            // Also check if tile itself is bad water (not just buffer zone)
-            int tileTypeCost = 0;
-            byte tileType = Walker.getTileTypeMap().getTileType(nx, ny, plane);
-            if (isBadTileType(tileType)) {
-                tileTypeCost = BAD_WATER_COST;
-            } else if (badWaterDist > 0) {
-                // Buffer zone: graduated penalty based on distance
-                tileTypeCost = BAD_WATER_COST >> badWaterDist;
-            }
-
-            // Cloud avoidance cost: high penalty for tiles in cloud danger zones
-            int cloudCost = 0;
-            if (avoidTiles != null && avoidTiles.contains(neighborPacked)) {
-                cloudCost = AVOID_COST;
-            }
-
-            int edgeCost = baseCost * proximityCost + turnCost + alternationCost + tileTypeCost + cloudCost;
-            int tentativeG = currentG + edgeCost;
-
-            // Only update if this path is better
-            if (tentativeG < gScores.get(neighborPacked)) {
-                gScores.put(neighborPacked, tentativeG);
-                parents.put(neighborPacked, current);
-
-                // Weighted A* priority: f = g + w*h (w=1.5 for faster search, slightly suboptimal paths)
-                // This reduces node exploration by 2-5x while paths remain near-optimal
-                int h = heuristic(nx, ny, targetX, targetY);
-                int f = tentativeG + (h * 3 / 2);  // w = 1.5
-                heapSize = heapPush(heapNodes, heapCosts, heapSize, neighborPacked, f);
-            }
+            return heapSize;
+        } finally {
+            MethodProfiler.end("BoatPathing.expandNeighborsAStar");
         }
-
-        return heapSize;
     }
 
     /**
@@ -1423,60 +1473,65 @@ public class BoatPathing
      */
     public static List<Waypoint> convertToWaypoints(List<WorldPoint> path)
     {
-        if (path.size() < 2) {
-            return new ArrayList<>();
-        }
-
-        List<Waypoint> waypoints = new ArrayList<>();
-
-        // Window size for smoothing wobble while detecting turns quickly
-        final int WINDOW_SIZE = 4;
-        // Maximum distance any path tile can be from the straight line before forcing a waypoint
-        final int MAX_DEVIATION = 3;
-        // Maximum segment length before forcing a waypoint
-        final int MAX_SEGMENT_LENGTH = 25;
-
-        // Add starting waypoint so boat starts in correct direction
-        Heading startHeading = Heading.getOptimalHeading(path.get(0), path.get(Math.min(WINDOW_SIZE, path.size() - 1)));
-        waypoints.add(new Waypoint(path.get(0), startHeading));
-
-        // Track segment start for heading calculation
-        int segmentStartIndex = 0;
-        Heading segmentStartHeading = startHeading;
-
-        for (int i = WINDOW_SIZE; i < path.size(); i++) {
-            // Calculate local heading over sliding window
-            int windowStart = i - WINDOW_SIZE;
-            Heading localHeading = Heading.getOptimalHeading(path.get(windowStart), path.get(i));
-
-            // Compare current local heading to segment START heading
-            int diff = getHeadingDifference(localHeading, segmentStartHeading);
-
-            // Check if segment is too long
-            int segmentLength = i - segmentStartIndex;
-
-            // Check path deviation - does the actual path stray from straight line?
-            boolean deviationExceeded = checkPathDeviation(path, segmentStartIndex, i);
-
-            // Create waypoint if: heading changed significantly, segment too long, or path deviates
-            if (diff > 1 || segmentLength >= MAX_SEGMENT_LENGTH || deviationExceeded) {
-                // Place waypoint at position where turn/deviation was detected
-                WorldPoint turnPoint = path.get(windowStart);
-                Heading segmentHeading = Heading.getOptimalHeading(path.get(segmentStartIndex), turnPoint);
-                waypoints.add(new Waypoint(turnPoint, segmentHeading));
-
-                // Start new segment
-                segmentStartIndex = windowStart;
-                segmentStartHeading = localHeading;
+        MethodProfiler.begin("BoatPathing.convertToWaypoints");
+        try {
+            if (path.size() < 2) {
+                return new ArrayList<>();
             }
+
+            List<Waypoint> waypoints = new ArrayList<>();
+
+            // Window size for smoothing wobble while detecting turns quickly
+            final int WINDOW_SIZE = 4;
+            // Maximum distance any path tile can be from the straight line before forcing a waypoint
+            final int MAX_DEVIATION = 3;
+            // Maximum segment length before forcing a waypoint
+            final int MAX_SEGMENT_LENGTH = 25;
+
+            // Add starting waypoint so boat starts in correct direction
+            Heading startHeading = Heading.getOptimalHeading(path.get(0), path.get(Math.min(WINDOW_SIZE, path.size() - 1)));
+            waypoints.add(new Waypoint(path.get(0), startHeading));
+
+            // Track segment start for heading calculation
+            int segmentStartIndex = 0;
+            Heading segmentStartHeading = startHeading;
+
+            for (int i = WINDOW_SIZE; i < path.size(); i++) {
+                // Calculate local heading over sliding window
+                int windowStart = i - WINDOW_SIZE;
+                Heading localHeading = Heading.getOptimalHeading(path.get(windowStart), path.get(i));
+
+                // Compare current local heading to segment START heading
+                int diff = getHeadingDifference(localHeading, segmentStartHeading);
+
+                // Check if segment is too long
+                int segmentLength = i - segmentStartIndex;
+
+                // Check path deviation - does the actual path stray from straight line?
+                boolean deviationExceeded = checkPathDeviation(path, segmentStartIndex, i);
+
+                // Create waypoint if: heading changed significantly, segment too long, or path deviates
+                if (diff > 1 || segmentLength >= MAX_SEGMENT_LENGTH || deviationExceeded) {
+                    // Place waypoint at position where turn/deviation was detected
+                    WorldPoint turnPoint = path.get(windowStart);
+                    Heading segmentHeading = Heading.getOptimalHeading(path.get(segmentStartIndex), turnPoint);
+                    waypoints.add(new Waypoint(turnPoint, segmentHeading));
+
+                    // Start new segment
+                    segmentStartIndex = windowStart;
+                    segmentStartHeading = localHeading;
+                }
+            }
+
+            // Final waypoint
+            WorldPoint last = path.get(path.size() - 1);
+            Heading finalHeading = Heading.getOptimalHeading(path.get(segmentStartIndex), last);
+            waypoints.add(new Waypoint(last, finalHeading));
+
+            return waypoints;
+        } finally {
+            MethodProfiler.end("BoatPathing.convertToWaypoints");
         }
-
-        // Final waypoint
-        WorldPoint last = path.get(path.size() - 1);
-        Heading finalHeading = Heading.getOptimalHeading(path.get(segmentStartIndex), last);
-        waypoints.add(new Waypoint(last, finalHeading));
-
-        return waypoints;
     }
 
     /**
