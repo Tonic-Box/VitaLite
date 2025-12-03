@@ -34,7 +34,7 @@ public class MethodProfiler {
 
     private static final Map<String, MethodTiming> timings = new ConcurrentHashMap<>();
     private static final ThreadLocal<Map<String, Long>> activeTimings = ThreadLocal.withInitial(ConcurrentHashMap::new);
-    private static volatile boolean enabled = true;
+    private static volatile boolean enabled = false;  // Disabled by default for zero overhead
 
     /**
      * Start timing a method/section. Must be paired with end().
@@ -151,6 +151,72 @@ public class MethodProfiler {
      */
     public static boolean hasData() {
         return !timings.isEmpty();
+    }
+
+    /**
+     * Generate a text report of all profiling data.
+     */
+    public static String generateReport() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== MethodProfiler Report ===\n");
+        sb.append(String.format("Generated: %s\n", java.time.LocalDateTime.now()));
+        sb.append(String.format("Methods tracked: %d\n\n", timings.size()));
+
+        List<MethodTiming> sorted = getAllTimings();
+        if (sorted.isEmpty()) {
+            sb.append("No data recorded.\n");
+            return sb.toString();
+        }
+
+        // Calculate totals
+        long totalCalls = sorted.stream().mapToLong(MethodTiming::getCallCount).sum();
+        double totalMs = sorted.stream().mapToDouble(MethodTiming::getTotalMs).sum();
+
+        sb.append(String.format("Total calls: %,d\n", totalCalls));
+        sb.append(String.format("Total time: %.2fms\n\n", totalMs));
+
+        // Header
+        sb.append(String.format("%-50s %12s %12s %12s %12s %12s\n",
+                "Method", "Calls", "Total", "Average", "Min", "Max"));
+        sb.append("-".repeat(110)).append("\n");
+
+        // Data rows
+        for (MethodTiming timing : sorted) {
+            sb.append(String.format("%-50s %,12d %12s %12s %12s %12s\n",
+                    truncate(timing.getLabel(), 50),
+                    timing.getCallCount(),
+                    timing.getFormattedTotalTime(),
+                    timing.getFormattedAverageTime(),
+                    timing.getFormattedMinTime(),
+                    timing.getFormattedMaxTime()));
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Generate a CSV report of all profiling data.
+     */
+    public static String generateCSVReport() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Method,Calls,TotalMs,AverageMs,MinMs,MaxMs\n");
+
+        for (MethodTiming timing : getAllTimings()) {
+            sb.append(String.format("\"%s\",%d,%.6f,%.6f,%.6f,%.6f\n",
+                    timing.getLabel().replace("\"", "\"\""),
+                    timing.getCallCount(),
+                    timing.getTotalMs(),
+                    timing.getAverageMs(),
+                    timing.getMinMs(),
+                    timing.getMaxMs()));
+        }
+
+        return sb.toString();
+    }
+
+    private static String truncate(String s, int maxLen) {
+        if (s.length() <= maxLen) return s;
+        return s.substring(0, maxLen - 3) + "...";
     }
 
     /**
