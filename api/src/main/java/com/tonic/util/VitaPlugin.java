@@ -28,7 +28,7 @@ public class VitaPlugin extends Plugin
      * as necessary.
      */
     @Subscribe
-    public final void onGameTick(GameTick event) {
+    public final void _onGameTick(GameTick event) {
         if (!ReflectUtil.isOverridden(this, "loop"))
             return;
 

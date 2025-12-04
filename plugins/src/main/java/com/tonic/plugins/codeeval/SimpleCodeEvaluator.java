@@ -2,6 +2,17 @@ package com.tonic.plugins.codeeval;
 
 import com.tonic.api.game.MovementAPI;
 
+import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.stmt.ForStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
+import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.expr.BooleanLiteralExpr;
+import com.github.javaparser.ast.expr.BinaryExpr;
+import com.github.javaparser.ast.expr.IntegerLiteralExpr;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+
 import javax.tools.*;
 import java.io.*;
 import java.lang.reflect.Method;
@@ -19,6 +30,95 @@ public class SimpleCodeEvaluator {
 
     public ClassLoader getParentClassLoader() {
         return parentClassLoader;
+    }
+
+    /**
+     * Checks user code for potential infinite loops without proper delays.
+     * @param code The user code to check
+     * @return Warning message if dangerous loop detected, null if safe
+     */
+    public String checkForInfiniteLoop(String code) {
+        List<String> warnings = new ArrayList<>();
+
+        try {
+            // Wrap user code in class structure (same pattern as TypeInference.java)
+            String wrappedCode = wrapInClassForParsing(code);
+            CompilationUnit cu = StaticJavaParser.parse(wrappedCode);
+
+            // Visit all while and for statements
+            cu.accept(new VoidVisitorAdapter<Void>() {
+                @Override
+                public void visit(WhileStmt stmt, Void arg) {
+                    super.visit(stmt, arg);
+                    if (isAlwaysTrue(stmt.getCondition()) && !containsSafeDelay(stmt.getBody())) {
+                        warnings.add("• while(" + stmt.getCondition() + ") loop without delay");
+                    }
+                }
+
+                @Override
+                public void visit(ForStmt stmt, Void arg) {
+                    super.visit(stmt, arg);
+                    // for(;;) has no compare expression
+                    boolean isInfinite = stmt.getCompare().isEmpty() ||
+                        stmt.getCompare().map(expr -> isAlwaysTrue(expr)).orElse(false);
+                    if (isInfinite && !containsSafeDelay(stmt.getBody())) {
+                        warnings.add("• for(;;) loop without delay");
+                    }
+                }
+            }, null);
+
+        } catch (Exception e) {
+            // If parsing fails, don't block execution - just skip validation
+            return null;
+        }
+
+        if (!warnings.isEmpty()) {
+            return "Potential infinite loop detected!\n\n" +
+                String.join("\n", warnings) + "\n\n" +
+                "Loop(s) found without Delays.tick(), Delays.wait(), or Thread.sleep().\n" +
+                "This may freeze the client.\n\n" +
+                "Click 'Run Anyway' to execute, or 'Cancel' to abort.";
+        }
+        return null;
+    }
+
+    private String wrapInClassForParsing(String code) {
+        return "public class Temp {\n  public void run() {\n" + code + "\n  }\n}\n";
+    }
+
+    private boolean isAlwaysTrue(Expression expr) {
+        // Check for literal true
+        if (expr instanceof BooleanLiteralExpr) {
+            return ((BooleanLiteralExpr) expr).getValue();
+        }
+
+        // Check for binary comparisons like 1==1, 1>0, etc.
+        if (expr instanceof BinaryExpr) {
+            BinaryExpr binary = (BinaryExpr) expr;
+            if (binary.getLeft() instanceof IntegerLiteralExpr &&
+                binary.getRight() instanceof IntegerLiteralExpr) {
+                int left = Integer.parseInt(((IntegerLiteralExpr) binary.getLeft()).getValue());
+                int right = Integer.parseInt(((IntegerLiteralExpr) binary.getRight()).getValue());
+
+                switch (binary.getOperator()) {
+                    case EQUALS: return left == right;
+                    case NOT_EQUALS: return left != right;
+                    case GREATER: return left > right;
+                    case GREATER_EQUALS: return left >= right;
+                    case LESS: return left < right;
+                    case LESS_EQUALS: return left <= right;
+                    default: return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean containsSafeDelay(Statement body) {
+        String bodyStr = body.toString();
+        return bodyStr.contains("Delays.tick") ||
+               bodyStr.contains("Delays.wait") ||
+               bodyStr.contains("Thread.sleep");
     }
 
     public Object evaluate(String code) {
