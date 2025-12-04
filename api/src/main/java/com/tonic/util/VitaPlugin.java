@@ -1,9 +1,12 @@
 package com.tonic.util;
 
 import com.tonic.Logger;
+import net.runelite.api.Client;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
+
+import javax.inject.Inject;
 import java.util.concurrent.Future;
 
 /**
@@ -11,7 +14,76 @@ import java.util.concurrent.Future;
  */
 public class VitaPlugin extends Plugin
 {
+    @Inject
+    Client client;
     private Future<?> loopFuture = null;
+    private volatile boolean shutdown = false;
+    private volatile boolean started = false; // Track if plugin is actually enabled/started
+
+    /**
+     * Constructor
+     */
+    public VitaPlugin() {
+        super();
+    }
+
+    /**
+     * Subscriber to the gametick event to handle dealing with starting new futures for our loop() method
+     * as necessary when logged in.
+     */
+    @Subscribe
+    public final void onGameTick(GameTick event) {
+        triggerLoop();
+    }
+
+    /**
+     * Start a background thread to poll for login screen and trigger loop() 
+     * Similar to how AutoLogin works in GameManager
+     */
+    @Override
+    protected void startUp() throws Exception {
+        super.startUp();
+        started = true;
+        shutdown = false; // Reset shutdown flag
+        Logger.norm("[VitaPlugin] Plugin started, loop() enabled for " + getName());
+        
+        // Start login screen polling thread
+        ThreadPool.submit(() -> {
+            Logger.norm("[VitaPlugin] Polling thread started for " + getName());
+            while (!isPluginShutdown()) {
+                try {
+                    if (client != null && (client.getGameState() == net.runelite.api.GameState.LOGIN_SCREEN || 
+                        client.getGameState() == net.runelite.api.GameState.LOGIN_SCREEN_AUTHENTICATOR)) {
+                        Logger.norm("[" + getName() + "] Login screen detected, triggering loop()");
+                        triggerLoop();
+                        // Wait a bit before next check (similar to game tick rate)
+                        Thread.sleep(600);
+                    } else {
+                        // When not on login screen, check less frequently
+                        Thread.sleep(1000);
+                    }
+                } catch (InterruptedException e) {
+                    Logger.norm("[VitaPlugin] Polling thread interrupted");
+                    break; // Exit thread if interrupted
+                } catch (Exception e) {
+                    Logger.error(e, "[" + getName() + "] Error in login screen polling: %e");
+                }
+            }
+            Logger.norm("[VitaPlugin] Login screen polling thread stopped");
+        });
+    }
+
+    @Override
+    protected void shutDown() throws Exception {
+        started = false;
+        shutdown = true;
+        super.shutDown();
+        Logger.norm("[VitaPlugin] Plugin shut down, loop() disabled for " + getName());
+    }
+    
+    private boolean isPluginShutdown() {
+        return shutdown;
+    }
 
     /**
      * Overridable loop() method. It is safe to sleep in, but as a result is
@@ -24,16 +96,16 @@ public class VitaPlugin extends Plugin
     }
 
     /**
-     * Subscriber to the gametick event to handle dealing with starting new futures for our loop() method
-     * as necessary.
+     * Shared method to trigger loop() execution
      */
-    @Subscribe
-    public final void onGameTick(GameTick event) {
-        if (!ReflectUtil.isOverridden(this, "loop"))
+    private void triggerLoop() {
+        if (!ReflectUtil.isOverridden(this, "loop")) {
             return;
+        }
 
-        if(loopFuture != null && !loopFuture.isDone())
+        if(loopFuture != null && !loopFuture.isDone()) {
             return;
+        }
 
         loopFuture = ThreadPool.submit(new AsyncTask(() -> {
             try
@@ -42,6 +114,7 @@ public class VitaPlugin extends Plugin
             }
             catch (RuntimeException e)
             {
+                // Log unexpected RuntimeExceptions
                 Logger.norm("[" + getName() + "] Plugin::loop() has been interrupted.");
             }
             catch (Throwable e)

@@ -75,6 +75,12 @@ public class VitaLiteOptions extends OptionsParser
     private String jagexLogin = null;
 
     @CLIArgument(
+            name = "disableAutoLogin",
+            description = "Disables the built-in auto-login feature"
+    )
+    private boolean disableAutoLogin = false;
+
+    @CLIArgument(
             name = "runInjector",
             description = "For use with developing mixins to runt he injector on launch"
     )
