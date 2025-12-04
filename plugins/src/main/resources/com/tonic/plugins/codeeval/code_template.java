@@ -35,6 +35,7 @@ import com.tonic.data.*;
 import com.tonic.util.handler.*;
 import com.tonic.util.handler.script.*;
 import com.tonic.api.handlers.*;
+import net.runelite.client.eventbus.*;
 
 // VitaLite classes (should be available since they're compiled)
 import com.tonic.services.GameManager;

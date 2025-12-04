@@ -333,6 +333,27 @@ public class CodeEvalFrame extends VitaFrame {
             return;
         }
 
+        // Check for infinite loop warning
+        String warning = ctx.getEvaluator().checkForInfiniteLoop(codeArea.getText());
+        if (warning != null) {
+            int result = JOptionPane.showOptionDialog(
+                this,
+                warning,
+                "Infinite Loop Warning",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                new String[]{"Run Anyway", "Cancel"},
+                "Cancel"
+            );
+
+            if (result != JOptionPane.YES_OPTION) {
+                outputArea.append(">>> Execution cancelled - infinite loop warning.\n");
+                runButton.setText("Run Code (Ctrl+Enter)");
+                return;
+            }
+        }
+
         future = ThreadPool.submit(() -> {
             outputArea.append(">>> Running code in " + currentContext + " context...\n");
 
