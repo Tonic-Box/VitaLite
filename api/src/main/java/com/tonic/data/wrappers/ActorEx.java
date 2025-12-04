@@ -123,7 +123,7 @@ public abstract class ActorEx<T extends Actor> implements Entity
         if(actor == null)
         {
             actor = new PlayerQuery()
-                    .keepIf(n -> n.getInteracting() != null && n.equals(this))
+                    .keepIf(n -> n.getInteracting() != null && n.getInteracting().equals(this))
                     .keepIf(n -> !n.isIdle() || healthBarVisible())
                     .nearest();
         }
