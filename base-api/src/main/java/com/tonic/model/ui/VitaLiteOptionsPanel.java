@@ -109,6 +109,17 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 () -> Static.setHeadless(headlessToggle.isSelected())
         ));
         generalPanel.addVerticalStrut(12);
+
+        ToggleSlider headlessMapToggle = new ToggleSlider();
+        headlessMapToggle.setSelected(Static.getVitaConfig().shouldShowHeadlessMap());
+        generalPanel.addContent(createToggleOption(
+                "Headless Map View",
+                "Show collision map when in headless mode",
+                headlessMapToggle,
+                () -> Static.getVitaConfig().setShowHeadlessMap(headlessMapToggle.isSelected())
+        ));
+        generalPanel.addVerticalStrut(12);
+
         ToggleSlider neverLogToggle = new ToggleSlider();
         neverLogToggle.setSelected(Static.getVitaConfig().shouldNeverLog());
         generalPanel.addContent(createToggleOption(

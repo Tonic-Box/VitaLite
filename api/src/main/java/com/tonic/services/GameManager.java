@@ -17,6 +17,7 @@ import com.tonic.data.wrappers.NpcEx;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileItemEx;
 import com.tonic.data.wrappers.TileObjectEx;
+import com.tonic.headless.HeadlessMode;
 import com.tonic.services.hotswapper.PluginReloader;
 import com.tonic.services.mouse.ClickVisualizationOverlay;
 import com.tonic.services.mouse.MovementVisualizationOverlay;
@@ -544,6 +545,13 @@ public class GameManager extends Overlay {
         else if(!WidgetAPI.isVisible(gameframe) && !Static.isHeadless())
         {
             gameframe.setHidden(false);
+        }
+
+        // Update headless map view if active
+        if (Static.isHeadless() && Static.getVitaConfig().shouldShowHeadlessMap()) {
+            WorldPoint pos = PlayerEx.getLocal().getWorldPoint();
+            HeadlessMode.updateMap(pos.getX(), pos.getY(), pos.getPlane(),
+                    (x, y, plane) -> Walker.getCollisionMap().all((short) x, (short) y, (byte) plane));
         }
     }
 
