@@ -106,6 +106,7 @@ public class BoatPathing
 
     // Graph-based pathfinding: maximum deviation from node path corridor (tiles)
     private static final int CORRIDOR_DEVIATION = 25;
+    private static final int CORRIDOR_DEVIATION_SQUARED = CORRIDOR_DEVIATION * CORRIDOR_DEVIATION;
 
     // Maximum radius to search for nearest graph node (nodes can be sparse)
     private static final int MAX_NODE_SEARCH_RADIUS = 100;
@@ -807,6 +808,9 @@ public class BoatPathing
             int sY = WorldPointUtil.getCompressedY(startPacked);
             int targetPacked = WorldPointUtil.compress(targetX, targetY, plane);
 
+            // Cache TileTypeMap reference - avoid repeated getter calls in hot loop
+            var tileTypeMap = Walker.getTileTypeMap();
+
             for (int dir = 0; dir < 8; dir++) {
                 int nx = x + DX[dir];
                 int ny = y + DY[dir];
@@ -840,11 +844,13 @@ public class BoatPathing
                 int proximityCost = PROXIMITY_COSTS[Math.min(collisionDist, PROXIMITY_COSTS.length - 1)];
                 if (proximityCost == Integer.MAX_VALUE) continue;
 
-                int turnCost = getTurnCost(parents, current, dir);
-                int alternationCost = getAlternationCost(parents, current, dir);
+                // Combined turn + alternation costs (single parent chain walk)
+                int combinedCosts = getCombinedTurnCosts(parents, current, dir);
+                int turnCost = combinedCosts >>> 16;
+                int alternationCost = combinedCosts & 0xFFFF;
 
                 int tileTypeCost = 0;
-                byte tileType = Walker.getTileTypeMap().getTileType(nx, ny, plane);
+                byte tileType = tileTypeMap.getTileType(nx, ny, plane);
                 if (isBadTileType(tileType)) {
                     tileTypeCost = BAD_WATER_COST;
                 } else if (badWaterDist > 0) {
@@ -908,7 +914,8 @@ public class BoatPathing
             return true;
         }
 
-        // Check distance to each segment between graph nodes
+        // Check distance to each segment between graph nodes (using squared distance)
+        // Uses pre-computed CORRIDOR_DEVIATION_SQUARED constant
         for (int i = 0; i < nodePath.size() - 1; i++) {
             int n1 = nodePath.get(i);
             int n2 = nodePath.get(i + 1);
@@ -918,8 +925,8 @@ public class BoatPathing
             int x2 = GraphNode.getX(n2);
             int y2 = GraphNode.getY(n2);
 
-            double dist = pointToSegmentDistance(tileX, tileY, x1, y1, x2, y2);
-            if (dist <= maxDeviation) {
+            int distSquared = pointToSegmentDistanceSquared(tileX, tileY, x1, y1, x2, y2);
+            if (distSquared <= CORRIDOR_DEVIATION_SQUARED) {
                 return true;
             }
         }
@@ -936,23 +943,35 @@ public class BoatPathing
     }
 
     /**
-     * Calculates perpendicular distance from point to line segment.
+     * Calculates squared perpendicular distance from point to line segment.
+     * OPTIMIZED: Uses integer math only, no Math.sqrt (compare squared values instead).
      */
-    private static double pointToSegmentDistance(int px, int py, int x1, int y1, int x2, int y2)
+    private static int pointToSegmentDistanceSquared(int px, int py, int x1, int y1, int x2, int y2)
     {
-        double dx = x2 - x1;
-        double dy = y2 - y1;
-        double lengthSquared = dx * dx + dy * dy;
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+        int lengthSquared = dx * dx + dy * dy;
 
         if (lengthSquared == 0) {
-            return Math.sqrt((px - x1) * (px - x1) + (py - y1) * (py - y1));
+            return (px - x1) * (px - x1) + (py - y1) * (py - y1);
         }
 
-        double t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / lengthSquared));
-        double projX = x1 + t * dx;
-        double projY = y1 + t * dy;
+        // Clamp t to [0, 1] using integer math
+        int dot = (px - x1) * dx + (py - y1) * dy;
+        int projX, projY;
+        if (dot <= 0) {
+            projX = x1;
+            projY = y1;
+        } else if (dot >= lengthSquared) {
+            projX = x2;
+            projY = y2;
+        } else {
+            // t = dot / lengthSquared, proj = start + t * (end - start)
+            projX = x1 + (dot * dx) / lengthSquared;
+            projY = y1 + (dot * dy) / lengthSquared;
+        }
 
-        return Math.sqrt((px - projX) * (px - projX) + (py - projY) * (py - projY));
+        return (px - projX) * (px - projX) + (py - projY) * (py - projY);
     }
 
     /**
@@ -1032,13 +1051,10 @@ public class BoatPathing
                     continue;
                 }
 
-                // Calculate turn cost penalty (discourages sharp direction changes)
-                // Uses multi-parent lookback to detect "split turn" exploits
-                int turnCost = getTurnCost(parents, current, dir);
-
-                // Anti-wobble penalty: discourage alternating between adjacent directions
-                // E.g., EAST→SE→EAST pattern gets penalized to prefer clean 8-direction paths
-                int alternationCost = getAlternationCost(parents, current, dir);
+                // Combined turn + alternation costs (single parent chain walk)
+                int combinedCosts = getCombinedTurnCosts(parents, current, dir);
+                int turnCost = combinedCosts >>> 16;
+                int alternationCost = combinedCosts & 0xFFFF;
 
                 // Tile type penalty: bad water buffer zone from unified scan
                 // Also check if tile itself is bad water (not just buffer zone)
@@ -1306,59 +1322,100 @@ public class BoatPathing
     }
 
     /**
-     * Calculates turn cost penalty based on cumulative heading change over recent steps.
-     * Looks back TURN_LOOKBACK_DEPTH parents to detect "split turns" where a boat
-     * gradually turns (e.g., North->NW->West = 90° split into two 45° turns).
+     * Calculates both turn cost and alternation cost in a single parent chain walk.
+     * OPTIMIZED: Combines getTurnCost and getAlternationCost to avoid duplicate parent lookups.
      *
-     * This prevents the exploit where a 90° turn (cost 40) could be split into
-     * multiple smaller turns with lower total cost.
+     * Returns packed int: (turnCost << 16) | alternationCost
+     *
+     * Turn cost: Based on cumulative heading change over TURN_LOOKBACK_DEPTH steps.
+     * Alternation cost: Penalizes wobble patterns like EAST → SE → EAST.
      *
      * @param parents Parent map for path reconstruction
      * @param current Current node's packed coordinates
      * @param nextDir Direction index (0-7) for the next move
-     * @return Turn cost penalty based on cumulative turn over lookback window
+     * @return Packed costs: (turnCost << 16) | alternationCost
      */
-    private static int getTurnCost(Int2IntOpenHashMap parents, int current, int nextDir)
+    private static int getCombinedTurnCosts(Int2IntOpenHashMap parents, int current, int nextDir)
     {
-        // Walk back TURN_LOOKBACK_DEPTH parents to find ancestor
-        int ancestor = current;
+        // Get parent chain - need current, parent, grandparent for alternation
+        // and up to TURN_LOOKBACK_DEPTH ancestors for turn cost
+        int parent = parents.get(current);
+        if (parent == -1 || parent == -2) {
+            return 0;  // No parent, no costs
+        }
+
+        int grandparent = parents.get(parent);
+
+        // Extract coordinates for shared use
+        int currentX = WorldPointUtil.getCompressedX(current);
+        int currentY = WorldPointUtil.getCompressedY(current);
+        int parentX = WorldPointUtil.getCompressedX(parent);
+        int parentY = WorldPointUtil.getCompressedY(parent);
+
+        // Direction from parent -> current (the move we just made)
+        int currentDir = getDirectionIndex(parentX, parentY, currentX, currentY);
+
+        // ===== ALTERNATION COST =====
+        int alternationCost = 0;
+        if (grandparent != -1 && grandparent != -2 && currentDir != -1) {
+            int grandX = WorldPointUtil.getCompressedX(grandparent);
+            int grandY = WorldPointUtil.getCompressedY(grandparent);
+            int prevDir = getDirectionIndex(grandX, grandY, parentX, parentY);
+
+            if (prevDir != -1 && prevDir != currentDir && nextDir == prevDir) {
+                // Check if adjacent directions (within 45°)
+                int prevHeading = DIRECTION_TO_HEADING[prevDir];
+                int currentHeading = DIRECTION_TO_HEADING[currentDir];
+                int headingDiff = Math.abs(prevHeading - currentHeading);
+                if (headingDiff > 8) headingDiff = 16 - headingDiff;
+                if (headingDiff <= 2) {
+                    alternationCost = 25;
+                }
+            }
+        }
+
+        // ===== TURN COST =====
+        // Continue walking back to find ancestor at TURN_LOOKBACK_DEPTH
+        int ancestor = parent;
         int prevAncestor = current;
 
-        for (int i = 0; i < TURN_LOOKBACK_DEPTH; i++) {
-            int parent = parents.get(ancestor);
-            if (parent == -1 || parent == -2) {
-                break;  // Reached start or not enough history
+        // Already walked 1 step (current -> parent), need TURN_LOOKBACK_DEPTH - 1 more
+        for (int i = 1; i < TURN_LOOKBACK_DEPTH; i++) {
+            int next = parents.get(ancestor);
+            if (next == -1 || next == -2) {
+                break;
             }
             prevAncestor = ancestor;
-            ancestor = parent;
+            ancestor = next;
         }
 
-        // If we didn't move back at all, no turn cost
-        if (ancestor == current) {
-            return 0;
+        int turnCost = 0;
+        if (ancestor != current) {
+            int ancestorX = WorldPointUtil.getCompressedX(ancestor);
+            int ancestorY = WorldPointUtil.getCompressedY(ancestor);
+            int prevX = WorldPointUtil.getCompressedX(prevAncestor);
+            int prevY = WorldPointUtil.getCompressedY(prevAncestor);
+
+            int startDir = getDirectionIndex(ancestorX, ancestorY, prevX, prevY);
+            if (startDir != -1) {
+                int startHeading = DIRECTION_TO_HEADING[startDir];
+                int endHeading = DIRECTION_TO_HEADING[nextDir];
+                int headingDiff = Math.abs(endHeading - startHeading);
+                if (headingDiff > 8) headingDiff = 16 - headingDiff;
+                turnCost = TURN_COSTS[headingDiff];
+            }
         }
 
-        // Calculate direction from ancestor -> prevAncestor (outgoing direction at ancestor)
-        int ancestorX = WorldPointUtil.getCompressedX(ancestor);
-        int ancestorY = WorldPointUtil.getCompressedY(ancestor);
-        int prevX = WorldPointUtil.getCompressedX(prevAncestor);
-        int prevY = WorldPointUtil.getCompressedY(prevAncestor);
+        return (turnCost << 16) | alternationCost;
+    }
 
-        int startDir = getDirectionIndex(ancestorX, ancestorY, prevX, prevY);
-        if (startDir == -1) {
-            return 0;
-        }
-
-        // Compare start heading (from N steps ago) to next heading
-        int startHeading = DIRECTION_TO_HEADING[startDir];
-        int endHeading = DIRECTION_TO_HEADING[nextDir];
-
-        int headingDiff = Math.abs(endHeading - startHeading);
-        if (headingDiff > 8) {
-            headingDiff = 16 - headingDiff;  // Shortest path around circle
-        }
-
-        return TURN_COSTS[headingDiff];
+    /**
+     * @deprecated Use getCombinedTurnCosts for better performance
+     */
+    @Deprecated
+    private static int getTurnCost(Int2IntOpenHashMap parents, int current, int nextDir)
+    {
+        return getCombinedTurnCosts(parents, current, nextDir) >>> 16;
     }
 
     /**
@@ -1389,68 +1446,6 @@ public class BoatPathing
         if (lineLen == 0) return 0;
 
         return cross / lineLen;
-    }
-
-    /**
-     * Penalizes alternating between adjacent directions (anti-wobble).
-     * Detects patterns like EAST → SE → EAST where we alternate back to a previous direction.
-     * This discourages 2:1 slope wobble patterns, preferring clean 8-direction paths.
-     *
-     * @param parents Parent map for path reconstruction
-     * @param current Current node's packed coordinates
-     * @param nextDir Direction index (0-7) for the next move
-     * @return Alternation penalty (0 if no wobble pattern detected)
-     */
-    private static int getAlternationCost(Int2IntOpenHashMap parents, int current, int nextDir)
-    {
-        // Get parent to find the direction we just came from
-        int parent = parents.get(current);
-        if (parent == -1 || parent == -2) {
-            return 0;  // No parent, no alternation possible
-        }
-
-        // Get grandparent to find direction before that
-        int grandparent = parents.get(parent);
-        if (grandparent == -1 || grandparent == -2) {
-            return 0;  // Not enough history
-        }
-
-        // Calculate the previous two directions
-        int prevDir = getDirectionIndex(
-                WorldPointUtil.getCompressedX(grandparent),
-                WorldPointUtil.getCompressedY(grandparent),
-                WorldPointUtil.getCompressedX(parent),
-                WorldPointUtil.getCompressedY(parent)
-        );
-
-        int currentDir = getDirectionIndex(
-                WorldPointUtil.getCompressedX(parent),
-                WorldPointUtil.getCompressedY(parent),
-                WorldPointUtil.getCompressedX(current),
-                WorldPointUtil.getCompressedY(current)
-        );
-
-        if (prevDir == -1 || currentDir == -1) {
-            return 0;
-        }
-
-        // Check for alternation pattern: prevDir != currentDir, but nextDir == prevDir
-        // This catches: EAST → SE → EAST (alternating back to previous direction)
-        if (prevDir != currentDir && nextDir == prevDir) {
-            // Check if they're adjacent directions (within 45° of each other)
-            int prevHeading = DIRECTION_TO_HEADING[prevDir];
-            int currentHeading = DIRECTION_TO_HEADING[currentDir];
-            int headingDiff = Math.abs(prevHeading - currentHeading);
-            if (headingDiff > 8) {
-                headingDiff = 16 - headingDiff;  // Shortest path around circle
-            }
-
-            if (headingDiff <= 2) {  // Adjacent directions (within 45°)
-                return 25;  // Strong penalty for wobble pattern
-            }
-        }
-
-        return 0;
     }
 
     /**
