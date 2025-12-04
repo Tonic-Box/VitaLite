@@ -108,6 +108,12 @@ public class BoatPathing
     private static final int CORRIDOR_DEVIATION = 25;
     private static final int CORRIDOR_DEVIATION_SQUARED = CORRIDOR_DEVIATION * CORRIDOR_DEVIATION;
 
+    // Corridor centerline pull weight - penalizes tiles far from corridor center
+    // Higher = stronger preference for centerline (reduces node exploration)
+    // Penalty = (distSq / CORRIDOR_DEVIATION) * WEIGHT (quadratic, integer-only)
+    // 1 = gentle guidance, 2-3 = moderate, 5+ = strong pull
+    private static final int CORRIDOR_PULL_WEIGHT = 2;
+
     // Maximum radius to search for nearest graph node (nodes can be sparse)
     private static final int MAX_NODE_SEARCH_RADIUS = 100;
 
@@ -742,11 +748,11 @@ public class BoatPathing
             Int2IntOpenHashMap parents = new Int2IntOpenHashMap();
             Int2IntOpenHashMap proximityCache = new Int2IntOpenHashMap();
             IntOpenHashSet closedSet = new IntOpenHashSet();
-            IntOpenHashSet corridorYes = new IntOpenHashSet();  // tiles confirmed IN corridor
-            IntOpenHashSet corridorNo = new IntOpenHashSet();   // tiles confirmed OUTSIDE corridor
+            Int2IntOpenHashMap corridorDistance = new Int2IntOpenHashMap();  // cached distance to centerline (-2 = outside)
             gScores.defaultReturnValue(Integer.MAX_VALUE);
             parents.defaultReturnValue(-2);
             proximityCache.defaultReturnValue(-1);
+            corridorDistance.defaultReturnValue(-1);  // -1 = not computed yet
 
             int startPacked = WorldPointUtil.compress(start);
             int targetPacked = WorldPointUtil.compress(adjustedTarget);
@@ -778,7 +784,7 @@ public class BoatPathing
                         targetX, targetY, gScores, parents, proximityCache, closedSet,
                         heapNodes, heapCosts, heapSize, avoidTiles, startPacked, nodePath,
                         start.getX(), start.getY(), adjustedTarget.getX(), adjustedTarget.getY(),
-                        corridorYes, corridorNo);
+                        corridorDistance);
             }
 
             return null;
@@ -788,8 +794,9 @@ public class BoatPathing
     }
 
     /**
-     * Expands neighbors with corridor constraint.
-     * Similar to expandNeighborsAStar but skips tiles outside the corridor.
+     * Expands neighbors with corridor constraint and centerline heuristic bonus.
+     * Similar to expandNeighborsAStar but skips tiles outside the corridor
+     * and adds a penalty for tiles far from the corridor centerline.
      */
     private static int expandNeighborsAStarCorridor(
             BoatHullCache cache, CollisionMap collisionMap,
@@ -801,7 +808,7 @@ public class BoatPathing
             IntOpenHashSet avoidTiles, int startPacked,
             List<Integer> nodePath,
             int startWorldX, int startWorldY, int targetWorldX, int targetWorldY,
-            IntOpenHashSet corridorYes, IntOpenHashSet corridorNo)
+            Int2IntOpenHashMap corridorDistance)
     {
         MethodProfiler.begin("BoatPathing.expandNeighborsAStarCorridor");
         try {
@@ -822,20 +829,21 @@ public class BoatPathing
 
                 if (closedSet.contains(neighborPacked)) continue;
 
-                // Corridor constraint: skip tiles outside the corridor (with caching)
-                if (!corridorYes.contains(neighborPacked)) {
-                    if (corridorNo.contains(neighborPacked)) {
-                        continue;  // Known to be outside corridor
-                    }
+                // Corridor constraint: get distance to centerline (with caching)
+                // -1 = not computed, -2 = outside corridor, >= 0 = distance squared
+                int corridorDistSq = corridorDistance.get(neighborPacked);
+                if (corridorDistSq == -1) {
                     // Not cached - compute and cache result
-                    boolean inCorridor = isWithinCorridor(nx, ny, nodePath, CORRIDOR_DEVIATION,
+                    corridorDistSq = getCorridorDistanceSquared(nx, ny, nodePath,
                             startWorldX, startWorldY, targetWorldX, targetWorldY);
-                    if (inCorridor) {
-                        corridorYes.add(neighborPacked);
-                    } else {
-                        corridorNo.add(neighborPacked);
-                        continue;
+                    // Store -2 for outside corridor, otherwise store actual distance
+                    corridorDistance.put(neighborPacked, corridorDistSq == -1 ? -2 : corridorDistSq);
+                    if (corridorDistSq == -1) {
+                        corridorDistSq = -2;  // Update local var for the check below
                     }
+                }
+                if (corridorDistSq == -2) {
+                    continue;  // Outside corridor
                 }
 
                 // Hull collision check
@@ -884,7 +892,13 @@ public class BoatPathing
                     parents.put(neighborPacked, current);
 
                     int h = heuristic(nx, ny, targetX, targetY);
-                    int f = tentativeG + (h * 3 / 2);
+
+                    // Corridor centerline pull: penalize tiles far from center (quadratic, integer-only)
+                    // corridorDistSq 0 = on centerline = no penalty
+                    // corridorDistSq 625 (25²) = at edge = penalty of 25 * WEIGHT
+                    int corridorPenalty = (corridorDistSq / CORRIDOR_DEVIATION) * CORRIDOR_PULL_WEIGHT;
+
+                    int f = tentativeG + (h * 3 / 2) + corridorPenalty;
                     heapSize = heapPush(heapNodes, heapCosts, heapSize, neighborPacked, f);
                 }
             }
@@ -954,6 +968,67 @@ public class BoatPathing
                 Math.abs(tileY - GraphNode.getY(last)));
 
         return distToFirst <= maxDeviation || distToLast <= maxDeviation;
+    }
+
+    /**
+     * Returns the minimum squared distance from a tile to the corridor centerline.
+     * Returns -1 if the tile is outside the corridor (> CORRIDOR_DEVIATION from all segments).
+     * Used for corridor centerline heuristic bonus - tiles closer to center get lower penalty.
+     *
+     * @param tileX Tile X coordinate
+     * @param tileY Tile Y coordinate
+     * @param nodePath List of packed graph node coordinates forming the corridor
+     * @param startX Actual start position X
+     * @param startY Actual start position Y
+     * @param targetX Actual target position X
+     * @param targetY Actual target position Y
+     * @return Minimum squared distance to corridor centerline, or -1 if outside corridor
+     */
+    private static int getCorridorDistanceSquared(int tileX, int tileY, List<Integer> nodePath,
+                                                   int startX, int startY, int targetX, int targetY)
+    {
+        if (nodePath == null || nodePath.size() < 2) {
+            return 0; // No corridor = on centerline
+        }
+
+        int minDistSq = Integer.MAX_VALUE;
+
+        // Distance to actual start position
+        int dxStart = tileX - startX;
+        int dyStart = tileY - startY;
+        int distToStartSq = dxStart * dxStart + dyStart * dyStart;
+        minDistSq = Math.min(minDistSq, distToStartSq);
+
+        // Distance to actual target position
+        int dxTarget = tileX - targetX;
+        int dyTarget = tileY - targetY;
+        int distToTargetSq = dxTarget * dxTarget + dyTarget * dyTarget;
+        minDistSq = Math.min(minDistSq, distToTargetSq);
+
+        // Distance to each path segment
+        for (int i = 0; i < nodePath.size() - 1; i++) {
+            int n1 = nodePath.get(i);
+            int n2 = nodePath.get(i + 1);
+
+            int distSq = pointToSegmentDistanceSquared(tileX, tileY,
+                    GraphNode.getX(n1), GraphNode.getY(n1),
+                    GraphNode.getX(n2), GraphNode.getY(n2));
+            minDistSq = Math.min(minDistSq, distSq);
+        }
+
+        // Distance to first/last graph nodes
+        int first = nodePath.get(0);
+        int last = nodePath.get(nodePath.size() - 1);
+        int dxFirst = tileX - GraphNode.getX(first);
+        int dyFirst = tileY - GraphNode.getY(first);
+        minDistSq = Math.min(minDistSq, dxFirst * dxFirst + dyFirst * dyFirst);
+
+        int dxLast = tileX - GraphNode.getX(last);
+        int dyLast = tileY - GraphNode.getY(last);
+        minDistSq = Math.min(minDistSq, dxLast * dxLast + dyLast * dyLast);
+
+        // Return -1 if outside corridor, otherwise the minimum distance squared
+        return minDistSq <= CORRIDOR_DEVIATION_SQUARED ? minDistSq : -1;
     }
 
     /**
