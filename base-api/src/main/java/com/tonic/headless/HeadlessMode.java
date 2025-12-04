@@ -155,7 +155,6 @@ public class HeadlessMode {
         if (mapPanel != null && mapPanelActive && Static.isHeadless() && Static.getVitaConfig().shouldShowHeadlessMap()) {
             if (mapPanel.getWidth() > 0 && mapPanel.getHeight() > 0) {
                 mapPanel.setCollisionAccessor(collisionAccessor);
-                mapPanel.setInfoText(String.format("Position: %d, %d, %d", x, y, plane));
                 mapPanel.updateMap(x, y, plane);
             }
         }
@@ -197,6 +196,16 @@ public class HeadlessMode {
     public static void clearMapDestination() {
         if (mapPanel != null) {
             mapPanel.clearDestination();
+        }
+    }
+
+    /**
+     * Set the info text provider for the headless map.
+     * Call this from api module to provide rich info using API classes.
+     */
+    public static void setMapInfoProvider(HeadlessMapPanel.MapInfoProvider provider) {
+        if (mapPanel != null) {
+            mapPanel.setInfoProvider(provider);
         }
     }
 }
