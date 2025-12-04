@@ -1147,14 +1147,114 @@ public class ProfilerWindow extends VitaFrame {
 
     // ==================== STATUS BAR ====================
 
+    private JLabel apiStatusLabel;
+
     private JPanel createStatusBar() {
-        JPanel statusBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBackground(PANEL_BG);
         statusBar.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(20, 21, 24)));
 
+        // Left side - status info
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        leftPanel.setOpaque(false);
+
         JLabel statusLabel = createStyledLabel("JVMTI: " + (JVMTI.isAvailable() ? "Available ✓" : "Unavailable ✗") + " | Auto-refresh: ON");
         statusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
-        statusBar.add(statusLabel);
+        leftPanel.add(statusLabel);
+
+        statusBar.add(leftPanel, BorderLayout.WEST);
+
+        // Right side - API server controls
+        JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+        rightPanel.setOpaque(false);
+
+        apiStatusLabel = createStyledLabel("API: Off");
+        apiStatusLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        rightPanel.add(apiStatusLabel);
+
+        // Clickable URL link label
+        JLabel apiUrlLabel = new JLabel();
+        apiUrlLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        apiUrlLabel.setForeground(ACCENT_COLOR);
+        apiUrlLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        apiUrlLabel.setVisible(false);
+        apiUrlLabel.setToolTipText("Click to copy URL to clipboard");
+
+        final String[] baseUrl = {""};  // Store clean URL
+
+        apiUrlLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                if (baseUrl[0] != null && !baseUrl[0].isEmpty()) {
+                    // Copy clean URL to clipboard (not the HTML)
+                    java.awt.datatransfer.StringSelection selection = new java.awt.datatransfer.StringSelection(baseUrl[0]);
+                    java.awt.Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
+
+                    // Show "Copied!" feedback
+                    Color originalColor = apiUrlLabel.getForeground();
+                    apiUrlLabel.setText("Copied!");
+                    apiUrlLabel.setForeground(SUCCESS_COLOR);
+
+                    // Restore after 1 second
+                    Timer restoreTimer = new Timer(1000, evt -> {
+                        apiUrlLabel.setText(baseUrl[0]);
+                        apiUrlLabel.setForeground(originalColor);
+                    });
+                    restoreTimer.setRepeats(false);
+                    restoreTimer.start();
+                }
+            }
+
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                if (!apiUrlLabel.getText().equals("Copied!")) {
+                    apiUrlLabel.setText("<html><u>" + baseUrl[0] + "</u></html>");
+                }
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                if (!apiUrlLabel.getText().equals("Copied!")) {
+                    apiUrlLabel.setText(baseUrl[0]);
+                }
+            }
+        });
+        rightPanel.add(apiUrlLabel);
+
+        JButton apiToggleBtn = new JButton("Start API");
+        apiToggleBtn.setBackground(ACCENT_COLOR);
+        apiToggleBtn.setForeground(Color.WHITE);
+        apiToggleBtn.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        apiToggleBtn.setFocusPainted(false);
+        apiToggleBtn.setBorderPainted(false);
+        apiToggleBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        apiToggleBtn.setPreferredSize(new Dimension(90, 24));
+
+        apiToggleBtn.addActionListener(e -> {
+            com.tonic.services.profiler.server.ProfilerServer server = com.tonic.services.profiler.server.ProfilerServer.getInstance();
+            if (server.isRunning()) {
+                server.stop();
+                apiToggleBtn.setText("Start API");
+                apiToggleBtn.setBackground(ACCENT_COLOR);
+                apiStatusLabel.setText("API: Off");
+                apiUrlLabel.setVisible(false);
+            } else {
+                try {
+                    server.start();
+                    apiToggleBtn.setText("Stop API");
+                    apiToggleBtn.setBackground(ERROR_COLOR);
+                    apiStatusLabel.setText("API:");
+                    baseUrl[0] = "http://localhost:" + server.getPort();
+                    apiUrlLabel.setText(baseUrl[0]);
+                    apiUrlLabel.setVisible(true);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Failed to start API server: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        rightPanel.add(apiToggleBtn);
+
+        statusBar.add(rightPanel, BorderLayout.EAST);
 
         return statusBar;
     }
