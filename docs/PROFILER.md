@@ -680,6 +680,198 @@ Regular diagnostics as baseline:
 
 ---
 
+## 9. Exact Timing (MethodProfiler)
+
+Manual method timing for precise, per-invocation measurements with nanosecond precision.
+
+### Overview
+
+Unlike sampling-based profiling which estimates time statistically, the MethodProfiler provides **exact timing** by instrumenting your code directly. This is ideal for:
+- Measuring specific code paths with precision
+- Benchmarking algorithmic changes
+- Profiling hot methods identified by the sampling profiler
+- Tracking performance across invocations (min/max/avg)
+
+**Trade-off:** Manual instrumentation required vs zero estimation error.
+
+### Features
+
+#### Enable/Disable Toggle
+- **Disabled by default** for zero runtime overhead
+- Enable via checkbox in UI or `MethodProfiler.setEnabled(true)`
+- When disabled, all profiling calls are no-ops
+
+#### Timing Table
+Displays all recorded method timings with:
+- **Method:** Label/name you assigned
+- **Calls:** Total invocation count
+- **Total Time:** Cumulative time across all calls
+- **Avg Time:** Average time per call
+- **Min:** Fastest invocation
+- **Max:** Slowest invocation
+
+#### Heat Coloring
+- **Red:** Avg time ≥100ms (very slow)
+- **Orange:** Avg time ≥10ms (slow)
+- **Yellow:** Avg time ≥1ms (moderate)
+- **Normal:** Avg time <1ms (fast)
+
+#### Filter
+Type in the filter box to show only methods whose names start with the entered prefix. Export respects the current filter.
+
+### Usage Patterns
+
+#### Pattern 1: Begin/End Pairs
+```java
+MethodProfiler.begin("MyClass.expensiveMethod");
+// ... your code ...
+MethodProfiler.end("MyClass.expensiveMethod");
+```
+
+#### Pattern 2: Try-with-Resources (Recommended)
+```java
+try (var ignored = MethodProfiler.time("MyClass.expensiveMethod")) {
+    // ... your code ...
+}
+// Automatically ends timing when scope exits
+```
+
+#### Pattern 3: Lambda (Void Operations)
+```java
+MethodProfiler.time("MyClass.expensiveMethod", () -> {
+    // ... your code ...
+});
+```
+
+#### Pattern 4: Lambda with Return Value
+```java
+Result result = MethodProfiler.timeResult("MyClass.compute", () -> {
+    return computeExpensiveValue();
+});
+```
+
+### API Reference
+
+```java
+// Enable/disable profiling
+MethodProfiler.setEnabled(boolean enabled);
+MethodProfiler.isEnabled();
+
+// Timing methods
+MethodProfiler.begin(String label);
+MethodProfiler.end(String label);
+MethodProfiler.time(String label);                    // Returns AutoCloseable
+MethodProfiler.time(String label, Runnable op);       // Times void operation
+MethodProfiler.timeResult(String label, Supplier<T>); // Times and returns value
+
+// Data access
+MethodProfiler.getAllTimings();           // List sorted by total time
+MethodProfiler.getAllTimingsByAverage();  // List sorted by average time
+MethodProfiler.getTiming(String label);   // Get specific timing
+MethodProfiler.hasData();                 // Check if any data exists
+MethodProfiler.getMethodCount();          // Count of tracked methods
+
+// Reports
+MethodProfiler.generateReport();     // Human-readable text report
+MethodProfiler.generateCSVReport();  // CSV format for spreadsheets
+
+// Management
+MethodProfiler.clear();  // Clear all recorded data
+```
+
+### Best Practices
+
+**Naming Conventions:**
+```java
+// Good: Class.method format
+MethodProfiler.begin("Walker.buildPath");
+MethodProfiler.begin("BoatPathing.expandNeighbors");
+
+// Good: Hierarchical for related operations
+MethodProfiler.begin("Pathfinding.total");
+MethodProfiler.begin("Pathfinding.astar");
+MethodProfiler.begin("Pathfinding.corridor");
+
+// Bad: Vague names
+MethodProfiler.begin("step1");
+MethodProfiler.begin("loop");
+```
+
+**Granularity Tips:**
+- Profile at method level first, then drill into loops if needed
+- Avoid profiling very fast operations (<1μs) - overhead may dominate
+- Use hierarchical labels for nested timing regions
+
+**Production Usage:**
+- Keep `MethodProfiler.setEnabled(false)` in production
+- All calls become no-ops with zero overhead when disabled
+- Safe to leave instrumentation in code permanently
+
+**Comparing Optimizations:**
+```java
+// Before optimization
+MethodProfiler.begin("Algorithm.v1");
+runOldAlgorithm();
+MethodProfiler.end("Algorithm.v1");
+
+// After optimization
+MethodProfiler.begin("Algorithm.v2");
+runNewAlgorithm();
+MethodProfiler.end("Algorithm.v2");
+
+// Compare average times in the Exact Timing tab
+```
+
+### Workflow Example
+
+**Optimizing a Hot Method:**
+```
+1. Use Sampling tab to identify hot methods (e.g., "expandNeighbors" at 40%)
+2. Add MethodProfiler instrumentation:
+
+   try (var t = MethodProfiler.time("expandNeighbors.total")) {
+       try (var t2 = MethodProfiler.time("expandNeighbors.corridorCheck")) {
+           // corridor logic
+       }
+       try (var t3 = MethodProfiler.time("expandNeighbors.heuristic")) {
+           // heuristic calculation
+       }
+   }
+
+3. Enable recording in Exact Timing tab
+4. Run workload
+5. Analyze exact breakdown of time within the method
+6. Optimize the slowest sub-operation
+7. Compare before/after using the timing data
+```
+
+### Export Formats
+
+**Text Report:**
+```
+=== MethodProfiler Report ===
+Generated: 2024-01-15T10:30:45
+Methods tracked: 5
+
+Total calls: 47,469
+Total time: 128.25ms
+
+Method                                             Calls        Total      Average          Min          Max
+--------------------------------------------------------------------------------------------------------------
+Walker.expandNeighbors                            47,469      128.25ms       2.70μs       1.20μs      15.30ms
+Walker.canBoatFit                                187,234       31.50ms       0.17μs       0.08μs       2.10ms
+...
+```
+
+**CSV Report:**
+```csv
+Method,Calls,TotalMs,AverageMs,MinMs,MaxMs
+"Walker.expandNeighbors",47469,128.250000,0.002701,0.001200,15.300000
+"Walker.canBoatFit",187234,31.500000,0.000168,0.000080,2.100000
+```
+
+---
+
 ## General Best Practices
 
 ### Performance Profiling Workflow

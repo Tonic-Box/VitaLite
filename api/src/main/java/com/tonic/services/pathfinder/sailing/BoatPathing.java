@@ -742,6 +742,8 @@ public class BoatPathing
             Int2IntOpenHashMap parents = new Int2IntOpenHashMap();
             Int2IntOpenHashMap proximityCache = new Int2IntOpenHashMap();
             IntOpenHashSet closedSet = new IntOpenHashSet();
+            IntOpenHashSet corridorYes = new IntOpenHashSet();  // tiles confirmed IN corridor
+            IntOpenHashSet corridorNo = new IntOpenHashSet();   // tiles confirmed OUTSIDE corridor
             gScores.defaultReturnValue(Integer.MAX_VALUE);
             parents.defaultReturnValue(-2);
             proximityCache.defaultReturnValue(-1);
@@ -775,7 +777,8 @@ public class BoatPathing
                 heapSize = expandNeighborsAStarCorridor(cache, collisionMap, current, currentG,
                         targetX, targetY, gScores, parents, proximityCache, closedSet,
                         heapNodes, heapCosts, heapSize, avoidTiles, startPacked, nodePath,
-                        start.getX(), start.getY(), adjustedTarget.getX(), adjustedTarget.getY());
+                        start.getX(), start.getY(), adjustedTarget.getX(), adjustedTarget.getY(),
+                        corridorYes, corridorNo);
             }
 
             return null;
@@ -797,7 +800,8 @@ public class BoatPathing
             int[] heapNodes, int[] heapCosts, int heapSize,
             IntOpenHashSet avoidTiles, int startPacked,
             List<Integer> nodePath,
-            int startWorldX, int startWorldY, int targetWorldX, int targetWorldY)
+            int startWorldX, int startWorldY, int targetWorldX, int targetWorldY,
+            IntOpenHashSet corridorYes, IntOpenHashSet corridorNo)
     {
         MethodProfiler.begin("BoatPathing.expandNeighborsAStarCorridor");
         try {
@@ -818,10 +822,20 @@ public class BoatPathing
 
                 if (closedSet.contains(neighborPacked)) continue;
 
-                // Corridor constraint: skip tiles outside the corridor
-                if (!isWithinCorridor(nx, ny, nodePath, CORRIDOR_DEVIATION,
-                        startWorldX, startWorldY, targetWorldX, targetWorldY)) {
-                    continue;
+                // Corridor constraint: skip tiles outside the corridor (with caching)
+                if (!corridorYes.contains(neighborPacked)) {
+                    if (corridorNo.contains(neighborPacked)) {
+                        continue;  // Known to be outside corridor
+                    }
+                    // Not cached - compute and cache result
+                    boolean inCorridor = isWithinCorridor(nx, ny, nodePath, CORRIDOR_DEVIATION,
+                            startWorldX, startWorldY, targetWorldX, targetWorldY);
+                    if (inCorridor) {
+                        corridorYes.add(neighborPacked);
+                    } else {
+                        corridorNo.add(neighborPacked);
+                        continue;
+                    }
                 }
 
                 // Hull collision check
