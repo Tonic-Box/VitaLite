@@ -160,4 +160,43 @@ public class HeadlessMode {
             }
         }
     }
+
+    /**
+     * Set the left-click handler for the headless map.
+     * Call this from api module to set up click actions with access to MovementAPI etc.
+     */
+    public static void setMapLeftClickHandler(HeadlessMapPanel.MapClickHandler handler) {
+        if (mapPanel != null) {
+            mapPanel.setLeftClickHandler(handler);
+        }
+    }
+
+    /**
+     * Set the context menu provider for the headless map.
+     * Call this from api module to set up right-click menu with access to MovementAPI etc.
+     */
+    public static void setMapContextMenuProvider(HeadlessMapPanel.MapContextMenuProvider provider) {
+        if (mapPanel != null) {
+            mapPanel.setContextMenuProvider(provider);
+        }
+    }
+
+    /**
+     * Set the destination marker on the headless map.
+     * The marker will auto-clear when the player reaches it.
+     */
+    public static void setMapDestination(int x, int y, int plane) {
+        if (mapPanel != null) {
+            mapPanel.setDestination(x, y, plane);
+        }
+    }
+
+    /**
+     * Clear the destination marker on the headless map.
+     */
+    public static void clearMapDestination() {
+        if (mapPanel != null) {
+            mapPanel.clearDestination();
+        }
+    }
 }

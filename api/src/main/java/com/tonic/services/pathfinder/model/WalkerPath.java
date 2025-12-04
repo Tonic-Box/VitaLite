@@ -138,7 +138,7 @@ public class WalkerPath
         GameManager.clearPathPoints();
     }
 
-    private boolean isDone()
+    public boolean isDone()
     {
         boolean value = steps.isEmpty();
         if(value)

@@ -135,7 +135,6 @@ public class Walker
 
     private static boolean walk(WalkerPath walkerPath, BooleanSupplier stopCondition)
     {
-        Client client = Static.getClient();
         try
         {
             WorldPoint end = walkerPath.getSteps().get(walkerPath.getSteps().size() - 1).getPosition();

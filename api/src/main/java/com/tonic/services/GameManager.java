@@ -36,6 +36,7 @@ import com.tonic.util.handler.StepHandler;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.api.coords.WorldPoint;
@@ -82,6 +83,8 @@ public class GameManager extends Overlay {
     private static final List<NpcEx> npcs = new ArrayList<>();
     private static final List<PlayerEx> players = new ArrayList<>();
     private static final List<TileItemEx> tileItemCache = new CopyOnWriteArrayList<>();
+    @Setter
+    @Getter
     private static WalkerPath walkerPath;
     private static volatile StepHandler sailingPath;
     private static final TIntSet reachableTiles = new TIntHashSet();
@@ -552,6 +555,11 @@ public class GameManager extends Overlay {
 
         // Update headless map view if active
         if (Static.isHeadless() && Static.getVitaConfig().shouldShowHeadlessMap()) {
+            // Initialize click handlers once when map panel becomes available
+            if (!HeadlessMapInteraction.isInitialized()) {
+                HeadlessMapInteraction.initialize();
+            }
+
             WorldPoint pos = PlayerEx.getLocal().getWorldPoint();
             HeadlessMode.updateMap(pos.getX(), pos.getY(), pos.getPlane(),
                     (x, y, plane) -> Walker.getCollisionMap().all((short) x, (short) y, (byte) plane));
