@@ -30,7 +30,7 @@ public class MethodHookTransformer
             return;
         }
 
-        InsnList call = MethodUtil.generateContextAwareInvoke(mixin, toHook, method, true);
+        InsnList call = MethodUtil.generateContextAwareInvoke(gamepack, toHook, method, true);
 
         AbstractInsnNode injectionPoint = null;
 

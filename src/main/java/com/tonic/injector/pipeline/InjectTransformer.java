@@ -19,21 +19,22 @@ public class InjectTransformer
      * @param fromClass source mixin class
      * @param method method to inject
      */
-    public static void patch(ClassNode toClass, ClassNode fromClass, MethodNode method)
+    public static MethodNode patch(ClassNode toClass, ClassNode fromClass, MethodNode method)
     {
         if(method.name.equals("<init>") && method.desc.equals("()V"))
-            return;
+            return null;
 
-        boolean methodExists = toClass.methods.stream()
-                .anyMatch(m -> m.name.equals(method.name) && m.desc.equals(method.desc));
+        MethodNode methodExists = toClass.methods.stream()
+                .filter(m -> m.name.equals(method.name) && m.desc.equals(method.desc)).findFirst().orElse(null);
 
-        if(methodExists)
-            return;
+        if(methodExists != null)
+            return methodExists;
 
         MethodNode copyMethod = MethodUtil.copyMethod(method, method.name, fromClass, toClass);
         if(copyMethod.visibleAnnotations != null)
             copyMethod.visibleAnnotations.removeIf(a -> a.desc.contains("com/tonic"));
         toClass.methods.add(copyMethod);
+        return copyMethod;
     }
 
     /**
