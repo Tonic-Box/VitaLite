@@ -1,14 +1,12 @@
 package com.tonic.services;
 
 import com.tonic.Logger;
-import com.tonic.api.game.MovementAPI;
+import com.tonic.data.RegionInfo;
 import com.tonic.headless.HeadlessMode;
-import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.util.ThreadPool;
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -37,6 +35,7 @@ public class HeadlessMapInteraction {
 
         HeadlessMode.setMapLeftClickHandler(HeadlessMapInteraction::onLeftClick);
         HeadlessMode.setMapContextMenuProvider(HeadlessMapInteraction::createContextMenu);
+        HeadlessMode.setMapInfoProvider(HeadlessMapInteraction::getInfoLines);
 
         initialized = true;
         Logger.info("Headless map click handlers initialized");
@@ -81,6 +80,21 @@ public class HeadlessMapInteraction {
     private static void copyToClipboard(String text) {
         Toolkit.getDefaultToolkit().getSystemClipboard()
             .setContents(new StringSelection(text), null);
+    }
+
+    /**
+     * Generate info lines for the map overlay.
+     * Can access all API classes here for rich data display.
+     */
+    private static java.util.List<String> getInfoLines(int playerX, int playerY, int plane) {
+        int regionId = ((playerX >> 6) << 8) | (playerY >> 6);
+        RegionInfo regionInfo = RegionInfo.fromRegion(regionId);
+        java.util.List<String> lines = new java.util.ArrayList<>();
+        lines.add(String.format("Position: %d, %d, %d", playerX, playerY, plane));
+        lines.add(String.format("RegionId: %d", ((playerX >> 6) << 8) | (playerY >> 6)));
+        lines.add(String.format("Location: %s", regionInfo != null ? regionInfo.getAreaName() : "Unknown"));
+
+        return lines;
     }
 
     private static void walkTo(int worldX, int worldY, int plane) {

@@ -95,6 +95,7 @@ public class HeadlessMapPanel extends JPanel {
     // Click handlers
     private MapClickHandler leftClickHandler;
     private MapContextMenuProvider contextMenuProvider;
+    private MapInfoProvider infoProvider;
 
     /**
      * Functional interface for collision map access.
@@ -119,6 +120,14 @@ public class HeadlessMapPanel extends JPanel {
     @FunctionalInterface
     public interface MapContextMenuProvider {
         JPopupMenu getContextMenu(int worldX, int worldY, int plane);
+    }
+
+    /**
+     * Functional interface for providing info text to display on the map.
+     */
+    @FunctionalInterface
+    public interface MapInfoProvider {
+        java.util.List<String> getInfoLines(int playerX, int playerY, int plane);
     }
 
     public HeadlessMapPanel() {
@@ -310,6 +319,13 @@ public class HeadlessMapPanel extends JPanel {
     }
 
     /**
+     * Set the provider for info text displayed on the map.
+     */
+    public void setInfoProvider(MapInfoProvider provider) {
+        this.infoProvider = provider;
+    }
+
+    /**
      * Set the destination marker position.
      * Pass -1 for any coordinate to clear the marker.
      */
@@ -413,6 +429,11 @@ public class HeadlessMapPanel extends JPanel {
             viewCenterX = playerX;
             viewCenterY = playerY;
             viewPlane = plane;
+        }
+
+        // Update info text from provider
+        if (infoProvider != null) {
+            setInfoLines(infoProvider.getInfoLines(playerX, playerY, plane));
         }
 
         redrawMap();
