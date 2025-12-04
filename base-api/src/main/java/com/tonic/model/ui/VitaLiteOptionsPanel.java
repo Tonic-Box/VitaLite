@@ -51,6 +51,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ToggleSlider sendMouseMovement;
     private final ToggleSlider recordTrajectory;
     private Timer trajectoryCheckTimer;
+    private boolean shouldRestoreGpu = false;
 
     private VitaLiteOptionsPanel() {
         super(false);
