@@ -185,6 +185,9 @@ public class TileObjectEx implements Entity
             WorldView wv = getWorldView();
             GameObject go = (GameObject) tileObject;
             Point p = go.getSceneMinLocation();
+            if (wv == null || p == null) {
+                return wp;  // Fallback to base location if scene data unavailable
+            }
             wp = WorldPoint.fromScene(wv, p.getX(), p.getY(), wv.getPlane());
         }
         return wp;
