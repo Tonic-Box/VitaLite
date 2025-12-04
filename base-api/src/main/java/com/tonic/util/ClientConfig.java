@@ -116,4 +116,10 @@ public interface ClientConfig extends VitaConfig {
     boolean getDrawBoatDebug();
     @ConfigKey(value = "boatDebug")
     void setDrawBoatDebug(boolean draw);
+
+    // Headless map view
+    @ConfigKey(value = "headlessMapView", defaultValue = "true")
+    boolean shouldShowHeadlessMap();
+    @ConfigKey(value = "headlessMapView")
+    void setShowHeadlessMap(boolean show);
 }
