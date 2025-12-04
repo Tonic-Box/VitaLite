@@ -3,6 +3,7 @@ package com.tonic.headless;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.util.ReflectBuilder;
+import lombok.Getter;
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,14 +13,14 @@ public class HeadlessMode {
     private static final JFrame frame;
     private static final JTabbedPane sidebar;
     private static RestoreSize clientPanelSize;
-
-    // Map panel for headless mode visualization - overlay approach
+    @Getter
     private static HeadlessMapPanel mapPanel;
+    @Getter
     private static boolean mapPanelActive = false;
-
-    // Wrapper panel that holds both clientPanel and mapPanel as overlays
     private static JLayeredPane wrapperPane;
     private static boolean wrapperInstalled = false;
+
+    private static Object shouldRestoreGpu = null;
 
     static
     {
@@ -48,16 +49,12 @@ public class HeadlessMode {
 
         boolean showMap = Static.getVitaConfig().shouldShowHeadlessMap();
 
-        Logger.info("[HeadlessDebug] === Toggle headless=" + headless + " showMap=" + showMap + " ===");
-
         if (headless && showMap) {
-            // OVERLAY APPROACH: Don't remove clientPanel from hierarchy
-            // Instead, overlay mapPanel on top using JLayeredPane
+            shouldRestoreGpu = Static.getRuneLite().getPluginManager().stopPlugin("net.runelite.client.plugins.gpu.GpuPlugin");
 
             if (mapPanel == null) {
                 mapPanel = new HeadlessMapPanel();
                 mapPanel.setOpaque(true);
-                Logger.info("[HeadlessDebug] Created new HeadlessMapPanel");
             }
 
             if (!mapPanelActive) {
@@ -67,15 +64,12 @@ public class HeadlessMode {
                     return;
                 }
 
-                // Ensure sidebar is visible
                 if (!sidebar.isVisible() || sidebar.getSelectedIndex() < 0) {
                     ReflectBuilder.of(clientUI)
                             .method("togglePluginPanel", null, null);
                 }
 
                 if (!wrapperInstalled) {
-                    // First time: Install the wrapper JLayeredPane
-                    // This replaces clientPanel at index 0 with a layered pane containing both
                     int clientIndex = -1;
                     for (int i = 0; i < content.getComponentCount(); i++) {
                         if (content.getComponent(i) == clientPanel) {
@@ -85,41 +79,31 @@ public class HeadlessMode {
                     }
 
                     if (clientIndex < 0) {
-                        Logger.info("[HeadlessDebug] ERROR: clientPanel not found in content");
+                        Logger.error("[HeadlessDebug] ERROR: clientPanel not found in content");
                         return;
                     }
 
-                    Logger.info("[HeadlessDebug] Installing wrapper at index " + clientIndex);
-
-                    // Create layered pane
                     wrapperPane = new JLayeredPane();
                     wrapperPane.setLayout(new OverlayLayout(wrapperPane));
 
-                    // Remove clientPanel, add wrapper, add clientPanel to wrapper
                     Dimension clientSize = clientPanel.getSize();
                     content.remove(clientPanel);
 
-                    // Add clientPanel to bottom layer
                     clientPanel.setAlignmentX(0.5f);
                     clientPanel.setAlignmentY(0.5f);
                     wrapperPane.add(clientPanel, JLayeredPane.DEFAULT_LAYER);
 
-                    // Set wrapper size to match
                     wrapperPane.setPreferredSize(clientSize);
                     wrapperPane.setMinimumSize(clientSize);
                     wrapperPane.setSize(clientSize);
 
-                    // Add wrapper to content at original position
                     content.add(wrapperPane, clientIndex);
 
                     wrapperInstalled = true;
                     content.revalidate();
                     content.repaint();
-
-                    Logger.info("[HeadlessDebug] Wrapper installed, clientPanel in DEFAULT_LAYER");
                 }
 
-                // Add mapPanel to top layer (above clientPanel)
                 mapPanel.setAlignmentX(0.5f);
                 mapPanel.setAlignmentY(0.5f);
                 mapPanel.setSize(clientPanel.getSize());
@@ -129,11 +113,8 @@ public class HeadlessMode {
                 mapPanelActive = true;
                 wrapperPane.revalidate();
                 wrapperPane.repaint();
-
-                Logger.info("[HeadlessDebug] MapPanel added to PALETTE_LAYER (overlay on top)");
             }
-        } else if (headless && !showMap) {
-            // Original headless behavior - just hide/shrink client panel
+        } else if (headless) {
             clientPanel.setVisible(false);
             if (!sidebar.isVisible() || sidebar.getSelectedIndex() < 0) {
                 ReflectBuilder.of(clientUI)
@@ -142,30 +123,23 @@ public class HeadlessMode {
             clientPanelSize = new RestoreSize(clientPanel);
             clientPanelSize.hide(clientPanel);
         } else {
-            // Restoring from headless mode
-            Logger.info("[HeadlessDebug] RESTORE: mapPanelActive=" + mapPanelActive);
-
             if (mapPanelActive && wrapperPane != null) {
-                // Simply remove the overlay - clientPanel never left the hierarchy!
                 mapPanel.clearMap();
                 wrapperPane.remove(mapPanel);
                 mapPanelActive = false;
 
                 wrapperPane.revalidate();
                 wrapperPane.repaint();
-
-                Logger.info("[HeadlessDebug] MapPanel removed from overlay, clientPanel was never removed");
             } else if (clientPanelSize != null) {
-                // Restore non-map headless mode size (was hidden, not swapped)
                 clientPanelSize.restore(clientPanel);
             }
 
-            // Restore client panel visibility
             clientPanel.setVisible(true);
-            Logger.info("[HeadlessDebug] Set clientPanel.visible=true");
+            if (shouldRestoreGpu != null) {
+                Static.getRuneLite().getPluginManager().startPlugin(shouldRestoreGpu);
+                shouldRestoreGpu = null;
+            }
         }
-
-        Logger.info("[HeadlessDebug] === Toggle complete ===");
     }
 
     /**
@@ -185,19 +159,5 @@ public class HeadlessMode {
                 mapPanel.updateMap(x, y, plane);
             }
         }
-    }
-
-    /**
-     * Get the map panel for direct access if needed.
-     */
-    public static HeadlessMapPanel getMapPanel() {
-        return mapPanel;
-    }
-
-    /**
-     * Check if the map panel is currently active.
-     */
-    public static boolean isMapPanelActive() {
-        return mapPanelActive;
     }
 }

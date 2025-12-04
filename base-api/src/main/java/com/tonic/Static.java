@@ -6,6 +6,7 @@ import com.tonic.headless.HeadlessMode;
 import com.tonic.model.RuneLite;
 import com.tonic.util.ClientConfig;
 import com.tonic.util.RuneliteConfigUtil;
+import com.tonic.util.ThreadPool;
 import com.tonic.util.config.ConfigFactory;
 import lombok.Getter;
 import lombok.Setter;

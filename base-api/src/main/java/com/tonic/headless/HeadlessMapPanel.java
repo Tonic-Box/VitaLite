@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
@@ -45,6 +47,14 @@ public class HeadlessMapPanel extends JPanel {
     private int tilesX;        // Number of tiles visible horizontally
     private int tilesY;        // Number of tiles visible vertically
 
+    // Zoom control
+    private static final int MIN_TILE_SIZE = 1;
+    private static final int MAX_TILE_SIZE = 16;
+    private int zoomTileSize = 4;  // User-controlled tile size (pixels per tile)
+
+    // Last known player position for immediate redraw on zoom
+    private int lastPlayerX, lastPlayerY, lastPlane;
+
     // Info overlay - extensible list of info lines
     private final java.util.List<String> infoLines = new java.util.ArrayList<>();
 
@@ -76,6 +86,26 @@ public class HeadlessMapPanel extends JPanel {
                 recreateImage();
             }
         });
+
+        // Mouse wheel zoom
+        addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int rotation = e.getWheelRotation();
+                if (rotation < 0) {
+                    // Scroll up = zoom in (larger tiles)
+                    zoomTileSize = Math.min(MAX_TILE_SIZE, zoomTileSize + 1);
+                } else {
+                    // Scroll down = zoom out (smaller tiles)
+                    zoomTileSize = Math.max(MIN_TILE_SIZE, zoomTileSize - 1);
+                }
+                recreateImage();
+                // Immediately redraw with last known position to prevent flash
+                if (collisionAccessor != null) {
+                    updateMap(lastPlayerX, lastPlayerY, lastPlane);
+                }
+            }
+        });
     }
 
     /**
@@ -86,17 +116,15 @@ public class HeadlessMapPanel extends JPanel {
     }
 
     /**
-     * Recreate the backing image when panel is resized.
+     * Recreate the backing image when panel is resized or zoom changes.
      */
     private void recreateImage() {
         int w = getWidth();
         int h = getHeight();
         if (w <= 0 || h <= 0) return;
 
-        // Calculate tile size to fill the panel nicely
-        // Aim for ~4-6 pixels per tile, adjust based on panel size
-        int minDimension = Math.min(w, h);
-        tileSize = Math.max(2, Math.min(8, minDimension / 100));
+        // Use user-controlled zoom tile size
+        tileSize = zoomTileSize;
 
         tilesX = w / tileSize;
         tilesY = h / tileSize;
@@ -104,6 +132,10 @@ public class HeadlessMapPanel extends JPanel {
         // Make sure we have odd tile counts so player is centered
         if (tilesX % 2 == 0) tilesX--;
         if (tilesY % 2 == 0) tilesY--;
+
+        // Ensure minimum tile counts
+        tilesX = Math.max(3, tilesX);
+        tilesY = Math.max(3, tilesY);
 
         imageWidth = tilesX * tileSize;
         imageHeight = tilesY * tileSize;
@@ -116,6 +148,11 @@ public class HeadlessMapPanel extends JPanel {
      * Update the map display with the player's current position.
      */
     public void updateMap(int playerX, int playerY, int plane) {
+        // Save position for immediate redraw on zoom
+        this.lastPlayerX = playerX;
+        this.lastPlayerY = playerY;
+        this.lastPlane = plane;
+
         if (mapImage == null || collisionAccessor == null) {
             recreateImage();
             if (mapImage == null) return;
