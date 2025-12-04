@@ -296,6 +296,8 @@ tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shad
     exclude("com/tonic/services/profiler/**")
     exclude("com/tonic/services/pathfinder/ui/**")
     exclude("com/tonic/injector/**")
+    exclude("com/tonic/mixin/**")
+    exclude("com/tonic/rlmixin/**")
     exclude("**/mappings.json")
 
     transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer::class.java) {
