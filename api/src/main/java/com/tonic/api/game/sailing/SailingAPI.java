@@ -7,25 +7,16 @@ import com.tonic.api.game.GameAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.SailingConstants;
-import com.tonic.data.wrappers.NpcEx;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileObjectEx;
-import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
-import lombok.Getter;
-import lombok.Setter;
 import net.runelite.api.MenuAction;
 import net.runelite.api.WorldEntity;
 import net.runelite.api.WorldView;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.gameval.NpcID;
-import net.runelite.api.gameval.ObjectID;
 import net.runelite.api.gameval.VarbitID;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Sailing API
