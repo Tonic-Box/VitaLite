@@ -84,6 +84,7 @@ public class RecordingTab extends JPanel {
     private DefaultTableModel exactTimingModel;
     private JLabel exactTimingSummaryLabel;
     private JCheckBox methodProfilerEnabledCheckbox;
+    private JTextField exactTimingFilterField;
 
     // State
     private Timer statusTimer;
@@ -458,6 +459,27 @@ public class RecordingTab extends JPanel {
         infoLabel.setForeground(TEXT_COLOR);
         infoPanel.add(infoLabel, BorderLayout.CENTER);
 
+        // Right side controls panel
+        JPanel controlsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        controlsPanel.setBackground(new Color(50, 52, 56));
+
+        // Filter field
+        controlsPanel.add(createStyledLabel("Filter:"));
+        exactTimingFilterField = new JTextField(15);
+        styleTextField(exactTimingFilterField);
+        exactTimingFilterField.setToolTipText("Filter by method name prefix");
+        exactTimingFilterField.addActionListener(e -> refreshExactTimingTable());
+        // Also refresh on each key release for live filtering
+        exactTimingFilterField.addKeyListener(new java.awt.event.KeyAdapter() {
+            @Override
+            public void keyReleased(java.awt.event.KeyEvent e) {
+                refreshExactTimingTable();
+            }
+        });
+        controlsPanel.add(exactTimingFilterField);
+
+        controlsPanel.add(Box.createHorizontalStrut(10));
+
         // Enable/disable toggle
         methodProfilerEnabledCheckbox = new JCheckBox("Enable Recording");
         methodProfilerEnabledCheckbox.setBackground(new Color(50, 52, 56));
@@ -472,7 +494,9 @@ public class RecordingTab extends JPanel {
                 exactTimingSummaryLabel.setText("Recording disabled - MethodProfiler calls are no-op (zero overhead)");
             }
         });
-        infoPanel.add(methodProfilerEnabledCheckbox, BorderLayout.EAST);
+        controlsPanel.add(methodProfilerEnabledCheckbox);
+
+        infoPanel.add(controlsPanel, BorderLayout.EAST);
 
         panel.add(infoPanel, BorderLayout.NORTH);
 
@@ -734,7 +758,17 @@ public class RecordingTab extends JPanel {
 
         List<MethodProfiler.MethodTiming> timings = MethodProfiler.getAllTimingsByAverage();
 
-        for (MethodProfiler.MethodTiming timing : timings) {
+        // Apply filter if present
+        String filterText = exactTimingFilterField != null ? exactTimingFilterField.getText().trim().toLowerCase() : "";
+        List<MethodProfiler.MethodTiming> filteredTimings = timings;
+        if (!filterText.isEmpty()) {
+            filteredTimings = timings.stream()
+                .filter(t -> t.getLabel().toLowerCase().startsWith(filterText) ||
+                             t.getDisplayName().toLowerCase().startsWith(filterText))
+                .collect(java.util.stream.Collectors.toList());
+        }
+
+        for (MethodProfiler.MethodTiming timing : filteredTimings) {
             exactTimingModel.addRow(new Object[]{
                 timing.getDisplayName(),
                 timing.getCallCount(),
@@ -745,12 +779,13 @@ public class RecordingTab extends JPanel {
             });
         }
 
-        long totalCalls = timings.stream().mapToLong(MethodProfiler.MethodTiming::getCallCount).sum();
-        double totalMs = timings.stream().mapToDouble(MethodProfiler.MethodTiming::getTotalMs).sum();
+        long totalCalls = filteredTimings.stream().mapToLong(MethodProfiler.MethodTiming::getCallCount).sum();
+        double totalMs = filteredTimings.stream().mapToDouble(MethodProfiler.MethodTiming::getTotalMs).sum();
 
+        String filterInfo = filterText.isEmpty() ? "" : String.format(" (filtered from %d)", timings.size());
         exactTimingSummaryLabel.setText(String.format(
-            "%d methods | %,d calls | %s total",
-            timings.size(), totalCalls, formatTime((long) totalMs)));
+            "%d methods%s | %,d calls | %s total",
+            filteredTimings.size(), filterInfo, totalCalls, formatTime((long) totalMs)));
     }
 
     private void clearResults() {
@@ -833,14 +868,70 @@ public class RecordingTab extends JPanel {
 
         if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
             try (PrintWriter writer = new PrintWriter(new FileWriter(chooser.getSelectedFile()))) {
-                if (csv) {
-                    writer.print(MethodProfiler.generateCSVReport());
-                } else {
-                    writer.print(MethodProfiler.generateReport());
+                // Get filter and apply to export
+                String filterText = exactTimingFilterField != null ? exactTimingFilterField.getText().trim().toLowerCase() : "";
+                List<MethodProfiler.MethodTiming> timings = MethodProfiler.getAllTimings();
+
+                if (!filterText.isEmpty()) {
+                    timings = timings.stream()
+                        .filter(t -> t.getLabel().toLowerCase().startsWith(filterText) ||
+                                     t.getDisplayName().toLowerCase().startsWith(filterText))
+                        .collect(java.util.stream.Collectors.toList());
                 }
 
+                if (csv) {
+                    // Generate filtered CSV
+                    writer.println("Method,Calls,TotalMs,AverageMs,MinMs,MaxMs");
+                    for (MethodProfiler.MethodTiming timing : timings) {
+                        writer.printf("\"%s\",%d,%.6f,%.6f,%.6f,%.6f%n",
+                            timing.getLabel().replace("\"", "\"\""),
+                            timing.getCallCount(),
+                            timing.getTotalMs(),
+                            timing.getAverageMs(),
+                            timing.getMinMs(),
+                            timing.getMaxMs());
+                    }
+                } else {
+                    // Generate filtered text report
+                    writer.println("=== MethodProfiler Report ===");
+                    writer.printf("Generated: %s%n", java.time.LocalDateTime.now());
+                    if (!filterText.isEmpty()) {
+                        writer.printf("Filter: \"%s\"%n", filterText);
+                    }
+                    writer.printf("Methods tracked: %d%n%n", timings.size());
+
+                    if (timings.isEmpty()) {
+                        writer.println("No data recorded (or all filtered out).");
+                    } else {
+                        long totalCalls = timings.stream().mapToLong(MethodProfiler.MethodTiming::getCallCount).sum();
+                        double totalMs = timings.stream().mapToDouble(MethodProfiler.MethodTiming::getTotalMs).sum();
+
+                        writer.printf("Total calls: %,d%n", totalCalls);
+                        writer.printf("Total time: %.2fms%n%n", totalMs);
+
+                        writer.printf("%-50s %12s %12s %12s %12s %12s%n",
+                            "Method", "Calls", "Total", "Average", "Min", "Max");
+                        writer.println("-".repeat(110));
+
+                        for (MethodProfiler.MethodTiming timing : timings) {
+                            String label = timing.getLabel();
+                            if (label.length() > 50) {
+                                label = label.substring(0, 47) + "...";
+                            }
+                            writer.printf("%-50s %,12d %12s %12s %12s %12s%n",
+                                label,
+                                timing.getCallCount(),
+                                timing.getFormattedTotalTime(),
+                                timing.getFormattedAverageTime(),
+                                timing.getFormattedMinTime(),
+                                timing.getFormattedMaxTime());
+                        }
+                    }
+                }
+
+                String filterNote = filterText.isEmpty() ? "" : " (filtered)";
                 JOptionPane.showMessageDialog(this,
-                    "Exported to: " + chooser.getSelectedFile().getName(),
+                    "Exported to: " + chooser.getSelectedFile().getName() + filterNote,
                     "Export Complete", JOptionPane.INFORMATION_MESSAGE);
 
             } catch (Exception e) {
