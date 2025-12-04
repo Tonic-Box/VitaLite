@@ -1,4 +1,4 @@
-package com.tonic.injector.util;
+package com.tonic.patch;
 
 import com.tonic.injector.annotations.At;
 import com.tonic.injector.annotations.AtTarget;

@@ -1,4 +1,4 @@
-package com.tonic.injector.util;
+package com.tonic.patch;
 
 import com.tonic.VitaLite;
 import com.tonic.vitalite.Main;

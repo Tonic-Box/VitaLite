@@ -1,7 +1,7 @@
 package com.tonic.rlmixins;
 
 import com.tonic.injector.annotations.*;
-import com.tonic.injector.util.BytecodeBuilder;
+import com.tonic.util.asm.BytecodeBuilder;
 import org.objectweb.asm.tree.*;
 
 @Mixin("net/runelite/client/eventbus/EventBus")

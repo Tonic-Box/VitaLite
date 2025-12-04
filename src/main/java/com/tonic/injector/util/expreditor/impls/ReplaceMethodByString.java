@@ -1,6 +1,6 @@
 package com.tonic.injector.util.expreditor.impls;
 
-import com.tonic.injector.util.BytecodeBuilder;
+import com.tonic.util.asm.BytecodeBuilder;
 import com.tonic.injector.util.expreditor.ExprEditor;
 import com.tonic.injector.util.expreditor.LiteralValue;
 import org.objectweb.asm.Opcodes;

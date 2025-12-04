@@ -1,8 +1,7 @@
 package com.tonic.classloader;
 
 import com.tonic.VitaLite;
-import com.tonic.injector.util.SignerMapper;
-import com.tonic.runelite.Install;
+import com.tonic.util.asm.SignerMapper;
 import com.tonic.vitalite.Main;
 import com.tonic.model.Libs;
 

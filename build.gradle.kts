@@ -211,11 +211,9 @@ val runeliteVersions by lazy { getRuneLiteArtifacts() }
 dependencies {
     compileOnly("net.runelite:runelite-api:$runeliteVersion")
 
-    implementation("org.projectlombok:lombok:1.18.24")
+    compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
-    implementation("com.google.code.findbugs:jsr305:3.0.2")
     compileOnly("org.jetbrains:annotations:24.1.0")
-
     implementation("org.slf4j:slf4j-api:2.0.13")
     runtimeOnly("org.slf4j:slf4j-simple:2.0.13")
 
@@ -247,36 +245,84 @@ dependencies {
     implementation("io.sigpipe:jbsdiff:1.0")
 
     implementation("com.github.javaparser:javaparser-symbol-solver-core:3.25.5")
-
-//    implementation("com.lmax:disruptor:3.4.4")
-//    implementation("org.jctools:jctools-core:4.0.5")
-//    implementation("com.fasterxml.jackson.core:jackson-core:2.15.2")
-//    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
-//    implementation("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
-//    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
-//    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2")
-//    implementation("com.sun.mail:javax.mail:1.6.2")
-//    implementation("org.osgi:org.osgi.framework:1.10.0")
-//    implementation("org.conscrypt:conscrypt-openjdk-uber:2.5.2")
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
+// Release-specific shadow jar with additional exclusions
+tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJarRelease") {
+    group = "release-pipeline"
+    dependsOn("copySubmoduleJar", "copySubmoduleJar2")
+
+    from(sourceSets.main.get().output)
+    configurations = listOf(project.configurations.runtimeClasspath.get())
+
+    archiveBaseName.set("VitaLite")
+    archiveClassifier.set("release-shaded")
+    isZip64 = true
+
+    manifest {
+        attributes(
+            "Main-Class" to "com.tonic.VitaLite",
+            "Implementation-Version" to project.version,
+            "Implementation-Title" to "VitaLite",
+            "Implementation-Vendor" to "Tonic",
+            "Multi-Release" to "true"
+        )
+    }
+
+    mergeServiceFiles()
+
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.DSA")
+    exclude("META-INF/*.RSA")
+    exclude("module-info.class")
+
+    // Existing API package exclusions
+    exclude {
+        val path = it.path
+        val isInApiPackage = path.startsWith("net/runelite/api/") && path.endsWith(".class")
+        val whitelist = setOf(
+            "net/runelite/api/gameval/ItemID.class",
+            "net/runelite/api/gameval/InterfaceID.class",
+            "net/runelite/api/gameval/ObjectID.class",
+            "net/runelite/api/gameval/ObjectID1.class"
+        )
+        isInApiPackage && path !in whitelist
+    }
+
+    exclude("com/tonic/services/profiler/**")
+    exclude("com/tonic/services/pathfinder/ui/**")
+    exclude("com/tonic/injector/**")
+    exclude("**/mappings.json")
+
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer::class.java) {
+        resource = "META-INF/services/javax.swing.LookAndFeel"
+    }
+
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer::class.java) {
+        resource = "META-INF/services/java.nio.file.spi.FileSystemProvider"
+    }
+}
+
+// Package release using the release shadow jar
 tasks.register<Zip>("packageRelease") {
-    dependsOn("shadowJar")
+    group = "release-pipeline"
+    dependsOn("shadowJarRelease")
 
-    val shadowJarTask = tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar")
+    val shadowJarTask = tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJarRelease")
 
-    // Output zip name: VitaLite-1.12.7_1.zip (version without -shaded)
     archiveBaseName.set("VitaLite")
     archiveVersion.set(project.version.toString())
     archiveClassifier.set("")
     destinationDirectory.set(layout.buildDirectory.dir("libs"))
 
-    // Include the shaded jar, renamed to VitaLite.jar
     from(shadowJarTask.flatMap { it.archiveFile }) {
         rename { "VitaLite.jar" }
     }
 
-    // Include the run scripts from the same directory as the shaded jar
     from("scripts") {
         include("run-linux.sh")
         include("run-mac.sh")
@@ -284,6 +330,15 @@ tasks.register<Zip>("packageRelease") {
     }
 }
 
-tasks.test {
-    useJUnitPlatform()
+// Build release: publish all + package release
+tasks.register("buildRelease") {
+    group = "release-pipeline"
+    description = "Builds and publishes all projects, then creates release package"
+
+    dependsOn(tasks.named("publishToMavenLocal"))
+    subprojects.forEach {
+        dependsOn(it.tasks.named("publishToMavenLocal"))
+    }
+
+    finalizedBy("packageRelease")
 }

@@ -2,6 +2,10 @@ package com.tonic.injector;
 
 import com.tonic.injector.util.AnnotationUtil;
 import com.tonic.injector.util.*;
+import com.tonic.patch.PatchGenerator;
+import com.tonic.util.MappingProvider;
+import com.tonic.util.asm.ClassNodeUtil;
+import com.tonic.util.asm.SignerMapper;
 import com.tonic.vitalite.Main;
 import com.tonic.util.dto.JClass;
 import com.tonic.injector.annotations.*;

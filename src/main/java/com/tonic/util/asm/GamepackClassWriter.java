@@ -1,4 +1,4 @@
-package com.tonic.injector.types;
+package com.tonic.util.asm;
 
 import org.objectweb.asm.ClassWriter;
 

@@ -1,7 +1,5 @@
-package com.tonic.injector.util;
+package com.tonic.patch;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;

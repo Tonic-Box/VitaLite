@@ -3,7 +3,7 @@ package com.tonic.injector.pipeline;
 import com.tonic.util.dto.JClass;
 import com.tonic.util.dto.JField;
 import com.tonic.injector.Injector;
-import com.tonic.injector.util.MappingProvider;
+import com.tonic.util.MappingProvider;
 import com.tonic.injector.annotations.FieldHook;
 import com.tonic.injector.annotations.Mixin;
 import com.tonic.injector.types.FieldHookDef;

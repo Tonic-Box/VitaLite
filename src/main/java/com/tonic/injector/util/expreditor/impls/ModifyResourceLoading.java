@@ -1,10 +1,9 @@
 package com.tonic.injector.util.expreditor.impls;
 
 import com.tonic.Static;
-import com.tonic.injector.util.BytecodeBuilder;
+import com.tonic.util.asm.BytecodeBuilder;
 import com.tonic.injector.util.expreditor.ExprEditor;
 import com.tonic.injector.util.expreditor.LiteralValue;
-import com.tonic.vitalite.Main;
 import org.objectweb.asm.tree.*;
 import java.util.ArrayList;
 import java.util.List;

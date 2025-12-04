@@ -1,14 +1,13 @@
 package com.tonic.injector;
 
 import com.tonic.Static;
-import com.tonic.injector.util.BytecodeBuilder;
+import com.tonic.util.asm.BytecodeBuilder;
 import com.tonic.injector.util.LdcRewriter;
-import com.tonic.injector.util.MappingProvider;
+import com.tonic.util.MappingProvider;
 import com.tonic.injector.util.expreditor.impls.*;
 import com.tonic.model.ConditionType;
 import com.tonic.util.dto.JClass;
 import com.tonic.util.dto.JField;
-import com.tonic.vitalite.Main;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 

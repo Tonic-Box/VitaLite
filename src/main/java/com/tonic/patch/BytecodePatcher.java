@@ -1,4 +1,4 @@
-package com.tonic.injector.util;
+package com.tonic.patch;
 
 import io.sigpipe.jbsdiff.Diff;
 import io.sigpipe.jbsdiff.Patch;

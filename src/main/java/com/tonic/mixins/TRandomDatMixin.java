@@ -2,21 +2,12 @@ package com.tonic.mixins;
 
 import com.tonic.Logger;
 import com.tonic.Static;
-import com.tonic.api.TBuffer;
-import com.tonic.api.TClient;
 import com.tonic.injector.annotations.*;
-import com.tonic.injector.util.BytecodeBuilder;
-import com.tonic.injector.util.MappingProvider;
 import com.tonic.model.RandomDat;
 import com.tonic.util.ReflectBuilder;
-import com.tonic.util.dto.JClass;
-import com.tonic.util.dto.JField;
 import net.runelite.api.Client;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.*;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Mixin("Client")
 public abstract class TRandomDatMixin

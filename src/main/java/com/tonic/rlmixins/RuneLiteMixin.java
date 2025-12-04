@@ -4,8 +4,7 @@ import com.tonic.injector.annotations.At;
 import com.tonic.injector.annotations.AtTarget;
 import com.tonic.injector.annotations.Insert;
 import com.tonic.injector.annotations.Mixin;
-import com.tonic.injector.util.BytecodeBuilder;
-import com.tonic.vitalite.Main;
+import com.tonic.util.asm.BytecodeBuilder;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 

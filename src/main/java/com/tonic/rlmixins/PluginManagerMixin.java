@@ -2,10 +2,9 @@ package com.tonic.rlmixins;
 
 import com.tonic.Static;
 import com.tonic.injector.annotations.*;
-import com.tonic.injector.util.BytecodeBuilder;
+import com.tonic.util.asm.BytecodeBuilder;
 import com.tonic.injector.util.LogCallRemover;
 import com.tonic.model.ConditionType;
-import com.tonic.vitalite.Main;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;

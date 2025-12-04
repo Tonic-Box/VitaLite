@@ -3,12 +3,14 @@ package com.tonic.injector;
 import com.tonic.injector.annotations.*;
 import com.tonic.injector.pipeline.*;
 import com.tonic.injector.util.*;
+import com.tonic.patch.PatchGenerator;
 import com.tonic.util.PackageUtil;
+import com.tonic.util.asm.ClassNodeUtil;
+import com.tonic.util.asm.SignerMapper;
 import com.tonic.vitalite.Main;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
