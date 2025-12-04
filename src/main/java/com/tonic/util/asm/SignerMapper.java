@@ -1,7 +1,6 @@
-package com.tonic.injector.util;
+package com.tonic.util.asm;
 
 import com.tonic.vitalite.Main;
-import com.tonic.injector.util.ClassNodeUtil;
 import org.objectweb.asm.tree.*;
 
 import java.util.HashSet;

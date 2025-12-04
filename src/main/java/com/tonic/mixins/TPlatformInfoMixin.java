@@ -1,7 +1,7 @@
 package com.tonic.mixins;
 
 import com.tonic.injector.annotations.*;
-import com.tonic.injector.util.BytecodeBuilder;
+import com.tonic.util.asm.BytecodeBuilder;
 import com.tonic.injector.util.ControlFlow;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;

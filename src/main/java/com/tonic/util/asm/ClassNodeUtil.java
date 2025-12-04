@@ -1,7 +1,6 @@
-package com.tonic.injector.util;
+package com.tonic.util.asm;
 
 import com.tonic.vitalite.Main;
-import com.tonic.injector.types.GamepackClassWriter;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
@@ -10,7 +9,6 @@ import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.util.CheckClassAdapter;
 import org.objectweb.asm.util.Textifier;
-import org.objectweb.asm.util.TraceClassVisitor;
 import org.objectweb.asm.util.TraceMethodVisitor;
 
 import java.io.PrintWriter;

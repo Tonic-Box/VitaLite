@@ -1,6 +1,6 @@
-package com.tonic.injector.util;
+package com.tonic.util.asm;
 
-import com.tonic.injector.util.BytecodeBuilder;
+import com.tonic.util.asm.BytecodeBuilder;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 

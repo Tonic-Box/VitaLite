@@ -3,7 +3,7 @@ package com.tonic.injector.types;
 import com.tonic.util.dto.JClass;
 import com.tonic.util.dto.JField;
 import com.tonic.util.dto.JMethod;
-import com.tonic.injector.util.MappingProvider;
+import com.tonic.util.MappingProvider;
 import com.tonic.injector.annotations.At;
 import com.tonic.injector.annotations.AtTarget;
 import com.tonic.injector.annotations.Constant;

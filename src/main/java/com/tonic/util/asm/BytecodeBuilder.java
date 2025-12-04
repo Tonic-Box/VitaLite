@@ -1,4 +1,4 @@
-package com.tonic.injector.util;
+package com.tonic.util.asm;
 
 import com.tonic.model.ConditionType;
 import org.objectweb.asm.Handle;
