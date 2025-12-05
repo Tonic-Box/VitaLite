@@ -46,7 +46,12 @@ public final class Versioning
     public static boolean isRunningFromShadedJar() {
         final String jarPath = VitaLite.class.getProtectionDomain()
                 .getCodeSource().getLocation().getPath();
-        return jarPath.contains("shaded") || jarPath.endsWith(".jar");
+        return jarPath.contains("shaded") || jarPath.endsWith(".jar") || !isLaunchedFromIde();
+    }
+
+    public static boolean isLaunchedFromIde() {
+        String classpath = System.getProperty("java.class.path");
+        return classpath.contains("IntelliJ IDEA") || classpath.contains("idea_rt.jar") || classpath.contains("eclipse");
     }
 
     /**
