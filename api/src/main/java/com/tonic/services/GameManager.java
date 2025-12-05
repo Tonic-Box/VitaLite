@@ -786,6 +786,8 @@ public class GameManager extends Overlay {
     private LocalPoint lastPoint;
     private void processSpeed()
     {
+        if(!SailingAPI.isOnBoat())
+            return;
         WorldEntity we = BoatCollisionAPI.getPlayerBoat();
         LocalPoint lp = we.getTargetLocation();
 
