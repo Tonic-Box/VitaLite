@@ -38,30 +38,46 @@ public class BFSCache
 
     public List<HybridBFSStep> path(int pos)
     {
+        // First: Build path positions
         int parent = get(pos);
-        LinkedList<HybridBFSStep> path = new LinkedList<>();
-        Transport transport;
-        path.add(0, new HybridBFSStep(pos, null));
+        LinkedList<Integer> positions = new LinkedList<>();
+        positions.add(0, pos);
         while(parent != -1)
         {
-            transport = getTransport(pos, parent);
-            pos = parent;
-            parent = get(pos);
-            path.add(0, new HybridBFSStep(pos, transport));
+            positions.add(0, parent);
+            parent = get(parent);
         }
+
+        // Second: Convert to steps, checking for transports between consecutive positions
+        LinkedList<HybridBFSStep> path = new LinkedList<>();
+        for(int i = 0; i < positions.size(); i++)
+        {
+            int currentPos = positions.get(i);
+            Transport transport = null;
+
+            // If there's a next position, check for transport from current to next
+            if(i + 1 < positions.size())
+            {
+                int nextPos = positions.get(i + 1);
+                transport = findTransport(currentPos, nextPos);
+            }
+
+            path.add(new HybridBFSStep(currentPos, transport));
+        }
+
         return path;
     }
 
-    public Transport getTransport(int pos, int parent)
+    private Transport findTransport(int source, int destination)
     {
-        ArrayList<Transport> tr = TransportLoader.getTransports().get(parent);
+        ArrayList<Transport> tr = TransportLoader.getTransports().get(source);
         if(tr != null)
         {
-            for (int i = 0; i < tr.size(); i++)
+            for(Transport t : tr)
             {
-                if(tr.get(i).getDestination() == pos)
+                if(t.getDestination() == destination)
                 {
-                    return tr.get(i);
+                    return t;
                 }
             }
         }

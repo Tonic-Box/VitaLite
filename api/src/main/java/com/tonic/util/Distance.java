@@ -24,6 +24,8 @@ public class Distance
     {
         if(from.equals(to))
             return 0;
+        if(from.getPlane() != to.getPlane())
+            return Integer.MAX_VALUE;
         return Static.invoke(() -> {
             List<WorldPoint> path = SceneAPI.pathTo(from, to);
             if (path == null || path.isEmpty())

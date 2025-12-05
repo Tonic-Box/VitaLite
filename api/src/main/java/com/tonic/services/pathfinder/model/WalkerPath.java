@@ -92,6 +92,13 @@ public class WalkerPath
         if(!steps.isEmpty()) {
             destination = steps.get(steps.size() - 1).getPosition();
         }
+        // Debug: log which steps have transports
+        for(int i = 0; i < steps.size(); i++) {
+            IStep s = steps.get(i);
+            if(s.hasTransport()) {
+                System.out.println("[Pathfinder] Step " + i + " has transport: " + s.getPosition());
+            }
+        }
     }
 
     public void cancel()
@@ -238,13 +245,16 @@ public class WalkerPath
             s--;
             steps.subList(0, s).clear();
         }
-        if(steps.size() > 1 && steps.get(1).hasTransport())
+        // Skip to transport step if it's next and reachable
+        while(steps.size() > 1 && steps.get(1).hasTransport()
+              && SceneAPI.isReachable(local.getWorldLocation(), steps.get(0).getPosition()))
         {
             steps.remove(0);
         }
-        step = steps.get(0); //Walker.walkTo(new WorldPoint(2575,3268,1));
+        step = steps.get(0);
         IStep nextStep = steps.size() > 1 ? steps.get(1) : null;
-        boolean nextBlocked = nextStep != null && !SceneAPI.isReachable(step.getPosition(), nextStep.getPosition());
+        // Don't consider next step "blocked" if current step has a transport (transport handles the transition)
+        boolean nextBlocked = nextStep != null && !step.hasTransport() && !SceneAPI.isReachable(step.getPosition(), nextStep.getPosition());
         MovementAPI.walkTowards(step.getPosition());
         if((!step.hasTransport() && MovementAPI.isMoving()) || nextBlocked || (steps.size() == 1 && local.getWorldLocation().equals(step.getPosition())))
             steps.remove(step);
@@ -283,7 +293,7 @@ public class WalkerPath
     }
 
     private boolean handleTransports() {
-        if(!PlayerEx.getLocal().isIdle() && !MovementAPI.isMoving())
+        if(!PlayerEx.getLocal().isIdle() && MovementAPI.isMoving())
         {
             return true;
         }
@@ -340,7 +350,12 @@ public class WalkerPath
         boolean value = step.getTransport().getHandler().step();
         if(!value)
         {
+            System.out.println("[Pathfinder] Transport complete, removing step");
             steps.remove(step);
+        }
+        else
+        {
+            System.out.println("[Pathfinder] Transport in progress...");
         }
         return value;
     }
