@@ -16,6 +16,7 @@ import com.tonic.services.pathfinder.objects.ObjectMap;
 import com.tonic.services.pathfinder.sailing.graph.NavGraph;
 import com.tonic.services.pathfinder.tiletype.TileTypeMap;
 import com.tonic.util.IntPair;
+import com.tonic.util.ThreadPool;
 import com.tonic.util.handler.StepHandler;
 import lombok.Getter;
 import net.runelite.api.Client;
@@ -49,8 +50,8 @@ public class Walker
     private static TileTypeMap tileTypeMap;
     @Getter
     private static NavGraph navGraph;
-
     private static boolean running = false;
+    private static WalkerPath currentPath = null;
 
     private Walker()
     {
@@ -135,16 +136,22 @@ public class Walker
 
     private static boolean walk(WalkerPath walkerPath, BooleanSupplier stopCondition)
     {
+        currentPath = walkerPath;
+        if(running)
+        {
+            Logger.warn("[Pathfinder] Already walking!");
+            return false;
+        }
         try
         {
-            WorldPoint end = walkerPath.getSteps().get(walkerPath.getSteps().size() - 1).getPosition();
+            WorldPoint end = currentPath.getSteps().get(currentPath.getSteps().size() - 1).getPosition();
             running = true;
             if(stopCondition.getAsBoolean())
             {
                 cancel();
                 return true;
             }
-            while(walkerPath.step())
+            while(currentPath.step())
             {
                 if(stopCondition.getAsBoolean())
                 {
@@ -183,14 +190,14 @@ public class Walker
                 worldPoint = Static.invoke(() -> PlayerEx.getLocal().getWorldPoint());
                 if(!running)
                 {
-                    walkerPath.shutdown();
+                    currentPath.shutdown();
                     GameManager.clearPathPoints();
                     return false;
                 }
             }
         }
         finally {
-            walkerPath.shutdown();
+            currentPath.shutdown();
             GameManager.clearPathPoints();
             running = false;
         }
@@ -200,6 +207,7 @@ public class Walker
     public static void cancel()
     {
         running = false;
+        currentPath.cancel();
         GameManager.clearPathPoints();
     }
 
