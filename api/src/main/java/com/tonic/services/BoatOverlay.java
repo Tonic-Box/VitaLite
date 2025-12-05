@@ -17,7 +17,7 @@ public class BoatOverlay extends VitaOverlay
         super();
         setLayer(OverlayLayer.ABOVE_WIDGETS);
         setWidth(250);
-        setHeight(200);
+        setHeight(215);
         setHidden(false);
     }
 
@@ -53,6 +53,7 @@ public class BoatOverlay extends VitaOverlay
         newLineEx("Sails Need Trimming: ", SailingAPI.sailsNeedTrimming() ? "Yes" : "No", 12);
         newLineEx("Is Navigating: ", SailingAPI.isNavigating() ? "Yes" : "No", 12);
         newLineEx("Movement: ", SailingAPI.isMovingForward() ? "Forward" : (SailingAPI.isMovingBackward() ? "Backward" : "Still"), 12);
+        newLineEx("Speed: ", SailingAPI.getSpeed() + "", 12);
         newLine("# Sailing Boat Stats", 14);
         buildStatsLine("Rapid", BoatStatsAPI.getRapidResistance());
         buildStatsLine("Storm", BoatStatsAPI.getStormResistance());

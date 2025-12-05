@@ -10,6 +10,8 @@ import com.tonic.data.SailingConstants;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
+import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.MenuAction;
 import net.runelite.api.WorldEntity;
 import net.runelite.api.WorldView;
@@ -23,6 +25,10 @@ import net.runelite.api.gameval.VarbitID;
  */
 public class SailingAPI
 {
+    @Getter
+    @Setter
+    private static volatile int speed = 0;
+
     /**
      * Sets sails to start navigating
      * @return true if sails were set, false otherwise
