@@ -198,6 +198,7 @@ public class Walker
         }
         finally {
             currentPath.shutdown();
+            currentPath = null;
             GameManager.clearPathPoints();
             running = false;
         }
@@ -208,6 +209,7 @@ public class Walker
     {
         running = false;
         currentPath.cancel();
+        currentPath = null;
         GameManager.clearPathPoints();
     }
 
