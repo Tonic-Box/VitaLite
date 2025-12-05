@@ -797,7 +797,10 @@ public class GameManager extends Overlay {
                         (lastPoint.getX() - lp.getX()),
                         (lastPoint.getY() - lp.getY())
                 );
-                SailingAPI.setSpeed(roundToQuarterTile(trueSpeed) / 32);
+                int speed = roundToQuarterTile(trueSpeed) / 32;
+                if(speed > 32)
+                    return;
+                SailingAPI.setSpeed(speed);
             }
             lastPoint = lp;
         }
