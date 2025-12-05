@@ -77,12 +77,12 @@ public abstract class ActorEx<T extends Actor> implements Entity
 
     public boolean isDead()
     {
-        return actor.isDead();
+        return Static.invoke(actor::isDead);
     }
 
     public int getCombatLevel()
     {
-        return actor.getCombatLevel();
+        return Static.invoke(actor::getCombatLevel);
     }
 
     public int getIndex()

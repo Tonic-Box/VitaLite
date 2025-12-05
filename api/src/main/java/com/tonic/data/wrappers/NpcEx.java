@@ -108,6 +108,10 @@ public class NpcEx extends ActorEx<NPC>
 
     @Override
     public String[] getActions() {
-        return Static.invoke(() -> getComposition().getActions());
+        return Static.invoke(() -> {
+            if(getComposition() == null)
+                return new String[0];
+            return getComposition().getActions();
+        });
     }
 }
