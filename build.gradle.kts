@@ -325,9 +325,16 @@ tasks.register<Zip>("packageRelease") {
         rename { "VitaLite.jar" }
     }
 
+    // Unix shell scripts - convert to LF line endings for Linux/Mac compatibility
     from("scripts") {
         include("run-linux.sh")
         include("run-mac.sh")
+        filter(mapOf("eol" to org.apache.tools.ant.filters.FixCrLfFilter.CrLf.newInstance("lf")),
+            org.apache.tools.ant.filters.FixCrLfFilter::class.java)
+    }
+
+    // Windows batch file - keep as-is (CRLF is fine for Windows)
+    from("scripts") {
         include("run-windows.bat")
     }
 }
