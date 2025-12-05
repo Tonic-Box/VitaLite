@@ -142,14 +142,13 @@ public class SailingAPI
     }
 
     /**
-     * Checks if the player is on a sailing boat using direct WorldEntity check.
-     * More reliable than varbit-based isOnBoat() as it checks the actual boat entity.
+     * Checks if the player is on a sailing boat using worldview level check.
      *
      * @return true if player is on a sailing boat, false otherwise
      */
     public static boolean isOnBoat()
     {
-        return Static.invoke(() -> BoatCollisionAPI.getPlayerBoat() != null);
+        return Static.invoke(() -> !PlayerEx.getLocal().getWorldView().isTopLevel());
     }
 
     /**
@@ -189,10 +188,12 @@ public class SailingAPI
     public static int getHeadingRaw()
     {
         return Static.invoke(() -> {
-            if (!isOnBoat()) {
+            if (!isOnBoat())
                 return -1;
-            }
-            return getAnimatedHeadingRaw();
+            WorldEntity boat = BoatCollisionAPI.getPlayerBoat();
+            if (boat == null)
+                return -1;
+            return boat.getTargetOrientation();
         });
     }
 
@@ -254,57 +255,6 @@ public class SailingAPI
 
             int targetHeading = getTargetHeadingValue();
             return targetHeading >= 0 && targetHeading <= 15 && targetHeading != getResolvedHeadingValue();
-        });
-    }
-
-    /**
-     * Gets real-time boat heading by extracting rotation from transformation matrix.
-     * Works during rotation animation, not just when varbit updates.
-     *
-     * Uses LocalPoint precision (128 sub-units per tile) to avoid the cardinal direction
-     * snapping issue that occurred with tile-based geometry calculation.
-     *
-     * @return heading in JAU (0-2047), or -1 if not on boat
-     */
-    private static int getAnimatedHeadingRaw()
-    {
-        return Static.invoke(() -> {
-            WorldEntity boat = BoatCollisionAPI.getPlayerBoat();
-            if (boat == null) return -1;
-
-            WorldView boatView = boat.getWorldView();
-            if (boatView == null) return -1;
-
-            // Use LocalPoint coordinates (128 units per tile) for precision
-            // Center of boat-local tile (0,0) and +1 tile in Y direction
-            // Boat's forward (bow) direction is along +Y in boat-local space
-            LocalPoint origin = new LocalPoint(64, 64, boatView);
-            LocalPoint testPoint = new LocalPoint(64, 64 + 128, boatView); // +1 tile Y
-
-            LocalPoint transformedOrigin = boat.transformToMainWorld(origin);
-            LocalPoint transformedTest = boat.transformToMainWorld(testPoint);
-
-            if (transformedOrigin == null || transformedTest == null) {
-                // Fallback to varbit
-                return VarAPI.getVar(VarbitID.SAILING_BOAT_SPAWNED_ANGLE);
-            }
-
-            // Calculate direction vector (preserves full precision)
-            double dx = transformedTest.getX() - transformedOrigin.getX();
-            double dy = transformedTest.getY() - transformedOrigin.getY();
-
-            // atan2 gives continuous angle from +X axis
-            // RS coordinate system: +X = East, +Y = North
-            // RS JAU: 0 = South, 512 = West, 1024 = North, 1536 = East
-            // Use atan2(dx, dy) to measure angle from +Y (North) axis
-            double angleRadians = Math.atan2(dx, dy);
-            double jau = (angleRadians * 1024.0 / Math.PI);
-
-            // Normalize to 0-2047 range
-            while (jau < 0) jau += 2048;
-            while (jau >= 2048) jau -= 2048;
-
-            return (int) Math.round(jau);
         });
     }
 
