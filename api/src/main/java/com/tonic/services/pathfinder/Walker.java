@@ -161,6 +161,7 @@ public class Walker
                 if(!running)
                 {
                     GameManager.clearPathPoints();
+                    cancel();
                     return false;
                 }
                 Delays.tick();
@@ -208,8 +209,11 @@ public class Walker
     public static void cancel()
     {
         running = false;
-        currentPath.cancel();
-        currentPath = null;
+        if(currentPath != null)
+        {
+            currentPath.cancel();
+            currentPath = null;
+        }
         GameManager.clearPathPoints();
     }
 
