@@ -21,6 +21,7 @@ public class Logger {
     private static JComponent loggerComponent;
     private static Container wrapper;            // the panel that holds the logger (BorderLayout)
     private static JFrame clientFrame;           // the top level window
+    private static JScrollPane consoleScrollPane; // scroll pane for smart auto-scroll
     private static int loggerHeight = 150;         // height of the logger component
     private static int maxMessages = 50;           // maximum number of messages to keep in console
 
@@ -242,13 +243,12 @@ public class Logger {
         console = new JTextPane();
         console.setBackground(Color.BLACK);
         console.setForeground(Color.GREEN);
-        console.setAutoscrolls(true);
         console.setEditable(false);
         console.setFont(new Font("Monoid", Font.PLAIN, 14));
 
-
+        // Use NEVER_UPDATE so we control scrolling manually
         DefaultCaret caret = (DefaultCaret)console.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         fontFactory(console);
         addFullContextMenu(console);
 
@@ -329,6 +329,9 @@ public class Logger {
 
                 // Remove oldest messages if we exceed the limit
                 trimToMaxMessages();
+
+                // Auto-scroll if at bottom and no selection
+                scrollToBottomIfNeeded();
             }
         });
     }
@@ -348,6 +351,9 @@ public class Logger {
 
                 // Remove oldest messages if we exceed the limit
                 trimToMaxMessages();
+
+                // Auto-scroll if at bottom and no selection
+                scrollToBottomIfNeeded();
             }
         });
     }
@@ -367,6 +373,9 @@ public class Logger {
 
                 // Remove oldest messages if we exceed the limit
                 trimToMaxMessages();
+
+                // Auto-scroll if at bottom and no selection
+                scrollToBottomIfNeeded();
             }
         });
     }
@@ -386,6 +395,9 @@ public class Logger {
 
                 // Remove oldest messages if we exceed the limit
                 trimToMaxMessages();
+
+                // Auto-scroll if at bottom and no selection
+                scrollToBottomIfNeeded();
             }
         });
     }
@@ -404,9 +416,70 @@ public class Logger {
         wrapper = wrapperPanel;
         clientFrame = frame;
 
+        // Capture scroll pane reference for smart auto-scrolling
+        if (component instanceof JScrollPane) {
+            consoleScrollPane = (JScrollPane) component;
+        }
+
         // Remember the preferred height (including borders etc.)
         if (component != null) {
             loggerHeight = component.getPreferredSize().height;
+        }
+    }
+
+    /**
+     * Sets the scroll pane used for the console (for smart auto-scroll behavior).
+     * @param scrollPane The JScrollPane containing the console
+     */
+    public static void setConsoleScrollPane(JScrollPane scrollPane) {
+        consoleScrollPane = scrollPane;
+    }
+
+    /**
+     * Checks if the user has text selected in the console.
+     */
+    private static boolean hasSelection() {
+        if (INSTANCE == null) return false;
+        return INSTANCE.console.getSelectionStart() != INSTANCE.console.getSelectionEnd();
+    }
+
+    /**
+     * Checks if the console is scrolled to the bottom.
+     * @return true if at bottom (or within threshold), false if scrolled up
+     */
+    private static boolean shouldAutoScroll() {
+        // Don't auto-scroll if user has text selected
+        if (hasSelection()) {
+            return false;
+        }
+
+        if (consoleScrollPane == null) {
+            return true; // Default to auto-scroll if no scroll pane set
+        }
+        JScrollBar vertical = consoleScrollPane.getVerticalScrollBar();
+        int max = vertical.getMaximum();
+        int extent = vertical.getVisibleAmount();
+        int value = vertical.getValue();
+
+        // If no scrollbar yet (empty/small content), always auto-scroll
+        if (max <= extent) {
+            return true;
+        }
+
+        // Consider "at bottom" if within a small threshold
+        return (max - extent - value) < 30;
+    }
+
+    /**
+     * Scrolls the console to the bottom if appropriate.
+     * Uses scrollbar manipulation instead of caret to avoid disrupting selection.
+     */
+    private static void scrollToBottomIfNeeded() {
+        if (shouldAutoScroll() && consoleScrollPane != null) {
+            // Force layout to update scrollbar bounds immediately
+            consoleScrollPane.validate();
+            JScrollBar vertical = consoleScrollPane.getVerticalScrollBar();
+            vertical.setValue(vertical.getMaximum());
         }
     }
 
@@ -486,11 +559,30 @@ public class Logger {
     /**
      * Trims the console to keep only the most recent maxMessages.
      * Removes oldest messages from the beginning of the document.
+     * Preserves scroll position and selection by adjusting for removed content.
      */
     @SneakyThrows
     private void trimToMaxMessages()
     {
-        // Only trim if we exceed the limit
+        if (currentMessageCount <= maxMessages) {
+            return;
+        }
+
+        // Check if we should preserve scroll position (not at bottom)
+        boolean preserveScroll = !shouldAutoScroll();
+        int scrollValue = 0;
+        if (preserveScroll && consoleScrollPane != null) {
+            scrollValue = consoleScrollPane.getVerticalScrollBar().getValue();
+        }
+
+        // Save selection before removing
+        int selStart = console.getSelectionStart();
+        int selEnd = console.getSelectionEnd();
+        boolean hadSelection = selStart != selEnd;
+
+        int totalCharsRemoved = 0;
+
+        // Trim messages
         while (currentMessageCount > maxMessages)
         {
             // Find the first newline (end of first message)
@@ -499,9 +591,10 @@ public class Logger {
 
             if (firstNewline >= 0)
             {
-                // Remove from start to first newline (inclusive)
-                console.getStyledDocument().remove(0, firstNewline + 1);
+                int charsToRemove = firstNewline + 1;
+                console.getStyledDocument().remove(0, charsToRemove);
                 currentMessageCount--;
+                totalCharsRemoved += charsToRemove;
             }
             else
             {
@@ -509,5 +602,19 @@ public class Logger {
                 break;
             }
         }
+
+        // Restore selection if there was one, adjusted for removed content
+        if (hadSelection && totalCharsRemoved > 0) {
+            int newSelStart = Math.max(0, selStart - totalCharsRemoved);
+            int newSelEnd = Math.max(0, selEnd - totalCharsRemoved);
+            if (newSelEnd > newSelStart) {
+                console.setSelectionStart(newSelStart);
+                console.setSelectionEnd(newSelEnd);
+            }
+        }
+
+        // Restore scroll position if we weren't at bottom
+        // The scroll position doesn't need adjustment since we're removing from top
+        // and the viewport should naturally shift up with the content
     }
 }
