@@ -77066,5 +77066,33 @@
     },
     "action": "Climb",
     "objectId": 2585
+  },
+  {
+    "source": {
+      "x": 3126,
+      "y": 3833,
+      "plane": 0
+    },
+    "destination": {
+      "x": 3241,
+      "y": 10233,
+      "plane": 0
+    },
+    "action": "Enter",
+    "objectId": 31556
+  },
+  {
+    "source": {
+      "x": 3126,
+      "y": 3832,
+      "plane": 0
+    },
+    "destination": {
+      "x": 3241,
+      "y": 10233,
+      "plane": 0
+    },
+    "action": "Enter",
+    "objectId": 31556
   }
 ]

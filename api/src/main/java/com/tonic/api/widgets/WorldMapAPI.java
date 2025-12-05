@@ -83,11 +83,6 @@ public class WorldMapAPI
         int worldX = mapWorldPosition.getX() + worldDeltaX;
         int worldY = mapWorldPosition.getY() + worldDeltaY;
 
-        // Validate coordinates are reasonable (basic bounds check)
-        if (worldX < 0 || worldY < 0 || worldX > 10000 || worldY > 10000) {
-            return null;
-        }
-
         return new WorldPoint(worldX, worldY, 0);
     }
 
