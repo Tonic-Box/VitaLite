@@ -94,13 +94,6 @@ public class WalkerPath
         if(!steps.isEmpty()) {
             destination = steps.get(steps.size() - 1).getPosition();
         }
-        // Debug: log which steps have transports
-        for(int i = 0; i < steps.size(); i++) {
-            IStep s = steps.get(i);
-            if(s.hasTransport()) {
-                System.out.println("[Pathfinder] Step " + i + " has transport: " + s.getPosition());
-            }
-        }
     }
 
     public void cancel()
@@ -258,8 +251,11 @@ public class WalkerPath
         // Don't consider next step "blocked" if it has a transport (transport handles the transition)
         boolean nextBlocked = nextStep != null && !nextStep.hasTransport() && !SceneAPI.isReachable(step.getPosition(), nextStep.getPosition());
 
-        MovementAPI.walkTowards(step.getPosition());
-        if(MovementAPI.isMoving() || nextBlocked || (steps.size() == 1 && local.getWorldLocation().equals(step.getPosition())))
+        boolean atStepPos = local.getWorldLocation().equals(step.getPosition());
+        boolean isMoving = MovementAPI.isMoving();
+
+        MovementAPI.walkToWorldPoint(step.getPosition());
+        if(isMoving || nextBlocked || atStepPos)
             steps.remove(step);
         return !isDone();
     }
@@ -348,15 +344,6 @@ public class WalkerPath
         {
             timesDialogueSeen = 0;
             lastText = null;
-        }
-
-        if(!step.getTransport().getHandler().isStarted())
-        {
-            if(!PlayerEx.getLocal().getWorldPoint().equals(step.getPosition()))
-            {
-                MovementAPI.walkToWorldPoint(step.getPosition());
-                return true;
-            }
         }
 
         boolean value = step.getTransport().getHandler().step();
