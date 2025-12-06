@@ -179,7 +179,7 @@ public class TransportLoader
                 else if (QuestAPI.hasState(Quest.A_KINGDOM_DIVIDED, QuestState.IN_PROGRESS, QuestState.FINISHED) || !filter) // Veos is replaced during/after quest
                 {
                     transports.add(npcBoatTransport(new WorldPoint(3055, 3245, 0),
-                            new WorldPoint(1824, 3691, 0),
+                            new WorldPoint(1824, 3695, 1),
                             "Cabin Boy Herbert",
                             "Port Piscarilius", 4));
                     transports.add(npcBoatTransport(new WorldPoint(3055, 3245, 0),
@@ -324,15 +324,15 @@ public class TransportLoader
                 transports.add(trapDoorTransport(new WorldPoint(3422, 3484, 0), new WorldPoint(3440, 9887, 0), 3432, 3433));
 
                 // Port Piscarilius
-                if (QuestAPI.isCompleted(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
-                {
-                    transports.add(npcBoatTransport(new WorldPoint(1824, 3691, 0), new WorldPoint(3055, 3245, 0), 10932, "Port Sarim", 4));
-                    transports.add(npcBoatTransport(new WorldPoint(1824, 3691, 0), new WorldPoint(1504, 3399, 0), 10932, "Land's End", 4));
-                }
-                else
-                {
-                    transports.add(npcBoatTransport(new WorldPoint(1824, 3691, 0), new WorldPoint(3055, 3245, 0), 10727, "Port Sarim", 4));
-                }
+//                if (QuestAPI.isCompleted(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
+//                {
+//                    transports.add(npcBoatTransport(new WorldPoint(1824, 3691, 0), new WorldPoint(3055, 3245, 0), 10932, "Port Sarim", 4));
+//                    transports.add(npcBoatTransport(new WorldPoint(1824, 3691, 0), new WorldPoint(1504, 3399, 0), 10932, "Land's End", 4));
+//                }
+//                else
+//                {
+//                    transports.add(npcBoatTransport(new WorldPoint(1824, 3691, 0), new WorldPoint(3055, 3245, 0), 10727, "Port Sarim", 4));
+//                }
 
                 // Land's End
                 transports.add(npcBoatTransport(new WorldPoint(1504, 3399, 0), new WorldPoint(3055, 3245, 0), 7471, "Port Sarim", 4));
@@ -1146,9 +1146,9 @@ public class TransportLoader
                     }
                     return 2;
                 })
-                .addDelayUntil(1, () -> {
+                .add(1, () -> {
                     WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
-                    return Distance.pathDistanceTo(worldPoint, destination) < 10 && SceneAPI.isReachable(destination);
+                    return Distance.pathDistanceTo(worldPoint, destination) < 10 && SceneAPI.isReachable(destination) ? 2 : 0;
                 });
         return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), requirements, objId);
     }
