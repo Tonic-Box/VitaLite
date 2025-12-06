@@ -13,6 +13,8 @@ import net.runelite.client.util.Text;
 import net.runelite.client.util.WildcardMatcher;
 import org.apache.commons.lang3.ArrayUtils;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -334,5 +336,65 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
      */
     public TileObjectEx longestPath() {
         return this.sortLongestPath().first();
+    }
+
+    /**
+     * Sorts the query results using a greedy nearest-neighbor approach based on shortest path.
+     * Starting from the local player, selects the object with the shortest path, then from that
+     * object's interaction point selects the next shortest path, and so on.
+     * In case of path length ties, uses Chebyshev distance as a tiebreaker.
+     * @return TileObjectQuery
+     */
+    public TileObjectQuery sortGreedyShortestPath()
+    {
+        return sortGreedyShortestPath(PlayerEx.getLocal().getWorldPoint());
+    }
+
+    /**
+     * Sorts the query results using a greedy nearest-neighbor approach based on shortest path.
+     * @param start The starting point for the greedy traversal.
+     * @return TileObjectQuery
+     */
+    public TileObjectQuery sortGreedyShortestPath(WorldPoint start)
+    {
+        return postProcess(items -> {
+            if (items.size() <= 1)
+            {
+                return items;
+            }
+
+            List<TileObjectEx> remaining = new ArrayList<>(items);
+            List<TileObjectEx> ordered = new ArrayList<>(remaining.size());
+            WorldPoint current = start;
+
+            while (!remaining.isEmpty())
+            {
+                final WorldPoint pos = current;
+
+                TileObjectEx nearest = Collections.min(remaining, (o1, o2) -> {
+                    List<WorldPoint> path1 = SceneAPI.pathTo(pos, o1.getInteractionPoint());
+                    List<WorldPoint> path2 = SceneAPI.pathTo(pos, o2.getInteractionPoint());
+                    int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
+                    int len2 = path2 == null ? Integer.MAX_VALUE : path2.size();
+
+                    int cmp = Integer.compare(len1, len2);
+                    if (cmp != 0)
+                    {
+                        return cmp;
+                    }
+
+                    return Integer.compare(
+                            Distance.chebyshev(pos, o1.getWorldPoint()),
+                            Distance.chebyshev(pos, o2.getWorldPoint())
+                    );
+                });
+
+                ordered.add(nearest);
+                remaining.remove(nearest);
+                current = nearest.getInteractionPoint();
+            }
+
+            return ordered;
+        });
     }
 }

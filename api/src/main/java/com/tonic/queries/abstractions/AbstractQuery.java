@@ -21,6 +21,7 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
     private final List<Predicate<T>> filters = new ArrayList<>();
     private final List<Comparator<T>> sorters = new ArrayList<>();
     private final List<Consumer<T>> peekActions = new ArrayList<>();
+    private Function<List<T>, List<T>> postProcessor = null;
 
     public AbstractQuery(List<T> cache) {
         this.dataSource = () -> new ArrayList<>(cache);
@@ -130,7 +131,13 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
                 stream = stream.limit(limitValue);
             }
 
-            return stream.collect(Collectors.toList());
+            List<T> result = stream.collect(Collectors.toList());
+
+            if (postProcessor != null) {
+                result = postProcessor.apply(result);
+            }
+
+            return result;
         });
     }
 
@@ -332,5 +339,16 @@ public abstract class AbstractQuery<T, Q extends AbstractQuery<T, Q>> {
 
             return stream.collect(collector);
         });
+    }
+
+    /**
+     * Apply a post-processing function after sorting.
+     * Useful for reordering algorithms that can't be expressed as Comparators.
+     * @param processor function to transform the result list
+     * @return the query instance
+     */
+    public Q postProcess(Function<List<T>, List<T>> processor) {
+        this.postProcessor = processor;
+        return self();
     }
 }

@@ -3,6 +3,7 @@ package com.tonic.services.pathfinder.collision;
 import com.tonic.Logger;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.util.WorldPointUtil;
+import net.runelite.api.coords.WorldPoint;
 
 import java.io.*;
 

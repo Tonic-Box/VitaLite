@@ -18,6 +18,7 @@ import com.tonic.queries.TileObjectQuery;
 import com.tonic.queries.WidgetQuery;
 import static com.tonic.services.pathfinder.Walker.*;
 import com.tonic.services.GameManager;
+import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.abstractions.IStep;
 import com.tonic.services.pathfinder.teleports.Teleport;
@@ -66,6 +67,7 @@ public class WalkerPath
      */
     public static WalkerPath get(WorldPoint target)
     {
+        target = Walker.getCollisionMap().nearestWalkableEuclidean(target, 5);
         final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
         List<? extends IStep> path = engine.find(target);
         return new WalkerPath(path, engine.getTeleport());
@@ -224,14 +226,14 @@ public class WalkerPath
             return true;
         }
 
-        int rand = ThreadLocalRandom.current().nextInt(4, 8);
+        int rand = ThreadLocalRandom.current().nextInt(8, 12);
         if (last.distanceTo2D(dest) > rand && !PlayerEx.getLocal().isIdle())
         {
             return true;
         }
 
         int s = 0;
-        rand = ThreadLocalRandom.current().nextInt(5, 16);
+        rand = ThreadLocalRandom.current().nextInt(10, 16);
         while(s <= rand && s < steps.size() && !steps.get(s).hasTransport())
         {
             if(!SceneAPI.isReachable(local.getWorldLocation(), steps.get(s).getPosition()))
@@ -293,7 +295,7 @@ public class WalkerPath
     }
 
     private boolean handleTransports() {
-        if(!PlayerEx.getLocal().isIdle() && MovementAPI.isMoving())
+        if(!PlayerEx.getLocal().isIdle() && !MovementAPI.isMoving())
         {
             return true;
         }

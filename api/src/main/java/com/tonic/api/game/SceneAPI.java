@@ -28,7 +28,6 @@ public class SceneAPI {
      */
     public static List<WorldPoint> reachableTiles()
     {
-        Client client = Static.getClient();
         return reachableTiles(PlayerEx.getLocal().getWorldPoint());
     }
 

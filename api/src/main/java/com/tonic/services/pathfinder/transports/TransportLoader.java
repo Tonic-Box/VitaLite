@@ -1141,7 +1141,7 @@ public class TransportLoader
                 })
                 .addDelayUntil(1, () -> {
                     WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
-                    return Distance.pathDistanceTo(worldPoint, destination) < 5;
+                    return Distance.pathDistanceTo(worldPoint, destination) < 10 && SceneAPI.isReachable(destination);
                 });
         return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), requirements, objId);
     }
