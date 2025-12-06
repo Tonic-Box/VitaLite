@@ -247,18 +247,19 @@ public class WalkerPath
             s--;
             steps.subList(0, s).clear();
         }
-        // Skip to transport step if it's next and reachable
-        while(steps.size() > 1 && steps.get(1).hasTransport()
-              && SceneAPI.isReachable(local.getWorldLocation(), steps.get(0).getPosition()))
-        {
-            steps.remove(0);
-        }
         step = steps.get(0);
+
+        // Never remove transport steps here - they must be handled by handleTransports()
+        if(step.hasTransport()) {
+            return !isDone();
+        }
+
         IStep nextStep = steps.size() > 1 ? steps.get(1) : null;
-        // Don't consider next step "blocked" if current step has a transport (transport handles the transition)
-        boolean nextBlocked = nextStep != null && !step.hasTransport() && !SceneAPI.isReachable(step.getPosition(), nextStep.getPosition());
+        // Don't consider next step "blocked" if it has a transport (transport handles the transition)
+        boolean nextBlocked = nextStep != null && !nextStep.hasTransport() && !SceneAPI.isReachable(step.getPosition(), nextStep.getPosition());
+
         MovementAPI.walkTowards(step.getPosition());
-        if((!step.hasTransport() && MovementAPI.isMoving()) || nextBlocked || (steps.size() == 1 && local.getWorldLocation().equals(step.getPosition())))
+        if(MovementAPI.isMoving() || nextBlocked || (steps.size() == 1 && local.getWorldLocation().equals(step.getPosition())))
             steps.remove(step);
         return !isDone();
     }
