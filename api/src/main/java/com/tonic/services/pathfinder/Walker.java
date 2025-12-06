@@ -120,6 +120,7 @@ public class Walker
     }
 
     private static boolean walk(WorldPoint target, BooleanSupplier stopCondition) {
+        target = collisionMap.nearestWalkableEuclidean(target, 5);
         WalkerPath walkerPath = WalkerPath.get(target);
         return walk(walkerPath, stopCondition);
     }
@@ -127,7 +128,7 @@ public class Walker
     private static boolean walk(List<WorldArea> targets, BooleanSupplier stopCondition) {
         WalkerPath walkerPath = WalkerPath.get(targets);
         return walk(walkerPath, stopCondition);
-    }
+    } //Walker.walkTo(new WorldPoint(2570, 3245, 0));
 
     private static void walk(WalkerPath walkerPath)
     {
