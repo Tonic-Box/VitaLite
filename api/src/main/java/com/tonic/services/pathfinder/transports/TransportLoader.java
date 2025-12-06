@@ -149,6 +149,12 @@ public class TransportLoader
                     transports.add(npcTransport(new WorldPoint(1782, 3458, 0), new WorldPoint(1778, 3417, 0), 7483, "Travel"));
                 }
 
+                if(QuestAPI.isCompleted(Quest.CHILDREN_OF_THE_SUN))
+                {
+                    transports.add(npcTransport(new WorldPoint(3280, 3412, 0), new WorldPoint(1700, 3141, 0), "Primio", "Travel"));
+                    transports.add(npcTransport(new WorldPoint(1703, 3140, 0), new WorldPoint(3280, 3412, 0), "Primio", "Travel"));
+                }
+
                 transports.add(npcTransport(new WorldPoint(1779, 3418, 0), new WorldPoint(1784, 3458, 0), 7484, "Travel"));
 
                 // Port sarim
