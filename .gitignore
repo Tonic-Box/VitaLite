@@ -112,3 +112,5 @@ bin/
 /api/src/main/resources/com/tonic/services/pathfinder/transports.backup.json
 *.hprof
 /agent/
+/api/src/main/java/com/tonic/services/llmapi/
+/.mcp.json

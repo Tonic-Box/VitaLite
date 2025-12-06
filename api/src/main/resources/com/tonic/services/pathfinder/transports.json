@@ -77094,5 +77094,75 @@
     },
     "action": "Enter",
     "objectId": 31556
+  },
+  {
+    "source": {
+      "x": 1644,
+      "y": 3451,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1646,
+      "y": 9848,
+      "plane": 0
+    },
+    "action": "Enter",
+    "objectId": 31690
+  },
+  {
+    "source": {
+      "x": 1646,
+      "y": 9848,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1643,
+      "y": 3450,
+      "plane": 0
+    },
+    "action": "Enter",
+    "objectId": 31691
+  },
+  {
+    "source": {
+      "x": 1645,
+      "y": 3451,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1646,
+      "y": 9848,
+      "plane": 0
+    },
+    "action": "Enter",
+    "objectId": 31690
+  },
+  {
+    "source": {
+      "x": 1643,
+      "y": 3450,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1646,
+      "y": 9848,
+      "plane": 0
+    },
+    "action": "Enter",
+    "objectId": 31690
+  },
+  {
+    "source": {
+      "x": 1643,
+      "y": 3449,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1646,
+      "y": 9848,
+      "plane": 0
+    },
+    "action": "Enter",
+    "objectId": 31690
   }
 ]
