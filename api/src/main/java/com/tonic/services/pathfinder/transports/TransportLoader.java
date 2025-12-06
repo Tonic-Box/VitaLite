@@ -7,6 +7,7 @@ import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.*;
+import com.tonic.api.handlers.GenericHandlerBuilder;
 import com.tonic.data.wrappers.NpcEx;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.util.DialogueNode;
@@ -1162,8 +1163,8 @@ public class TransportLoader
     {
         DialogueNode node = DialogueNode.get()
                 .node((Object[])chatOptions);
-        HandlerBuilder builder = HandlerBuilder.get()
-                .add(0, () -> {
+        GenericHandlerBuilder builder = GenericHandlerBuilder.get()
+                .add(() -> {
                     TileObjectEx obj = new TileObjectQuery()
                             .withId(objId)
                             .within(source, 5)
@@ -1172,13 +1173,19 @@ public class TransportLoader
                     if (obj != null)
                     {
                         TileObjectAPI.interact(obj, action);
-                        return chatOptions != null && chatOptions.length > 0 ? 1 : 3;
                     }
-                    return 0;
                 })
-                .addDelayUntil(1, DialogueAPI::dialoguePresent)
-                .addDelayUntil(2, () -> !node.processStep())
-                .addDelay(3, 1);
+                .addDelayUntil(() -> {
+                    if(SceneAPI.isReachable(destination) && Distance.pathDistanceTo(PlayerEx.getLocal().getWorldPoint(), destination) < 5)
+                    {
+                        return true;
+                    }
+                    if(DialogueAPI.dialoguePresent())
+                    {
+                        node.processStep();
+                    }
+                    return false;
+                });
 
         return new LongTransport(source, destination, Integer.MAX_VALUE, 0, builder.build());
     }

@@ -27,6 +27,9 @@ public final class StepHandler
     private final Map<Integer, Function<StepContext,Integer>> steps;
     private int STEP_POINTER = 0;
 
+    @Getter
+    private boolean started = false;
+
     public StepHandler(Map<Integer, Function<StepContext,Integer>> steps) {
         this.steps = steps;
     }
@@ -41,6 +44,7 @@ public final class StepHandler
      */
     public boolean step()
     {
+        started = true;
         if(!steps.containsKey(STEP_POINTER))
         {
             reset();
@@ -76,6 +80,7 @@ public final class StepHandler
      */
     public void reset()
     {
+        started = false;
         STEP_POINTER = 0;
         context.remove("SPEED_UP");
         for(Object value : context.values())

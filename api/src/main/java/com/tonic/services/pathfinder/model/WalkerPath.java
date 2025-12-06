@@ -350,6 +350,15 @@ public class WalkerPath
             lastText = null;
         }
 
+        if(!step.getTransport().getHandler().isStarted())
+        {
+            if(!PlayerEx.getLocal().getWorldPoint().equals(step.getPosition()))
+            {
+                MovementAPI.walkToWorldPoint(step.getPosition());
+                return true;
+            }
+        }
+
         boolean value = step.getTransport().getHandler().step();
         if(!value)
         {
