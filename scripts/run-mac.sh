@@ -9,7 +9,7 @@ JAR_NAME="VitaLite.jar"  # Change this to your jar name
 mkdir -p "$JDK_DIR"
 
 # Check if JDK already exists
-if [ ! -f "$JDK_DIR/bin/java" ]; then
+if [ ! -f "$JDK_DIR/Contents/Home/bin/java" ]; then
     echo "JDK not found. Downloading JDK $JDK_VERSION..."
     
     # Detect architecture (Apple Silicon vs Intel)
@@ -42,4 +42,4 @@ fi
 
 # Launch the application
 echo "Launching application..."
-"$JDK_DIR/bin/java" -jar "$JAR_NAME" "$@"
+"$JDK_DIR/Contents/Home/bin/java" -jar "$JAR_NAME" "$@"
