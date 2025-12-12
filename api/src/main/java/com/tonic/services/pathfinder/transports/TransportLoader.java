@@ -405,6 +405,22 @@ public class TransportLoader
                         transports.add(slashWebTransport(pair.getRight(), pair.getLeft()));
                     }
                 }
+
+                // Varrock <-> Varlamore via Regulus Cento
+                if (QuestAPI.isCompleted(Quest.CHILDREN_OF_THE_SUN) || !filter)
+                {
+                    // Varrock -> Varlamore
+                    transports.add(npcTransport(
+                            new WorldPoint(3280, 3412, 0),
+                            new WorldPoint(1700, 3141, 0),
+                            "Regulus Cento", "Travel"));
+                    // Varlamore -> Varrock
+                    transports.add(npcTransport(
+                            new WorldPoint(1700, 3141, 0),
+                            new WorldPoint(3280, 3412, 0),
+                            "Regulus Cento", "Travel"));
+                }
+
 //            if (TEMP_TRANSPORTS != null)
 //            {
 //                LAST_TRANSPORT_LIST.addAll(TEMP_TRANSPORTS);
