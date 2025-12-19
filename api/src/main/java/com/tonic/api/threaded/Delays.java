@@ -47,9 +47,19 @@ public class Delays
      */
     public static void wait(int ms)
     {
+        if (AsyncTask._isCancelled()) {
+            throw new RuntimeException("Task cancelled");
+        }
         try {
             Thread.sleep(ms);
-        } catch (InterruptedException ignored) {
+        } catch (InterruptedException e) {
+            if (AsyncTask._isCancelled()) {
+                throw new RuntimeException("Task cancelled");
+            }
+            Thread.currentThread().interrupt();
+        }
+        if (AsyncTask._isCancelled()) {
+            throw new RuntimeException("Task cancelled");
         }
     }
 

@@ -5,16 +5,16 @@ import com.tonic.api.TClient;
 import com.tonic.headless.HeadlessMode;
 import com.tonic.model.RuneLite;
 import com.tonic.util.ClientConfig;
-import com.tonic.util.RuneliteConfigUtil;
-import com.tonic.util.ThreadPool;
 import com.tonic.util.config.ConfigFactory;
 import lombok.Getter;
-import lombok.Setter;
-
+import com.tonic.exceptions.InvokeTimeoutException;
+import com.tonic.services.watchdog.ThreadDiagnostics;
+import com.tonic.services.watchdog.TrackedInvoke;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -33,9 +33,14 @@ public class Static
     @Getter
     private static ClassLoader classLoader;
     @Getter
-    private static VitaLiteOptions cliArgs = new VitaLiteOptions();
+    private static final VitaLiteOptions cliArgs = new VitaLiteOptions();
     private static Object CLIENT_OBJECT;
     private static RuneLite RL;
+    @Getter
+    private static final ConcurrentHashMap<Long, TrackedInvoke<?>> pendingInvokes = new ConcurrentHashMap<>();
+    private static final AtomicLong invokeIdGenerator = new AtomicLong(0);
+    private static final long INVOKE_TIMEOUT_MS = 3000L;
+    private static final ThreadLocal<Integer> invokeDepth = ThreadLocal.withInitial(() -> 0);
 
     /**
      * get client instance
@@ -102,14 +107,45 @@ public class Static
      *
      * @param supplier runnable block
      * @return return value
+     * @throws InvokeTimeoutException if the invoke times out after 3 seconds
      */
     public static <T> T invoke(Supplier<T> supplier) {
         TClient T_CLIENT = (TClient) CLIENT_OBJECT;
         if (!T_CLIENT.isClientThread()) {
-            CompletableFuture<T> future = new CompletableFuture<>();
-            Runnable runnable = () -> future.complete(supplier.get());
-            invoke(runnable);
-            return future.join();
+            int depth = invokeDepth.get();
+            if (depth > 10) {
+                throw new IllegalStateException("Recursive invoke detected (depth > 10)");
+            }
+            invokeDepth.set(depth + 1);
+
+            try {
+                CompletableFuture<T> future = new CompletableFuture<>();
+                String caller = ThreadDiagnostics.getCaller();
+                TrackedInvoke<T> tracked = new TrackedInvoke<>(future, caller);
+
+                long invokeId = invokeIdGenerator.incrementAndGet();
+                pendingInvokes.put(invokeId, tracked);
+
+                Runnable runnable = () -> {
+                    try {
+                        future.complete(supplier.get());
+                    } catch (Throwable t) {
+                        future.completeExceptionally(t);
+                    } finally {
+                        pendingInvokes.remove(invokeId);
+                    }
+                };
+                getRuneLite().getClientThread().invoke(runnable);
+
+                try {
+                    return tracked.getWithTimeout(INVOKE_TIMEOUT_MS);
+                } catch (InvokeTimeoutException e) {
+                    pendingInvokes.remove(invokeId);
+                    throw e;
+                }
+            } finally {
+                invokeDepth.set(depth);
+            }
         } else {
             return supplier.get();
         }
@@ -142,13 +178,55 @@ public class Static
     public static <T> T invokeLater(Supplier<T> supplier) {
         TClient T_CLIENT = (TClient) CLIENT_OBJECT;
         if (!T_CLIENT.isClientThread()) {
-            CompletableFuture<T> future = new CompletableFuture<>();
-            Runnable runnable = () -> future.complete(supplier.get());
-            invokeLater(runnable);
-            return future.join();
+            int depth = invokeDepth.get();
+            if (depth > 10) {
+                throw new IllegalStateException("Recursive invoke detected (depth > 10)");
+            }
+            invokeDepth.set(depth + 1);
+
+            try {
+                CompletableFuture<T> future = new CompletableFuture<>();
+                String caller = ThreadDiagnostics.getCaller();
+                TrackedInvoke<T> tracked = new TrackedInvoke<>(future, caller);
+
+                long invokeId = invokeIdGenerator.incrementAndGet();
+                pendingInvokes.put(invokeId, tracked);
+
+                Runnable runnable = () -> {
+                    try {
+                        future.complete(supplier.get());
+                    } catch (Throwable t) {
+                        future.completeExceptionally(t);
+                    } finally {
+                        pendingInvokes.remove(invokeId);
+                    }
+                };
+                invokeLater(runnable);
+
+                try {
+                    return tracked.getWithTimeout(INVOKE_TIMEOUT_MS);
+                } catch (InvokeTimeoutException e) {
+                    pendingInvokes.remove(invokeId);
+                    throw e;
+                }
+            } finally {
+                invokeDepth.set(depth);
+            }
         } else {
             return supplier.get();
         }
+    }
+
+    public static void cancelAllPendingInvokes() {
+        pendingInvokes.values().forEach(TrackedInvoke::cancel);
+        pendingInvokes.clear();
+    }
+
+    public static void resetForRecovery() {
+        cancelAllPendingInvokes();
+        CLIENT_OBJECT = null;
+        RL = null;
+        classLoader = null;
     }
 
     /**
