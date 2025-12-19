@@ -142,12 +142,11 @@ public class ClientWatchdog {
 
         Logger.warn("[Watchdog] No game ticks for " + missedChecks + " checks (~" + (missedChecks * 600) + "ms) - client thread may be stuck");
 
-        var pending = com.tonic.Static.getPendingInvokes();
-        if (!pending.isEmpty()) {
-            Logger.error("[Watchdog] Pending invokes (" + pending.size() + "):");
-            for (TrackedInvoke<?> invoke : pending.values()) {
-                Logger.error(invoke.getCallerInfo());
-            }
+        TrackedRunnable current = TrackedRunnable.getCurrentlyExecuting();
+        if (current != null) {
+            long elapsed = System.currentTimeMillis() - current.getQueuedAt();
+            Logger.error("[Watchdog] Client Thread Dead-Lock detected (running for " + elapsed + "ms)");
+            Logger.error(current.getCallerStack());
         }
 
         for (WatchdogListener listener : listeners) {

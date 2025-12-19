@@ -1,7 +1,6 @@
 package com.tonic.services.watchdog;
 
 import com.tonic.Logger;
-import com.tonic.Static;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -67,13 +66,11 @@ public class RecoveryManager {
 
     private static boolean cancelAllPendingInvokes() {
         try {
-            int pendingCount = Static.getPendingInvokes().size();
-            Static.cancelAllPendingInvokes();
             TrackedInvoke.triggerCancellationHook();
-            Logger.info("[Recovery] Cancelled " + pendingCount + " pending invokes, signaled cancellation");
+            Logger.info("[Recovery] Signaled cancellation");
             return true;
         } catch (Throwable t) {
-            Logger.error("[Recovery] Failed to cancel pending invokes: " + t.getMessage());
+            Logger.error("[Recovery] Failed to signal cancellation: " + t.getMessage());
             return false;
         }
     }
