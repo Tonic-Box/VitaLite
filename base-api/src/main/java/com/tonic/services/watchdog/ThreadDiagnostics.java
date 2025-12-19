@@ -73,6 +73,33 @@ public class ThreadDiagnostics {
         return "unknown";
     }
 
+    public static String getCallerStack() {
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== QUEUED FROM ===\n");
+
+        boolean foundExternal = false;
+        for (int i = 2; i < stack.length; i++) {
+            StackTraceElement element = stack[i];
+            String className = element.getClassName();
+            if (!foundExternal) {
+                if (className.startsWith("com.tonic.Static") ||
+                    className.startsWith("com.tonic.services.watchdog")) {
+                    continue;
+                }
+                foundExternal = true;
+            }
+            sb.append(String.format("  [%d] %s.%s(%s:%d)\n",
+                    i - 2,
+                    element.getClassName(),
+                    element.getMethodName(),
+                    element.getFileName() != null ? element.getFileName() : "Unknown",
+                    element.getLineNumber()));
+        }
+
+        return sb.toString();
+    }
+
     private static String formatThread(Thread thread, StackTraceElement[] stack) {
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("Thread: %s (id=%d, state=%s)\n",

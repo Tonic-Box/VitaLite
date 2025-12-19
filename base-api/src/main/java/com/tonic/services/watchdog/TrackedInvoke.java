@@ -105,10 +105,7 @@ public class TrackedInvoke<T> {
     }
 
     private void onTimeout(long timeoutMs) {
-        String dump = ThreadDiagnostics.generateFullDump();
-        Logger.error("[Watchdog] Invoke timeout after " + timeoutMs + "ms from " + callerInfo);
-        Logger.error(dump);
-        ThreadDiagnostics.dumpToFile(dump);
+        Logger.error("[Watchdog] Client Thread Dead-Lock" + timeoutMs + "ms\n" + callerInfo);
         cancel();
     }
 }
