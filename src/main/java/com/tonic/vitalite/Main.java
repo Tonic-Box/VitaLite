@@ -2,6 +2,7 @@ package com.tonic.vitalite;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.logging.LogFileManager;
 import com.tonic.VitaLiteOptions;
 import com.tonic.bootstrap.RLUpdater;
 import com.tonic.classloader.RLClassLoader;
@@ -37,6 +38,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception
     {
+        LogFileManager.initialize();
         VitaLiteOptions optionsParser = Static.getCliArgs();
         args = optionsParser.parse(args);
         optionsParser._checkAudio();
