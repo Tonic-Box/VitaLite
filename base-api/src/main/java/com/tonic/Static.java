@@ -120,8 +120,8 @@ public class Static
 
             try {
                 CompletableFuture<T> future = new CompletableFuture<>();
-                String caller = ThreadDiagnostics.getCaller();
-                TrackedInvoke<T> tracked = new TrackedInvoke<>(future, caller);
+                String callerStack = ThreadDiagnostics.getCallerStack();
+                TrackedInvoke<T> tracked = new TrackedInvoke<>(future, callerStack);
 
                 long invokeId = invokeIdGenerator.incrementAndGet();
                 pendingInvokes.put(invokeId, tracked);
@@ -186,8 +186,8 @@ public class Static
 
             try {
                 CompletableFuture<T> future = new CompletableFuture<>();
-                String caller = ThreadDiagnostics.getCaller();
-                TrackedInvoke<T> tracked = new TrackedInvoke<>(future, caller);
+                String callerStack = ThreadDiagnostics.getCallerStack();
+                TrackedInvoke<T> tracked = new TrackedInvoke<>(future, callerStack);
 
                 long invokeId = invokeIdGenerator.incrementAndGet();
                 pendingInvokes.put(invokeId, tracked);

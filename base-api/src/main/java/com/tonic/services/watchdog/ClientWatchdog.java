@@ -142,9 +142,13 @@ public class ClientWatchdog {
 
         Logger.warn("[Watchdog] No game ticks for " + missedChecks + " checks (~" + (missedChecks * 600) + "ms) - client thread may be stuck");
 
-        String dump = ThreadDiagnostics.generateFullDump();
-        Logger.error("[Watchdog] Thread dump:\n" + dump);
-        ThreadDiagnostics.dumpToFile(dump);
+        var pending = com.tonic.Static.getPendingInvokes();
+        if (!pending.isEmpty()) {
+            Logger.error("[Watchdog] Pending invokes (" + pending.size() + "):");
+            for (TrackedInvoke<?> invoke : pending.values()) {
+                Logger.error(invoke.getCallerInfo());
+            }
+        }
 
         for (WatchdogListener listener : listeners) {
             try {
