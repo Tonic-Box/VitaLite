@@ -1,4 +1,4 @@
-package com.tonic.injector.util;
+package com.tonic.util;
 
 import com.tonic.Logger;
 import com.tonic.util.MappingProvider;
