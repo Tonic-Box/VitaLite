@@ -35,7 +35,7 @@ public class Delays
         {
             if(Thread.currentThread().isInterrupted() || AsyncTask._isCancelled())
             {
-                throw new RuntimeException();
+                throw new RuntimeException("Task cancelled");
             }
             wait(20);
         }
@@ -73,7 +73,7 @@ public class Delays
         {
             if(Thread.currentThread().isInterrupted() || AsyncTask._isCancelled())
             {
-                throw new RuntimeException();
+                throw new RuntimeException("Task cancelled");
             }
             wait(100);
         }
@@ -96,7 +96,7 @@ public class Delays
             }
             if(Thread.currentThread().isInterrupted() || AsyncTask._isCancelled())
             {
-                throw new RuntimeException();
+                throw new RuntimeException("Task cancelled");
             }
             wait(100);
         }
@@ -120,7 +120,7 @@ public class Delays
             }
             if(Thread.currentThread().isInterrupted() || AsyncTask._isCancelled())
             {
-                throw new RuntimeException();
+                throw new RuntimeException("Task cancelled");
             }
             wait(100);
         }

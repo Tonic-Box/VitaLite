@@ -42,7 +42,15 @@ public class VitaPlugin extends Plugin
             }
             catch (RuntimeException e)
             {
-                Logger.norm("[" + getName() + "] Plugin::loop() has been interrupted.");
+                if(e.getMessage().equals("Task cancelled"))
+                {
+                    Logger.warn("[" + getName() + "] Plugin::loop() has been interrupted.");
+                }
+                else
+                {
+                    Logger.error(e, "[" + getName() + "] Error in loop(): %e");
+                    e.printStackTrace();
+                }
             }
             catch (Throwable e)
             {
