@@ -1,5 +1,6 @@
 package com.tonic;
 
+import com.tonic.util.LoggerFormatting;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import javax.inject.Singleton;
@@ -127,6 +128,22 @@ public class Logger {
         INSTANCE._norm(data);
     }
 
+
+    /**
+     * For normal purposeful logging with SLF4J-style {} placeholders.
+     * Supports escaping with \{} to print literal braces.
+     *
+     * @param format The format string containing {} placeholders
+     * @param args Arguments to substitute into the placeholders
+     */
+    public static void norm(String format, Object... args)
+    {
+        if(INSTANCE == null)
+            return;
+        INSTANCE._norm(format(format, args));
+    }
+
+
     /**
      * for general diagnostic logging
      * @param data data
@@ -139,6 +156,22 @@ public class Logger {
     }
 
     /**
+     * For general diagnostic logging with SLF4J-style {} placeholders.
+     * Supports escaping with \{} to print literal braces.
+     *
+     * @param format The format string containing {} placeholders
+     * @param args Arguments to substitute into the placeholders
+     */
+    public static void info(String format, Object... args)
+    {
+        if(INSTANCE == null)
+            return;
+        if(!INSTANCE.info)
+            return;
+        INSTANCE._info(format(format, args));
+    }
+
+    /**
      * For non fatal warnings
      * @param data data
      */
@@ -147,6 +180,22 @@ public class Logger {
         if(INSTANCE == null)
             return;
         INSTANCE._warn(data);
+    }
+
+    /**
+     * For non-fatal warnings with SLF4J-style {} placeholders.
+     * Supports escaping with \{} to print literal braces.
+     *
+     * @param format The format string containing {} placeholders
+     * @param args Arguments to substitute into the placeholders
+     */
+    public static void warn(String format, Object... args)
+    {
+        if(INSTANCE == null)
+            return;
+        if(!INSTANCE.warning)
+            return;
+        INSTANCE._warn(format(format, args));
     }
 
     /**
@@ -162,6 +211,65 @@ public class Logger {
         }
         INSTANCE._error(data);
     }
+
+
+    /**
+     * For fatal errors with SLF4J-style {} placeholders.
+     * Supports escaping with \{} to print literal braces.
+     * If the last argument is a Throwable, it will be treated as an exception context.
+     *
+     * @param format The format string containing {} placeholders
+     * @param args Arguments to substitute into the placeholders
+     */
+    public static void error(String format, Object... args)
+    {
+        if(INSTANCE == null)
+        {
+            System.err.println(format(format, args));
+            return;
+        }
+        if(!INSTANCE.error)
+            return;
+
+        // Use MessageFormatter to detect and extract Throwable
+        LoggerFormatting.FormattingTuple tuple = LoggerFormatting.arrayFormat(format, args);
+        String message = tuple.getMessage();
+        Throwable throwable = tuple.getThrowable();
+
+        if (throwable != null) {
+            // Format message with stack trace
+            StringBuilder sb = new StringBuilder(message);
+            sb.append("\n");
+            sb.append(throwable.getClass().getName());
+            sb.append(": ");
+            sb.append(throwable.getMessage());
+
+            // Append stack trace elements
+            for (StackTraceElement element : throwable.getStackTrace()) {
+                sb.append("\n\tat ");
+                sb.append(element.toString());
+            }
+
+            // Append causes if present
+            Throwable cause = throwable.getCause();
+            while (cause != null) {
+                sb.append("\nCaused by: ");
+                sb.append(cause.getClass().getName());
+                sb.append(": ");
+                sb.append(cause.getMessage());
+                for (StackTraceElement element : cause.getStackTrace()) {
+                    sb.append("\n\tat ");
+                    sb.append(element.toString());
+                }
+                cause = cause.getCause();
+            }
+
+            INSTANCE._error(sb.toString());
+        } else {
+            INSTANCE._error(message);
+        }
+    }
+
 
     /**
      * for fatal errors
@@ -186,6 +294,29 @@ public class Logger {
         if(INSTANCE == null)
             return;
         INSTANCE._error(message.replace("%e", throwable.getMessage()));
+    }
+
+
+
+    /**
+     * Formats a message using SLF4J-style {} placeholders with the provided arguments.
+     * Supports escaping with \{} to print literal braces.
+     * Automatically handles Throwable as the last argument.
+     *
+     * @param format The format string containing {} placeholders
+     * @param args Arguments to substitute into the placeholders
+     * @return The formatted message string
+     */
+    private static String format(String format, Object... args) {
+        if (format == null) {
+            return null;
+        }
+        if (args == null || args.length == 0) {
+            return format;
+        }
+
+        LoggerFormatting.FormattingTuple tuple = LoggerFormatting.arrayFormat(format, args);
+        return tuple.getMessage();
     }
 
     /**
