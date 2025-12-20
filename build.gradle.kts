@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("2")
+val vitaVersion by extra("3")
 val runeliteVersion by extra("1.12.9")
 
 group = "com.tonic"
@@ -358,10 +358,9 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-BUGFIX"
+    val title = "${tag}-FEATURE"
     val body = "# ${tag}\n" +
-            "- fixed a bug that caused some servers to write logs as whitespace/garbled text\n" +
-            "- fixed bug with client thread watchdog service"
+            "- better error propagation for looped plugins (VitaPlugin)"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {

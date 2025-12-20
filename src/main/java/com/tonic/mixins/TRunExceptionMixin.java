@@ -3,7 +3,7 @@ package com.tonic.mixins;
 import com.tonic.Logger;
 import com.tonic.injector.annotations.Disable;
 import com.tonic.injector.annotations.Mixin;
-import com.tonic.injector.util.ExceptionUtil;
+import com.tonic.util.ExceptionUtil;
 import com.tonic.util.StackTraceUtil;
 
 @Mixin("Client")

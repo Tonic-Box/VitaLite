@@ -1,11 +1,8 @@
 package com.tonic.mixins;
 
-import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.*;
 import com.tonic.injector.annotations.*;
-import com.tonic.injector.util.ExceptionUtil;
-import com.tonic.model.ui.VitaLiteOptionsPanel;
 
 @Mixin("Client")
 public abstract class TClientMixin implements TClient
