@@ -526,7 +526,6 @@ public class GameManager extends Overlay {
     protected void onGameTick(GameTick event)
     {
         tickCount++;
-        ClientWatchdog.recordHeartbeat(tickCount);
         if(walkerPath != null && !walkerPath.step())
         {
             walkerPath = null;

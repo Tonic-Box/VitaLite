@@ -3,6 +3,7 @@ package com.tonic.logging;
 import com.tonic.Static;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -48,8 +49,8 @@ public class LogFileManager {
             TeeOutputStream teeOut = new TeeOutputStream(originalOut, timestampedFile);
             TeeOutputStream teeErr = new TeeOutputStream(originalErr, timestampedFile);
 
-            System.setOut(new PrintStream(teeOut, false));
-            System.setErr(new PrintStream(teeErr, false));
+            System.setOut(new PrintStream(teeOut, false, StandardCharsets.UTF_8));
+            System.setErr(new PrintStream(teeErr, false, StandardCharsets.UTF_8));
 
             startFlushScheduler();
 
@@ -130,8 +131,8 @@ public class LogFileManager {
         TeeOutputStream teeOut = new TeeOutputStream(originalOut, timestampedFile);
         TeeOutputStream teeErr = new TeeOutputStream(originalErr, timestampedFile);
 
-        System.setOut(new PrintStream(teeOut, false));
-        System.setErr(new PrintStream(teeErr, false));
+        System.setOut(new PrintStream(teeOut, false, StandardCharsets.UTF_8));
+        System.setErr(new PrintStream(teeErr, false, StandardCharsets.UTF_8));
     }
 
     /**
