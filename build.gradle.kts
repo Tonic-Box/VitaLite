@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("0")
+val vitaVersion by extra("2")
 val runeliteVersion by extra("1.12.9")
 
 group = "com.tonic"
@@ -350,4 +350,30 @@ tasks.register("buildRelease") {
     }
 
     finalizedBy("packageRelease")
+}
+
+tasks.register<Exec>("publishRelease") {
+    group = "release-pipeline"
+    description = "Creates a GitHub release with the packaged zip"
+    dependsOn("buildRelease")
+
+    val tag = "${runeliteVersion}_${vitaVersion}"
+    val title = "${tag}-BUGFIX"
+    val body = "# ${tag}\n" +
+            "- fixed a bug that caused some servers to write logs as whitespace/garbled text\n" +
+            "- fixed bug with client thread watchdog service"
+    val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
+
+    doFirst {
+        if (!zipFile.exists()) {
+            throw GradleException("Release zip not found: ${zipFile.absolutePath}")
+        }
+    }
+
+    commandLine(
+        "C:\\Program Files\\GitHub CLI\\gh.exe", "release", "create", tag,
+        zipFile.absolutePath,
+        "--title", title,
+        "--notes", body
+    )
 }
