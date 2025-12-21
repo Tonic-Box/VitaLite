@@ -258,7 +258,7 @@ public class SceneAPI {
     }
 
     /**
-     * Finds a path from one world point to another and returns a list of waypoints (WorldPoints) along the path.
+     * Finds a path from one world point to another and returns a list of WorldPoints along the path.
      * @param from The starting WorldPoint.
      * @param to The destination WorldPoint.
      * @return A list of WorldPoints representing the path, or null if no path is found or if the points are on different planes.
