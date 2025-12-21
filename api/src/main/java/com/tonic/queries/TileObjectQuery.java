@@ -248,6 +248,10 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
     public TileObjectQuery sortShortestPath(WorldPoint center)
     {
         return sort((o1, o2) -> {
+            WorldPoint o1Point = o1.getInteractionPoint();
+            WorldPoint o2Point = o2.getInteractionPoint();
+            if(o1Point == null || o2Point == null)
+                return 0;
             List<WorldPoint> path1 = SceneAPI.pathTo(center, o1.getInteractionPoint());
             List<WorldPoint> path2 = SceneAPI.pathTo(center, o2.getInteractionPoint());
             int len1 = path1 == null ? Integer.MAX_VALUE : path1.size();
