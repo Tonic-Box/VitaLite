@@ -6,6 +6,7 @@ import com.tonic.data.wrappers.NpcEx;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.util.AsyncTask;
 import com.tonic.services.GameManager;
+import com.tonic.util.StackTraceUtil;
 import net.runelite.api.Client;
 import net.runelite.api.Player;
 
@@ -47,6 +48,12 @@ public class Delays
      */
     public static void wait(int ms)
     {
+        Client client = Static.getClient();
+        if(client.isClientThread())
+        {
+            String msg = StackTraceUtil.getStackTrace("Cannot wait on client thread");
+            throw new RuntimeException(msg);
+        }
         if (AsyncTask._isCancelled()) {
             throw new RuntimeException("Task cancelled");
         }
