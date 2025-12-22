@@ -29,7 +29,12 @@ public class PluginListItemMixin
                 tryBlock -> {
                     tryBlock
                             .pushThis()
-                            .pushLocal(2)
+                            .pushThis()
+                            .getField(
+                                    "net/runelite/client/plugins/config/PluginListItem",
+                                    "pluginConfig",
+                                    "Lnet/runelite/client/plugins/config/PluginConfigurationDescriptor;"
+                            )
                             .invokeVirtual(
                                     "net/runelite/client/plugins/config/PluginConfigurationDescriptor",
                                     "getPlugin",

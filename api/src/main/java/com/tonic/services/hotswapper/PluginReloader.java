@@ -133,6 +133,10 @@ public class PluginReloader {
                     .findFirst()
                     .orElse(null);
 
+            if (plugin == null) {
+                return;
+            }
+
             ReflectBuilder.of(plugin)
                     .field("pluginListPanelProvider")
                     .method("get", null, null)
@@ -145,9 +149,6 @@ public class PluginReloader {
         }
     }
 
-    /*
-     * INTERNAL USE ONLY: A call to this is injected into RuneLite's plugin list items
-     */
     public static void addRedButtonAfterPin(JPanel pluginListItem, Plugin plugin) {
         SwingUtilities.invokeLater(() -> {
             if (!(pluginListItem.getLayout() instanceof BorderLayout)) {
