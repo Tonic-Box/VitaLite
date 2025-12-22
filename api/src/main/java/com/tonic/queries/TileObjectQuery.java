@@ -250,10 +250,8 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
         return sort((o1, o2) -> {
             WorldPoint o1Point = o1.getInteractionPoint();
             WorldPoint o2Point = o2.getInteractionPoint();
-            if(o1Point == null || o2Point == null)
-                return 0;
-            int len1 = Distance.pathDistanceTo(center, o1.getInteractionPoint());
-            int len2 = Distance.pathDistanceTo(center, o2.getInteractionPoint());
+            int len1 = o1Point == null ? Integer.MAX_VALUE : Distance.pathDistanceTo(center, o1Point);
+            int len2 = o2Point == null ? Integer.MAX_VALUE : Distance.pathDistanceTo(center, o2Point);
             return Integer.compare(len1, len2);
         });
     }
@@ -275,8 +273,10 @@ public class TileObjectQuery extends AbstractQuery<TileObjectEx, TileObjectQuery
     public TileObjectQuery sortLongestPath(WorldPoint center)
     {
         return sort((o1, o2) -> {
-            int len1 = Distance.pathDistanceTo(center, o1.getInteractionPoint());
-            int len2 = Distance.pathDistanceTo(center, o2.getInteractionPoint());
+            WorldPoint o1Point = o1.getInteractionPoint();
+            WorldPoint o2Point = o2.getInteractionPoint();
+            int len1 = o1Point == null ? Integer.MAX_VALUE : Distance.pathDistanceTo(center, o1Point);
+            int len2 = o2Point == null ? Integer.MAX_VALUE : Distance.pathDistanceTo(center, o2Point);
             return Integer.compare(len2, len1);
         });
     }
