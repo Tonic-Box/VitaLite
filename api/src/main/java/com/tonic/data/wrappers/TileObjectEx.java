@@ -289,7 +289,7 @@ public class TileObjectEx implements Entity
 
     public WorldPoint getInteractionPoint(WorldPoint to)
     {
-        WorldPoint closest = getWorldPoint();
+        WorldPoint closest = null;
         int closestDist = Integer.MAX_VALUE;
         for(WorldPoint wp : interactableFrom())
         {
