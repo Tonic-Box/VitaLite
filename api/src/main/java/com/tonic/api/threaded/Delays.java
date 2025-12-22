@@ -49,7 +49,7 @@ public class Delays
     public static void wait(int ms)
     {
         Client client = Static.getClient();
-        if(client.isClientThread())
+        if(client != null && client.isClientThread())
         {
             String msg = StackTraceUtil.getStackTrace("Cannot wait on client thread");
             throw new RuntimeException(msg);
