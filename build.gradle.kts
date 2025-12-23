@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("1")
+val vitaVersion by extra("2")
 val runeliteVersion by extra("1.12.10")
 
 group = "com.tonic"
@@ -360,8 +360,7 @@ tasks.register<Exec>("publishRelease") {
     val tag = "${runeliteVersion}_${vitaVersion}"
     val title = "${tag}-BUGFIX"
     val body = "# ${tag}\n" +
-            "- Fixed NPE in some distance sorting apis\n" +
-            "- Fixed npe causing both autologin and hot-reloading systems to properly init\n";
+            "- Removed the watchdog service, caused too many issues and better solved with client thread checks";
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
