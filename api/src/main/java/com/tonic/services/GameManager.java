@@ -19,8 +19,6 @@ import com.tonic.data.wrappers.TileItemEx;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.headless.HeadlessMode;
 import com.tonic.services.hotswapper.PluginReloader;
-import com.tonic.services.watchdog.ClientWatchdog;
-import com.tonic.services.watchdog.TrackedInvoke;
 import com.tonic.util.AsyncTask;
 import com.tonic.services.mouse.ClickVisualizationOverlay;
 import com.tonic.services.mouse.MovementVisualizationOverlay;
@@ -30,7 +28,6 @@ import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.services.stratpath.StratPathOverlay;
-import com.tonic.ui.VitaOverlay;
 import com.tonic.util.Profiler;
 import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
@@ -433,9 +430,6 @@ public class GameManager extends Overlay {
                 .register(this);
         TransportLoader.init();
         BankCache.init();
-        ClientWatchdog.init();
-        TrackedInvoke.setGlobalCancellationHook(AsyncTask::_cancel);
-        TrackedInvoke.setGlobalResetHook(AsyncTask::dispose);
 
         ThreadPool.submit(() -> {
             Client client = Static.getClient();
@@ -594,8 +588,6 @@ public class GameManager extends Overlay {
         GameState state = event.getGameState();
         if(state == GameState.LOGIN_SCREEN || state == GameState.HOPPING)
             tickCount = 0;
-
-        ClientWatchdog.setLoggedIn(state == GameState.LOGGED_IN);
     }
 
     @Subscribe
