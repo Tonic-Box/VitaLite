@@ -358,9 +358,10 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-SUBREV"
+    val title = "${tag}-BUGFIX"
     val body = "# ${tag}\n" +
-            "- Subrev"
+            "- Fixed NPE in some distance sorting apis\n" +
+            "- Fixed npe causing both autologin and hot-reloading systems to properly init\n";
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
