@@ -7,7 +7,7 @@ VitaLite's mouse movement system uses **trajectory-based generation** to create 
 ## How It Works
 
 ### 1. Recording Phase
-The system passively records your mouse movements during manual play by intercepting `OP_MOUSE_MOVEMENT` packets (opcode 70) from the game client. Each packet contains:
+The system passively records your mouse movements during manual play by intercepting `OP_MOUSE_MOVEMENT` packets from the game client. Each packet contains:
 - Multiple compressed mouse samples (position + timing data)
 - Movement metadata (distance, direction, duration, sample count)
 - Compression statistics (Small/Medium/Large/XLarge delta encoding)
