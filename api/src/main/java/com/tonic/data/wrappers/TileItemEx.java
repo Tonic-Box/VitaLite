@@ -7,7 +7,6 @@ import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.data.wrappers.abstractions.Entity;
 import com.tonic.services.GameManager;
-import com.tonic.util.Distance;
 import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -73,6 +72,18 @@ public class TileItemEx implements Entity
         return itemManager.canonicalize(item.getId());
     }
 
+    /**
+     * Checks if this item is stackable.
+     * @return true if the item can be stacked, false otherwise
+     */
+    public boolean isStackable() {
+        return Static.invoke(() -> {
+            ItemManager itemManager = Static.getInjector().getInstance(ItemManager.class);
+            var comp = itemManager.getItemComposition(getCanonicalId());
+            return comp.isStackable();
+        });
+    }
+
     @Override
     public String getName() {
         Client client = Static.getClient();
@@ -106,6 +117,38 @@ public class TileItemEx implements Entity
         });
 
         return actions;
+    }
+
+    /**
+     * Checks if this item has the specified action.
+     * @param action the action to check for (case-insensitive)
+     * @return true if the action exists, false otherwise
+     */
+    public boolean hasAction(String action) {
+        String[] actions = getActions();
+        if(actions == null)
+            return false;
+        for(String a : actions) {
+            if(a != null && a.equalsIgnoreCase(action))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if this item has an action containing the specified text.
+     * @param actionPart the text to search for in actions (case-insensitive)
+     * @return true if any action contains the text, false otherwise
+     */
+    public boolean hasActionContains(String actionPart) {
+        String[] actions = getActions();
+        if(actions == null)
+            return false;
+        for(String a : actions) {
+            if(a != null && a.toLowerCase().contains(actionPart.toLowerCase()))
+                return true;
+        }
+        return false;
     }
 
     public int getShopPrice() {
