@@ -41,8 +41,16 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class WalkerPath
 {
-    private static final int[] STAMINA = {net.runelite.api.gameval.ItemID._1DOSESTAMINA, net.runelite.api.gameval.ItemID._2DOSESTAMINA, net.runelite.api.gameval.ItemID._3DOSESTAMINA, ItemID._4DOSESTAMINA};
-
+    private static final int[] STAMINA = {
+        ItemID._1DOSESTAMINA,
+        ItemID._2DOSESTAMINA,
+        ItemID._3DOSESTAMINA,
+        ItemID._4DOSESTAMINA,
+        ItemID._1DOSE2STAMINA,
+        ItemID._2DOSE2STAMINA,
+        ItemID._3DOSE2STAMINA,
+        ItemID._4DOSE2STAMINA
+    };
     private final Client client;
     @Getter
     private final List<IStep> steps;
