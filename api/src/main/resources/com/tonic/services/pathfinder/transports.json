@@ -62776,7 +62776,15 @@
       "plane": 0
     },
     "action": "Move",
-    "objectId": 26415
+    "objectId": 26415,
+    "requirements": {
+      "skillRequirements": [
+        {
+          "skill": "STRENGTH",
+          "level": 60
+        }
+      ]
+    }
   },
   {
     "source": {
@@ -62790,7 +62798,15 @@
       "plane": 0
     },
     "action": "Move",
-    "objectId": 26415
+    "objectId": 26415,
+    "requirements": {
+      "skillRequirements": [
+        {
+          "skill": "STRENGTH",
+          "level": 60
+        }
+      ]
+    }
   },
   {
     "source": {
@@ -62804,7 +62820,15 @@
       "plane": 0
     },
     "action": "Move",
-    "objectId": 26415
+    "objectId": 26415,
+    "requirements": {
+      "skillRequirements": [
+        {
+          "skill": "STRENGTH",
+          "level": 60
+        }
+      ]
+    }
   },
   {
     "source": {
@@ -62818,7 +62842,15 @@
       "plane": 0
     },
     "action": "Move",
-    "objectId": 26415
+    "objectId": 26415,
+    "requirements": {
+      "skillRequirements": [
+        {
+          "skill": "STRENGTH",
+          "level": 60
+        }
+      ]
+    }
   },
   {
     "source": {
@@ -62832,7 +62864,15 @@
       "plane": 0
     },
     "action": "Move",
-    "objectId": 26415
+    "objectId": 26415,
+    "requirements": {
+      "skillRequirements": [
+        {
+          "skill": "STRENGTH",
+          "level": 60
+        }
+      ]
+    }
   },
   {
     "source": {
@@ -62846,7 +62886,15 @@
       "plane": 0
     },
     "action": "Crawl-through",
-    "objectId": 26382
+    "objectId": 26382,
+    "requirements": {
+      "skillRequirements": [
+        {
+          "skill": "AGILITY",
+          "level": 60
+        }
+      ]
+    }
   },
   {
     "source": {
@@ -62860,7 +62908,15 @@
       "plane": 0
     },
     "action": "Crawl-through",
-    "objectId": 26382
+    "objectId": 26382,
+    "requirements": {
+      "skillRequirements": [
+        {
+          "skill": "AGILITY",
+          "level": 60
+        }
+      ]
+    }
   },
   {
     "source": {
