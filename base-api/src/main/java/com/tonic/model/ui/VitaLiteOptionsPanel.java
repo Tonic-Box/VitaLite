@@ -182,11 +182,15 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         loggingPanel.addVerticalStrut(12);
 
         hideLoggerToggle = new ToggleSlider();
+        hideLoggerToggle.setSelected(!Static.getVitaConfig().shouldShowHLoggerPanel());
         loggingPanel.addContent(createToggleOption(
                 "Hide Logger",
                 "Hide the logger panel",
                 hideLoggerToggle,
-                () -> Logger.setLoggerVisible(!hideLoggerToggle.isSelected())
+                () -> {
+                    Logger.setLoggerVisible(!hideLoggerToggle.isSelected());
+                    Static.getVitaConfig().setShowLoggerPanel(!hideLoggerToggle.isSelected());
+                }
         ));
         loggingPanel.addVerticalStrut(12);
 
