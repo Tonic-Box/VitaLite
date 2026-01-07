@@ -57,16 +57,16 @@ public class RuneliteConfigUtil
         {
             if(CacheClient.checkForUpdate(revision))
             {
-                int result = JOptionPane.showConfirmDialog(
-                        null,
-                        "There has been a cache update and you are about to be loading an impossible version of runelite. Are you sure you want to proceed? (" + revision + ")",            // message
-                        "Confirmation",
-                        JOptionPane.YES_NO_OPTION
-                );
-
-                if (result != JOptionPane.YES_OPTION) {
-                    System.exit(0);
-                }
+//                int result = JOptionPane.showConfirmDialog(
+//                        null,
+//                        "There has been a cache update and you are about to be loading an impossible version of runelite. Are you sure you want to proceed? (" + revision + ")",            // message
+//                        "Confirmation",
+//                        JOptionPane.YES_NO_OPTION
+//                );
+//
+//                if (result != JOptionPane.YES_OPTION) {
+//                    System.exit(0);
+//                }
             }
         }
         CacheClient.updateCache();
