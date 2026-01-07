@@ -122,4 +122,9 @@ public interface ClientConfig extends VitaConfig {
     boolean shouldShowHeadlessMap();
     @ConfigKey(value = "headlessMapView")
     void setShowHeadlessMap(boolean show);
+
+    @ConfigKey(value = "showLogger", defaultValue = "true")
+    boolean shouldShowHLoggerPanel();
+    @ConfigKey(value = "showLogger")
+    void setShowLoggerPanel(boolean show);
 }

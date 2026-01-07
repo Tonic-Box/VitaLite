@@ -8,8 +8,8 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("2")
-val runeliteVersion by extra("1.12.10")
+val vitaVersion by extra("0")
+val runeliteVersion by extra("1.12.11")
 
 group = "com.tonic"
 version = runeliteVersion + "_" + vitaVersion

@@ -4,6 +4,9 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.api.game.sailing.BoatStatsAPI;
+import com.tonic.data.magic.SpellBook;
+import com.tonic.data.magic.spellbooks.SpellbookEnums;
+import com.tonic.data.magic.spellbooks.Standard;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
 import com.tonic.services.pathfinder.sailing.BoatPathing;
 import com.tonic.api.game.sailing.SailingAPI;
@@ -469,6 +472,9 @@ public class GameManager extends Overlay {
                     Logger.error("AutoLogin failed: " + e.getMessage());
                 }
             }
+
+            if(Logger.isLoggerVisible() != Static.getVitaConfig().shouldShowHLoggerPanel())
+                Logger.setLoggerVisible(Static.getVitaConfig().shouldShowHLoggerPanel());
         });
 
         System.out.println("GameCache initialized!");
