@@ -92,6 +92,12 @@ public class VitaLiteOptions extends OptionsParser
     )
     private int world = -1;
 
+    @CLIArgument(
+            name = "autoEnterGame",
+            description = "Whether we enter the game (world) automatically or not. Login happens automatically regardless."
+    )
+    private boolean autoEnterGame = true;
+
     public void _checkAudio()
     {
         if(!AudioDeviceChecker.hasAudioDevice())
