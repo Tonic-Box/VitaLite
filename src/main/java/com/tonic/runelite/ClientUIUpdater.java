@@ -2,6 +2,7 @@ package com.tonic.runelite;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.model.InputSelector;
 import com.tonic.services.proxy.ProxyManager;
 import com.tonic.vitalite.Main;
 import com.tonic.model.NavButton;
@@ -18,6 +19,7 @@ public class ClientUIUpdater
 {
     private static JPanel wrapper;
     private static JScrollPane scrollPane;
+    private static InputSelector inputSelector;
 
     public static void inject()
     {
@@ -25,6 +27,9 @@ public class ClientUIUpdater
             return;
 
         addNavigation();
+
+        // Initialize input selector for enable/disable input buttons
+        inputSelector = new InputSelector();
 
         Object clientUI = ReflectBuilder.runelite()
                 .staticField("rlInstance")
