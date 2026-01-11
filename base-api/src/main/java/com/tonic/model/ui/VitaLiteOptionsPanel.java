@@ -14,7 +14,6 @@ import com.tonic.services.mouserecorder.trajectory.ui.TrajectoryTrainerMonitor;
 import com.tonic.services.mouserecorder.trajectory.ui.TrajectorySettingsPanel;
 import com.tonic.services.pathfinder.PathfinderAlgo;
 import com.tonic.services.mouserecorder.MovementVisualization;
-import com.tonic.services.profiler.ProfilerWindow;
 import com.tonic.util.ReflectBuilder;
 import com.tonic.util.ThreadPool;
 import javax.swing.*;
@@ -515,11 +514,6 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
         // Debug Settings
         CollapsiblePanel debugPanel = new CollapsiblePanel("Debug");
-
-        FancyButton profilerButton = new FancyButton("Profiler");
-        profilerButton.addActionListener(e -> ProfilerWindow.toggle());
-        debugPanel.addContent(profilerButton);
-        debugPanel.addVerticalStrut(12);
 
         FancyButton checkButton = new FancyButton("Check Platform Info");
         checkButton.addActionListener(e -> PlatformInfoViewer.toggle());
