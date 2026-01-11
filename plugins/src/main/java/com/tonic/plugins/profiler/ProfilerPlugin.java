@@ -1,43 +1,26 @@
 package com.tonic.plugins.profiler;
 
+import com.tonic.model.ui.ProfilerAccessor;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.ui.ClientToolbar;
-import net.runelite.client.ui.NavigationButton;
-import net.runelite.client.util.ImageUtil;
-
-import javax.inject.Inject;
-import java.awt.image.BufferedImage;
 
 @PluginDescriptor(
-        name = "Profiler",
-        description = "JVM Profiler for performance monitoring and analysis",
+        name = "# Profiler",
+        description = "JVM Profiler for performance monitoring and analysis. Access via Debug > Profiler button in Settings.",
         tags = {"profiler", "jvm", "performance", "monitoring"},
         enabledByDefault = true
 )
 public class ProfilerPlugin extends Plugin {
-    @Inject
-    private ClientToolbar clientToolbar;
-
-    private ProfilerPanel panel;
-    private final BufferedImage iconImage = ImageUtil.loadImageResource(ProfilerPlugin.class, "icon.png");
-    private NavigationButton navButton;
-
+    
     @Override
     protected void startUp() throws Exception {
-        panel = new ProfilerPanel();
-        navButton = NavigationButton.builder()
-                .tooltip("Profiler")
-                .icon(iconImage)
-                .priority(5)
-                .panel(panel)
-                .build();
-        clientToolbar.addNavigation(navButton);
+        // Register the profiler toggle callback so VitaLiteOptionsPanel can access it
+        ProfilerAccessor.registerToggleCallback(ProfilerWindow::toggle);
     }
 
     @Override
     protected void shutDown() throws Exception {
-        clientToolbar.removeNavigation(navButton);
-        panel = null;
+        // Unregister the callback when plugin is disabled
+        ProfilerAccessor.unregisterToggleCallback();
     }
 }

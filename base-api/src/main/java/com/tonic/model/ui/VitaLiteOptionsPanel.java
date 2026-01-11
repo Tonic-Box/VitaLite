@@ -515,6 +515,15 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         // Debug Settings
         CollapsiblePanel debugPanel = new CollapsiblePanel("Debug");
 
+        FancyButton profilerButton = new FancyButton("Profiler");
+        profilerButton.addActionListener(e -> {
+            if (!ProfilerAccessor.toggle()) {
+                Logger.warn("Profiler plugin not loaded or unavailable - make sure the plugin is enabled");
+            }
+        });
+        debugPanel.addContent(profilerButton);
+        debugPanel.addVerticalStrut(12);
+
         FancyButton checkButton = new FancyButton("Check Platform Info");
         checkButton.addActionListener(e -> PlatformInfoViewer.toggle());
         debugPanel.addContent(checkButton);
