@@ -49,11 +49,11 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         addNodeHook(node);
     }
 
-//    @Inject
-//    public void addNode(TPacketBufferNode node)
-//    {
-//        addNodeSwitch(node);
-//    }
+    @Inject
+    public void addNode(TPacketBufferNode node)
+    {
+        addNodeSwitch(node);
+    }
 
 //    @Shadow("addNode")
 //    public abstract void addNode(TPacketBufferNode node);
