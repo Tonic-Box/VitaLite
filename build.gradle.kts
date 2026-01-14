@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("2")
+val vitaVersion by extra("3")
 val runeliteVersion by extra("1.12.11")
 
 group = "com.tonic"
@@ -360,7 +360,7 @@ tasks.register<Exec>("publishRelease") {
     val tag = "${runeliteVersion}_${vitaVersion}"
     val title = "${tag}-bugfix"
     val body = "# ${tag}\n" +
-            "- fixed issue with raw addNode() not getting injected";
+            "- Fixed incorrect mapping for item ground actions";
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
