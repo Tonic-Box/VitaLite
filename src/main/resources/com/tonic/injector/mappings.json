@@ -36863,7 +36863,6 @@
         "isStatic": false
       },
       {
-        "name": "groundActions",
         "obfuscatedName": "bi",
         "owner": "ItemComposition",
         "ownerObfuscatedName": "is",
@@ -37087,7 +37086,7 @@
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "groundActions",
         "obfuscatedName": "by",
         "owner": "ItemComposition",
         "ownerObfuscatedName": "is",
