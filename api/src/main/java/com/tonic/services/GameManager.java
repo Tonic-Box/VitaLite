@@ -646,6 +646,7 @@ public class GameManager extends Overlay {
                         .setType(MenuAction.RUNELITE)
                         .onClick(e -> {
                             ThreadPool.submit(() -> {
+                                System.out.println("Started sailing 1...");
                                 sailingPath = BoatPathing.travelTo(wp);
                             });
                         });
