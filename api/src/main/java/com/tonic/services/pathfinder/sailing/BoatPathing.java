@@ -137,7 +137,6 @@ public class BoatPathing
 
     public static StepHandler travelTo(WorldPoint worldPoint)
     {
-        System.out.println(2);
         WorldPoint start = BoatCollisionAPI.getPlayerBoatWorldPoint();
         List<WorldPoint> fullPath = findFullPath(start, worldPoint);
         if(fullPath == null || fullPath.isEmpty())
@@ -145,7 +144,6 @@ public class BoatPathing
             System.out.println("BoatPathing: No path found to " + worldPoint);
             return GenericHandlerBuilder.get().build();
         }
-        System.out.println(3);
         GameManager.setPathPoints(fullPath);
         List<Waypoint> waypoints = convertToWaypoints(fullPath);
         return travelTo(waypoints);
