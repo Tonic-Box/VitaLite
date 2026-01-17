@@ -3,7 +3,9 @@ package com.tonic.services.proxy;
 import com.tonic.Logger;
 import lombok.Getter;
 import java.net.Authenticator;
+import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
+import java.net.URL;
 
 public class ProxyManager
 {
@@ -14,11 +16,15 @@ public class ProxyManager
         String[] parts = input.split(":");
         if(parts.length == 2)
         {
-            addProxy(parts[0], Integer.parseInt(parts[1]));
+            //addProxy(parts[0], Integer.parseInt(parts[1]));
+            SocksProxyUtil.setProxy(parts[0], Integer.parseInt(parts[1]));
+            Logger.info("Connected to Proxy [" + parts[0] + ":" + parts[1] + "]");
         }
         else if(parts.length == 4)
         {
-            addProxy(parts[0], Integer.parseInt(parts[1]), parts[2], parts[3]);
+            //addProxy(parts[0], Integer.parseInt(parts[1]), parts[2], parts[3]);
+            SocksProxyUtil.setProxy(parts[0], Integer.parseInt(parts[1]), parts[2], parts[3]);
+            Logger.info("Connected to Proxy [" + parts[0] + ":" + parts[1] + ":{Auth}]");
         }
         else
         {

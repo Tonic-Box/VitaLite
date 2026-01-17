@@ -49,7 +49,6 @@ public class Main {
         }
         if(optionsParser.getProxy() != null)
         {
-            System.out.println("Using Proxy: " + optionsParser.getProxy());
             ProxyManager.process(optionsParser.getProxy());
         }
         if(optionsParser.getLegacyLogin() != null)
