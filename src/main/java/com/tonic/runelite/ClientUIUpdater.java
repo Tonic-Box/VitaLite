@@ -44,8 +44,8 @@ public class ClientUIUpdater
         if(ProxyManager.getProxy() != null)
         {
             frame.setTitle("VitaLite (Proxy: " +
-                    ProxyManager.getProxy().getProxyInfo().getHost() + ":" +
-                    ProxyManager.getProxy().getProxyInfo().getPort() + ")"
+                    ProxyManager.getProxy().getHost() + ":" +
+                    ProxyManager.getProxy().getPort() + ")"
             );
         }
         else
