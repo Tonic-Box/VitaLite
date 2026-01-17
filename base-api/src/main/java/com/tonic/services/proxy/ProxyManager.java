@@ -18,17 +18,17 @@ public class ProxyManager
         {
             //addProxy(parts[0], Integer.parseInt(parts[1]));
             SocksProxyUtil.setProxy(parts[0], Integer.parseInt(parts[1]));
-            Logger.info("Connected to Proxy [" + parts[0] + ":" + parts[1] + "]");
+            System.out.println("Connected to Proxy [" + parts[0] + ":" + parts[1] + "]");
         }
         else if(parts.length == 4)
         {
             //addProxy(parts[0], Integer.parseInt(parts[1]), parts[2], parts[3]);
             SocksProxyUtil.setProxy(parts[0], Integer.parseInt(parts[1]), parts[2], parts[3]);
-            Logger.info("Connected to Proxy [" + parts[0] + ":" + parts[1] + ":{Auth}]");
+            System.out.println("Connected to Proxy [" + parts[0] + ":" + parts[1] + ":{Auth}]");
         }
         else
         {
-            Logger.error("Invalid proxy format. Use host:port or host:port:user:pass");
+            System.out.println("Invalid proxy format. Use host:port or host:port:user:pass");
         }
     }
 
