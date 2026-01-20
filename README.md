@@ -1,6 +1,6 @@
 # VitaLite
 
-VitaLite is a launcher and SDK for RuneLite that provides additional features, game pack functionality access, and a comprehensive API for plugin development.
+VitaLite is a launcher and SDK for RuneLite that provides additional features, gamepack functionality access, and a comprehensive API for plugin development.
 
 ![VitaLite Screenshot](img.png)
 
