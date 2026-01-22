@@ -235,7 +235,7 @@ Widget continueBtn = WidgetAPI.search()
 // Find all visible widgets with specific text
 List<Widget> widgets = WidgetAPI.search()
     .withTextContains("Bank")
-    .visible()
+    .isVisible()
     .collect();
 ```
 
@@ -243,13 +243,15 @@ List<Widget> widgets = WidgetAPI.search()
 
 | Method | Description |
 |--------|-------------|
-| `withId(int widgetId)` | Filter by widget ID |
-| `withParent(int parentId)` | Filter by parent widget |
+| `withId(int... widgetIds)` | Filter by widget IDs |
+| `withParentId(int... parentIds)` | Filter by parent widget IDs |
 | `withText(String text)` | Filter by exact text |
-| `withTextContains(String part)` | Filter by partial text |
-| `withAction(String action)` | Filter by available action |
-| `visible()` | Filter to visible widgets only |
-| `hidden()` | Filter to hidden widgets only |
+| `withTextContains(String... parts)` | Filter by partial text |
+| `withActions(String... actions)` | Filter by available actions |
+| `isVisible()` | Filter to visible widgets only |
+| `isHidden()` | Filter to hidden widgets only |
+| `isSelfVisible()` | Filter by widget's own visibility |
+| `isSelfHidden()` | Filter by widget's own hidden state |
 
 Source: `api/src/main/java/com/tonic/queries/WidgetQuery.java`
 
@@ -288,7 +290,6 @@ All queries inherit from `AbstractQuery` and have these common methods:
 |--------|-------------|
 | `keepIf(Predicate<T>)` | Keep only matching elements |
 | `removeIf(Predicate<T>)` | Remove matching elements |
-| `filter(Predicate<T>)` | Alias for keepIf |
 
 ### Terminal Operations
 
@@ -296,16 +297,15 @@ All queries inherit from `AbstractQuery` and have these common methods:
 |--------|-------------|
 | `first()` | Get first element or null |
 | `collect()` | Get all elements as List |
-| `stream()` | Get as Java Stream |
+| `collect(Collector)` | Collect with custom collector |
 | `isEmpty()` | Check if empty |
-| `isNotEmpty()` | Check if not empty |
-| `size()` | Get count |
+| `count()` | Get count |
 
 ### Aggregation
 
 | Method | Description |
 |--------|-------------|
-| `aggregate(Function<Stream<T>, R>)` | Apply custom aggregation |
+| `aggregate(Function<Stream<T>, R>)` | Apply custom aggregation to stream |
 
 Source: `api/src/main/java/com/tonic/queries/abstractions/AbstractQuery.java`
 
