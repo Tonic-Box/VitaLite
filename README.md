@@ -1,15 +1,15 @@
 # VitaLite
 
-VitaLite is a launcher and SDK for RuneLite that provides additional features, gamepack functionality access, and a comprehensive API for plugin development.
+VitaLite is a launcher and SDK for RuneLite. It loads RuneLite and an injected gamepack, applies mixins, and then starts the client.
 
 ![VitaLite Screenshot](img.png)
 
 ## Features
 
-- Access to additional GamePack functionalities
-- Robust built-in SDK for plugin development
-- Built-in plugins including Profiles for Jagex Account management
-- Dual-layered mixin system for modifying RuneLite and GamePack classes
+- Access to additional gamepack functionality
+- Built-in SDK for plugin development (`base-api/` and `api/`)
+- Built-in plugins including Profiles for Jagex Account management (`plugins/`)
+- Dual-layered mixin system for modifying RuneLite and gamepack classes
 - External plugin side-loading support
 - Advanced pathfinding and world walker
 - Trajectory-based mouse movement system
@@ -20,135 +20,71 @@ VitaLite is a launcher and SDK for RuneLite that provides additional features, g
 
 ### For Users
 
-Download the latest release from the [VitaLite Launcher](https://github.com/Tonic-Box/VitaLauncher/releases).
+Download the latest release from the VitaLite Launcher:
+
+- https://github.com/Tonic-Box/VitaLauncher/releases
 
 ### For Developers
 
-**Requirements:** JDK 11
+Requirements:
 
-1. Clone and enter the repository:
-   ```bash
-   git clone https://github.com/Tonic-Box/VitaLite.git
-   cd VitaLite
-   ```
+- Java 11
 
-2. Sync the RuneLite API (required once per rev update):
-   ```bash
-   ./gradlew SyncRuneliteApi
-   ```
+Build and run:
 
-3. Build all artifacts:
-   ```bash
-   ./gradlew buildAndPublishAll
-   ```
+```sh
+git clone https://github.com/Tonic-Box/VitaLite.git
+cd VitaLite
 
-4. Run the client:
-   ```bash
-   ./gradlew run
-   ```
+# Required once per rev update
+./gradlew :base-api:syncRuneliteApi
+
+./gradlew buildAndPublishAll
+./gradlew run
+```
+
+When running from an IDE, use the `com.tonic.VitaLite` main class.
 
 ## Documentation
 
-Full documentation is available in the [docs/](./docs/) directory:
+Start here:
 
-| Document | Description |
-|----------|-------------|
-| [Documentation Index](./docs/index.md) | Main documentation hub |
-| [Getting Started](./docs/getting-started.md) | Installation and setup guide |
-| [Configuration](./docs/configuration.md) | All configuration options |
-| [CLI Reference](./docs/cli-reference.md) | Command line arguments |
-| [SDK Overview](./docs/SDK-DOCS.md) | API structure overview |
-| [Plugin Development](./docs/EXTERNALPLUGIN.md) | External plugin guide |
-| [Common Mistakes](./docs/common-mistakes.md) | Frequent errors and fixes |
+- [Documentation Index](docs/index.md)
 
-### API Reference
+Key topics:
 
-| Document | Description |
-|----------|-------------|
-| [Query System](./docs/api/queries.md) | NPC, Item, Object queries |
-| [Interactions](./docs/api/interactions.md) | Click and dialogue handling |
-| [Pathfinding](./docs/api/pathfinding.md) | Walker and navigation |
-| [IPC](./docs/api/ipc.md) | Inter-client communication |
-| [Static](./docs/api/static.md) | Core access class |
-| [Logger](./docs/api/logger.md) | Logging utilities |
+- [Getting Started](docs/GETTING-STARTED.md)
+- [CLI Overview](docs/CLI.md)
+- [CLI Reference](docs/cli-reference.md)
+- [Configuration](docs/CONFIGURATION.md)
+- [Authentication](docs/AUTHENTICATION.md)
+- [External Plugins](docs/EXTERNALPLUGIN.md)
+- [Injector](docs/INJECTOR.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
 
-### Feature Documentation
+Feature docs:
 
-| Document | Description |
-|----------|-------------|
-| [Click Manager](./docs/CLICKMANAGER.md) | Click strategy configuration |
-| [Mouse Movement](./docs/MOUSE-MOVEMENT.md) | Trajectory-based movement |
-| [Script DSL](./docs/SCRIPT-DSL.md) | Coroutine-style scripting |
-| [Profiler](./docs/PROFILER.md) | JVM profiling tools |
-| [Features](./docs/FEATURES.md) | Built-in client features |
+- [Features](docs/FEATURES.md)
+- [Click Manager](docs/CLICKMANAGER.md)
+- [Mouse Movement](docs/MOUSE-MOVEMENT.md)
+- [Profiler](docs/PROFILER.md)
+- [Script DSL](docs/SCRIPT-DSL.md)
 
-## Command Line Options
+## External Plugins
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `-runInjector` | Boolean | Run injector on startup (mixin development) |
-| `--rsdump` | String | Path to dump gamepack |
-| `-noPlugins` | Boolean | Disable core plugins |
-| `-min` | Boolean | Minimal memory mode |
-| `-noMusic` | Boolean | Disable music loading |
-| `-incognito` | Boolean | Display as 'RuneLite' |
-| `--legacyLogin` | String | Legacy login (user:pass) |
-| `--jagexLogin` | String | Jagex login (sessionID:characterID:displayName) |
-| `--proxy` | String | Proxy server (ip:port or ip:port:user:pass) |
-| `--world` | Integer | Set login world |
-| `-disableMouseHook` | Boolean | Disable mousehook DLL |
+VitaLite scans for external plugin jars in:
 
-See [CLI Reference](./docs/cli-reference.md) for complete details.
+- `${user.home}/.runelite/sideloaded-plugins`
+- `${user.home}/.runelite/externalplugins`
 
-## Side-Loading Plugins
+See [External Plugins](docs/EXTERNALPLUGIN.md).
 
-Place external plugin JARs in `~/.runelite/sideloaded-plugins/` for automatic loading.
+## Data and File Locations
 
-See [Plugin Development](./docs/EXTERNALPLUGIN.md) for creating plugins.
+VitaLite uses the RuneLite home directory plus a VitaLite subdirectory:
 
-## Plugin Development Quick Start
-
-Add dependencies to your `build.gradle.kts`:
-
-```kotlin
-val apiVersion = "latest.release"
-
-repositories {
-    mavenLocal()
-    maven {
-        url = uri("https://repo.runelite.net")
-        content { includeGroupByRegex("net\\.runelite.*") }
-    }
-    mavenCentral()
-}
-
-dependencies {
-    compileOnly("net.runelite:client:$apiVersion")
-    compileOnly("com.tonic:base-api:$apiVersion")
-    compileOnly("com.tonic:api:$apiVersion")
-}
-```
-
-Create a basic plugin:
-
-```java
-@PluginDescriptor(name = "My Plugin", description = "Description")
-public class MyPlugin extends VitaPlugin {
-    @Override
-    public void loop() throws Exception {
-        // Called each game tick - safe to sleep/block
-        NpcEx target = new NpcQuery()
-            .withName("Goblin")
-            .withinDistance(10)
-            .nearest();
-
-        if (target != null) {
-            NpcAPI.interact(target, "Attack");
-            Delays.waitUntil(() -> target.isDead(), 5000);
-        }
-    }
-}
-```
+- RuneLite base directory: `${user.home}/.runelite`
+- VitaLite directory: `${user.home}/.runelite/vitalite`
 
 ## Contributing
 
@@ -160,16 +96,16 @@ public class MyPlugin extends VitaPlugin {
 
 ## Support
 
-- [GitHub Issues](https://github.com/Tonic-Box/VitaLite/issues) - Bug reports and feature requests
-- [Documentation](./docs/index.md) - Full SDK documentation
+- GitHub Issues: https://github.com/Tonic-Box/VitaLite/issues
+- Documentation: [docs/index.md](docs/index.md)
 
 ## Disclaimer
 
-VitaLite is a third-party loader for RuneLite. Use at your own risk. The developers are not responsible for any consequences resulting from the use of this software.
+VitaLite is a third party loader for RuneLite. Use at your own risk. The developers are not responsible for consequences resulting from use of this software.
 
 ## License
 
-See [LICENSE](./LICENSE) for details.
+See [LICENSE](LICENSE) for details.
 
 ---
 

@@ -1,55 +1,41 @@
-# VitaLite SDK Documentation
+# VitaLite Documentation
 
-VitaLite is a launcher and SDK for RuneLite that provides additional features and a comprehensive API for plugin development.
+This documentation covers the VitaLite client, its embedded SDK, and the built in plugins shipped with the client.
 
-## Documentation Contents
+## Start Here
 
-### Getting Started
-- [Installation and Setup](getting-started.md) - How to install and run VitaLite
-- [External Plugin Development](EXTERNALPLUGIN.md) - Guide to building plugins
-- [SDK Overview](SDK-DOCS.md) - High-level API overview
+- [Getting Started](GETTING-STARTED.md) - Build and run from source, release packaging, and where VitaLite stores data.
+- [CLI Overview](CLI.md) - Command line options and parsing rules.
+- [CLI Reference](cli-reference.md) - Complete command line reference.
+- [Configuration](CONFIGURATION.md) - User and developer configuration files, keys, and defaults.
+- [Authentication](AUTHENTICATION.md) - Auto login options and the Enhanced Profiles plugin flows.
+- [External Plugins](EXTERNALPLUGIN.md) - External plugin development and sideloading.
+- [Troubleshooting](TROUBLESHOOTING.md) - Troubleshooting and failure modes.
 
-### Core Features
-- [Features Overview](FEATURES.md) - Built-in client features
-- [Configuration Reference](configuration.md) - All configuration options
-- [Command Line Options](cli-reference.md) - Command line arguments
+## Feature and Advanced Topics
 
-### API Reference
-- [Query System](api/queries.md) - NPC, Item, Object, and Widget queries
-- [Interaction APIs](api/interactions.md) - Click, movement, and dialogue handling
-- [Pathfinding and Walker](api/pathfinding.md) - World walker and pathfinding
-- [IPC Channel](api/ipc.md) - Inter-process communication between clients
+- [Features](FEATURES.md) - User visible features and where they live in code.
+- [Click Manager](CLICKMANAGER.md) - Click strategies and click box integration.
+- [Mouse Movement](MOUSE-MOVEMENT.md) - Mouse movement training, recording, and generation.
+- [Script DSL](SCRIPT-DSL.md) - Script DSL (StepHandler builder) usage and patterns.
+- [Profiler](PROFILER.md) - JVM profiler window and related utilities.
+- [Injector](INJECTOR.md) - Injector pipeline and mixin development workflow.
+- [Common Mistakes](common-mistakes.md) - Frequent errors and how to fix them.
 
-### Advanced Topics
-- [Click Manager](CLICKMANAGER.md) - Mouse click strategies and configuration
-- [Mouse Movement System](MOUSE-MOVEMENT.md) - Trajectory-based mouse movement
-- [Script DSL](SCRIPT-DSL.md) - Coroutine-style automation scripting
-- [Profiler](PROFILER.md) - JVM profiling and performance monitoring
+## API Reference
 
-### Troubleshooting
-- [Common Mistakes](common-mistakes.md) - Frequent errors and how to fix them
+- [Query System](api/queries.md) - NPC, Item, Object, and Widget queries.
+- [Interaction APIs](api/interactions.md) - Click, movement, and dialogue handling.
+- [Pathfinding and Walker](api/pathfinding.md) - World walker and pathfinding.
+- [IPC Channel](api/ipc.md) - Inter-process communication between clients.
+- [Static](api/static.md) - Core access class.
+- [Logger](api/logger.md) - Logging utilities.
 
----
+## Scope and Non Goals
 
-## Quick Links
+- These docs only describe behavior present in this repository.
+- If a feature is mentioned in UI text but not backed by code, it is treated as unconfirmed and is not documented as behavior.
 
-| Topic | Description |
-|-------|-------------|
-| [VitaPlugin](EXTERNALPLUGIN.md#plugin-structure) | Base class for looped plugins |
-| [Static](api/static.md) | Global access to client objects |
-| [Logger](api/logger.md) | Logging utilities |
-| [Walker](api/pathfinding.md) | World pathfinding |
-| [Query System](api/queries.md) | Entity and item searching |
+## Version
 
----
-
-## Version Information
-
-Current version can be found in `build.gradle.kts`. The versioning follows the format `major.minor.patch.subrev_build`.
-
-Recent notable changes:
-- Version 1.12.12: JVM-wide proxy support, proxy display in title bar
-- Version 1.12.11: Logger panel visibility persistence, updated collision maps
-- Version 1.12.9: Client thread deadlock watcher and recovery
-
-Source: `build.gradle.kts`, git history
+The current version is defined in `build.gradle.kts`.
