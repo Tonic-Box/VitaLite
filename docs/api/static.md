@@ -10,7 +10,7 @@ The `Static` class provides global access to core client objects and thread-safe
 - Event bus posting
 - Configuration access
 
-Source: `src/main/java/com/tonic/Static.java`
+Source: `base-api/src/main/java/com/tonic/Static.java`
 
 ---
 
@@ -19,11 +19,16 @@ Source: `src/main/java/com/tonic/Static.java`
 ### Getting the Client
 
 ```java
-// Get the TClient instance
+// Get the client instance (generic return type)
+// Can be assigned to TClient or Client
 TClient client = Static.getClient();
+// Or: Client client = Static.getClient();
 
 // Example: Get current tick
 int tick = client.getTickCount();
+
+// Note: Due to generics, you must assign to a variable first.
+// Static.getClient().getTickCount() will not compile.
 ```
 
 ### Getting RuneLite
@@ -70,16 +75,18 @@ Static.invoke(() -> {
 ### Asynchronous Invocation
 
 ```java
-// Invoke later (non-blocking)
+// Invoke later (non-blocking, fire-and-forget)
 Static.invokeLater(() -> {
     // Runs on client thread at next opportunity
     client.doSomething();
 });
 
-// Invoke later with return (returns Future)
-Future<Widget> future = Static.invokeLater(() -> {
+// Invoke later with return (blocks until complete, returns value directly)
+Widget widget = Static.invokeLater(() -> {
     return client.getWidget(widgetId);
 });
+// Note: Despite the name, invokeLater with a return value blocks the calling
+// thread until the result is available. It uses CompletableFuture.join() internally.
 ```
 
 ### Usage Guidelines
@@ -158,8 +165,26 @@ if (options.isIncognito()) {
 
 ### Safe Widget Access
 
+For widget access, prefer using `WidgetAPI` or `WidgetQuery` which handle thread safety internally:
+
 ```java
-// Get widget safely on client thread
+// Recommended: Use WidgetAPI/WidgetQuery (handles invocation internally)
+Widget widget = WidgetAPI.search()
+    .withId(groupId << 16 | childId)
+    .isVisible()
+    .first();
+
+// Or using WidgetQuery directly
+Widget widget = new WidgetQuery()
+    .withId(groupId << 16 | childId)
+    .isVisible()
+    .first();
+
+if (widget != null) {
+    // Use widget
+}
+
+// Manual invoke is still available if needed for custom logic:
 Widget widget = Static.invoke(() -> {
     Widget w = client.getWidget(groupId, childId);
     if (w != null && !w.isHidden()) {
@@ -167,10 +192,6 @@ Widget widget = Static.invoke(() -> {
     }
     return null;
 });
-
-if (widget != null) {
-    // Use widget
-}
 ```
 
 ### Batch Operations
@@ -205,19 +226,18 @@ if (someCondition) {
 
 ### Nested invokes
 
-**Wrong:**
+Nested invokes are safe - the implementation checks `isClientThread()` and executes directly if already on the client thread. However, keeping everything in one invoke is cleaner:
+
 ```java
+// This is safe (no deadlock), but unnecessary nesting
 Static.invoke(() -> {
-    Static.invoke(() -> {  // Deadlock risk!
+    Static.invoke(() -> {  // Executes directly since already on client thread
         // ...
     });
 });
-```
 
-**Correct:**
-```java
+// Cleaner: Do everything in one invoke
 Static.invoke(() -> {
-    // Do everything in one invoke
     Widget w = client.getWidget(id);
     // Process w
 });
@@ -245,36 +265,49 @@ Walker.walkTo(target);
 
 ### Accessing client outside invoke
 
-**Wrong:**
-```java
-// From a worker thread
-TClient client = Static.getClient();
-int tick = client.getTickCount();  // Unsafe!
-```
+Some read-only operations like `getTickCount()` are safe to call off the client thread:
 
-**Correct:**
 ```java
-int tick = Static.invoke(() -> {
-    return Static.getClient().getTickCount();
+// Reading tick count is fine off-thread
+TClient client = Static.getClient();
+int tick = client.getTickCount();  // OK for read-only values
+
+// Note: Due to generics, you must assign to a variable first:
+// Static.getClient().getTickCount();  // Won't compile
+
+// For operations that modify state or access mutable data, use invoke:
+Static.invoke(() -> {
+    TClient client = Static.getClient();
+    client.doSomethingThatModifiesState();
 });
 ```
 
 ### Storing references from invoke
 
-**Wrong:**
+Widget references can become stale. Re-fetch when needed or use `WidgetAPI`/`WidgetQuery`:
+
+**Avoid:**
 ```java
 Widget savedWidget = Static.invoke(() -> client.getWidget(id));
 // Later, in another thread...
 savedWidget.getText();  // Widget might be stale or modified!
 ```
 
-**Correct:**
+**Better - Re-fetch when needed:**
 ```java
-// Re-fetch when needed
 String text = Static.invoke(() -> {
     Widget w = client.getWidget(id);
     return w != null ? w.getText() : null;
 });
+```
+
+**Best - Use WidgetAPI/WidgetQuery:**
+```java
+// WidgetAPI/WidgetQuery handles thread safety and freshness
+Widget w = WidgetAPI.search()
+    .withId(id)
+    .first();
+String text = w != null ? w.getText() : null;
 ```
 
 ---

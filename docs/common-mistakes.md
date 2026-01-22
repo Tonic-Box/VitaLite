@@ -77,28 +77,26 @@ public void onGameTick(GameTick event) {
 // Use VitaPlugin.loop() for blocking operations
 @Override
 public void loop() {
-    Delays.sleep(1000);  // OK in loop
+    Delays.wait(1000);  // OK in loop
     Walker.walkTo(target);  // OK in loop
 }
 ```
 
 ### Nested Static.invoke()
 
-**Symptom:** Deadlock
+**Note:** Nested invokes are actually safe - the implementation checks `isClientThread()` and executes directly if already on the client thread. However, nesting is unnecessary and keeping everything in one invoke is cleaner:
 
-**Wrong:**
 ```java
+// Safe but unnecessary nesting
 Static.invoke(() -> {
-    Static.invoke(() -> {  // Deadlock!
+    Static.invoke(() -> {  // Executes directly, no deadlock
         // ...
     });
 });
-```
 
-**Correct:**
-```java
+// Cleaner: Do everything in one invoke
 Static.invoke(() -> {
-    // Do everything in one invoke
+    // All operations here
 });
 ```
 
@@ -168,14 +166,14 @@ NpcEx target = new NpcQuery()
 **Wrong:**
 ```java
 NpcAPI.interact(banker, "Bank");
-BankAPI.depositInventory();  // Bank not open yet!
+BankAPI.depositAll();  // Bank not open yet!
 ```
 
 **Correct:**
 ```java
 NpcAPI.interact(banker, "Bank");
 Delays.waitUntil(BankAPI::isOpen, 5000);
-BankAPI.depositInventory();
+BankAPI.depositAll();
 ```
 
 ### Missing Action Check

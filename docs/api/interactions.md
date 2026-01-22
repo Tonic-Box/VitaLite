@@ -100,15 +100,19 @@ General widget interaction.
 // Click a button
 Widget button = WidgetAPI.search()
     .withText("Yes")
-    .visible()
+    .isVisible()
     .first();
 
 if (button != null) {
-    WidgetAPI.interact(button, 1);  // Left click
+    WidgetAPI.interact(button, 1);  // First action (action index 1)
 }
 
 // Interact by action name
 WidgetAPI.interact(widget, "Use");
+
+// Note: The numeric parameter is the 1-based action index (widget opcode),
+// NOT a mouse button. It maps to widget.getActions()[action - 1].
+// You can discover opcodes by logging interaction packets.
 ```
 
 Source: `api/src/main/java/com/tonic/api/widgets/WidgetAPI.java`
@@ -146,13 +150,13 @@ Banking operations.
 ```java
 // Check if bank is open
 if (BankAPI.isOpen()) {
-    // Deposit all
-    BankAPI.depositInventory();
+    // Deposit all inventory items
+    BankAPI.depositAll();
 
     // Withdraw items using loadout
     InventoryLoadout loadout = new InventoryLoadout()
-        .addItem("Shark", 10)
-        .addItem("Prayer potion(4)", 4);
+        .add(new LoadoutItem("Shark", 10))
+        .add(new LoadoutItem("Prayer potion(4)", 4));
 
     BankAPI.withdraw(loadout);
 
@@ -186,9 +190,6 @@ if (DialogueAPI.dialoguePresent()) {
 
     // Submit numeric input
     DialogueAPI.resumeNumericDialogue(100);
-
-    // Submit string input
-    DialogueAPI.resumeStringDialogue("hello");
 }
 ```
 
@@ -316,7 +317,7 @@ Static.invokeLater(() -> {
 });
 ```
 
-Source: `src/main/java/com/tonic/Static.java`
+Source: `base-api/src/main/java/com/tonic/Static.java`
 
 ---
 
@@ -327,14 +328,14 @@ Source: `src/main/java/com/tonic/Static.java`
 **Wrong:**
 ```java
 NpcAPI.interact(banker, "Bank");
-BankAPI.depositInventory();  // Bank might not be open yet!
+BankAPI.depositAll();  // Bank might not be open yet!
 ```
 
 **Correct:**
 ```java
 NpcAPI.interact(banker, "Bank");
 Delays.waitUntil(BankAPI::isOpen, 5000);
-BankAPI.depositInventory();
+BankAPI.depositAll();
 ```
 
 ### Interacting from wrong thread

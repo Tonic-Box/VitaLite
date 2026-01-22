@@ -34,7 +34,7 @@ Channel channel = new ChannelBuilder("MyClient")
 | Method | Default | Description |
 |--------|---------|-------------|
 | `port(int)` | 5000 | Multicast UDP port |
-| `group(String)` | "230.0.0.1" | Multicast group address |
+| `group(String)` | "230.0.0.0" | Multicast group address |
 | `ttl(int)` | 1 | Time-to-live for packets |
 | `networkInterface(NetworkInterface)` | null | Specific network interface |
 

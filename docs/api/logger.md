@@ -10,7 +10,7 @@ The `Logger` class provides:
 - File logging
 - SLF4J-style placeholder formatting
 
-Source: `src/main/java/com/tonic/Logger.java`
+Source: `base-api/src/main/java/com/tonic/Logger.java`
 
 ---
 
