@@ -25,38 +25,45 @@ Everything in the built-in API is designed with thread safety in mind
 │   │   └── TileObjectAPI     # Tile object api
 │   │
 │   ├── 🎯 game/
+│   │   ├── CameraAPI         # Camera control & positioning
 │   │   ├── ClientScriptAPI   # CS2 script execution
 │   │   ├── CombatAPI         # Combat calculations & state
 │   │   ├── GameAPI           # Core game utilities
 │   │   ├── HouseAPI          # Player-owned house api
+│   │   ├── HouseOptionsAPI   # House settings & options
 │   │   ├── MovementAPI       # Walking api
 │   │   ├── QuestAPI          # Quest progress & completion
 │   │   ├── SceneAPI          # Scene/region management
 │   │   ├── SkillAPI          # Skill levels & experience
-│   │   └── VarAPI            # Game variable access
+│   │   ├── VarAPI            # Game variable access
+│   │   └── WorldsAPI         # World hopping & selection
 │   │
 │   └── 🔄 threaded/
 │       ├── Cannon            # Dwarf cannon automation
 │       ├── Delays            # Smart timing utilities
 │       ├── Dialogues         # Dialogue interaction system
 │       ├── GrandExchange     # GE trading automation
-│       ├── Minigames         # Minigame-teleport API
-│       └── WorldsAPI         # World hopping & selection
+│       └── Minigames         # Minigame-teleport API
 │
 ├── 🎨 Widget APIs
 │   ├── BankAPI               # Banking operations
+│   ├── DepositBoxAPI         # Deposit box operations
 │   ├── DialogueAPI           # Chat & dialogue handling
 │   ├── EmoteAPI              # Emote api
 │   ├── EquipmentAPI          # Equipment api
 │   ├── GrandExchangeAPI      # Grand Exchange automation
 │   ├── InventoryAPI          # Inventory api
 │   ├── MagicAPI              # Spellcasting & magic
+│   ├── MakeXAPI              # Make-X interface handling
+│   ├── MiniMapAPI            # Minimap api
 │   ├── PrayerAPI             # Prayer api
 │   ├── ShopAPI               # Shop interface handling
 │   ├── SlayerRewardsAPI      # Slayer rewards interface api
+│   ├── SmithingAPI           # Smithing interface api
 │   ├── TabsAPI               # Inventory tabs management
+│   ├── TanningAPI            # Tanning interface api
+│   ├── TradeAPI              # Player trading api
 │   ├── WidgetAPI             # General widget api
-│   ├── MiniMapAPI            # Minimap api
 │   └── WorldMapAPI           # World map api
 │
 ├── 🗺️ Advanced Services
@@ -87,7 +94,6 @@ Everything in the built-in API is designed with thread safety in mind
     ├── ActorPathing             # NPC/player movement utilities
     ├── ClickManagerUtil         # Click interaction helpers
     ├── ClientConfig             # Client configuration management
-    ├── Coroutine                # Async task management
     ├── Location                 # Location & coordinate utilities
     ├── MessageUtil              # Game message handling
     ├── Profiler                 # Performance profiling

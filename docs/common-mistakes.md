@@ -14,7 +14,7 @@ This document covers frequent errors when using the VitaLite SDK and how to fix 
 
 **Fix:**
 ```bash
-./gradlew SyncRuneliteApi
+./gradlew :base-api:syncRuneliteApi
 ./gradlew buildAndPublishAll
 ```
 

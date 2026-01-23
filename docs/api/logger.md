@@ -127,7 +127,7 @@ Logs are written to files automatically via `LogFileManager`:
 - Location: `~/.runelite/vitalite/logs/`
 - Format: Timestamped entries
 
-Source: `src/main/java/com/tonic/logging/LogFileManager.java`
+Source: `base-api/src/main/java/com/tonic/logging/LogFileManager.java`
 
 ---
 

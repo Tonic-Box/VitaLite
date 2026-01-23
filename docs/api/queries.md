@@ -280,6 +280,181 @@ Source: `api/src/main/java/com/tonic/queries/WorldQuery.java`
 
 ---
 
+## LocationQuery
+
+Search for tiles in the game world.
+
+### Basic Usage
+
+```java
+// Find reachable tiles within distance
+List<Tile> tiles = new LocationQuery()
+    .withinDistance(10)
+    .isReachable()
+    .collect();
+
+// Find tiles within an area
+List<Tile> areaTiles = new LocationQuery()
+    .withinArea(new WorldArea(3200, 3200, 20, 20, 0))
+    .collect();
+```
+
+### Filter Methods
+
+| Method | Description |
+|--------|-------------|
+| `isReachable()` | Filter to tiles reachable from player |
+| `hasLosTo()` | Filter to tiles with line of sight to player |
+| `withinDistance(int distance)` | Filter by Chebyshev distance from player |
+| `beyondDistance(int distance)` | Filter to tiles beyond distance |
+| `withinPathingDistance(int distance)` | Filter by actual path distance |
+| `beyondPathingDistance(int distance)` | Filter to tiles beyond path distance |
+| `withinArea(WorldArea area)` | Filter to tiles within area |
+| `outsideArea(WorldArea area)` | Filter to tiles outside area |
+| `hasTileObject()` | Filter to tiles containing objects |
+
+### Conversion Methods
+
+| Method | Description |
+|--------|-------------|
+| `toWorldPointList()` | Convert results to WorldPoint list |
+| `toLocalPointList()` | Convert results to LocalPoint list |
+
+Source: `api/src/main/java/com/tonic/queries/LocationQuery.java`
+
+---
+
+## ShopQuery
+
+Search for shops in the game.
+
+### Basic Usage
+
+```java
+// Find accessible shops nearby
+Shop shop = new ShopQuery()
+    .canAccess()
+    .sortNearest()
+    .first();
+
+// Find shops by name
+List<Shop> generalStores = new ShopQuery()
+    .withNameContains("GENERAL")
+    .collect();
+```
+
+### Filter Methods
+
+| Method | Description |
+|--------|-------------|
+| `withInventoryId(int... ids)` | Filter by inventory IDs |
+| `withShopkeeper(NpcLocations... shopkeepers)` | Filter by shopkeeper NPC |
+| `withShopkeeperNameContains(String namePart)` | Filter by shopkeeper name substring |
+| `withShopkeeperNameMatches(String pattern)` | Filter by wildcard pattern |
+| `withName(String name)` | Filter by exact shop enum name |
+| `withNameContains(String namePart)` | Filter by shop name substring |
+| `withNames(String... names)` | Filter by multiple shop names |
+| `withNameMatches(String pattern)` | Filter by wildcard pattern |
+| `canAccess()` | Filter to accessible shops |
+| `withRequirements()` | Filter to shops with requirements |
+| `withoutRequirements()` | Filter to shops without requirements |
+| `within(int distance)` | Filter by distance from player |
+| `within(WorldPoint center, int distance)` | Filter by distance from point |
+| `atLocation(WorldPoint location)` | Filter by exact location |
+
+### Sorting Methods
+
+| Method | Description |
+|--------|-------------|
+| `sortNearest()` | Sort by Euclidean distance (nearest first) |
+| `sortFurthest()` | Sort by Euclidean distance (furthest first) |
+| `sortShortestPath()` | Sort by pathfinding distance |
+| `sortLongestPath()` | Sort by pathfinding distance (longest first) |
+| `sortShortestGlobalPath()` | Sort by global path (includes teleports) |
+| `sortLongestGlobalPath()` | Sort by global path (longest first) |
+
+### Terminal Operations
+
+| Method | Description |
+|--------|-------------|
+| `nearest()` | Get nearest shop |
+| `furthest()` | Get furthest shop |
+| `shortestPath()` | Get shop with shortest path |
+| `longestPath()` | Get shop with longest path |
+| `shortestGlobalPath()` | Get shop with shortest global path |
+| `getCurrent()` | Get currently open shop |
+
+Source: `api/src/main/java/com/tonic/queries/ShopQuery.java`
+
+---
+
+## EntityQuery
+
+Combined query for all entity types (NPCs, Players, TileItems, TileObjects).
+
+### Basic Usage
+
+```java
+// Find any entity by name
+Entity entity = new EntityQuery()
+    .withName("Banker")
+    .nearest();
+
+// Find NPCs and objects only
+List<Entity> entities = new EntityQuery()
+    .removePlayers()
+    .removeTileItems()
+    .withAction("Bank")
+    .collect();
+```
+
+### Type Filters
+
+| Method | Description |
+|--------|-------------|
+| `ofTypes(Class<? extends Entity>... types)` | Filter to specific entity types |
+| `removePlayers()` | Exclude players |
+| `removeNpcs()` | Exclude NPCs |
+| `removeTileItems()` | Exclude ground items |
+| `removeTileObjects()` | Exclude game objects |
+
+### Filter Methods
+
+| Method | Description |
+|--------|-------------|
+| `withId(int... id)` | Filter by IDs |
+| `withName(String name)` | Filter by exact name |
+| `withNameContains(String name)` | Filter by name substring |
+| `withNames(String... names)` | Filter by multiple names |
+| `withNamesContains(String... names)` | Filter by multiple name substrings |
+| `withNameMatches(String namePart)` | Filter by wildcard pattern |
+| `withAction(String action)` | Filter by action |
+| `withPartialAction(String partial)` | Filter by partial action |
+| `withinDistance(int distance)` | Filter by distance |
+| `beyondDistance(int distance)` | Filter beyond distance |
+
+### Sorting Methods
+
+| Method | Description |
+|--------|-------------|
+| `sortNearest()` | Sort by distance (nearest first) |
+| `sortFurthest()` | Sort by distance (furthest first) |
+| `sortShortestPath()` | Sort by path distance |
+| `sortLongestPath()` | Sort by path distance (longest first) |
+
+### Terminal Operations
+
+| Method | Description |
+|--------|-------------|
+| `nearest()` | Get nearest entity |
+| `farthest()` | Get farthest entity |
+| `shortestPath()` | Get entity with shortest path |
+| `longestPath()` | Get entity with longest path |
+
+Source: `api/src/main/java/com/tonic/queries/combined/EntityQuery.java`
+
+---
+
 ## Abstract Query Methods
 
 All queries inherit from `AbstractQuery` and have these common methods:
