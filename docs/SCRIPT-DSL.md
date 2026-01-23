@@ -11,7 +11,7 @@ import com.tonic.util.handler.script.*;
 StepHandler handler = Script.build(s -> {
     s.action(() -> openBank());
     s.await(BankAPI::isOpen);
-    s.action(() -> BankAPI.depositInventory());
+    s.action(() -> BankAPI.depositAll());
 });
 
 // Execute it
@@ -87,7 +87,7 @@ Script.execute(s -> {
 
     s.action(ctx -> {
         ctx.set(COUNT, ctx.get(COUNT) + 1);
-        NpcAPI.attack(ctx.get(TARGET));
+        NpcAPI.interact(ctx.get(TARGET), "Attack");
     });
 
     s.await(ctx -> ctx.get(TARGET).isDead());
@@ -130,14 +130,14 @@ Script.execute(s -> {
 ```java
 // Simple conditional (skip if false)
 s.when(() -> shouldDeposit(), body -> {
-    body.action(() -> BankAPI.depositInventory());
+    body.action(() -> BankAPI.depositAll());
 });
 
 // If-then
 s.ifThen(() -> inventoryFull(), body -> {
     body.action(() -> walkToBank());
     body.await(BankAPI::isOpen);
-    body.action(() -> BankAPI.depositInventory());
+    body.action(() -> BankAPI.depositAll());
 });
 
 // If-then-else
@@ -215,13 +215,12 @@ s.exitIf(ctx -> ctx.get(ATTEMPTS) >= 5);
 // Include another script inline
 Consumer<ScriptBuilder> depositItems = sub -> {
     sub.await(BankAPI::isOpen);
-    sub.action(() -> BankAPI.depositInventory());
+    sub.action(() -> BankAPI.depositAll());
 };
 
 Script.execute(s -> {
-    s.action(() -> openBank());
+    s.action(() -> openBank());  // Your own openBank() helper method
     s.include(depositItems);
-    s.action(() -> BankAPI.close());
 });
 
 // Include an existing StepHandler
@@ -229,7 +228,7 @@ StepHandler walkingHandler = BankBuilder.get().open().build();
 
 Script.execute(s -> {
     s.include(walkingHandler);
-    s.action(() -> BankAPI.depositInventory());
+    s.action(() -> BankAPI.depositAll());
 });
 ```
 
@@ -270,7 +269,7 @@ public StepHandler createBankingHandler() {
         s.jumpIf(ctx -> ctx.get(FOUND_BANK), "wait_open");
 
         // Walk to nearest bank
-        s.action(() -> MovementAPI.walkTo(BankLocations.getNearest()));
+        s.action(() -> BankLocations.walkToNearest());
         s.await(PlayerAPI::isIdle);
 
         // Wait for bank to open
@@ -306,16 +305,21 @@ public void mineWithBanking(WorldPoint miningSpot, int targetOres) {
             });
 
             // Bank the ores
-            loop.action(() -> MovementAPI.walkTo(BankLocations.getNearest()));
-            loop.await(() -> BankAPI.isNearBank());
-            loop.action(() -> BankAPI.open());
+            loop.action(() -> BankLocations.walkToNearest());
+            loop.await(PlayerAPI::isIdle);
+            loop.action(() -> {
+                TileObjectEx booth = TileObjectAPI.search()
+                    .withName("Bank booth")
+                    .withAction("Bank")
+                    .nearest();
+                if (booth != null) TileObjectAPI.interact(booth, "Bank");
+            });
             loop.await(BankAPI::isOpen);
-            loop.action(() -> BankAPI.depositInventory());
+            loop.action(() -> BankAPI.depositAll());
             loop.yield(2);
-            loop.action(() -> BankAPI.close());
 
             // Return to mining spot
-            loop.action(() -> MovementAPI.walkTo(miningSpot));
+            loop.action(() -> Walker.walkTo(miningSpot));
             loop.await(PlayerAPI::isIdle);
         });
     });
@@ -340,7 +344,7 @@ public StepHandler talkToNpc(String npcName, String... dialogueOptions) {
         s.loopWhile(DialogueAPI::dialoguePresent, loop -> {
             loop.action(() -> {
                 for (String option : dialogueOptions) {
-                    if (DialogueAPI.hasOption(option)) {
+                    if (DialogueAPI.optionPresent(option)) {
                         DialogueAPI.selectOption(option);
                         return;
                     }

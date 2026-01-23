@@ -1,31 +1,74 @@
 # Click Manager
-The click manager enables users to control the behavior of how clicks are crafted. This includes clicking at static points, clicking at random points, clicking in defined controlled areas (must be supported by plugin developer), or not sending clicks at all. WHat you set the strategy to `STATIC` you will see a panel show where you can define the x/y for the static click location.
 
-## Configuration
-In the VitaLite options sidebar, there is a dropdown for configuring this option.
+The click manager controls how click packets are produced and optionally how mouse movement samples are generated before a click.
+Source: `base-api/src/main/java/com/tonic/services/ClickManager.java`
 
-## Developers
-If you want to support controlled clicks, you will need to integrate your automation with the ClickManager API.
+## Click Strategies
 
-At any point during your automation you can call:
+The configured click strategy is stored in `ClientConfig.clickStrategy`.
+Source: `base-api/src/main/java/com/tonic/util/ClientConfig.java:getClickStrategy`
+
+Available strategies:
+
+- `STATIC` - click at a configured static point (`clickPointX`, `clickPointY`).
+- `RANDOM` - click at a random point inside the viewport bounds.
+- `CONTROLLED` - click at a random point inside a plugin provided click box shape.
+- `NONE` - no click packet is generated.
+
+Source: `base-api/src/main/java/com/tonic/services/ClickStrategy.java`
+Source: `base-api/src/main/java/com/tonic/services/ClickManager.java:click` (switch behavior)
+
+## Plugin Integration: Controlled Click Boxes
+
+If you want your plugin to support controlled clicking, set a click box for the current target before interacting, and then clear it when you are done.
+
+### Direct API
+
+```java
+import com.tonic.services.ClickManager;
+import java.awt.Rectangle;
+
+ClickManager.queueClickBox(new Rectangle(100, 100, 50, 20));
+// ... interact using other APIs ...
+ClickManager.clearClickBox();
 ```
-ClickManager::queueClickBox(Rectangle rectangle)
+
+Source: `base-api/src/main/java/com/tonic/services/ClickManager.java:queueClickBox`
+
+### Convenience helpers (`ClickManagerUtil`)
+
+`ClickManagerUtil` provides helpers for common shapes, such as NPCs, objects, items, and widgets.
+These helpers run on the client thread via `Static.invoke(...)`.
+
+Source: `api/src/main/java/com/tonic/util/ClickManagerUtil.java`
+
+Example:
+
+```java
+import com.tonic.api.entities.NpcAPI;
+import com.tonic.data.wrappers.NpcEx;
+import com.tonic.util.ClickManagerUtil;
+import com.tonic.services.ClickManager;
+
+NpcEx banker = NpcAPI.search().withName("Banker").nearest();
+ClickManagerUtil.queueClickBox(banker);
+NpcAPI.interact(banker, "Bank");
+ClickManager.clearClickBox();
 ```
 
-this wills et the area for which the click manager will select a random point from when set to `CONTROLLED` strategy. It will stay persistent until its either cleared or set to a new Rectangle.
+## Failure Modes and Fallbacks
 
-There is also a Util class for setting this up easier:
-## ClickManagerUtil
-```
-//Queue click on a TileObject
-ClickManagerUtil.queueClickBox(TileObjectEx object)
+### Controlled strategy without a click box
 
-//Queue click on an actor
-ClickManagerUtil.queueClickBox(Actor actor)
+If the strategy is `CONTROLLED` but no shape was queued, the click manager logs a warning and falls back to the static click behavior.
+Source: `base-api/src/main/java/com/tonic/services/ClickManager.java:click`
 
-//Queue click on an item
-ClickManagerUtil.queueClickBox(ItemEx item)
-```
+### Infinite loops with `queueClickBox`
 
-## Notes
-If the click box is not set, but the user has the strategy set to `CONTROLLED`, it will fallback to `STATIC` strategy.
+`queueClickBox` only sets a shape. It does not clear it automatically. If your plugin sets a click box and never clears it, future clicks can keep using that shape.
+Source: `base-api/src/main/java/com/tonic/services/ClickManager.java:clearClickBox`
+
+### Strategy `NONE`
+
+When the strategy is `NONE`, `ClickManager.click(...)` does not match any switch case and does not emit a click packet.
+Source: `base-api/src/main/java/com/tonic/services/ClickManager.java:click`
