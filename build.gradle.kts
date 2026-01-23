@@ -8,8 +8,8 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("2")
-val runeliteVersion by extra("1.12.12.1")
+val vitaVersion by extra("1")
+val runeliteVersion by extra("1.12.13")
 
 group = "com.tonic"
 version = runeliteVersion + "_" + vitaVersion
@@ -358,9 +358,9 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-feature"
+    val title = "${tag}-bugfix"
     val body = "# ${tag}\n" +
-            "- Proxy now displays in client title bar again";
+            "- Forgot to rerun injector for patches\n"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
