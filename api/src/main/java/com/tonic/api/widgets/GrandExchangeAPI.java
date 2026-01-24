@@ -4,6 +4,7 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.game.ClientScriptAPI;
+import com.tonic.api.game.GameAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.data.GrandExchangeSlot;
 import com.tonic.data.wrappers.ItemEx;
@@ -16,12 +17,25 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.Widget;
 
+import java.util.function.Supplier;
+
 
 /**
  * Grand Exchange API
  */
 public class GrandExchangeAPI
 {
+    /**
+     * Closes the Grand Exchange window if it is currently open.
+     */
+    public static void close()
+    {
+        Widget exitButton = WidgetAPI.get(465, 2, 11);
+        if (WidgetAPI.isVisible(exitButton) && GrandExchangeAPI.isOpen())
+        {
+            GameAPI.invokeMenuAction(1, 57, 11, 30474242, -1);
+        }
+    }
     /**
      * Bypasses the high offer warning dialog if it is open.
      */

@@ -41,6 +41,16 @@ public class MovementAPI {
     }
 
     /**
+     * Checks run energy will return / 100
+     * @return 100 if run energy is full
+     */
+    public static int getRunEnergy()
+    {
+        Client client = Static.getClient();
+        return Static.invoke(() -> client.getEnergy() / 100);
+    }
+
+    /**
      * Checks if run is enabled
      * @return True if run is enabled, false otherwise
      */
