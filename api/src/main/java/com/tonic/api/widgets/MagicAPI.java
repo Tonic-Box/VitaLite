@@ -5,6 +5,8 @@ import com.tonic.api.game.SkillAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.data.magic.Spell;
 import com.tonic.data.magic.SpellBook;
+import com.tonic.data.magic.spellbooks.Standard;
+import com.tonic.data.wrappers.*;
 import net.runelite.api.Skill;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
@@ -81,6 +83,76 @@ public class MagicAPI
             return;
 
         spell.cast();
+    }
+
+    /**
+     * Casts the specified spell on a target if it is valid and can be cast.
+     *
+     * @param spell  The spell to be cast.
+     * @param target The NPC target for the spell.
+     */
+    public static void cast(Spell spell, NpcEx target)
+    {
+        if (spell == null || target == null || !spell.canCast())
+            return;
+
+        spell.castOn(target);
+    }
+
+    /**
+     * Casts the specified spell on an item if it is valid and can be cast.
+     *
+     * @param spell The spell to be cast.
+     * @param item  The item target for the spell.
+     */
+    public static void cast(Spell spell, ItemEx item)
+    {
+        if (spell == null || item == null || !spell.canCast())
+            return;
+
+        spell.castOn(item);
+    }
+
+    /**
+     * Casts the specified spell on a player if it is valid and can be cast.
+     *
+     * @param spell  The spell to be cast.
+     * @param player The player target for the spell.
+     */
+    public static void cast(Spell spell, PlayerEx player)
+    {
+        if (spell == null || player == null || !spell.canCast())
+            return;
+
+        spell.castOn(player);
+    }
+
+    /**
+     * Casts the specified spell on a tile object if it is valid and can be cast.
+     *
+     * @param spell      The spell to be cast.
+     * @param tileObject The tile object target for the spell.
+     */
+    public static void cast(Spell spell, TileObjectEx tileObject)
+    {
+        if (spell == null || tileObject == null || !spell.canCast())
+            return;
+
+        spell.castOn(tileObject);
+    }
+
+    /**
+     * Casts the specified spell on a ground item if it is valid and can be cast.
+     *
+     * @param spell    The spell to be cast.
+     * @param tileItem The ground item target for the spell.
+     */
+    public static void cast(Spell spell, TileItemEx tileItem)
+    {
+        if (spell == null || tileItem == null || !spell.canCast())
+            return;
+
+        spell.castOn(tileItem);
     }
 
     /**
