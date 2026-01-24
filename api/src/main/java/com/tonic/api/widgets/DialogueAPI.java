@@ -343,6 +343,16 @@ public class DialogueAPI
     }
 
     /**
+     * Checks if a dialogue with options is present.
+     *
+     * @return true if a dialogue with options is present, false otherwise.
+     */
+
+    public static boolean isViewingOptions() {
+        return !getOptions().isEmpty();
+    }
+
+    /**
      * Checks if a specific dialogue option is present.
      *
      * @param option The text of the option to check for. Case-insensitive and partial matches are supported.
