@@ -76,6 +76,42 @@ public class GrandExchangeAPI
     }
 
     /**
+     * Aborts the active Grand Exchange offer slot which currently has the itemId.
+     */
+    public static void abortOffer(int itemId) {
+        try {
+            Client client = Static.getClient();
+            GrandExchangeOffer[] offers = Static.invoke(client::getGrandExchangeOffers);
+
+            if (offers == null) {
+                return;
+            }
+
+            for (int i = 0; i < offers.length; i++) {
+                GrandExchangeOffer offer = offers[i];
+
+                if (offer == null) {
+                    continue;
+                }
+
+                if (offer.getItemId() == itemId
+                        && offer.getState() != GrandExchangeOfferState.EMPTY
+                        && offer.getState() != GrandExchangeOfferState.CANCELLED_BUY
+                        && offer.getState() != GrandExchangeOfferState.CANCELLED_SELL) {
+
+                    GrandExchangeSlot slot = GrandExchangeSlot.getBySlot(i + 1);
+                    if (slot != null) {
+                        GrandExchangeAPI.cancel(slot);
+                        return;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logger.error(e);
+        }
+    }
+
+    /**
      * Bypasses the high offer warning dialog if it is open.
      */
     public static void bypassHighOfferWarning()
