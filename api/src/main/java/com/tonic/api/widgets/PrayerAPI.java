@@ -161,6 +161,19 @@ public enum PrayerAPI {
     }
 
     /**
+     * check if the player has any active prayers
+     * @return bool
+     */
+    public static boolean anyActive() {
+        for (PrayerAPI prayer : values()) {
+            if (prayer.isActive()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * check if the player has the level for this prayer
      * @return bool
      */
