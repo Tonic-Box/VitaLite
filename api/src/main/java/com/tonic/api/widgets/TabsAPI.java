@@ -36,9 +36,8 @@ public class TabsAPI
      * @param tab The tab to check.
      * @return True if the tab is open, false otherwise.
      */
-    public static boolean isOpen(Tab tab)
-    {
+    public static boolean isOpen(Tab tab) {
         Client client = Static.getClient();
-        return client.getVarcIntValue(VarClientID.TOPLEVEL_PANEL) == Arrays.asList(Tab.values()).indexOf(tab);
+        return client.getVarcIntValue(VarClientID.TOPLEVEL_PANEL) == tab.getTabVarbit();
     }
 }
