@@ -2,6 +2,7 @@ package com.tonic.api.widgets;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.loadouts.InventoryLoadout;
 import com.tonic.api.loadouts.item.LoadoutItem;
@@ -421,6 +422,17 @@ public class BankAPI
     {
         Client client = Static.getClient();
         return Static.invoke(() -> client.getItemContainer(InventoryID.BANK) != null);
+    }
+
+    /**
+     * Closes the bank if it is currently open.
+     */
+    public static void close()
+    {
+        if (BankAPI.isOpen())
+        {
+            ClientScriptAPI.runScript(29);
+        }
     }
 
     /**
