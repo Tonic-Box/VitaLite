@@ -13,10 +13,10 @@ import lombok.Getter;
 public class TObjectCompositionMixin implements TObjectComposition
 {
     @Inject
-    private int blockAccessFlags;
+    private static int blockAccessFlags;
 
     @Disable("decodeNext")
-    public boolean decodeNext(TBuffer buffer, int opcode)
+    public static boolean decodeNext(TObjectComposition composition, TBuffer buffer, int opcode)
     {
         if(opcode == 69)
         {
@@ -26,5 +26,10 @@ public class TObjectCompositionMixin implements TObjectComposition
         }
 
         return true;
+    }
+
+    @Override
+    public int getBlockAccessFlags() {
+        return blockAccessFlags;
     }
 }

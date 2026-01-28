@@ -266,7 +266,7 @@ public class BankAPI
         WithdrawModeSnapshot.noted = noted;
         WithdrawModeSnapshot.tick = GameManager.getTickCount();
 
-        WidgetAPI.interact(1, noted ? InterfaceID.Bankmain.NOTE : InterfaceID.Bankmain.ITEM, -1, -1);
+        WidgetAPI.interact(1, InterfaceID.Bankmain.NOTE, -1, -1);
     }
 
     /**
