@@ -13,4 +13,9 @@ public interface IPathfinder
     List<? extends IStep> find(WorldPoint target);
     List<? extends IStep> find(WorldArea... worldAreas);
     List<? extends IStep> find(List<WorldArea> worldAreas);
+
+    default WorldPoint findBestMidPoint(WorldPoint startA, WorldPoint startB, WorldPoint... midPoints)
+    {
+        throw new UnsupportedOperationException("This is only implemented for the Hybrid BFS Algo.");
+    }
 }

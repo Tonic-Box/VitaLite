@@ -8,22 +8,20 @@ import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.collections.BFSCache;
 import com.tonic.services.pathfinder.collections.HybridIntQueue;
+import com.tonic.services.pathfinder.collections.IntToBoolPairMap;
 import com.tonic.services.pathfinder.collision.Flags;
 import com.tonic.services.pathfinder.collision.Properties;
 import com.tonic.services.pathfinder.local.LocalCollisionMap;
 import com.tonic.services.pathfinder.teleports.Teleport;
 import com.tonic.services.pathfinder.transports.Transport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
-import com.tonic.util.Location;
 import com.tonic.util.Profiler;
 import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
 import net.runelite.api.Client;
-import net.runelite.api.Tile;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,6 +73,30 @@ public class HybridBFSAlgo implements IPathfinder
         TransportLoader.refreshTransports();
         worldAreaPoints = WorldPointUtil.toCompressedPoints(worldAreas.toArray(new WorldArea[0]));
         return find();
+    }
+
+    /**
+     * finds the nearest point from midpoints to both A and B
+     * @param startA start A
+     * @param startB start B
+     * @param midPoints mid points
+     * @return best midpoint
+     */
+    @Override
+    public WorldPoint findBestMidPoint(WorldPoint startA, WorldPoint startB, WorldPoint... midPoints)
+    {
+        TransportLoader.refreshTransports();
+        List<Integer> points = new ArrayList<>(midPoints.length);
+        for(WorldPoint wp : midPoints)
+        {
+            points.add(WorldPointUtil.compress(wp));
+        }
+
+        return findMidPoints(
+                WorldPointUtil.compress(startA),
+                WorldPointUtil.compress(startB),
+                points
+        );
     }
 
     /**
@@ -161,6 +183,39 @@ public class HybridBFSAlgo implements IPathfinder
         return new ArrayList<>();
     }
 
+    private WorldPoint findMidPoints(final int startA, final int startB, final List<Integer> destPoints)
+    {
+        final BFSCache visitedA = new BFSCache();
+        final BFSCache visitedB = new BFSCache();
+
+        //blacklist
+        for(int i : Properties.getBlacklist())
+        {
+            visitedA.put(i, -1);
+            visitedB.put(i, -1);
+        }
+
+        final HybridIntQueue queueA = new HybridIntQueue(10_000_000);
+        final HybridIntQueue queueB = new HybridIntQueue(10_000_000);
+
+        visitedA.put(startA, -1);
+        queueA.enqueue(startA);
+
+        visitedB.put(startB, -1);
+        queueB.enqueue(startB);
+
+        IntToBoolPairMap dests = new IntToBoolPairMap(100);
+
+        for(int point : destPoints)
+        {
+            dests.put(point, false, false);
+        }
+
+        if(worldAreaPoints != null && worldAreaPoints.length > 0)
+            return findBestMidPoint(visitedA, queueA, visitedB, queueB, dests);
+        return null;
+    }
+
     private List<HybridBFSStep> findAreaPoint(final BFSCache visited, final HybridIntQueue queue) {
         int current;
         while(!queue.isEmpty())
@@ -179,6 +234,40 @@ public class HybridBFSAlgo implements IPathfinder
             addNeighbors(current, queue, visited);
         }
         return new ArrayList<>();
+    }
+
+    private WorldPoint findBestMidPoint(
+            final BFSCache visitedA, final HybridIntQueue queueA,
+            final BFSCache visitedB, final HybridIntQueue queueB,
+            IntToBoolPairMap dests
+    ) {
+        int currentA;
+        int currentB;
+        while(!queueA.isEmpty() || !queueB.isEmpty())
+        {
+            currentA = queueA.dequeue();
+            currentB = queueB.dequeue();
+            if(dests.containsKey(currentA))
+            {
+                dests.setA(currentA);
+                if(dests.bothSet(currentA))
+                    return WorldPointUtil.fromCompressed(currentA);
+
+            }
+
+            addNeighbors(currentB, queueB, visitedB);
+
+            if(dests.containsKey(currentB))
+            {
+                dests.setB(currentB);
+                if(dests.bothSet(currentB))
+                    return WorldPointUtil.fromCompressed(currentB);
+
+            }
+
+            addNeighbors(currentA, queueA, visitedA);
+        }
+        return null;
     }
 
     private List<HybridBFSStep> findWorldPoint(final BFSCache visited, final HybridIntQueue queue) {

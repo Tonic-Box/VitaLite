@@ -18,12 +18,12 @@ import com.tonic.queries.TileObjectQuery;
 import com.tonic.queries.WidgetQuery;
 import static com.tonic.services.pathfinder.Walker.*;
 import com.tonic.services.GameManager;
+import com.tonic.services.pathfinder.PathfinderAlgo;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.abstractions.IStep;
 import com.tonic.services.pathfinder.teleports.Teleport;
 import com.tonic.util.ClickManagerUtil;
-import com.tonic.util.Location;
 import com.tonic.util.StaticIntFinder;
 import lombok.Getter;
 import lombok.Setter;
@@ -82,6 +82,19 @@ public class WalkerPath
     }
 
     /**
+     * Get a WalkerPath to a single target
+     * @param target The target WorldPoint
+     * @return The WalkerPath
+     */
+    public static WalkerPath get(WorldPoint target, PathfinderAlgo algo)
+    {
+        target = Walker.getCollisionMap().nearestWalkableEuclidean(target, 5);
+        final IPathfinder engine = algo.newInstance();
+        List<? extends IStep> path = engine.find(target);
+        return new WalkerPath(path, engine.getTeleport());
+    }
+
+    /**
      * Get a WalkerPath to the closest of multiple targets
      * @param targets The target WorldAreas
      * @return The WalkerPath
@@ -91,6 +104,20 @@ public class WalkerPath
         final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
         List<? extends IStep> path = engine.find(targets);
         return new WalkerPath(path, engine.getTeleport());
+    }
+
+    /**
+     * Returns the first midpoint that both StartA and StartB make it to via parallel pathfinding. Will
+     * return null if no collective matches are found.
+     * @param startA starting point A
+     * @param startB starting point B
+     * @param midPoints destinations to check against during pathfinding
+     * @return best midpoint, or null
+     */
+    public static WorldPoint getBestMidpoint(WorldPoint startA, WorldPoint startB, WorldPoint... midPoints)
+    {
+        final IPathfinder engine = PathfinderAlgo.HYBRID_BFS.newInstance();
+        return engine.findBestMidPoint(startA, startB, midPoints);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
