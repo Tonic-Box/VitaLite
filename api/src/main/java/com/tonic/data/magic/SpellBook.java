@@ -1,9 +1,12 @@
 package com.tonic.data.magic;
 
 import com.tonic.Static;
+import com.tonic.api.game.QuestAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.data.magic.spellbooks.Ancient;
 import com.tonic.data.magic.spellbooks.Standard;
+import net.runelite.api.Quest;
+import net.runelite.api.QuestState;
 import net.runelite.api.gameval.VarbitID;
 
 import java.util.*;
@@ -32,6 +35,30 @@ public enum SpellBook
                         .findFirst()
                         .orElse(null)
         );
+    }
+
+    public static boolean isOnStandardSpellbook() {
+        return getCurrent() == STANDARD;
+    }
+
+    public static boolean isOnAncientSpellbook() {
+        return getCurrent() == ANCIENT;
+    }
+
+    public static boolean isOnLunarSpellbook() {
+        return getCurrent() == LUNAR;
+    }
+
+    public static boolean isOnArceeusSpellbook() {
+        return getCurrent() == NECROMANCY;
+    }
+
+    public static boolean isAncientSpellbookUnlocked() {
+        return QuestAPI.getState(Quest.DESERT_TREASURE_I) == QuestState.FINISHED;
+    }
+
+    public static boolean isLunarSpellbookUnlocked() {
+        return QuestAPI.getState(Quest.LUNAR_DIPLOMACY) == QuestState.FINISHED;
     }
 
     public static Set<Spell> getCurrentOffensiveSpells()
