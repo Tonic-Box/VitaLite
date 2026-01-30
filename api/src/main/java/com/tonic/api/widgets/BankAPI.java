@@ -65,13 +65,13 @@ public class BankAPI
         int withdrawMode = VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE);
         if(withdrawMode != 3)
         {
-            WidgetAPI.interact(1, InterfaceID.Bankmain.QUANTITY_LAYER_TEXT0, -1, -1);
+            WidgetAPI.interact(1, InterfaceID.Bankmain.QUANTITY_LAYER, -1, -1);
         }
 
         int xQuantity = getX();
         if(xQuantity != amount && amount != 1 && amount != 5 && amount != 10 && amount != -1)
         {
-            WidgetAPI.interact(2, InterfaceID.Bankmain.QUANTITY_LAYER_TEXT0, -1, -1);
+            WidgetAPI.interact(2, InterfaceID.Bankmain.QUANTITY_LAYER, -1, -1);
             DialogueAPI.resumeNumericDialogue(amount);
             XSnapshot.amount = amount;
             XSnapshot.tick = GameManager.getTickCount();
