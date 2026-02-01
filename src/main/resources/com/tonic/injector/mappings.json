@@ -86491,6 +86491,7 @@
         "isStatic": true
       },
       {
+        "name": "getDeviceId",
         "obfuscatedName": "li",
         "owner": "PlatformInfo",
         "ownerObfuscatedName": "vn",
@@ -86507,7 +86508,7 @@
         "isStatic": true
       },
       {
-        "name": "getDeviceId",
+        "name": "",
         "obfuscatedName": "ag",
         "owner": "PlatformInfo",
         "ownerObfuscatedName": "vn",

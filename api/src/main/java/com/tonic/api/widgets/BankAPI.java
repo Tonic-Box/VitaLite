@@ -62,16 +62,17 @@ public class BankAPI
      */
     public static void setX(int amount)
     {
+        System.out.println(VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE));
         int withdrawMode = VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE);
         if(withdrawMode != 3)
         {
-            WidgetAPI.interact(1, InterfaceID.Bankmain.QUANTITY_LAYER, -1, -1);
+            WidgetAPI.interact(1, InterfaceID.Bankmain.QUANTITYX, -1, -1);
         }
 
         int xQuantity = getX();
         if(xQuantity != amount && amount != 1 && amount != 5 && amount != 10 && amount != -1)
         {
-            WidgetAPI.interact(2, InterfaceID.Bankmain.QUANTITY_LAYER, -1, -1);
+            WidgetAPI.interact(2, InterfaceID.Bankmain.QUANTITYX, -1, -1);
             DialogueAPI.resumeNumericDialogue(amount);
             XSnapshot.amount = amount;
             XSnapshot.tick = GameManager.getTickCount();
@@ -360,19 +361,19 @@ public class BankAPI
     public static void withdrawAction(int id, int amount, int slot) {
         setX(amount);
         if(amount == 1) {
-            WidgetAPI.interact(1, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(1, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else if(amount == 5) {
-            WidgetAPI.interact(3, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(3, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else if(amount == 10) {
-            WidgetAPI.interact(4, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(4, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else if(amount == -1) {
-            WidgetAPI.interact(7, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(7, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else {
-            WidgetAPI.interact(5, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(5, InterfaceID.Bankmain.ITEMS, slot, id);
         }
     }
 

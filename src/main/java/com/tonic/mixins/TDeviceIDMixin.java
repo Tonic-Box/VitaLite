@@ -18,17 +18,17 @@ public abstract class TDeviceIDMixin
     @Shadow("JX_CHARACTER_ID")
     public static String characterId;
 
-//    @MethodOverride("getDeviceId")
-//    public static String getDeviceId(PlatformInfo info, int os)
-//    {
-//        return process(os);
-//    }
-
     @MethodOverride("getDeviceId")
-    public String getDeviceId(int os)
+    public static String getDeviceId(PlatformInfo info, int os)
     {
         return process(os);
     }
+
+//    @MethodOverride("getDeviceId")
+//    public String getDeviceId(int os)
+//    {
+//        return process(os);
+//    }
 
     @Inject
     private static String process(int os)
