@@ -510,4 +510,20 @@ public enum PrayerAPI {
 
         private final PrayerAPI[] prayerMap;
     }
+
+    public static void toggle(PrayerAPI prayer) {
+        if (prayer != null) {
+            prayer.turnOn();
+        }
+    }
+
+    public static void toggle(PrayerAPI... prayers) {
+        for (PrayerAPI prayer : prayers) {
+            if (prayer != null) {
+                prayer.turnOn();
+            }
+        }
+    }
+
+
 }
