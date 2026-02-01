@@ -360,7 +360,7 @@ tasks.register<Exec>("publishRelease") {
     val tag = "${runeliteVersion}_${vitaVersion}"
     val title = "${tag}-bug fix"
     val body = "# ${tag}\n" +
-            "- Fixed DeviceID spoof logger output\n- Fixed banking\n"
+            "- Fixed DeviceID spoof logger output\n- Fixed banking\n- Additions to PrayerAPI\n- Additions to NpcQuery"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
