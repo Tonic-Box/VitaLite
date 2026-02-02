@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("2")
+val vitaVersion by extra("3")
 val runeliteVersion by extra("1.12.14.1")
 
 group = "com.tonic"
@@ -293,7 +293,7 @@ tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shad
         isInApiPackage && path !in whitelist
     }
 
-    exclude("com/tonic/services/profiler/**")
+    //exclude("com/tonic/services/profiler/**")
     exclude("com/tonic/services/pathfinder/ui/**")
     exclude("com/tonic/injector/**")
     exclude("com/tonic/mixin/**")
