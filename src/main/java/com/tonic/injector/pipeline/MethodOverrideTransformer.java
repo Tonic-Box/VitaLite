@@ -23,6 +23,11 @@ public class MethodOverrideTransformer {
         String name = AnnotationUtil.getAnnotation(method, MethodOverride.class, "value");
         MethodNode toReplace = TransformerUtil.getTargetMethod(mixin, name);
 
+        if (toReplace == null) {
+            String mixinTarget = AnnotationUtil.getAnnotation(mixin, com.tonic.injector.annotations.Mixin.class, "value");
+            throw new RuntimeException("MethodOverride target not found: " + name + " in mixin " + mixinTarget + " (method: " + method.name + method.desc + ")");
+        }
+
         toReplace.instructions.clear();
         toReplace.tryCatchBlocks.clear();
         toReplace.localVariables.clear();
