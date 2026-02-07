@@ -16,7 +16,7 @@ public class TObjectCompositionMixin implements TObjectComposition
     private static int blockAccessFlags;
 
     @Disable("decodeNext")
-    public static boolean decodeNext(TObjectComposition composition, TBuffer buffer, int opcode)
+    public static boolean decodeNext(TBuffer buffer, int opcode)
     {
         if(opcode == 69)
         {

@@ -9,7 +9,7 @@ plugins {
 }
 
 val vitaVersion by extra("3")
-val runeliteVersion by extra("1.12.14.1")
+val runeliteVersion by extra("1.12.16")
 
 group = "com.tonic"
 version = runeliteVersion + "_" + vitaVersion
@@ -358,9 +358,9 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-bug fix"
+    val title = "${tag}-revision"
     val body = "# ${tag}\n" +
-            "- fixed sailing pathing for release jar (Ty to Being)"
+            "- updated to new revision"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
