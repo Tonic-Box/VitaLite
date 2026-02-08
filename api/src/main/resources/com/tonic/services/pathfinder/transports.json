@@ -77220,5 +77220,287 @@
     },
     "action": "Enter",
     "objectId": 31690
+  },
+  {
+    "source": {
+      "x": 1640,
+      "y": 4828,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1641,
+      "y": 4828,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 30116,
+    "requirements": {
+      "itemRequirements": [
+        {
+          "reduction": "OR",
+          "equipped": false,
+          "ids": [
+            21053
+          ],
+          "amount": 1
+        }
+      ],
+      "varRequirements": [
+        {
+          "comparison": "GREATER_THAN",
+          "type": "VARBIT",
+          "var": 3468,
+          "value": 45
+        }
+      ]
+    }
+  },
+  {
+    "source": {
+      "x": 1633,
+      "y": 4831,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1632,
+      "y": 4831,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 11470
+  },
+  {
+    "source": {
+      "x": 1632,
+      "y": 4831,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1633,
+      "y": 4831,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 11470
+  },
+  {
+    "source": {
+      "x": 1641,
+      "y": 4828,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1640,
+      "y": 4828,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 30116
+  },
+  {
+    "source": {
+      "x": 1633,
+      "y": 4837,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1632,
+      "y": 4837,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 30117,
+    "requirements": {
+      "itemRequirements": [
+        {
+          "reduction": "OR",
+          "equipped": false,
+          "ids": [
+            21054
+          ],
+          "amount": 1
+        }
+      ],
+      "varRequirements": [
+        {
+          "comparison": "GREATER_THAN_EQUAL",
+          "type": "VARBIT",
+          "var": 3468,
+          "value": 85
+        }
+      ]
+    }
+  },
+  {
+    "source": {
+      "x": 1632,
+      "y": 4837,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1633,
+      "y": 4837,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 30117
+  },
+  {
+    "source": {
+      "x": 1636,
+      "y": 4824,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1636,
+      "y": 4828,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 30110,
+    "requirements": {
+      "itemRequirements": [
+        {
+          "reduction": "OR",
+          "equipped": false,
+          "ids": [
+            21052
+          ],
+          "amount": 1
+        }
+      ],
+      "varRequirements": [
+        {
+          "comparison": "GREATER_THAN_EQUAL",
+          "type": "VARBIT",
+          "var": 3468,
+          "value": 25
+        }
+      ]
+    }
+  },
+  {
+    "source": {
+      "x": 1637,
+      "y": 4824,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1637,
+      "y": 4825,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 30111,
+    "requirements": {
+      "itemRequirements": [
+        {
+          "reduction": "OR",
+          "equipped": false,
+          "ids": [
+            21052
+          ],
+          "amount": 1
+        }
+      ],
+      "varRequirements": [
+        {
+          "comparison": "GREATER_THAN_EQUAL",
+          "type": "VARBIT",
+          "var": 3468,
+          "value": 25
+        }
+      ]
+    }
+  },
+  {
+    "source": {
+      "x": 1636,
+      "y": 4825,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1636,
+      "y": 4824,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 30110
+  },
+  {
+    "source": {
+      "x": 1637,
+      "y": 4825,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1637,
+      "y": 4824,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 30111
+  },
+  {
+    "source": {
+      "x": 1628,
+      "y": 4829,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1627,
+      "y": 4829,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 30119,
+    "requirements": {
+      "itemRequirements": [
+        {
+          "reduction": "OR",
+          "equipped": false,
+          "ids": [
+            21055
+          ],
+          "amount": 1
+        }
+      ],
+      "varRequirements": [
+        {
+          "comparison": "GREATER_THAN_EQUAL",
+          "type": "VARBIT",
+          "var": 3468,
+          "value": 105
+        }
+      ]
+    }
+  },
+  {
+    "source": {
+      "x": 1643,
+      "y": 4832,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1643,
+      "y": 4833,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 11470
+  },
+  {
+    "source": {
+      "x": 1643,
+      "y": 4833,
+      "plane": 0
+    },
+    "destination": {
+      "x": 1643,
+      "y": 4832,
+      "plane": 0
+    },
+    "action": "Open",
+    "objectId": 11470
   }
 ]
