@@ -9,7 +9,7 @@ plugins {
 }
 
 val vitaVersion by extra("0")
-val runeliteVersion by extra("1.12.14")
+val runeliteVersion by extra("1.12.17")
 
 group = "com.tonic"
 version = runeliteVersion + "_" + vitaVersion
@@ -293,7 +293,7 @@ tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shad
         isInApiPackage && path !in whitelist
     }
 
-    exclude("com/tonic/services/profiler/**")
+    //exclude("com/tonic/services/profiler/**")
     exclude("com/tonic/services/pathfinder/ui/**")
     exclude("com/tonic/injector/**")
     exclude("com/tonic/mixin/**")
@@ -360,7 +360,7 @@ tasks.register<Exec>("publishRelease") {
     val tag = "${runeliteVersion}_${vitaVersion}"
     val title = "${tag}-subrev"
     val body = "# ${tag}\n" +
-            "- Subrev\n- Fixed some banking stuff related to changes this subrev\n"
+            "- updated to new subrev\n- fixed issue with mouse movement packet"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
