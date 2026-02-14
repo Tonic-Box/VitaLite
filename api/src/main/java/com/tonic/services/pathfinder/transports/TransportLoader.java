@@ -397,15 +397,6 @@ public class TransportLoader
                 transports.add(lockingDoorTransport(new WorldPoint(3123, 3244, 0), new WorldPoint(3123, 3243, 0), ObjectID.PRISON_GATE_2881));
                 transports.add(lockingDoorTransport(new WorldPoint(3123, 3243, 0), new WorldPoint(3123, 3244, 0), ObjectID.PRISON_GATE_2881));
 
-                if (InventoryAPI.contains(SLASH_ITEMS) || EquipmentAPI.isEquipped(i -> ArrayUtils.contains(SLASH_ITEMS, i.getId())) || !filter)
-                {
-                    for (Pair<WorldPoint, WorldPoint> pair : SLASH_WEB_POINTS)
-                    {
-                        transports.add(slashWebTransport(pair.getLeft(), pair.getRight()));
-                        transports.add(slashWebTransport(pair.getRight(), pair.getLeft()));
-                    }
-                }
-
                 // Varrock <-> Varlamore via Regulus Cento
                 if (QuestAPI.isCompleted(Quest.CHILDREN_OF_THE_SUN) || !filter)
                 {
@@ -459,6 +450,18 @@ public class TransportLoader
             }
             for (Transport transport : filteredStatic) {
                 computeIfAbsent(LAST_TRANSPORT_LIST, transport);
+            }
+
+            if (InventoryAPI.contains(SLASH_ITEMS) || EquipmentAPI.isEquipped(i -> i != null && ArrayUtils.contains(SLASH_ITEMS, i.getId())) || !filter)
+            {
+                for (Pair<WorldPoint, WorldPoint> pair : SLASH_WEB_POINTS)
+                {
+                    Transport forward = slashWebTransport(pair.getLeft(), pair.getRight());
+                    Transport backward = slashWebTransport(pair.getRight(), pair.getLeft());
+
+                    computeIfAbsent(LAST_TRANSPORT_LIST, WorldPointUtil.compress(pair.getLeft()), forward);
+                    computeIfAbsent(LAST_TRANSPORT_LIST, WorldPointUtil.compress(pair.getRight()), backward);
+                }
             }
 
             if(filter)
@@ -889,7 +892,7 @@ public class TransportLoader
                     return 0;
                 })
                 .addDelay(2, 1);
-        return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), -1);
+        return new Transport(source, destination, 5, 0, builder.build(), -1);
     }
 
     public static Transport itemUseTransport(
@@ -919,7 +922,7 @@ public class TransportLoader
                     return 0;
                 })
                 .addDelay(1, 1);
-        return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), -1);
+        return new Transport(source, destination, 5, 0, builder.build(), -1);
     }
 
     public static Transport npcTransport(
@@ -1127,7 +1130,7 @@ public class TransportLoader
                     WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
                     return Distance.pathDistanceTo(worldPoint, destination) < 5;
                 });
-        return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), -1);
+        return new Transport(source, destination, 5, 0, builder.build(), -1);
     }
 
     public static Transport objectTransport(
@@ -1166,7 +1169,7 @@ public class TransportLoader
                     WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
                     return Distance.pathDistanceTo(worldPoint, destination) < 10 && SceneAPI.isReachable(destination) ? 2 : 0;
                 });
-        return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), requirements, objId);
+        return new Transport(source, destination, 5, 0, builder.build(), requirements, objId);
     }
 
     public static Transport objectDialogTransport(
@@ -1203,9 +1206,8 @@ public class TransportLoader
                     return false;
                 });
 
-        return new LongTransport(source, destination, Integer.MAX_VALUE, 0, builder.build());
+        return new LongTransport(source, destination, 5, 0, builder.build());
     }
-
     public static Transport slashWebTransport(
             WorldPoint source,
             WorldPoint destination
@@ -1223,13 +1225,41 @@ public class TransportLoader
                         TileObjectAPI.interact(web, "Slash");
                         return 1;
                     }
-                    return 2;
+
+                    MovementAPI.walkToWorldPoint(destination);
+                    return 4;
                 })
-                .addDelayUntil(1, () -> {
+                .addDelay(1, 2)
+                .addDelayUntil(2, () -> {
+                    TileObjectEx web = new TileObjectQuery()
+                            .withNameContains("Web")
+                            .within(source, 5)
+                            .withAction("Slash")
+                            .first();
+                    if (web == null) return true;
+
+                    return PlayerEx.getLocal().isIdle() && !MovementAPI.isMoving();
+                })
+                .add(3, () -> {
+                    TileObjectEx web = new TileObjectQuery()
+                            .withNameContains("Web")
+                            .within(source, 5)
+                            .withAction("Slash")
+                            .first();
+                    if (web != null)
+                    {
+                        return 0;
+                    }
+
+                    MovementAPI.walkToWorldPoint(destination);
+                    return 4;
+                })
+                .addDelayUntil(4, () -> {
                     WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
-                    return Distance.pathDistanceTo(worldPoint, destination) < 3;
+                    return Distance.pathDistanceTo(worldPoint, destination) < 2;
                 });
-        return new Transport(source, destination, Integer.MAX_VALUE, 0, builder.build(), -1);
+
+        return new Transport(source, destination, 5, 0, builder.build(), -1);
     }
 
     private static void addManholes(final TIntObjectHashMap<ArrayList<Transport>> transports)
