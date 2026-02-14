@@ -235,4 +235,16 @@ public class ItemEx implements Interactable, Identifiable
             && this.getId() == that.getId()
             && this.getQuantity() == that.getQuantity();
     }
+
+    public boolean isFood() {
+        if (isNoted()) {
+            return false;
+        }
+
+        String name = getName().toLowerCase();
+
+        boolean isEdible = Arrays.stream(getActions()).anyMatch(action -> action != null && action.equalsIgnoreCase("eat"));
+
+        return (isEdible || name.contains("jug of wine")) && !name.contains("rock cake");
+    }
 }
