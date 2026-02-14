@@ -62,6 +62,7 @@ public class BankAPI
      */
     public static void setX(int amount)
     {
+        System.out.println(VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE));
         int withdrawMode = VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE);
         if(withdrawMode != 3)
         {
@@ -258,8 +259,9 @@ public class BankAPI
      * @param noted True for noted, false for unnoted.
      */
     public static void setWithdrawMode(boolean noted) {
-        if (noted == isWithdrawNote())
-        {
+        boolean currentlyNoted = VarAPI.getVar(VarbitID.BANK_WITHDRAWNOTES) == 1;
+
+        if (currentlyNoted == noted) {
             return;
         }
 
@@ -359,7 +361,7 @@ public class BankAPI
     public static void withdrawAction(int id, int amount, int slot) {
         setX(amount);
         if(amount == 1) {
-            WidgetAPI.interact(2, InterfaceID.Bankmain.ITEMS, slot, id);
+            WidgetAPI.interact(1, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else if(amount == 5) {
             WidgetAPI.interact(3, InterfaceID.Bankmain.ITEMS, slot, id);
@@ -384,7 +386,7 @@ public class BankAPI
     public static void depositAction(int id, int amount, int slot) {
         setX(amount);
         if(amount == 1) {
-            WidgetAPI.interact(3, InterfaceID.Bankside.ITEMS, slot, id);
+            WidgetAPI.interact(2, InterfaceID.Bankside.ITEMS, slot, id);
         }
         else if(amount == 5) {
             WidgetAPI.interact(4, InterfaceID.Bankside.ITEMS, slot, id);
@@ -396,22 +398,29 @@ public class BankAPI
             WidgetAPI.interact(8, InterfaceID.Bankside.ITEMS, slot, id);
         }
         else {
-            WidgetAPI.interact(2, InterfaceID.Bankside.ITEMS, slot, id);
+            WidgetAPI.interact(6, InterfaceID.Bankside.ITEMS, slot, id);
         }
+    }
+
+    /**
+     * Deposits all items from the containers in inventory into the bank.
+     */
+    public static void depositAllContainers() {
+        WidgetAPI.interact(1, InterfaceID.Bankmain.QUANTITYALL_TEXT, -1, -1);
     }
 
     /**
      * Deposits all items from the inventory into the bank.
      */
     public static void depositAll() {
-        WidgetAPI.interact(1, InterfaceID.Bankmain.DEPOSITINV, -1, -1);
+        WidgetAPI.interact(1, InterfaceID.Bankmain.PLACEHOLDER_GRAPHIC, -1, -1);
     }
 
     /**
      * Deposits all items from the equipment into the bank.
      */
     public static void depositEquipment() {
-        WidgetAPI.interact(1, InterfaceID.Bankmain.DEPOSITWORN, -1, -1);
+        WidgetAPI.interact(1, InterfaceID.Bankmain.SEARCH_GRAPHIC, -1, -1);
     }
 
     /**
