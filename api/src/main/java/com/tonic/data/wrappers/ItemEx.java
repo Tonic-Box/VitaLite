@@ -15,6 +15,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.game.ItemManager;
 
 import java.awt.*;
+import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
