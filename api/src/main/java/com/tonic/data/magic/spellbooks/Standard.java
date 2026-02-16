@@ -67,6 +67,12 @@ public enum Standard implements Spell
             new RuneRequirement(2, Rune.WATER),
             new RuneRequirement(2, Rune.LAW)
     ),
+    CIVITAS_ILLA_FORTIS(
+            54, InterfaceID.MagicSpellbook.FORTIS_TELEPORT, SpellbookEnums.StandardSpell.CIVITAS_ILLA_FORTIS_TELEPORT.index, true, Quest.TWILIGHTS_PROMISE,
+            new RuneRequirement(1, Rune.EARTH),
+            new RuneRequirement(1, Rune.FIRE),
+            new RuneRequirement(2, Rune.LAW)
+    ),
     WATCHTOWER_TELEPORT(
             58, InterfaceID.MagicSpellbook.WATCHTOWER_TELEPORT, SpellbookEnums.StandardSpell.WATCHTOWER_TELEPORT.index, true, Quest.WATCHTOWER,
             new RuneRequirement(2, Rune.EARTH),
