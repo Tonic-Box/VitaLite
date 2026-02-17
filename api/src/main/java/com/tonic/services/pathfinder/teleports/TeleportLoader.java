@@ -18,7 +18,6 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 import org.apache.commons.lang3.ArrayUtils;
-import org.lwjgl.system.linux.Stat;
 
 import java.util.*;
 import java.util.function.Predicate;
