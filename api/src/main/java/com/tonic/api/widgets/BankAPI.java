@@ -402,25 +402,32 @@ public class BankAPI
         }
     }
 
+    /** Widget ID for Empty containers button (opcode 57, param1 786471) */
+    private static final int WIDGET_EMPTY_CONTAINERS = 786471;
+    /** Widget ID for Deposit inventory button (opcode 57, param1 786473) */
+    private static final int WIDGET_DEPOSIT_INVENTORY = 786473;
+    /** Widget ID for Deposit worn items button (opcode 57, param1 786475) */
+    private static final int WIDGET_DEPOSIT_WORN_ITEMS = 786475;
+
     /**
-     * Deposits all items from the containers in inventory into the bank.
+     * Deposits all items from the containers in inventory into the bank (Empty containers).
      */
     public static void depositAllContainers() {
-        WidgetAPI.interact(1, InterfaceID.Bankmain.QUANTITYALL_TEXT, -1, -1);
+        WidgetAPI.interact(1, WIDGET_EMPTY_CONTAINERS, -1, -1);
     }
 
     /**
-     * Deposits all items from the inventory into the bank.
+     * Deposits all items from the inventory into the bank (Deposit inventory).
      */
     public static void depositAll() {
-        WidgetAPI.interact(1, InterfaceID.Bankmain.PLACEHOLDER_GRAPHIC, -1, -1);
+        WidgetAPI.interact(1, WIDGET_DEPOSIT_INVENTORY, -1, -1);
     }
 
     /**
-     * Deposits all items from the equipment into the bank.
+     * Deposits all items from the equipment into the bank (Deposit worn items).
      */
     public static void depositEquipment() {
-        WidgetAPI.interact(1, InterfaceID.Bankmain.SEARCH_GRAPHIC, -1, -1);
+        WidgetAPI.interact(1, WIDGET_DEPOSIT_WORN_ITEMS, -1, -1);
     }
 
     /**

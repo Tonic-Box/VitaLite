@@ -51,11 +51,14 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.WorldService;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginInstantiationException;
+import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.ui.overlay.*;
 import net.runelite.http.api.worlds.WorldResult;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -441,6 +444,7 @@ public class GameManager extends Overlay {
                 Delays.wait(1000);
                 client = Static.getClient();
             }
+            Static.getInjector().getInstance(KeyManager.class).registerKeyListener(stopWalkerHotkey);
             Walker.getObjectMap();
             PluginReloader.init();
             PluginReloader.forceRebuildPluginList();
@@ -521,6 +525,38 @@ public class GameManager extends Overlay {
     {
         INSTANCE.pathPoints = null;
     }
+
+    /**
+     * Stops the webwalker/pathfinder and sailing. Can be called from anywhere (e.g. keybind).
+     */
+    public static void cancelAllPathfinding()
+    {
+        Walker.cancel();
+        if (walkerPath != null) {
+            walkerPath.cancel();
+            setWalkerPath(null);
+        }
+        sailingPath = null;
+        SailingAPI.unSetSails();
+        clearPathPoints();
+    }
+
+    private static final net.runelite.client.input.KeyListener stopWalkerHotkey = new net.runelite.client.input.KeyListener() {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_X && (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) {
+                cancelAllPathfinding();
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+        }
+    };
 
     @Subscribe
     protected void onGameTick(GameTick event)
