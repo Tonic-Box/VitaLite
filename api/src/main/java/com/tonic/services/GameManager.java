@@ -569,9 +569,26 @@ public class GameManager extends Overlay {
                 HeadlessMapInteraction.initialize();
             }
 
-            WorldPoint pos = PlayerEx.getLocal().getWorldPoint();
-            HeadlessMode.updateMap(pos.getX(), pos.getY(), pos.getPlane(),
-                    (x, y, plane) -> Walker.getCollisionMap().all((short) x, (short) y, (byte) plane));
+            PlayerEx localPlayer = PlayerEx.getLocal();
+            if (localPlayer == null || Walker.getCollisionMap() == null) {
+                return;
+            }
+
+            WorldPoint pos = localPlayer.getWorldPoint();
+            if (pos == null) {
+                return;
+            }
+
+            final var collisionMap = Walker.getCollisionMap();
+            try {
+                HeadlessMode.updateMap(pos.getX(), pos.getY(), pos.getPlane(),
+                        (x, y, plane) -> collisionMap.all((short) x, (short) y, (byte) plane));
+            } catch (Exception e) {
+                Logger.error("Headless map update failed", e);
+            }
+        } else if (HeadlessMapInteraction.isInitialized()) {
+            // Ensure handlers are reinitialized cleanly when toggled back on.
+            HeadlessMapInteraction.reset();
         }
     }
 

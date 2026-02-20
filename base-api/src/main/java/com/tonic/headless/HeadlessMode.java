@@ -6,6 +6,7 @@ import com.tonic.util.ReflectBuilder;
 import lombok.Getter;
 import javax.swing.*;
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 
 public class HeadlessMode {
     private static final Object clientUI;
@@ -13,10 +14,11 @@ public class HeadlessMode {
     private static final JFrame frame;
     private static final JTabbedPane sidebar;
     private static RestoreSize clientPanelSize;
+    private static RestoreSize wrapperPaneSize;
     @Getter
-    private static HeadlessMapPanel mapPanel;
+    private static volatile HeadlessMapPanel mapPanel;
     @Getter
-    private static boolean mapPanelActive = false;
+    private static volatile boolean mapPanelActive = false;
     private static JLayeredPane wrapperPane;
     private static boolean wrapperInstalled = false;
 
@@ -43,6 +45,19 @@ public class HeadlessMode {
     }
 
     public static void toggleHeadless(boolean headless) {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            try {
+                SwingUtilities.invokeAndWait(() -> toggleHeadless(headless));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                Logger.error("Interrupted while toggling headless mode", e);
+            } catch (InvocationTargetException e) {
+                Throwable cause = e.getCause() != null ? e.getCause() : e;
+                Logger.error("Failed while toggling headless mode", cause);
+            }
+            return;
+        }
+
         if (clientUI == null || clientPanel == null || frame == null || sidebar == null) {
             return;
         }
@@ -50,7 +65,23 @@ public class HeadlessMode {
         boolean showMap = Static.getVitaConfig().shouldShowHeadlessMap();
 
         if (headless && showMap) {
-            shouldRestoreGpu = Static.getRuneLite().getPluginManager().stopPlugin("net.runelite.client.plugins.gpu.GpuPlugin");
+            if (shouldRestoreGpu == null) {
+                Object stoppedGpuPlugin = Static.getRuneLite().getPluginManager()
+                        .stopPlugin("net.runelite.client.plugins.gpu.GpuPlugin");
+                if (stoppedGpuPlugin != null) {
+                    shouldRestoreGpu = stoppedGpuPlugin;
+                }
+            }
+
+            if (clientPanelSize != null) {
+                clientPanelSize.restore(clientPanel);
+                clientPanelSize = null;
+            }
+            if (wrapperPane != null && wrapperPaneSize != null) {
+                wrapperPaneSize.restore(wrapperPane);
+                wrapperPaneSize = null;
+            }
+            clientPanel.setVisible(true);
 
             if (mapPanel == null) {
                 mapPanel = new HeadlessMapPanel();
@@ -108,6 +139,9 @@ public class HeadlessMode {
                 mapPanel.setAlignmentY(0.5f);
                 mapPanel.setSize(clientPanel.getSize());
                 mapPanel.setPreferredSize(clientPanel.getSize());
+                wrapperPane.setSize(clientPanel.getSize());
+                wrapperPane.setPreferredSize(clientPanel.getSize());
+                wrapperPane.setMinimumSize(clientPanel.getSize());
                 wrapperPane.add(mapPanel, JLayeredPane.PALETTE_LAYER);
 
                 mapPanelActive = true;
@@ -115,13 +149,31 @@ public class HeadlessMode {
                 wrapperPane.repaint();
             }
         } else if (headless) {
+            if (mapPanelActive && wrapperPane != null) {
+                mapPanel.clearMap();
+                wrapperPane.remove(mapPanel);
+                mapPanelActive = false;
+                wrapperPane.revalidate();
+                wrapperPane.repaint();
+            }
+
             clientPanel.setVisible(false);
             if (!sidebar.isVisible() || sidebar.getSelectedIndex() < 0) {
                 ReflectBuilder.of(clientUI)
                         .method("togglePluginPanel", null, null);
             }
-            clientPanelSize = new RestoreSize(clientPanel);
+            if (clientPanelSize == null) {
+                clientPanelSize = new RestoreSize(clientPanel);
+            }
             clientPanelSize.hide(clientPanel);
+            if (wrapperPane != null) {
+                if (wrapperPaneSize == null) {
+                    wrapperPaneSize = new RestoreSize(wrapperPane);
+                }
+                wrapperPaneSize.hide(wrapperPane);
+                wrapperPane.revalidate();
+                wrapperPane.repaint();
+            }
         } else {
             if (mapPanelActive && wrapperPane != null) {
                 mapPanel.clearMap();
@@ -130,14 +182,25 @@ public class HeadlessMode {
 
                 wrapperPane.revalidate();
                 wrapperPane.repaint();
-            } else if (clientPanelSize != null) {
+            }
+            if (clientPanelSize != null) {
                 clientPanelSize.restore(clientPanel);
+                clientPanelSize = null;
+            }
+            if (wrapperPane != null && wrapperPaneSize != null) {
+                wrapperPaneSize.restore(wrapperPane);
+                wrapperPaneSize = null;
             }
 
             clientPanel.setVisible(true);
             if (shouldRestoreGpu != null) {
-                Static.getRuneLite().getPluginManager().startPlugin(shouldRestoreGpu);
-                shouldRestoreGpu = null;
+                try {
+                    Static.getRuneLite().getPluginManager().startPlugin(shouldRestoreGpu);
+                } catch (Exception e) {
+                    Logger.error("Failed to restore GPU plugin after leaving headless mode", e);
+                } finally {
+                    shouldRestoreGpu = null;
+                }
             }
         }
     }
