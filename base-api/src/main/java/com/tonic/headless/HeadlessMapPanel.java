@@ -19,6 +19,7 @@ import java.util.Arrays;
  * Supports dragging to pan view and plane selection.
  */
 public class HeadlessMapPanel extends JPanel {
+    private final Object renderLock = new Object();
 
     // Size matching ClientPanel (765x503) - required for RuneLite's custom Layout manager
     private static final Dimension GAME_FIXED_SIZE = new Dimension(765, 503);
@@ -278,10 +279,12 @@ public class HeadlessMapPanel extends JPanel {
      * Lock the view back to player position and plane.
      */
     public void lockToPlayer() {
-        lockedToPlayer = true;
-        viewCenterX = lastPlayerX;
-        viewCenterY = lastPlayerY;
-        viewPlane = lastPlane;
+        synchronized (renderLock) {
+            lockedToPlayer = true;
+            viewCenterX = lastPlayerX;
+            viewCenterY = lastPlayerY;
+            viewPlane = lastPlane;
+        }
         redrawMap();
     }
 
@@ -291,8 +294,10 @@ public class HeadlessMapPanel extends JPanel {
      */
     public void setViewPlane(int plane) {
         if (plane >= 0 && plane <= 3) {
-            viewPlane = plane;
-            lockedToPlayer = false;
+            synchronized (renderLock) {
+                viewPlane = plane;
+                lockedToPlayer = false;
+            }
             redrawMap();
         }
     }
@@ -301,7 +306,9 @@ public class HeadlessMapPanel extends JPanel {
      * Set the collision map accessor for retrieving tile flags.
      */
     public void setCollisionAccessor(CollisionMapAccessor accessor) {
-        this.collisionAccessor = accessor;
+        synchronized (renderLock) {
+            this.collisionAccessor = accessor;
+        }
     }
 
     /**
@@ -330,18 +337,22 @@ public class HeadlessMapPanel extends JPanel {
      * Pass -1 for any coordinate to clear the marker.
      */
     public void setDestination(int x, int y, int plane) {
-        this.destX = x;
-        this.destY = y;
-        this.destPlane = plane;
+        synchronized (renderLock) {
+            this.destX = x;
+            this.destY = y;
+            this.destPlane = plane;
+        }
     }
 
     /**
      * Clear the destination marker.
      */
     public void clearDestination() {
-        this.destX = -1;
-        this.destY = -1;
-        this.destPlane = -1;
+        synchronized (renderLock) {
+            this.destX = -1;
+            this.destY = -1;
+            this.destPlane = -1;
+        }
     }
 
     /**
@@ -351,62 +362,66 @@ public class HeadlessMapPanel extends JPanel {
      * @return int[3] = {worldX, worldY, plane} or null if click is outside map
      */
     private int[] screenToWorld(int screenX, int screenY) {
-        if (mapImage == null || tileSize <= 0) return null;
+        synchronized (renderLock) {
+            if (mapImage == null || tileSize <= 0) return null;
 
-        // Account for centering offset
-        int offsetX = (getWidth() - imageWidth) / 2;
-        int offsetY = (getHeight() - imageHeight) / 2;
+            // Account for centering offset
+            int offsetX = (getWidth() - imageWidth) / 2;
+            int offsetY = (getHeight() - imageHeight) / 2;
 
-        // Convert to image-relative coordinates
-        int imgX = screenX - offsetX;
-        int imgY = screenY - offsetY;
+            // Convert to image-relative coordinates
+            int imgX = screenX - offsetX;
+            int imgY = screenY - offsetY;
 
-        // Check bounds
-        if (imgX < 0 || imgX >= imageWidth || imgY < 0 || imgY >= imageHeight) {
-            return null;
+            // Check bounds
+            if (imgX < 0 || imgX >= imageWidth || imgY < 0 || imgY >= imageHeight) {
+                return null;
+            }
+
+            // Convert to tile coordinates
+            int tileX = imgX / tileSize;
+            int tileY = (tilesY - 1) - (imgY / tileSize);  // Invert Y
+
+            // Convert to world coordinates using view center
+            int halfTilesX = tilesX / 2;
+            int halfTilesY = tilesY / 2;
+
+            int worldX = viewCenterX - halfTilesX + tileX;
+            int worldY = viewCenterY - halfTilesY + tileY;
+
+            return new int[] { worldX, worldY, viewPlane };
         }
-
-        // Convert to tile coordinates
-        int tileX = imgX / tileSize;
-        int tileY = (tilesY - 1) - (imgY / tileSize);  // Invert Y
-
-        // Convert to world coordinates using view center
-        int halfTilesX = tilesX / 2;
-        int halfTilesY = tilesY / 2;
-
-        int worldX = viewCenterX - halfTilesX + tileX;
-        int worldY = viewCenterY - halfTilesY + tileY;
-
-        return new int[] { worldX, worldY, viewPlane };
     }
 
     /**
      * Recreate the backing image when panel is resized or zoom changes.
      */
     private void recreateImage() {
-        int w = getWidth();
-        int h = getHeight();
-        if (w <= 0 || h <= 0) return;
+        synchronized (renderLock) {
+            int w = getWidth();
+            int h = getHeight();
+            if (w <= 0 || h <= 0) return;
 
-        // Use user-controlled zoom tile size
-        tileSize = zoomTileSize;
+            // Use user-controlled zoom tile size
+            tileSize = zoomTileSize;
 
-        tilesX = w / tileSize;
-        tilesY = h / tileSize;
+            tilesX = w / tileSize;
+            tilesY = h / tileSize;
 
-        // Make sure we have odd tile counts so player is centered
-        if (tilesX % 2 == 0) tilesX--;
-        if (tilesY % 2 == 0) tilesY--;
+            // Make sure we have odd tile counts so player is centered
+            if (tilesX % 2 == 0) tilesX--;
+            if (tilesY % 2 == 0) tilesY--;
 
-        // Ensure minimum tile counts
-        tilesX = Math.max(3, tilesX);
-        tilesY = Math.max(3, tilesY);
+            // Ensure minimum tile counts
+            tilesX = Math.max(3, tilesX);
+            tilesY = Math.max(3, tilesY);
 
-        imageWidth = tilesX * tileSize;
-        imageHeight = tilesY * tileSize;
+            imageWidth = tilesX * tileSize;
+            imageHeight = tilesY * tileSize;
 
-        mapImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
-        pixels = ((DataBufferInt) mapImage.getRaster().getDataBuffer()).getData();
+            mapImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+            pixels = ((DataBufferInt) mapImage.getRaster().getDataBuffer()).getData();
+        }
     }
 
     /**
@@ -414,26 +429,30 @@ public class HeadlessMapPanel extends JPanel {
      * Only updates view center if locked to player.
      */
     public void updateMap(int playerX, int playerY, int plane) {
-        // Always save player position
-        this.lastPlayerX = playerX;
-        this.lastPlayerY = playerY;
-        this.lastPlane = plane;
+        synchronized (renderLock) {
+            // Always save player position
+            this.lastPlayerX = playerX;
+            this.lastPlayerY = playerY;
+            this.lastPlane = plane;
 
-        // Clear destination if player reached it
-        if (playerX == destX && playerY == destY && plane == destPlane) {
-            clearDestination();
-        }
+            // Clear destination if player reached it
+            if (playerX == destX && playerY == destY && plane == destPlane) {
+                destX = -1;
+                destY = -1;
+                destPlane = -1;
+            }
 
-        // Only update view center if locked to player
-        if (lockedToPlayer) {
-            viewCenterX = playerX;
-            viewCenterY = playerY;
-            viewPlane = plane;
-        }
+            // Only update view center if locked to player
+            if (lockedToPlayer) {
+                viewCenterX = playerX;
+                viewCenterY = playerY;
+                viewPlane = plane;
+            }
 
-        // Update info text from provider
-        if (infoProvider != null) {
-            setInfoLines(infoProvider.getInfoLines(playerX, playerY, plane));
+            // Update info text from provider
+            if (infoProvider != null) {
+                setInfoLines(infoProvider.getInfoLines(playerX, playerY, plane));
+            }
         }
 
         redrawMap();
@@ -443,66 +462,68 @@ public class HeadlessMapPanel extends JPanel {
      * Redraw the map at current view center.
      */
     private void redrawMap() {
-        if (mapImage == null || collisionAccessor == null) {
-            recreateImage();
-            if (mapImage == null) return;
-        }
+        synchronized (renderLock) {
+            if (mapImage == null || collisionAccessor == null || pixels == null) {
+                recreateImage();
+                if (mapImage == null || collisionAccessor == null || pixels == null) return;
+            }
 
-        // Clear to background
-        Arrays.fill(pixels, COLOR_BACKGROUND);
+            // Clear to background
+            Arrays.fill(pixels, COLOR_BACKGROUND);
 
-        int halfTilesX = tilesX / 2;
-        int halfTilesY = tilesY / 2;
+            int halfTilesX = tilesX / 2;
+            int halfTilesY = tilesY / 2;
 
-        // Render tiles
-        for (int dx = 0; dx < tilesX; dx++) {
-            for (int dy = 0; dy < tilesY; dy++) {
-                int worldX = viewCenterX - halfTilesX + dx;
-                int worldY = viewCenterY - halfTilesY + dy;
+            // Render tiles
+            for (int dx = 0; dx < tilesX; dx++) {
+                for (int dy = 0; dy < tilesY; dy++) {
+                    int worldX = viewCenterX - halfTilesX + dx;
+                    int worldY = viewCenterY - halfTilesY + dy;
 
-                // Screen coordinates (Y inverted - north is up)
-                int screenX = dx * tileSize;
-                int screenY = (tilesY - 1 - dy) * tileSize;
+                    // Screen coordinates (Y inverted - north is up)
+                    int screenX = dx * tileSize;
+                    int screenY = (tilesY - 1 - dy) * tileSize;
 
-                // Check if this is the player tile (only if on same plane as view)
-                boolean isPlayerTile = (worldX == lastPlayerX && worldY == lastPlayerY && viewPlane == lastPlane);
-                if (isPlayerTile) {
-                    fillRect(screenX, screenY, tileSize, COLOR_PLAYER);
-                    continue;
-                }
-
-                // Check if this is the destination tile (only if on same plane as view)
-                boolean isDestTile = (destX >= 0 && worldX == destX && worldY == destY && viewPlane == destPlane);
-                if (isDestTile) {
-                    fillRect(screenX, screenY, tileSize, COLOR_DESTINATION);
-                    continue;
-                }
-
-                // Get collision flags for VIEW plane (not player plane)
-                byte flags = collisionAccessor.getFlags(worldX, worldY, viewPlane);
-
-                if (flags == FLAG_NONE) {
-                    // Fully blocked - red fill
-                    fillRect(screenX, screenY, tileSize, COLOR_BLOCKED);
-                } else if (flags != FLAG_ALL) {
-                    // Partial blocking - draw walls on blocked edges
-                    int wallThickness = Math.max(1, tileSize / 4);
-
-                    // North wall (top of screen tile)
-                    if ((flags & FLAG_NORTH) == 0) {
-                        fillRect(screenX, screenY, tileSize, wallThickness, COLOR_WALL);
+                    // Check if this is the player tile (only if on same plane as view)
+                    boolean isPlayerTile = (worldX == lastPlayerX && worldY == lastPlayerY && viewPlane == lastPlane);
+                    if (isPlayerTile) {
+                        fillRect(screenX, screenY, tileSize, COLOR_PLAYER);
+                        continue;
                     }
-                    // South wall (bottom of screen tile)
-                    if ((flags & FLAG_SOUTH) == 0) {
-                        fillRect(screenX, screenY + tileSize - wallThickness, tileSize, wallThickness, COLOR_WALL);
+
+                    // Check if this is the destination tile (only if on same plane as view)
+                    boolean isDestTile = (destX >= 0 && worldX == destX && worldY == destY && viewPlane == destPlane);
+                    if (isDestTile) {
+                        fillRect(screenX, screenY, tileSize, COLOR_DESTINATION);
+                        continue;
                     }
-                    // East wall (right of screen tile)
-                    if ((flags & FLAG_EAST) == 0) {
-                        fillRect(screenX + tileSize - wallThickness, screenY, wallThickness, tileSize, COLOR_WALL);
-                    }
-                    // West wall (left of screen tile)
-                    if ((flags & FLAG_WEST) == 0) {
-                        fillRect(screenX, screenY, wallThickness, tileSize, COLOR_WALL);
+
+                    // Get collision flags for VIEW plane (not player plane)
+                    byte flags = collisionAccessor.getFlags(worldX, worldY, viewPlane);
+
+                    if (flags == FLAG_NONE) {
+                        // Fully blocked - red fill
+                        fillRect(screenX, screenY, tileSize, COLOR_BLOCKED);
+                    } else if (flags != FLAG_ALL) {
+                        // Partial blocking - draw walls on blocked edges
+                        int wallThickness = Math.max(1, tileSize / 4);
+
+                        // North wall (top of screen tile)
+                        if ((flags & FLAG_NORTH) == 0) {
+                            fillRect(screenX, screenY, tileSize, wallThickness, COLOR_WALL);
+                        }
+                        // South wall (bottom of screen tile)
+                        if ((flags & FLAG_SOUTH) == 0) {
+                            fillRect(screenX, screenY + tileSize - wallThickness, tileSize, wallThickness, COLOR_WALL);
+                        }
+                        // East wall (right of screen tile)
+                        if ((flags & FLAG_EAST) == 0) {
+                            fillRect(screenX + tileSize - wallThickness, screenY, wallThickness, tileSize, COLOR_WALL);
+                        }
+                        // West wall (left of screen tile)
+                        if ((flags & FLAG_WEST) == 0) {
+                            fillRect(screenX, screenY, wallThickness, tileSize, COLOR_WALL);
+                        }
                     }
                 }
             }
@@ -582,12 +603,14 @@ public class HeadlessMapPanel extends JPanel {
      * Clear the map image to prevent ghost rendering after deactivation.
      */
     public void clearMap() {
-        if (pixels != null) {
-            Arrays.fill(pixels, 0);  // Clear to transparent
+        synchronized (renderLock) {
+            if (pixels != null) {
+                Arrays.fill(pixels, 0);  // Clear to transparent
+            }
+            mapImage = null;  // Release the image
+            pixels = null;
+            lockedToPlayer = true;  // Reset lock state
         }
-        mapImage = null;  // Release the image
-        pixels = null;
-        lockedToPlayer = true;  // Reset lock state
         repaint();
     }
 
@@ -600,10 +623,12 @@ public class HeadlessMapPanel extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
         // Draw the map image centered in the panel
-        if (mapImage != null) {
-            int offsetX = (getWidth() - imageWidth) / 2;
-            int offsetY = (getHeight() - imageHeight) / 2;
-            g2d.drawImage(mapImage, offsetX, offsetY, null);
+        synchronized (renderLock) {
+            if (mapImage != null) {
+                int offsetX = (getWidth() - imageWidth) / 2;
+                int offsetY = (getHeight() - imageHeight) / 2;
+                g2d.drawImage(mapImage, offsetX, offsetY, null);
+            }
         }
 
         // Draw info overlay in top-left
@@ -645,38 +670,40 @@ public class HeadlessMapPanel extends JPanel {
      * Draw the control buttons (lock to player, plane selectors) in the top-right corner.
      */
     private void drawControlButtons(Graphics2D g2d) {
-        int rightEdge = getWidth() - BUTTON_PADDING;
-        int y = BUTTON_PADDING;
+        synchronized (renderLock) {
+            int rightEdge = getWidth() - BUTTON_PADDING;
+            int y = BUTTON_PADDING;
 
-        g2d.setFont(BUTTON_FONT);
-        FontMetrics fm = g2d.getFontMetrics();
+            g2d.setFont(BUTTON_FONT);
+            FontMetrics fm = g2d.getFontMetrics();
 
-        // Lock to player button
-        int lockX = rightEdge - BUTTON_SIZE;
-        lockButtonBounds = new Rectangle(lockX, y, BUTTON_SIZE, BUTTON_SIZE);
+            // Lock to player button
+            int lockX = rightEdge - BUTTON_SIZE;
+            lockButtonBounds = new Rectangle(lockX, y, BUTTON_SIZE, BUTTON_SIZE);
 
-        g2d.setColor(lockedToPlayer ? BUTTON_ACTIVE : BUTTON_INACTIVE);
-        g2d.fillRoundRect(lockX, y, BUTTON_SIZE, BUTTON_SIZE, 4, 4);
-        g2d.setColor(Color.WHITE);
-        // Draw crosshair symbol (centered)
-        String lockSymbol = "\u2316";  // Position indicator symbol
-        int symbolWidth = fm.stringWidth(lockSymbol);
-        g2d.drawString(lockSymbol, lockX + (BUTTON_SIZE - symbolWidth) / 2, y + BUTTON_SIZE - 7);
-
-        // Plane buttons (0, 1, 2, 3)
-        y += BUTTON_SIZE + BUTTON_MARGIN;
-        for (int i = 0; i < 4; i++) {
-            int btnX = rightEdge - BUTTON_SIZE;
-            int btnY = y + i * (BUTTON_SIZE + BUTTON_MARGIN);
-            planeButtonBounds[i] = new Rectangle(btnX, btnY, BUTTON_SIZE, BUTTON_SIZE);
-
-            boolean isSelected = (viewPlane == i);
-            g2d.setColor(isSelected ? BUTTON_SELECTED : BUTTON_INACTIVE);
-            g2d.fillRoundRect(btnX, btnY, BUTTON_SIZE, BUTTON_SIZE, 4, 4);
+            g2d.setColor(lockedToPlayer ? BUTTON_ACTIVE : BUTTON_INACTIVE);
+            g2d.fillRoundRect(lockX, y, BUTTON_SIZE, BUTTON_SIZE, 4, 4);
             g2d.setColor(Color.WHITE);
-            String planeStr = String.valueOf(i);
-            int textWidth = fm.stringWidth(planeStr);
-            g2d.drawString(planeStr, btnX + (BUTTON_SIZE - textWidth) / 2, btnY + BUTTON_SIZE - 7);
+            // Draw crosshair symbol (centered)
+            String lockSymbol = "\u2316";  // Position indicator symbol
+            int symbolWidth = fm.stringWidth(lockSymbol);
+            g2d.drawString(lockSymbol, lockX + (BUTTON_SIZE - symbolWidth) / 2, y + BUTTON_SIZE - 7);
+
+            // Plane buttons (0, 1, 2, 3)
+            y += BUTTON_SIZE + BUTTON_MARGIN;
+            for (int i = 0; i < 4; i++) {
+                int btnX = rightEdge - BUTTON_SIZE;
+                int btnY = y + i * (BUTTON_SIZE + BUTTON_MARGIN);
+                planeButtonBounds[i] = new Rectangle(btnX, btnY, BUTTON_SIZE, BUTTON_SIZE);
+
+                boolean isSelected = (viewPlane == i);
+                g2d.setColor(isSelected ? BUTTON_SELECTED : BUTTON_INACTIVE);
+                g2d.fillRoundRect(btnX, btnY, BUTTON_SIZE, BUTTON_SIZE, 4, 4);
+                g2d.setColor(Color.WHITE);
+                String planeStr = String.valueOf(i);
+                int textWidth = fm.stringWidth(planeStr);
+                g2d.drawString(planeStr, btnX + (BUTTON_SIZE - textWidth) / 2, btnY + BUTTON_SIZE - 7);
+            }
         }
     }
 }

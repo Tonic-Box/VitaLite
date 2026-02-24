@@ -103,6 +103,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         // General Settings
         CollapsiblePanel generalPanel = new CollapsiblePanel("General");
         headlessToggle = new ToggleSlider();
+        headlessToggle.setSelected(Static.isHeadless());
         generalPanel.addContent(createToggleOption(
                 "Headless Mode",
                 "Run without rendering",
@@ -117,7 +118,13 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 "Headless Map View",
                 "Show collision map when in headless mode",
                 headlessMapToggle,
-                () -> Static.getVitaConfig().setShowHeadlessMap(headlessMapToggle.isSelected())
+                () -> {
+                    Static.getVitaConfig().setShowHeadlessMap(headlessMapToggle.isSelected());
+                    if (Static.isHeadless()) {
+                        // Re-apply current headless state so map mode transitions are immediate.
+                        Static.setHeadless(true);
+                    }
+                }
         ));
         generalPanel.addVerticalStrut(12);
 
