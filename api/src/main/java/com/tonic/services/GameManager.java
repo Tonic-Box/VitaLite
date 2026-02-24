@@ -462,13 +462,15 @@ public class GameManager extends Overlay {
                 {
                     String[] parts = AutoLogin.getCredentials().split(":");
                     AutoLogin.setCredentials(null);
+
+                    boolean shouldEnterGame = Static.getCliArgs().isAutoEnterGame();
                     if(parts.length == 2)
                     {
-                        LoginService.login(parts[0], parts[1], true);
+                        LoginService.login(parts[0], parts[1], shouldEnterGame);
                     }
                     else if(parts.length == 3)
                     {
-                        LoginService.login(parts[0], parts[1], parts[2], true);
+                        LoginService.login(parts[0], parts[1], parts[2], shouldEnterGame);
                     }
                 }
                 catch (Exception e)
@@ -605,9 +607,26 @@ public class GameManager extends Overlay {
                 HeadlessMapInteraction.initialize();
             }
 
-            WorldPoint pos = PlayerEx.getLocal().getWorldPoint();
-            HeadlessMode.updateMap(pos.getX(), pos.getY(), pos.getPlane(),
-                    (x, y, plane) -> Walker.getCollisionMap().all((short) x, (short) y, (byte) plane));
+            PlayerEx localPlayer = PlayerEx.getLocal();
+            if (localPlayer == null || Walker.getCollisionMap() == null) {
+                return;
+            }
+
+            WorldPoint pos = localPlayer.getWorldPoint();
+            if (pos == null) {
+                return;
+            }
+
+            final var collisionMap = Walker.getCollisionMap();
+            try {
+                HeadlessMode.updateMap(pos.getX(), pos.getY(), pos.getPlane(),
+                        (x, y, plane) -> collisionMap.all((short) x, (short) y, (byte) plane));
+            } catch (Exception e) {
+                Logger.error("Headless map update failed", e);
+            }
+        } else if (HeadlessMapInteraction.isInitialized()) {
+            // Ensure handlers are reinitialized cleanly when toggled back on.
+            HeadlessMapInteraction.reset();
         }
     }
 

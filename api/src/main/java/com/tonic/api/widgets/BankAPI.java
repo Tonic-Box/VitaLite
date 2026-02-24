@@ -15,9 +15,11 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.widgets.Widget;
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 /**
@@ -57,25 +59,168 @@ public class BankAPI
     }
 
     /**
-     * Sets the withdraw amount to the specified amount.
-     * @param amount The amount to set the withdraw amount to.
+     * Sets the withdraw quantity mode.
+     * Supports preset quantities (1, 5, 10, all) for compatibility and custom X amounts.
+     * @param amount The quantity mode amount.
      */
     public static void setX(int amount)
     {
-        System.out.println(VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE));
+        if (BankQuantityResolver.isPresetAmount(amount))
+        {
+            setPresetQuantityMode(amount);
+            return;
+        }
+
         int withdrawMode = VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE);
         if(withdrawMode != 3)
         {
             WidgetAPI.interact(1, InterfaceID.Bankmain.QUANTITYX, -1, -1);
+            waitForCondition(() -> VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE) == 3, 350);
         }
 
         int xQuantity = getX();
-        if(xQuantity != amount && amount != 1 && amount != 5 && amount != 10 && amount != -1)
+        if(xQuantity != amount)
         {
             WidgetAPI.interact(2, InterfaceID.Bankmain.QUANTITYX, -1, -1);
+            waitBriefly(25);
             DialogueAPI.resumeNumericDialogue(amount);
             XSnapshot.amount = amount;
             XSnapshot.tick = GameManager.getTickCount();
+            waitForCondition(() -> VarAPI.getVar(VarbitID.BANK_REQUESTEDQUANTITY) == amount, 350);
+        }
+    }
+
+    private static void setPresetQuantityMode(int amount)
+    {
+        switch (amount)
+        {
+            case 1:
+                clickQuantityButton(InterfaceID.Bankmain.QUANTITY1, InterfaceID.Bankmain.QUANTITY1_TEXT);
+                break;
+            case 5:
+                clickQuantityButton(InterfaceID.Bankmain.QUANTITY5, InterfaceID.Bankmain.QUANTITY5_TEXT);
+                break;
+            case 10:
+                clickQuantityButton(InterfaceID.Bankmain.QUANTITY10, InterfaceID.Bankmain.QUANTITY10_TEXT);
+                break;
+            case -1:
+                clickQuantityButton(InterfaceID.Bankmain.QUANTITYALL, InterfaceID.Bankmain.QUANTITYALL_TEXT);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private static void clickQuantityButton(int primaryWidgetId, int fallbackWidgetId)
+    {
+        if (WidgetAPI.isVisible(primaryWidgetId))
+        {
+            WidgetAPI.interact(1, primaryWidgetId, -1, -1);
+            return;
+        }
+        WidgetAPI.interact(1, fallbackWidgetId, -1, -1);
+    }
+
+    private static int resolveItemSlot(int containerWidgetId, int preferredSlot, int itemId)
+    {
+        Widget container = WidgetAPI.get(containerWidgetId);
+        if (container == null)
+        {
+            return -1;
+        }
+
+        if (preferredSlot >= 0)
+        {
+            Widget preferred = Static.invoke(() -> container.getChild(preferredSlot));
+            if (preferred != null && preferred.getItemId() == itemId && preferred.getItemQuantity() > 0)
+            {
+                return preferredSlot;
+            }
+        }
+
+        Widget[] children = Static.invoke(container::getChildren);
+        if (children == null)
+        {
+            return -1;
+        }
+
+        for (int i = 0; i < children.length; i++)
+        {
+            Widget child = children[i];
+            if (child == null)
+            {
+                continue;
+            }
+            if (child.getItemId() == itemId && child.getItemQuantity() > 0)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private static boolean interactItemByAction(int containerWidgetId, int slot, int itemId, String action)
+    {
+        Widget container = WidgetAPI.get(containerWidgetId);
+        if (container == null)
+        {
+            return false;
+        }
+
+        Widget widget = Static.invoke(() -> container.getChild(slot));
+        if (widget == null || widget.getItemId() != itemId || widget.getItemQuantity() <= 0)
+        {
+            return false;
+        }
+
+        WidgetAPI.interact(widget, action);
+        return true;
+    }
+
+    private static void waitForCondition(BooleanSupplier condition, int timeoutMs)
+    {
+        Client client = Static.getClient();
+        if (client == null || client.isClientThread() || timeoutMs <= 0)
+        {
+            return;
+        }
+
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        while (System.currentTimeMillis() < deadline)
+        {
+            if (condition.getAsBoolean())
+            {
+                return;
+            }
+
+            try
+            {
+                Thread.sleep(20L);
+            }
+            catch (InterruptedException e)
+            {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+    }
+
+    private static void waitBriefly(int milliseconds)
+    {
+        Client client = Static.getClient();
+        if (client == null || client.isClientThread() || milliseconds <= 0)
+        {
+            return;
+        }
+
+        try
+        {
+            Thread.sleep(milliseconds);
+        }
+        catch (InterruptedException e)
+        {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -359,22 +504,24 @@ public class BankAPI
      * @param slot The slot of the item in the bank.
      */
     public static void withdrawAction(int id, int amount, int slot) {
-        setX(amount);
-        if(amount == 1) {
-            WidgetAPI.interact(1, InterfaceID.Bankmain.ITEMS, slot, id);
+        if(!BankQuantityResolver.isPresetAmount(amount))
+        {
+            setX(amount);
         }
-        else if(amount == 5) {
-            WidgetAPI.interact(3, InterfaceID.Bankmain.ITEMS, slot, id);
+
+        int resolvedSlot = resolveItemSlot(InterfaceID.Bankmain.ITEMS, slot, id);
+        if (resolvedSlot == -1)
+        {
+            return;
         }
-        else if(amount == 10) {
-            WidgetAPI.interact(4, InterfaceID.Bankmain.ITEMS, slot, id);
+
+        String action = BankQuantityResolver.withdrawMenuAction(amount);
+        if (interactItemByAction(InterfaceID.Bankmain.ITEMS, resolvedSlot, id, action))
+        {
+            return;
         }
-        else if(amount == -1) {
-            WidgetAPI.interact(7, InterfaceID.Bankmain.ITEMS, slot, id);
-        }
-        else {
-            WidgetAPI.interact(5, InterfaceID.Bankmain.ITEMS, slot, id);
-        }
+
+        WidgetAPI.interact(BankQuantityResolver.withdrawFallbackAction(amount), InterfaceID.Bankmain.ITEMS, resolvedSlot, id);
     }
 
     /**
@@ -384,22 +531,24 @@ public class BankAPI
      * @param slot The slot of the item in the inventory.
      */
     public static void depositAction(int id, int amount, int slot) {
-        setX(amount);
-        if(amount == 1) {
-            WidgetAPI.interact(2, InterfaceID.Bankside.ITEMS, slot, id);
+        if(!BankQuantityResolver.isPresetAmount(amount))
+        {
+            setX(amount);
         }
-        else if(amount == 5) {
-            WidgetAPI.interact(4, InterfaceID.Bankside.ITEMS, slot, id);
+
+        int resolvedSlot = resolveItemSlot(InterfaceID.Bankside.ITEMS, slot, id);
+        if (resolvedSlot == -1)
+        {
+            return;
         }
-        else if(amount == 10) {
-            WidgetAPI.interact(5, InterfaceID.Bankside.ITEMS, slot, id);
+
+        String action = BankQuantityResolver.depositMenuAction(amount);
+        if (interactItemByAction(InterfaceID.Bankside.ITEMS, resolvedSlot, id, action))
+        {
+            return;
         }
-        else if(amount == -1) {
-            WidgetAPI.interact(8, InterfaceID.Bankside.ITEMS, slot, id);
-        }
-        else {
-            WidgetAPI.interact(6, InterfaceID.Bankside.ITEMS, slot, id);
-        }
+
+        WidgetAPI.interact(BankQuantityResolver.depositFallbackAction(amount), InterfaceID.Bankside.ITEMS, resolvedSlot, id);
     }
 
     /** Widget ID for Empty containers button (opcode 57, param1 786471) */
