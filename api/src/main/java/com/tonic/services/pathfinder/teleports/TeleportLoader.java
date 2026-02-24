@@ -6,12 +6,20 @@ import com.tonic.api.game.VarAPI;
 import com.tonic.api.game.WorldsAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
+import com.tonic.data.magic.Rune;
+import com.tonic.data.magic.RunePouch;
+import com.tonic.data.magic.SpellBook;
 import com.tonic.data.wrappers.ItemEx;
 import com.tonic.data.wrappers.PlayerEx;
 import net.runelite.api.Client;
+import net.runelite.api.ItemID;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarPlayerID;
+import net.runelite.api.gameval.VarbitID;
 import org.apache.commons.lang3.ArrayUtils;
+import org.lwjgl.system.linux.Stat;
+
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -20,13 +28,10 @@ public class TeleportLoader {
         return Static.invoke(() -> {
             List<Teleport> teleports = new ArrayList<>();
 
-            // TODO: if teleblocked return here
-            //Client client = Static.getClient();
-            //if (client.getVarbitValue(VarbitID.TELEBLOCK_CYCLES) > 0)
-            //  return teleports;
-
-            //var spellTeles = getTeleportSpells();
-            //teleports.addAll(spellTeles);
+            if (GameAPI.getWildyLevel() <= 20) {
+                List<Teleport> spellTeles = getTeleportSpells();
+                teleports.addAll(spellTeles);
+            }
 
             if (InventoryAPI.isEmpty() && EquipmentAPI.getAll().isEmpty()) {
                 return teleports;
@@ -36,14 +41,16 @@ public class TeleportLoader {
 
             for (TeleportItem tele : TeleportItem.values()) {
                 if (tele.canUse() && tele.getDestination().distanceTo(PlayerEx.getLocal().getWorldPoint()) > 20) {
-                    if(!membersCheck(tele.getItemId()))
+                    if (!membersCheck(tele.getItemId())) {
                         continue;
+                    }
 
                     if (tele == TeleportItem.ROYAL_SEED_POD) {
                         if (GameAPI.getWildyLevel() <= 30) {
                             teleports.add(itemTeleport(tele));
                         }
                     }
+
                     if (GameAPI.getWildyLevel() <= 20) {
                         teleports.add(itemTeleport(tele));
                     }
@@ -239,36 +246,41 @@ public class TeleportLoader {
         });
     }
 
-//    public static List<Teleport> getTeleportSpells() {
-//        var teleports = new ArrayList<Teleport>();
-//
-//        if(GameAPI.getWildyLevel(client) > 20)
-//        {
-//            return teleports;
-//        }
-//
-//        var canCastAnything = Inventory.contains(client, ItemID.LAW_RUNE)
-//                || RunePouch.getRunePouch(client) != null;
-//
-//        if(!canCastAnything){
-//            // only home teleport can be used
-//            var homeTeleport = TeleportSpell.getHomeTeleport(client);
-//            if(homeTeleport.canCast(client) && homeTeleport.distanceFromPoint(client) > 50)
-//            {
-//                teleports.add(Teleport.fromSpell(homeTeleport));
-//            }
-//            return teleports;
-//        }
-//
-//        for (TeleportSpell teleportSpell : TeleportSpell.values()) {
-//            if (teleportSpell.canCast(client) && teleportSpell.distanceFromPoint(client) > 50)
-//            {
-//                teleports.add(Teleport.fromSpell(teleportSpell));
-//            }
-//        }
-//
-//        return teleports;
-//    }
+    public static List<Teleport> getTeleportSpells() {
+        var teleports = new ArrayList<Teleport>();
+
+        if (!SpellBook.isOnStandardSpellbook()) {
+            return teleports;
+        }
+
+        boolean hasLawRunes = Rune.LAW.getQuantity() > 0;
+
+        if (!hasLawRunes) {
+            TeleportSpell homeTeleport = TeleportSpell.getHomeTeleport();
+
+            if (homeTeleport.canCast() && homeTeleport.distanceFromPlayer() > 50) {
+                teleports.add(spellTeleport(homeTeleport));
+            }
+
+            return teleports;
+        }
+
+        for (TeleportSpell teleportSpell : TeleportSpell.values()) {
+            if (teleportSpell.canCast() && teleportSpell.distanceFromPlayer() > 50) {
+                teleports.add(spellTeleport(teleportSpell));
+            }
+        }
+
+        return teleports;
+    }
+
+    public static Teleport spellTeleport(TeleportSpell teleportSpell) {
+        return new Teleport(teleportSpell.getDestination(), 5, () -> {
+            if (teleportSpell.canCast()) {
+                teleportSpell.getSpell().cast();
+            }
+        });
+    }
 
     public static Teleport itemTeleport(TeleportItem teleportItem) {
         return new Teleport(teleportItem.getDestination(), 5, new ArrayList<>() {{
