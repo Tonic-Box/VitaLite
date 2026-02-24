@@ -15,7 +15,6 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.client.game.ItemManager;
 
 import java.awt.*;
-import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
@@ -235,17 +234,5 @@ public class ItemEx implements Interactable, Identifiable
         return this.getSlot() == that.getSlot()
             && this.getId() == that.getId()
             && this.getQuantity() == that.getQuantity();
-    }
-
-    public boolean isFood() {
-        if (isNoted()) {
-            return false;
-        }
-
-        String name = getName().toLowerCase();
-
-        boolean isEdible = Arrays.stream(getActions()).anyMatch(action -> action != null && action.equalsIgnoreCase("eat"));
-
-        return (isEdible || name.contains("jug of wine")) && !name.contains("rock cake");
     }
 }

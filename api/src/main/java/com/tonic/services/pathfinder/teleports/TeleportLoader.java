@@ -18,7 +18,6 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 import org.apache.commons.lang3.ArrayUtils;
-import org.lwjgl.system.linux.Stat;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -28,6 +27,13 @@ public class TeleportLoader {
         return Static.invoke(() -> {
             List<Teleport> teleports = new ArrayList<>();
 
+            // TODO: if teleblocked return here
+            Client client = Static.getClient();
+
+            if (client.getVarbitValue(VarbitID.TELEBLOCK_CYCLES) > 0) {
+                return teleports;
+            }
+
             if (GameAPI.getWildyLevel() <= 20) {
                 List<Teleport> spellTeles = getTeleportSpells();
                 teleports.addAll(spellTeles);
@@ -36,8 +42,6 @@ public class TeleportLoader {
             if (InventoryAPI.isEmpty() && EquipmentAPI.getAll().isEmpty()) {
                 return teleports;
             }
-
-            Client client = Static.getClient();
 
             for (TeleportItem tele : TeleportItem.values()) {
                 if (tele.canUse() && tele.getDestination().distanceTo(PlayerEx.getLocal().getWorldPoint()) > 20) {
