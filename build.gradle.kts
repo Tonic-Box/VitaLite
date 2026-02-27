@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("0")
+val vitaVersion by extra("1")
 val runeliteVersion by extra("1.12.18")
 
 group = "com.tonic"
@@ -360,9 +360,7 @@ tasks.register<Exec>("publishRelease") {
     val tag = "${runeliteVersion}_${vitaVersion}"
     val title = "${tag}-subrev"
     val body = "# ${tag}\n" +
-            "- updated to new subrev\n- Stopped setX(...) from forcing X mode\n- Enhance headless mode functionality and improve map rendering stability\n" +
-            "-  Add isFood() to ItemEx\n- Added back Teleport Spells for Webwalker\n- fixed web slash logic\n- fixed some transport issues\n" +
-            "- add: autoEnterGame cli arg"
+            "- updated collision maps";
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
