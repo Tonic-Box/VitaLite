@@ -9,7 +9,7 @@ plugins {
 }
 
 val vitaVersion by extra("0")
-val runeliteVersion by extra("1.12.17")
+val runeliteVersion by extra("1.12.18")
 
 group = "com.tonic"
 version = runeliteVersion + "_" + vitaVersion
@@ -360,7 +360,9 @@ tasks.register<Exec>("publishRelease") {
     val tag = "${runeliteVersion}_${vitaVersion}"
     val title = "${tag}-subrev"
     val body = "# ${tag}\n" +
-            "- updated to new subrev\n- fixed issue with mouse movement packet"
+            "- updated to new subrev\n- Stopped setX(...) from forcing X mode\n- Enhance headless mode functionality and improve map rendering stability\n" +
+            "-  Add isFood() to ItemEx\n- Added back Teleport Spells for Webwalker\n- fixed web slash logic\n- fixed some transport issues\n" +
+            "- add: autoEnterGame cli arg"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
