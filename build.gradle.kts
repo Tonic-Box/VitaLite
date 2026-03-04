@@ -360,7 +360,7 @@ tasks.register<Exec>("publishRelease") {
     val tag = "${runeliteVersion}_${vitaVersion}"
     val title = "${tag}-subrev"
     val body = "# ${tag}\n" +
-            "- subrev 1.12.19\n- fixed BankAPI issues from bad PR";
+            "- subrev 1.12.19\n- fixed BankAPI issues from bad PR\n- updated collision maps";
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
