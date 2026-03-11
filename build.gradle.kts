@@ -9,7 +9,7 @@ plugins {
 }
 
 val vitaVersion by extra("0")
-val runeliteVersion by extra("1.12.19")
+val runeliteVersion by extra("1.12.20")
 
 group = "com.tonic"
 version = runeliteVersion + "_" + vitaVersion
@@ -360,7 +360,7 @@ tasks.register<Exec>("publishRelease") {
     val tag = "${runeliteVersion}_${vitaVersion}"
     val title = "${tag}-subrev"
     val body = "# ${tag}\n" +
-            "- subrev 1.12.19\n- fixed BankAPI issues from bad PR\n- updated collision maps";
+            "- updated to new subrev";
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
