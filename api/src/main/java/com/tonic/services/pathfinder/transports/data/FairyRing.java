@@ -79,7 +79,7 @@ public enum FairyRing
         this.requirements = new Requirements();
         this.requirements.addRequirements(requirements);
         this.requirements.addRequirement(new QuestRequirement(Quest.FAIRYTALE_II__CURE_A_QUEEN, QuestState.IN_PROGRESS, QuestState.FINISHED));
-        this.requirements.addRequirement(new ItemRequirement(true, 1, ItemID.DRAMEN_STAFF));
+        this.requirements.addRequirement(new ItemRequirement(null, 1, ItemID.DRAMEN_STAFF, ItemID.LUNAR_STAFF));
     }
 
     private static final int[][] TURN_INDICES = {{19, 20}, {21, 22}, {23, 24}};
