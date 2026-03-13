@@ -2,6 +2,7 @@ package com.tonic.services.pathfinder.teleports;
 
 import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.game.VarAPI;
+import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import net.runelite.api.ItemID;
 import net.runelite.api.Quest;
@@ -78,20 +79,27 @@ public enum TeleportItem
     JATIZSO_LYRE(new WorldPoint(2409, 3809, 0), "Jatizso", Quest.THE_FREMENNIK_TRIALS, MovementConstants.ENCHANTED_LYRE),
 
     // Diary
-    ARDOUGNE_CLOAK(new WorldPoint(2606, 3222, 0), "Monastery Teleport", null, MovementConstants.ARDOUGNE_CLOAK)
+    ARDOUGNE_CLOAK(new WorldPoint(2606, 3222, 0), "Monastery Teleport", "Kandarin Monastery", null, MovementConstants.ARDOUGNE_CLOAK)
     ;
 
     private final WorldPoint destination;
     private final Quest requirement;
     private final int[] itemIds;
     private final String action;
+    private final String equippedAction;
 
     TeleportItem(WorldPoint destination, String action, Quest requirement, int... itemIds)
+    {
+        this(destination, action, null, requirement, itemIds);
+    }
+
+    TeleportItem(WorldPoint destination, String action, String equippedAction, Quest requirement, int... itemIds)
     {
         this.destination = destination;
         this.requirement = requirement;
         this.itemIds = itemIds;
         this.action = action;
+        this.equippedAction = equippedAction;
     }
 
     public WorldPoint getDestination()
@@ -109,9 +117,19 @@ public enum TeleportItem
         return action;
     }
 
+    public String getEquippedAction()
+    {
+        return equippedAction != null ? equippedAction : action;
+    }
+
     public boolean canUse()
     {
-        return hasRequirements() && InventoryAPI.getItem(i -> ArrayUtils.contains(itemIds, i.getId())) != null;
+        if (!hasRequirements()) {
+            return false;
+        }
+
+        return InventoryAPI.getItem(i -> ArrayUtils.contains(itemIds, i.getId())) != null ||
+                EquipmentAPI.getItem(i -> ArrayUtils.contains(itemIds, i.getId())) != null;
     }
 
     public boolean hasRequirements()
