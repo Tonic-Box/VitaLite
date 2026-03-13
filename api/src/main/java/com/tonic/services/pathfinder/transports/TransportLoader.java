@@ -527,7 +527,6 @@ public class TransportLoader
                                 }
                                 return 1;
                             })
-                            //.addDelay(1, 1)  // Wait for equip animation
                             .add(1, () -> {
                                 TileObjectEx current = new TileObjectQuery()
                                         .withName("Fairy ring")
@@ -535,7 +534,7 @@ public class TransportLoader
                                 TileObjectAPI.interact(current, "Zanaris");
                                 return 2;
                             })
-                            .addDelay(2, 7);  // Wait for travel to complete
+                            .addDelay(2, 7);
 
                     Requirements merged = new Requirements();
                     merged.addRequirements(ring.getRequirements().getAll());
@@ -548,7 +547,6 @@ public class TransportLoader
 
                 HandlerBuilder builder = HandlerBuilder.get()
                         .add(0, () -> {
-                            // Equip staff if not already equipped
                             if (!EquipmentAPI.isEquipped(ItemID.DRAMEN_STAFF) && !EquipmentAPI.isEquipped(ItemID.LUNAR_STAFF)) {
                                 ItemEx staff = InventoryAPI.getItem(i -> i.getId() == ItemID.DRAMEN_STAFF || i.getId() == ItemID.LUNAR_STAFF);
                                 if (staff != null) {
@@ -632,7 +630,7 @@ public class TransportLoader
                                 NpcAPI.interact(npc, "Travel");
                                 return 1;
                             }
-                            return -1;  // Failed to find Renu
+                            return -1;
                         })
                         .addDelayUntil(1, () -> WidgetAPI.get(InterfaceID.QuetzalMenu.ICONS) != null && WidgetAPI.isVisible(InterfaceID.QuetzalMenu.UNIVERSE))
                         .add(2, () -> {
