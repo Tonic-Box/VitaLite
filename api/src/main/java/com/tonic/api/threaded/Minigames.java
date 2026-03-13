@@ -121,7 +121,7 @@ public class Minigames
             }
 
             WorldPoint wp = PlayerEx.getLocal().getWorldPoint();
-            WidgetAPI.interact(1, InterfaceID.Grouping.TELEPORT_TEXT1, destination.index);
+            WidgetAPI.interact(1, InterfaceID.Grouping.TELEPORT, destination.index);
             Delays.tick();
             while(wp.equals(PlayerEx.getLocal().getWorldPoint()) || !PlayerEx.getLocal().isIdle())
             {
@@ -204,29 +204,34 @@ public class Minigames
     {
         BARBARIAN_ASSAULT(1, "Barbarian Assault", new WorldPoint(2531, 3577, 0), false),
         BLAST_FURNACE(2, "Blast Furnace", new WorldPoint(2933, 10183, 0), true),
-        BURTHORPE_GAMES_ROOM(3, "Burthorpe Games Room", new WorldPoint(2208, 4938, 0), true),
-        CASTLE_WARS(4, "Castle Wars", new WorldPoint(2439, 3092, 0), false),
-        CLAN_WARS(5, "Clan Wars", new WorldPoint(3151, 3636, 0), false),
-        DAGANNOTH_KINGS(6, "Dagannoth Kings", null, true),
-        FISHING_TRAWLER(7, "Fishing Trawler", new WorldPoint(2658, 3158, 0), true),
-        GIANTS_FOUNDARY(8, "Giants' Foundry", new WorldPoint(3361, 3147, 0), true),
-        GOD_WARS(9, "God Wars", null, true),
-        GUARDIANS_OF_THE_RIFT(10, "Guardians of the Rift", new WorldPoint(3616, 9478, 0), true),
-        LAST_MAN_STANDING(11, "Last Man Standing", new WorldPoint(3149, 3635, 0), false),
-        MAGE_TRAINING_ARENA(12, "Nightmare Zone", new WorldPoint(3363, 3304, 0), true),
-        NIGHTMARE_ZONE(13, "Nightmare Zone", new WorldPoint(2611, 3121, 0), true),
-        PEST_CONTROL(14, "Pest Control", new WorldPoint(2653, 2655, 0), true),
-        PLAYER_OWNED_HOUSES(15, "Player Owned Houses", null, false),
-        RAT_PITS(16, "Rat Pits", new WorldPoint(3263, 3406, 0), true),
-        SHADES_OF_MORTTON(17, "Shades of Mort'ton", new WorldPoint(3500, 3300, 0), true),
-        SHIELD_OF_ARRAV(18, "Shield of Arrav", null, true),
-        SHOOTING_STARS(19, "Shooting Stars", null, true),
-        SOUL_WARS(20, "Soul Wars", new WorldPoint(2209, 2857, 0), true),
-        THEATRE_OF_BLOOD(21, "Theatre of Blood", null, true),
-        TITHE_FARM(22, "Tithe Farm", new WorldPoint(1793, 3501, 0), true),
-        TROUBLE_BREWING(23, "Trouble Brewing", new WorldPoint(3811, 3021, 0), true),
-        TZHAAR_FIGHT_PIT(24, "TzHaar Fight Pit", new WorldPoint(2402, 5181, 0), true),
-        VOLCANIC_MINE(25, "Volcanic Mine", null, true),
+        BOUNTY_HUNTER(3, "Bounty Hunter", new WorldPoint(3139, 3625, 0), true),
+        BURTHORPE_GAMES_ROOM(4, "Burthorpe Games Room", new WorldPoint(2208, 4938, 0), true),
+        CASTLE_WARS(5, "Castle Wars", new WorldPoint(2439, 3092, 0), false),
+        CLAN_WARS(6, "Clan Wars", new WorldPoint(3151, 3636, 0), false),
+        DAGANNOTH_KINGS(7, "Dagannoth Kings", null, true),
+        FISHING_TRAWLER(8, "Fishing Trawler", new WorldPoint(2658, 3158, 0), true),
+        GIANTS_FOUNDARY(9, "Giants' Foundry", new WorldPoint(3361, 3147, 0), true),
+        GOD_WARS(10, "God Wars", null, true),
+        GUARDIANS_OF_THE_RIFT(11, "Guardians of the Rift", new WorldPoint(3616, 9478, 0), true),
+        LAST_MAN_STANDING(12, "Last Man Standing", new WorldPoint(3149, 3635, 0), false),
+        MAGE_TRAINING_ARENA(13, "Nightmare Zone", new WorldPoint(3363, 3304, 0), true),
+        MASTERING_MIXOLOGY(14, "Mastering Mixology", new WorldPoint(1389, 2919, 0), true),
+        NIGHTMARE_ZONE(15, "Nightmare Zone", new WorldPoint(2611, 3121, 0), true),
+        PEST_CONTROL(16, "Pest Control", new WorldPoint(2653, 2655, 0), true),
+        PLAYER_OWNED_HOUSES(17, "Player Owned Houses", null, false),
+        RAT_PITS(18, "Rat Pits", new WorldPoint(3263, 3406, 0), true),
+        ROYAL_TITANS(19, "Royal Titans", null, true),
+        SHADES_OF_MORTTON(20, "Shades of Mort'ton", new WorldPoint(3500, 3300, 0), true),
+        SHIELD_OF_ARRAV(21, "Shield of Arrav", null, true),
+        SHOOTING_STARS(22, "Shooting Stars", null, true),
+        SORCERESS_GARDEN(23, "Sorceress Garden", new WorldPoint(3321, 3139, 0), true),
+        SOUL_WARS(24, "Soul Wars", new WorldPoint(2209, 2857, 0), true),
+        THEATRE_OF_BLOOD(25, "Theatre of Blood", null, true),
+        TITHE_FARM(26, "Tithe Farm", new WorldPoint(1793, 3501, 0), true),
+        TOMBS_OF_AMASCUT(27, "Tombs of Amascut", null, true),
+        TROUBLE_BREWING(28, "Trouble Brewing", new WorldPoint(3811, 3021, 0), true),
+        TZHAAR_FIGHT_PIT(29, "TzHaar Fight Pit", new WorldPoint(2402, 5181, 0), true),
+        VOLCANIC_MINE(30, "Volcanic Mine", null, true),
         NONE(-1, "None", null, false);
 
         private final int index;
