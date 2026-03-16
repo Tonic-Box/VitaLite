@@ -62,7 +62,6 @@ public class BankAPI
      */
     public static void setX(int amount)
     {
-        System.out.println(VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE));
         int withdrawMode = VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE);
         if(withdrawMode != 3)
         {
@@ -361,7 +360,7 @@ public class BankAPI
     public static void withdrawAction(int id, int amount, int slot) {
         setX(amount);
         if(amount == 1) {
-            WidgetAPI.interact(1, InterfaceID.Bankmain.ITEMS, slot, id);
+            WidgetAPI.interact(2, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else if(amount == 5) {
             WidgetAPI.interact(3, InterfaceID.Bankmain.ITEMS, slot, id);
