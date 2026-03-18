@@ -62,7 +62,6 @@ public class BankAPI
      */
     public static void setX(int amount)
     {
-        System.out.println(VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE));
         int withdrawMode = VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE);
         if(withdrawMode != 3)
         {
@@ -361,19 +360,19 @@ public class BankAPI
     public static void withdrawAction(int id, int amount, int slot) {
         setX(amount);
         if(amount == 1) {
-            WidgetAPI.interact(1, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(2, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else if(amount == 5) {
-            WidgetAPI.interact(3, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(3, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else if(amount == 10) {
-            WidgetAPI.interact(4, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(4, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else if(amount == -1) {
-            WidgetAPI.interact(7, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(7, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else {
-            WidgetAPI.interact(5, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(5, InterfaceID.Bankmain.ITEMS, slot, id);
         }
     }
 
@@ -406,21 +405,21 @@ public class BankAPI
      * Deposits all items from the containers in inventory into the bank.
      */
     public static void depositAllContainers() {
-        WidgetAPI.interact(1, InterfaceID.Bankmain.QUANTITYALL_TEXT, -1, -1);
+        WidgetAPI.interact(1, InterfaceID.Bankmain.DEPOSITCONTAINERS, -1, -1);
     }
 
     /**
      * Deposits all items from the inventory into the bank.
      */
     public static void depositAll() {
-        WidgetAPI.interact(1, InterfaceID.Bankmain.PLACEHOLDER_GRAPHIC, -1, -1);
+        WidgetAPI.interact(1, InterfaceID.Bankmain.DEPOSITINV, -1, -1);
     }
 
     /**
      * Deposits all items from the equipment into the bank.
      */
     public static void depositEquipment() {
-        WidgetAPI.interact(1, InterfaceID.Bankmain.SEARCH_GRAPHIC, -1, -1);
+        WidgetAPI.interact(1, InterfaceID.Bankmain.DEPOSITWORN, -1, -1);
     }
 
     /**
