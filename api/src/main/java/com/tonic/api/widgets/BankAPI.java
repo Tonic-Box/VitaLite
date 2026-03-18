@@ -405,7 +405,7 @@ public class BankAPI
      * Deposits all items from the containers in inventory into the bank.
      */
     public static void depositAllContainers() {
-        WidgetAPI.interact(1, InterfaceID.Bankmain.QUANTITYALL_TEXT, -1, -1);
+        WidgetAPI.interact(1, InterfaceID.Bankmain.DEPOSITCONTAINERS, -1, -1);
     }
 
     /**
@@ -419,7 +419,7 @@ public class BankAPI
      * Deposits all items from the equipment into the bank.
      */
     public static void depositEquipment() {
-        WidgetAPI.interact(1, InterfaceID.Bankmain.SEARCH_GRAPHIC, -1, -1);
+        WidgetAPI.interact(1, InterfaceID.Bankmain.DEPOSITWORN, -1, -1);
     }
 
     /**
