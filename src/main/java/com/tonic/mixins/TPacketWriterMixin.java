@@ -298,9 +298,9 @@ public abstract class TPacketWriterMixin implements TPacketWriter
 
     @Inject
     @Override
-    public void objectActionPacket(int type, int identifier, int worldX, int worldY, boolean ctrl)
+    public void objectActionPacket(int type, int identifier, int worldX, int worldY, boolean ctrl, int subop)
     {
-        MapEntry entry = PacketMapReader.get("OP_GAME_OBJECT_ACTION_" + type);
+        MapEntry entry = PacketMapReader.get("OP_GAME_OBJECT_ACTION_" + type + "_V2");
         if(entry == null)
         {
             System.err.println("Packets::objectActionPacket invalid type");
@@ -312,15 +312,16 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         args.put("ctrl", ctrl ? 1 : 0);
         args.put("worldX", worldX);
         args.put("worldY", worldY);
+        args.put("subop", subop);
 
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }
 
     @Inject
     @Override
-    public void groundItemActionPacket(int type, int identifier, int worldX, int worldY, boolean ctrl)
+    public void groundItemActionPacket(int type, int identifier, int worldX, int worldY, boolean ctrl, int subop)
     {
-        MapEntry entry = PacketMapReader.get("OP_GROUND_ITEM_ACTION_" + type);
+        MapEntry entry = PacketMapReader.get("OP_GROUND_ITEM_ACTION_" + type + "_V2");
         if(entry == null)
         {
             System.err.println("Packets::groundItemActionPacket invalid type");
@@ -332,6 +333,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         args.put("ctrl", ctrl ? 1 : 0);
         args.put("worldX", worldX);
         args.put("worldY", worldY);
+        args.put("subop", subop);
 
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }
@@ -356,9 +358,9 @@ public abstract class TPacketWriterMixin implements TPacketWriter
 
     @Inject
     @Override
-    public void npcActionPacket(int type, int npcIndex, boolean ctrl)
+    public void npcActionPacket(int type, int npcIndex, boolean ctrl, int subop)
     {
-        MapEntry entry = PacketMapReader.get("OP_NPC_ACTION_" + type);
+        MapEntry entry = PacketMapReader.get("OP_NPC_ACTION_" + type + "_V2");
         if(entry == null)
         {
             System.err.println("Packets::npcActionPacket invalid type");
@@ -368,6 +370,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         Map<String,Object> args = new HashMap<>();
         args.put("identifier", npcIndex);
         args.put("ctrl", ctrl ? 1 : 0);
+        args.put("subop", subop);
 
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }

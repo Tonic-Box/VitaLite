@@ -33,9 +33,22 @@ public class NpcBuilder extends AbstractHandlerBuilder<NpcBuilder>
      */
     public NpcBuilder interact(String name, String action)
     {
+        return interact(name, action, 0);
+    }
+
+    /**
+     * Adds an interaction with an NPC to the handler.
+     *
+     * @param name   name
+     * @param action action
+     * @param subop  subop
+     * @return NpcBuilder instance
+     */
+    public NpcBuilder interact(String name, String action, int subop)
+    {
         add(() -> {
             NpcEx npc = new NpcQuery().withName(name).first();
-            NpcAPI.interact(npc, action);
+            NpcAPI.interact(npc, subop, action);
         });
         return this;
     }
@@ -49,8 +62,21 @@ public class NpcBuilder extends AbstractHandlerBuilder<NpcBuilder>
      */
     public NpcBuilder visit(NpcLocations npcLocations, String action)
     {
+        return visit(npcLocations, action, 0);
+    }
+
+    /**
+     * Walks to and interacts with an NPC at a specified location.
+     *
+     * @param npcLocations npcLocations
+     * @param action       action
+     * @param subop        subop
+     * @return NpcBuilder instance
+     */
+    public NpcBuilder visit(NpcLocations npcLocations, String action, int subop)
+    {
         walkTo(npcLocations.getLocation());
-        interact(npcLocations.getName(), action);
+        interact(npcLocations.getName(), action, subop);
         return this;
     }
 

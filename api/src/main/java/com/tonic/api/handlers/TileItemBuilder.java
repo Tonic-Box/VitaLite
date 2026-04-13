@@ -31,11 +31,24 @@ public class TileItemBuilder extends AbstractHandlerBuilder<TileItemBuilder>
      */
     public TileItemBuilder interact(String itemName, String action)
     {
+        return interact(itemName, action, 0);
+    }
+
+    /**
+     * Interacts with a tile item by its name and action.
+     *
+     * @param itemName The name of the item to interact with.
+     * @param action   The action to perform on the item.
+     * @param subop    The sub operation.
+     * @return TileItemBuilder instance
+     */
+    public TileItemBuilder interact(String itemName, String action, int subop)
+    {
         add(() -> {
             TileItemEx item = TileItemAPI.search().withNameContains(itemName).first();
             if(item != null)
             {
-                TileItemAPI.interact(item, action);
+                TileItemAPI.interact(item, action, false, subop);
             }
         });
         addDelayUntil(() -> PlayerAPI.isIdle());
@@ -51,11 +64,24 @@ public class TileItemBuilder extends AbstractHandlerBuilder<TileItemBuilder>
      */
     public TileItemBuilder interact(int itemId, String action)
     {
+        return interact(itemId, action, 0);
+    }
+
+    /**
+     * Interacts with a tile item by its ID and action.
+     *
+     * @param itemId The ID of the item to interact with.
+     * @param action The action to perform on the item.
+     * @param subop  The sub operation.
+     * @return TileItemBuilder instance
+     */
+    public TileItemBuilder interact(int itemId, String action, int subop)
+    {
         add(() -> {
             TileItemEx item = TileItemAPI.search().withId(itemId).first();
             if(item != null)
             {
-                TileItemAPI.interact(item, action);
+                TileItemAPI.interact(item, action, false, subop);
             }
         });
         addDelayUntil(() -> PlayerAPI.isIdle());
@@ -71,11 +97,24 @@ public class TileItemBuilder extends AbstractHandlerBuilder<TileItemBuilder>
      */
     public TileItemBuilder interact(String itemName, int action)
     {
+        return interact(itemName, action, 0);
+    }
+
+    /**
+     * Interacts with a tile item by its name and action index.
+     *
+     * @param itemName The name of the item to interact with.
+     * @param action   The action index to perform on the item.
+     * @param subop    The sub operation.
+     * @return TileItemBuilder instance
+     */
+    public TileItemBuilder interact(String itemName, int action, int subop)
+    {
         add(() -> {
             TileItemEx item = TileItemAPI.search().withNameContains(itemName).first();
             if(item != null)
             {
-                TileItemAPI.interact(item, action);
+                TileItemAPI.interact(item, action, subop);
             }
         });
         addDelayUntil(() -> PlayerAPI.isIdle());
@@ -91,11 +130,24 @@ public class TileItemBuilder extends AbstractHandlerBuilder<TileItemBuilder>
      */
     public TileItemBuilder interact(int itemId, int action)
     {
+        return interact(itemId, action, 0);
+    }
+
+    /**
+     * Interacts with a tile item by its ID and action index.
+     *
+     * @param itemId The ID of the item to interact with.
+     * @param action The action index to perform on the item.
+     * @param subop  The sub operation.
+     * @return TileItemBuilder instance
+     */
+    public TileItemBuilder interact(int itemId, int action, int subop)
+    {
         add(() -> {
             TileItemEx item = TileItemAPI.search().withId(itemId).first();
             if(item != null)
             {
-                TileItemAPI.interact(item, action);
+                TileItemAPI.interact(item, action, subop);
             }
         });
         addDelayUntil(() -> PlayerAPI.isIdle());

@@ -9,7 +9,7 @@ plugins {
 }
 
 val vitaVersion by extra("0")
-val runeliteVersion by extra("1.12.20")
+val runeliteVersion by extra("1.12.23")
 
 group = "com.tonic"
 version = runeliteVersion + "_" + vitaVersion

@@ -32,6 +32,17 @@ public class TileObjectAPI
      */
     public static void interact(TileObjectEx object, int action)
     {
+        interact(object, action, 0);
+    }
+
+    /**
+     * interact with a tile object
+     * @param object object
+     * @param action action
+     * @param subop subop
+     */
+    public static void interact(TileObjectEx object, int action, int subop)
+    {
         Client client = Static.getClient();
         TClient tclient = Static.getClient();
         if(!client.getGameState().equals(GameState.LOGGED_IN) || object == null)
@@ -40,7 +51,7 @@ public class TileObjectAPI
         Static.invoke(() ->
         {
             ClickManager.click(ClickType.OBJECT);
-            tclient.getPacketWriter().objectActionPacket(action, object.getId(), object.getWorldPoint().getX(), object.getWorldPoint().getY(), false);
+            tclient.getPacketWriter().objectActionPacket(action, object.getId(), object.getWorldPoint().getX(), object.getWorldPoint().getY(), false, subop);
         });
     }
 
@@ -51,6 +62,17 @@ public class TileObjectAPI
      */
     public static void interact(TileObject object, int action)
     {
+        interact(object, action, 0);
+    }
+
+    /**
+     * interact with a tile object
+     * @param object object
+     * @param action action
+     * @param subop subop
+     */
+    public static void interact(TileObject object, int action, int subop)
+    {
         Client client = Static.getClient();
         TClient tclient = Static.getClient();
         if(!client.getGameState().equals(GameState.LOGGED_IN) || object == null)
@@ -59,7 +81,7 @@ public class TileObjectAPI
         Static.invoke(() ->
         {
             ClickManager.click(ClickType.OBJECT);
-            tclient.getPacketWriter().objectActionPacket(action, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false);
+            tclient.getPacketWriter().objectActionPacket(action, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false, subop);
         });
     }
 
@@ -69,6 +91,17 @@ public class TileObjectAPI
      * @param actions actions list
      */
     public static void interact(TileObjectEx object, String... actions)
+    {
+        interact(object, 0, actions);
+    }
+
+    /**
+     * interact with a tile object with first matching action
+     * @param object object
+     * @param subop subop
+     * @param actions actions list
+     */
+    public static void interact(TileObjectEx object, int subop, String... actions)
     {
         Client client = Static.getClient();
         TClient tclient = Static.getClient();
@@ -86,7 +119,7 @@ public class TileObjectAPI
             Static.invoke(() ->
             {
                 ClickManager.click(ClickType.OBJECT);
-                tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), wp.getX(), wp.getY(), false);
+                tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), wp.getX(), wp.getY(), false, subop);
             });
             return;
         }
@@ -98,6 +131,17 @@ public class TileObjectAPI
      * @param actions action list
      */
     public static void interact(TileObject object, String... actions)
+    {
+        interact(object, 0, actions);
+    }
+
+    /**
+     * interact with a tile object by first matching action
+     * @param object object
+     * @param subop subop
+     * @param actions action list
+     */
+    public static void interact(TileObject object, int subop, String... actions)
     {
         Client client = Static.getClient();
         TClient tclient = Static.getClient();
@@ -114,7 +158,7 @@ public class TileObjectAPI
             Static.invoke(() ->
             {
                 ClickManager.click(ClickType.OBJECT);
-                tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false);
+                tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false, subop);
             });
         }
     }

@@ -167,8 +167,9 @@ public interface TPacketWriter
      * @param worldX the world X coordinate
      * @param worldY the world Y coordinate
      * @param ctrl whether ctrl is pressed
+     * @param subop the sub operation
      */
-    void objectActionPacket(int type, int identifier, int worldX, int worldY, boolean ctrl);
+    void objectActionPacket(int type, int identifier, int worldX, int worldY, boolean ctrl, int subop);
 
     /**
      * Sends a ground item action packet.
@@ -178,8 +179,9 @@ public interface TPacketWriter
      * @param worldX the world X coordinate
      * @param worldY the world Y coordinate
      * @param ctrl whether ctrl is pressed
+     * @param subop the sub operation
      */
-    void groundItemActionPacket(int type, int identifier, int worldX, int worldY, boolean ctrl);
+    void groundItemActionPacket(int type, int identifier, int worldX, int worldY, boolean ctrl, int subop);
 
     /**
      * Sends a player action packet.
@@ -196,8 +198,9 @@ public interface TPacketWriter
      * @param type the action type
      * @param npcIndex the NPC index
      * @param ctrl whether ctrl is pressed
+     * @param subop the sub operation
      */
-    void npcActionPacket(int type, int npcIndex, boolean ctrl);
+    void npcActionPacket(int type, int npcIndex, boolean ctrl, int subop);
 
     /**
      * Sends a widget on widget packet.

@@ -101,9 +101,17 @@ public class NpcEx extends ActorEx<NPC>
         NpcAPI.interact(this, actions);
     }
 
+    public void interact(int subop, String... actions) {
+        NpcAPI.interact(this, subop, actions);
+    }
+
     @Override
     public void interact(int action) {
         NpcAPI.interact(this, action);
+    }
+
+    public void interact(int action, int subop) {
+        NpcAPI.interact(this, action, subop);
     }
 
     @Override

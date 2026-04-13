@@ -43,6 +43,22 @@ public class TileObjectBuilder extends AbstractHandlerBuilder<TileObjectBuilder>
      * @param worldPoint The world point to walk to.
      * @param objectName The name of the object to interact with.
      * @param action The action to perform on the object.
+     * @param subop The sub operation.
+     * @param node The dialogue node to handle after interaction.
+     * @return TileObjectBuilder instance
+     */
+    public TileObjectBuilder visit(WorldPoint worldPoint, String objectName, String action, int subop, DialogueNode node)
+    {
+        walkTo(worldPoint);
+        return interact(objectName, action, subop, node);
+    }
+
+    /**
+     * Walks to the specified world point and interacts with the specified object.
+     *
+     * @param worldPoint The world point to walk to.
+     * @param objectName The name of the object to interact with.
+     * @param action The action to perform on the object.
      * @param dialogueOptions The dialogue options to handle after interaction.
      * @return TileObjectBuilder instance
      */
@@ -58,11 +74,41 @@ public class TileObjectBuilder extends AbstractHandlerBuilder<TileObjectBuilder>
      * @param worldPoint The world point to walk to.
      * @param objectName The name of the object to interact with.
      * @param action The action to perform on the object.
+     * @param subop The sub operation.
+     * @param dialogueOptions The dialogue options to handle after interaction.
+     * @return TileObjectBuilder instance
+     */
+    public TileObjectBuilder visit(WorldPoint worldPoint, String objectName, String action, int subop, String ... dialogueOptions)
+    {
+        DialogueNode node = DialogueNode.get(dialogueOptions);
+        return visit(worldPoint, objectName, action, subop, node);
+    }
+
+    /**
+     * Walks to the specified world point and interacts with the specified object.
+     *
+     * @param worldPoint The world point to walk to.
+     * @param objectName The name of the object to interact with.
+     * @param action The action to perform on the object.
      * @return TileObjectBuilder instance
      */
     public TileObjectBuilder visit(WorldPoint worldPoint, String objectName, String action)
     {
         return visit(worldPoint, objectName, action, (DialogueNode) null);
+    }
+
+    /**
+     * Walks to the specified world point and interacts with the specified object.
+     *
+     * @param worldPoint The world point to walk to.
+     * @param objectName The name of the object to interact with.
+     * @param action The action to perform on the object.
+     * @param subop The sub operation.
+     * @return TileObjectBuilder instance
+     */
+    public TileObjectBuilder visit(WorldPoint worldPoint, String objectName, String action, int subop)
+    {
+        return visit(worldPoint, objectName, action, subop, (DialogueNode) null);
     }
 
     /**
@@ -87,6 +133,20 @@ public class TileObjectBuilder extends AbstractHandlerBuilder<TileObjectBuilder>
      */
     public TileObjectBuilder interact(String objectName, String action, DialogueNode node)
     {
+        return interact(objectName, action, 0, node);
+    }
+
+    /**
+     * Interacts with the specified object using the given action and handles dialogue.
+     *
+     * @param objectName The name of the object to interact with.
+     * @param action The action to perform on the object.
+     * @param subop The sub operation.
+     * @param node The dialogue node to handle after interaction.
+     * @return TileObjectBuilder instance
+     */
+    public TileObjectBuilder interact(String objectName, String action, int subop, DialogueNode node)
+    {
         int step = currentStep;
         add(() -> {
             TileObjectEx object = TileObjectAPI.search()
@@ -94,7 +154,7 @@ public class TileObjectBuilder extends AbstractHandlerBuilder<TileObjectBuilder>
                     .withPartialAction(action)
                     .nearest();
             if (object != null) {
-                TileObjectAPI.interact(object, action);
+                TileObjectAPI.interact(object, subop, action);
                 return step + 1;
             } else {
                 return step;

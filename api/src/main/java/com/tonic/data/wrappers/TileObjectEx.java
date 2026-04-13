@@ -140,9 +140,17 @@ public class TileObjectEx implements Entity
         TileObjectAPI.interact(this, actions);
     }
 
+    public void interact(int subop, String... actions) {
+        TileObjectAPI.interact(this, subop, actions);
+    }
+
     @Override
     public void interact(int action) {
         TileObjectAPI.interact(this, action);
+    }
+
+    public void interact(int action, int subop) {
+        TileObjectAPI.interact(this, action, subop);
     }
 
     @Override
