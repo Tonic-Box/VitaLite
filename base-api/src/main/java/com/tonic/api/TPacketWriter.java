@@ -118,6 +118,21 @@ public interface TPacketWriter
     void walkPacket(int x, int y, boolean ctrl);
 
     /**
+     * Sends a minimap walk packet. This uses the multiplexed OP_MINIMAP_WALK
+     * sub-opcode on the same opcode as OP_RESUME_STRINGDIALOG.
+     *
+     * @param worldX the world X coordinate
+     * @param worldY the world Y coordinate
+     * @param ctrl whether ctrl is pressed
+     * @param plane the current plane level (0-3)
+     * @param flag context flag from minimap click handler
+     * @param gameState game state field (client.jy equivalent)
+     * @param playerField1 player field (cc.bw equivalent)
+     * @param playerField2 player field (cc.dr equivalent)
+     */
+    void minimapWalkPacket(int worldX, int worldY, boolean ctrl, int plane, int flag, int gameState, int playerField1, int playerField2);
+
+    /**
      * Sets the heading packet.
      *
      * @param heading the heading value

@@ -14,6 +14,7 @@ import net.runelite.api.gameval.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,7 +23,7 @@ public class PacketMapReader
 {
     private static List<MapEntry> defs;
     private static final Gson gson = new GsonBuilder().create();
-    private static Map<Integer, MapEntry> idToEntryMap;
+    private static Map<Integer, List<MapEntry>> idToEntriesMap;
 
     public static List<MapEntry> get()
     {
@@ -64,9 +65,16 @@ public class PacketMapReader
         {
             fillMaps();
         }
-        return defs.stream()
-                .filter(e -> e.getPacket().getId() == id)
-                .findFirst().orElse(null);
+        List<MapEntry> entries = idToEntriesMap.get(id);
+        if(entries == null || entries.isEmpty())
+        {
+            return null;
+        }
+        // Return the default entry (no subOpcode) or the first entry
+        return entries.stream()
+                .filter(e -> e.getSubOpcode() == null)
+                .findFirst()
+                .orElse(entries.get(0));
     }
 
     public static String prettify(PacketBuffer buffer)
@@ -76,12 +84,13 @@ public class PacketMapReader
             fillMaps();
         }
 
-        if(!idToEntryMap.containsKey(buffer.getPacketId()))
+        List<MapEntry> entries = idToEntriesMap.get(buffer.getPacketId());
+        if(entries == null || entries.isEmpty())
         {
             return "[UNKNOWN(" + buffer.getPacketId() + ")] " + buffer;
         }
 
-        MapEntry entry = idToEntryMap.get(buffer.getPacketId());
+        MapEntry entry = resolveEntry(entries, buffer);
         if(entry.getName().equals("OP_MOUSE_MOVEMENT"))
             return "[UNKNOWN(" + buffer.getPacketId() + ")] " + buffer;
 
@@ -115,7 +124,7 @@ public class PacketMapReader
                         out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
                         continue;
                     }
-                    if(entry.getName().startsWith("OP_GAME_OBJECT_ACTION_") && entry.getArgs().get(i).equals("identifier"))
+                    if((entry.getName().startsWith("OP_GAME_OBJECT_ACTION_") || entry.getName().equals("OP_WIDGET_TARGET_ON_GAME_OBJECT")) && entry.getArgs().get(i).equals("identifier"))
                     {
                         name = StaticIntFinder.find(ObjectID.class, (int) num);
                         out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
@@ -137,14 +146,18 @@ public class PacketMapReader
      */
     public static PacketDefinition analyze(PacketBuffer buffer)
     {
-        MapEntry entry = get().stream()
-                .filter(e -> e.getPacket().getId() == buffer.getPacketId())
-                .findFirst().orElse(null);
+        if(defs == null)
+        {
+            fillMaps();
+        }
 
-        if(entry == null)
+        List<MapEntry> entries = idToEntriesMap.get(buffer.getPacketId());
+        if(entries == null || entries.isEmpty())
         {
             return null;
         }
+
+        MapEntry entry = resolveEntry(entries, buffer);
 
         PacketDefinition definition = new PacketDefinition(entry.getName(), buffer);
 
@@ -159,6 +172,35 @@ public class PacketMapReader
         }
         buffer.setOffset(0);
         return definition;
+    }
+
+    /**
+     * Resolves the correct MapEntry for a multiplexed packet by checking the first
+     * payload byte against subOpcode values. Falls back to the default entry (no
+     * subOpcode) if no match is found.
+     */
+    private static MapEntry resolveEntry(List<MapEntry> entries, PacketBuffer buffer)
+    {
+        if(entries.size() == 1)
+        {
+            return entries.get(0);
+        }
+        // Read first byte to match against subOpcode, then reset offset
+        int firstByte = buffer.readByte();
+        buffer.setOffset(0);
+        MapEntry fallback = null;
+        for(MapEntry e : entries)
+        {
+            if(e.getSubOpcode() != null && e.getSubOpcode() == firstByte)
+            {
+                return e;
+            }
+            if(e.getSubOpcode() == null)
+            {
+                fallback = e;
+            }
+        }
+        return fallback != null ? fallback : entries.get(0);
     }
 
     private static long doRead(PacketBuffer buffer, String method)
@@ -352,12 +394,11 @@ public class PacketMapReader
                 defs = gson.fromJson(fileContent, new TypeToken<ArrayList<MapEntry>>(){}.getType());
             }
 
-            idToEntryMap = defs.stream()
-                    .collect(Collectors.toMap(
-                            e -> e.getPacket().getId(),
-                            e -> e,
-                            (e1, e2) -> e1
-                    ));
+            idToEntriesMap = new HashMap<>();
+            for(MapEntry entry : defs)
+            {
+                idToEntriesMap.computeIfAbsent(entry.getPacket().getId(), k -> new ArrayList<>()).add(entry);
+            }
             System.out.println("Loaded " + defs.size() + " packet definitions.");
         }
         catch (IOException e)

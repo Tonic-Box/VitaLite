@@ -145,10 +145,6 @@ public interface TClient
 
     void setLoginIndex(int index);
 
-    void setAccountTypeLegacy();
-
-    void setAccountTypeJagex();
-
     int getShipHeading();
 
     void setShipHeading(int heading);

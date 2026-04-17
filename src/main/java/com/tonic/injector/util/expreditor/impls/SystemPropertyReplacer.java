@@ -19,7 +19,11 @@ public class SystemPropertyReplacer extends ExprEditor {
             if ("java.vendor".equals(propertyKey)) {
                 replaceWithHardcodedValue(call, "Eclipse Adoptium");
             } else if ("java.version".equals(propertyKey)) {
-                replaceWithHardcodedValue(call, JdkVersionUtil.calculateJreVersion());
+                String jreVersion = JdkVersionUtil.calculateJreVersion();
+                if (jreVersion == null) {
+                    jreVersion = System.getProperty("java.version");
+                }
+                replaceWithHardcodedValue(call, jreVersion);
             }
         }
     }

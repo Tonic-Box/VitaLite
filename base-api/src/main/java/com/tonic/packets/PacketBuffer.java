@@ -185,20 +185,15 @@ public class PacketBuffer {
     }
 
     public short readShortAdd() {
-        short value = (short)((payload.getByte(offset) & 0xFF) - 128 | ((payload.getByte(offset + 1) & 0xFF) << 8));
+        short value = (short)(((payload.getByte(offset) & 0xFF) << 8) | ((payload.getByte(offset + 1) & 0xFF) - 128));
         offset += 2;
         return value;
     }
 
     public int readUnsignedShortAdd() {
-        int low = payload.getByte(offset++) & 0xFF;
-        if (low < 128) {
-            low += 128;  // Adjust for the 128 added in the write method
-        } else {
-            low -= 128;  // Reverse the wrap-around effect
-        }
-        int high = (payload.getByte(offset++) & 0xFF) << 8;
-        return high | low;
+        int value = ((payload.getByte(offset) & 0xFF) << 8) | ((payload.getByte(offset + 1) & 0xFF) - 128 & 0xFF);
+        offset += 2;
+        return value;
     }
 
     public short readShortLE() {
@@ -214,15 +209,13 @@ public class PacketBuffer {
     }
 
     public short readShortAddLE() {
-        short value = (short)(((payload.getByte(offset) & 0xFF) << 8) | ((payload.getByte(offset + 1) & 0xFF) - 128));
-        //short value = (short)((payload[offset] & 0xFF) - 128 | ((payload[offset + 1] & 0xFF) << 8));
+        short value = (short)((payload.getByte(offset) & 0xFF) - 128 | ((payload.getByte(offset + 1) & 0xFF) << 8));
         offset += 2;
         return value;
     }
 
     public int readUnsignedShortAddLE() {
-        int value = ((payload.getByte(offset) & 0xFF) << 8) | ((payload.getByte(offset + 1) & 0xFF) - 128 & 0xFF);
-        //int value = ((payload[offset] & 0xFF) - 128 & 0xFF) | ((payload[offset + 1] & 0xFF) << 8);
+        int value = ((payload.getByte(offset) & 0xFF) - 128 & 0xFF) | ((payload.getByte(offset + 1) & 0xFF) << 8);
         offset += 2;
         return value;
     }
@@ -457,8 +450,8 @@ public class PacketBuffer {
 
     public void writeShortAdd(int value) {
         this.trueLength += 2;
-        payload.setByte(offset++, (byte)(value + 128));
         payload.setByte(offset++, (byte)(value >> 8));
+        payload.setByte(offset++, (byte)(value + 128));
     }
 
     public void writeShortLE(int value) {
@@ -469,8 +462,8 @@ public class PacketBuffer {
 
     public void writeShortAddLE(int value) {
         this.trueLength += 2;
-        payload.setByte(offset++, (byte)(value >> 8));
         payload.setByte(offset++, (byte)(value + 128));
+        payload.setByte(offset++, (byte)(value >> 8));
     }
 
     public void writeLengthShort(int var1) {

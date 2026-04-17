@@ -4,24 +4,29 @@ import com.tonic.api.TItemComposition;
 import com.tonic.injector.annotations.Mixin;
 import com.tonic.injector.annotations.Shadow;
 import com.tonic.util.TextUtil;
-import lombok.Getter;
+import net.runelite.api.EntityOps;
 
 @Mixin("ItemComposition")
 public abstract class TItemCompositionMixin implements TItemComposition
 {
     @Shadow("groundActions")
-    public String[] groundActions;
+    public Object groundActions;
 
     public String[] getGroundActions()
     {
-        String[] cleaned = new String[groundActions.length];
-        for(int i = 0; i < groundActions.length; i++)
+        if (groundActions == null)
+            return new String[0];
+
+        EntityOps ops = (EntityOps) groundActions;
+        String[] result = new String[EntityOps.MAX_OPS];
+        for (int i = 0; i < EntityOps.MAX_OPS; i++)
         {
-            if(groundActions[i] != null)
+            String op = ops.getOp(i);
+            if (op != null)
             {
-                cleaned[i] = TextUtil.sanitize(groundActions[i]);
+                result[i] = TextUtil.sanitize(op);
             }
         }
-        return cleaned;
+        return result;
     }
 }

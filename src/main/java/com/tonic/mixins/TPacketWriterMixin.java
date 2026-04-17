@@ -82,6 +82,8 @@ public abstract class TPacketWriterMixin implements TPacketWriter
 
         byte[] bytes = buffer.getArray();
         int payloadSize = (len > 0) ? len : (offset - 1);
+        payloadSize = Math.min(payloadSize, bytes.length - 1);
+        if (payloadSize < 0) payloadSize = 0;
         byte[] payload = new byte[payloadSize];
         System.arraycopy(bytes, 1, payload, 0, payloadSize);
 
@@ -207,9 +209,36 @@ public abstract class TPacketWriterMixin implements TPacketWriter
 
     @Inject
     @Override
+    public void minimapWalkPacket(int worldX, int worldY, boolean ctrl, int plane, int flag, int gameState, int playerField1, int playerField2)
+    {
+        MapEntry entry = PacketMapReader.get("OP_MINIMAP_WALK");
+        if(entry == null)
+        {
+            System.err.println("Packets::minimapWalkPacket OP_MINIMAP_WALK not found");
+            return;
+        }
+        Map<String,Object> args = new HashMap<>();
+        args.put("ctrl", ctrl ? 1 : 0);
+        args.put("worldY", worldY);
+        args.put("worldX", worldX);
+        args.put("plane", plane);
+        args.put("flag", flag);
+        args.put("gameState", gameState);
+        args.put("playerField1", playerField1);
+        args.put("playerField2", playerField2);
+        this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
+    }
+
+    @Inject
+    @Override
     public void setHeadingPacket(int heading)
     {
         MapEntry entry = PacketMapReader.get("OP_SET_HEADING");
+        if(entry == null)
+        {
+            System.err.println("Packets::setHeadingPacket OP_SET_HEADING not found");
+            return;
+        }
         Map<String,Object> args = new HashMap<>();
         args.put("heading", heading);
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
@@ -300,7 +329,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     @Override
     public void objectActionPacket(int type, int identifier, int worldX, int worldY, boolean ctrl)
     {
-        MapEntry entry = PacketMapReader.get("OP_GAME_OBJECT_ACTION_" + type);
+        MapEntry entry = PacketMapReader.get("OP_GAME_OBJECT_ACTION_" + type + "_SUBOP");
         if(entry == null)
         {
             System.err.println("Packets::objectActionPacket invalid type");
@@ -312,6 +341,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         args.put("ctrl", ctrl ? 1 : 0);
         args.put("worldX", worldX);
         args.put("worldY", worldY);
+        args.put("subOp", 0);
 
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }
@@ -320,7 +350,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     @Override
     public void groundItemActionPacket(int type, int identifier, int worldX, int worldY, boolean ctrl)
     {
-        MapEntry entry = PacketMapReader.get("OP_GROUND_ITEM_ACTION_" + type);
+        MapEntry entry = PacketMapReader.get("OP_GROUND_ITEM_ACTION_" + type + "_SUBOP");
         if(entry == null)
         {
             System.err.println("Packets::groundItemActionPacket invalid type");
@@ -332,6 +362,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         args.put("ctrl", ctrl ? 1 : 0);
         args.put("worldX", worldX);
         args.put("worldY", worldY);
+        args.put("subOp", 0);
 
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }
@@ -358,7 +389,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     @Override
     public void npcActionPacket(int type, int npcIndex, boolean ctrl)
     {
-        MapEntry entry = PacketMapReader.get("OP_NPC_ACTION_" + type);
+        MapEntry entry = PacketMapReader.get("OP_NPC_ACTION_" + type + "_SUBOP");
         if(entry == null)
         {
             System.err.println("Packets::npcActionPacket invalid type");
@@ -368,6 +399,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         Map<String,Object> args = new HashMap<>();
         args.put("identifier", npcIndex);
         args.put("ctrl", ctrl ? 1 : 0);
+        args.put("subOp", 0);
 
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }

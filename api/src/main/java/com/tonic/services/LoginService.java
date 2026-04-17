@@ -19,8 +19,6 @@ public class LoginService {
             tClient.setCharacterId(null);
             tClient.setDisplayName(null);
 
-            tClient.setAccountTypeLegacy();
-
             tClient.setLoginIndex(2);
 
             client.setUsername(username);
@@ -44,7 +42,6 @@ public class LoginService {
             }
             client.setUsername("");
             client.setPassword("");
-            tClient.setAccountTypeJagex();
             tClient.setLoginIndex(10);
             tClient.setSessionId(sessionId);
             tClient.setCharacterId(characterId);

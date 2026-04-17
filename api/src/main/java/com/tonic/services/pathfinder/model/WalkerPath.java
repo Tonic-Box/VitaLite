@@ -237,13 +237,13 @@ public class WalkerPath
         manageRunEnergyAndHitpoints();
 
         Player local = client.getLocalPlayer();
-        WorldPoint last = local.getWorldLocation();
+        WorldPoint last = Static.invoke(local::getWorldLocation);
         IStep step = steps.get(0);
         return handleWalking(local, last, step, step.getPosition());
     }
 
     private boolean handleWalking(Player local, WorldPoint last, IStep step, WorldPoint dest) {
-        if(!SceneAPI.isReachable(local.getWorldLocation(), step.getPosition())) {
+        if(!SceneAPI.isReachable(Static.invoke(local::getWorldLocation), step.getPosition())) {
             if (MovementAPI.isMoving()) {
                 return true;
             }
@@ -264,7 +264,7 @@ public class WalkerPath
         rand = ThreadLocalRandom.current().nextInt(10, 16);
         while(s <= rand && s < steps.size() && !steps.get(s).hasTransport())
         {
-            if(!SceneAPI.isReachable(local.getWorldLocation(), steps.get(s).getPosition()))
+            if(!SceneAPI.isReachable(Static.invoke(local::getWorldLocation), steps.get(s).getPosition()))
             {
                 break;
             }
@@ -286,7 +286,7 @@ public class WalkerPath
         // Don't consider next step "blocked" if it has a transport (transport handles the transition)
         boolean nextBlocked = nextStep != null && !nextStep.hasTransport() && !SceneAPI.isReachable(step.getPosition(), nextStep.getPosition());
 
-        boolean atStepPos = local.getWorldLocation().equals(step.getPosition());
+        boolean atStepPos = Static.invoke(local::getWorldLocation).equals(step.getPosition());
         boolean isMoving = MovementAPI.isMoving();
 
         MovementAPI.walkToWorldPoint(step.getPosition());
@@ -299,7 +299,7 @@ public class WalkerPath
     {
         TileObjectEx object = new TileObjectQuery()
                 .withNamesContains("door", "gate", "curtain")
-                .keepIf(o -> (o.getWorldPoint().equals(local.getWorldLocation()) || o.getWorldPoint().equals(step.getPosition())))
+                .keepIf(o -> (o.getWorldPoint().equals(Static.invoke(local::getWorldLocation)) || o.getWorldPoint().equals(step.getPosition())))
                 .sortNearest()
                 .first();
 

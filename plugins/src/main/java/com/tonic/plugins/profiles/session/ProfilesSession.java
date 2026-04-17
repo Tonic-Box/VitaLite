@@ -147,7 +147,6 @@ public class ProfilesSession
             }
             client.setUsername("");
             client.setPassword("");
-            tClient.setAccountTypeJagex();
             tClient.setLoginIndex(10);
             tClient.setSessionId(profile.getSessionId());
             tClient.setCharacterId(profile.getCharacterId());
@@ -174,8 +173,6 @@ public class ProfilesSession
             tClient.setSessionId(null);
             tClient.setCharacterId(null);
             tClient.setDisplayName(null);
-
-            tClient.setAccountTypeLegacy();
 
             tClient.setLoginIndex(2);
 

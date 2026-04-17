@@ -21,6 +21,8 @@ public class MapEntry
     private List<String> obfuWrites;
     @Expose
     private List<String> args;
+    @Expose
+    private Integer subOpcode;
 
     @Override
     public String toString()
