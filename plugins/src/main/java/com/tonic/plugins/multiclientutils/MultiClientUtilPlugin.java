@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.Player;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.client.config.ConfigManager;
@@ -48,6 +49,9 @@ public class MultiClientUtilPlugin extends VitaPlugin
     private Channel channel;
     @Setter
     private volatile boolean extendedMenus = false;
+    // Cached local player name; captured at channel creation so DESPAWN can still
+    // identify the sender after the player has despawned (e.g. on logout).
+    private volatile String sender;
 
     @Override
     protected void startUp() throws Exception
@@ -133,11 +137,9 @@ public class MultiClientUtilPlugin extends VitaPlugin
         if(channel == null || !channel.isRunning())
             return;
 
-        Client client = Static.getClient();
-
         Map<String,Object> argMap = new HashMap<>();
         argMap.put("command", command);
-        argMap.put("sender", client.getLocalPlayer().getName());
+        argMap.put("sender", sender);
         for(int i = 0; i < args.length; i++)
         {
             argMap.put("arg" + i, args[i].toString());
@@ -149,13 +151,15 @@ public class MultiClientUtilPlugin extends VitaPlugin
     private Channel createChannel()
     {
         Client client = Static.getClient();
-        String name = client.getLocalPlayer().getName();
+        Player localPlayer = client.getLocalPlayer();
+        String name = localPlayer != null ? localPlayer.getName() : null;
         if(name == null || name.isEmpty())
         {
             Logger.error("Waiting...");
             return null;
         }
-        Channel channel = new ChannelBuilder(client.getLocalPlayer().getName())
+        this.sender = name;
+        Channel channel = new ChannelBuilder(name)
                 .port(13337)
                 .build();
 

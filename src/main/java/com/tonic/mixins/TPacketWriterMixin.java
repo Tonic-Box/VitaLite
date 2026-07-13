@@ -271,7 +271,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         args.put("identifier", identifier);
         args.put("worldX", worldX);
         args.put("worldY", worldY);
-        args.put("ctrl", ctrl ? 0 : 1);
+        args.put("ctrl", ctrl ? 1 : 0);
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }
 
@@ -285,7 +285,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         args.put("itemId", itemId);
         args.put("slot", slot);
         args.put("identifier", identifier);
-        args.put("ctrl", ctrl ? 0 : 1);
+        args.put("ctrl", ctrl ? 1 : 0);
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }
 
@@ -299,7 +299,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         args.put("itemId", itemId);
         args.put("slot", slot);
         args.put("identifier", identifier);
-        args.put("ctrl", ctrl ? 0 : 1);
+        args.put("ctrl", ctrl ? 1 : 0);
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }
 
@@ -309,7 +309,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     {
         MapEntry entry = PacketMapReader.get("OP_RESUME_STRINGDIALOG");
         Map<String,Object> args = new HashMap<>();
-        args.put("length", text.length());
+        args.put("length", text.length() + 1);
         args.put("var7", text);
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }
@@ -431,7 +431,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
         args.put("identifier", groundItemID);
         args.put("worldX", worldX);
         args.put("worldY", worldY);
-        args.put("ctrl", ctrl ? 0 : 1);
+        args.put("ctrl", ctrl ? 1 : 0);
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }
 

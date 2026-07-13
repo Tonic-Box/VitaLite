@@ -10,6 +10,8 @@ plugins {
 group = "com.tonic"
 version = rootProject.version
 
+val runeliteRef: String by rootProject.extra
+
 repositories {
     mavenCentral()
     maven {
@@ -95,9 +97,9 @@ tasks.register("syncRuneliteApi") {
         apiFilePatterns.forEach { (subdir, pattern) ->
             // build the API endpoint URL for this subdirectory
             val dirUrl = if (subdir.isEmpty()) {
-                "$apiBaseUrl?ref=master"
+                "$apiBaseUrl?ref=$runeliteRef"
             } else {
-                "$apiBaseUrl/$subdir?ref=master"
+                "$apiBaseUrl/$subdir?ref=$runeliteRef"
             }
 
             // fetch directory listing as JSON

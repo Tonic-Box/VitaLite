@@ -1,5 +1,6 @@
 package com.tonic.api.widgets;
 
+import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.api.game.GameAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.queries.InventoryQuery;
@@ -27,7 +28,10 @@ public class ShopAPI
      */
     public static void close()
     {
-        GameAPI.invokeMenuAction(1, 57, 11, InterfaceID.Shopmain.FRAME, -1);
+        if (isOpen())
+        {
+            ClientScriptAPI.runScript(29);
+        }
     }
 
     /**

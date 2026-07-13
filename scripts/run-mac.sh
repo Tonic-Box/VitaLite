@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration
-JDK_VERSION="11.0.19+7"
+JDK_VERSION="17.0.18+8"
 JDK_DIR="$HOME/.runelite/vitalite/jdk"
 JAR_NAME="VitaLite.jar"  # Change this to your jar name
 
@@ -21,7 +21,7 @@ if [ ! -f "$JDK_DIR/Contents/Home/bin/java" ]; then
     fi
     
     # Download JDK
-    JDK_URL="https://api.adoptium.net/v3/binary/version/jdk-11.0.19%2B7/mac/$ARCH_URL/jdk/hotspot/normal/eclipse"
+    JDK_URL="https://api.adoptium.net/v3/binary/version/jdk-17.0.18%2B8/mac/$ARCH_URL/jdk/hotspot/normal/eclipse"
     TEMP_FILE="$JDK_DIR/jdk-temp.tar.gz"
     
     echo "Downloading from: $JDK_URL"

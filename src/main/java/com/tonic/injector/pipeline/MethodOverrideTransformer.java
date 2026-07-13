@@ -22,6 +22,11 @@ public class MethodOverrideTransformer {
     public static void patch(ClassNode mixin, MethodNode method) {
         String name = AnnotationUtil.getAnnotation(method, MethodOverride.class, "value");
         MethodNode toReplace = TransformerUtil.getTargetMethod(mixin, name);
+        if (toReplace == null)
+        {
+            throw new IllegalStateException("Could not find method override target " + name
+                    + " for mixin " + mixin.name + " (replacement descriptor " + method.desc + ")");
+        }
 
         toReplace.instructions.clear();
         toReplace.tryCatchBlocks.clear();

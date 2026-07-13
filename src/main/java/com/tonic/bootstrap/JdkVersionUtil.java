@@ -17,7 +17,7 @@ public class JdkVersionUtil {
 
     private static final String JDK_URL = "https://raw.githubusercontent.com/runelite/launcher/master/.jdk-versions.sh";
     private static final Path JRE_PATH = Path.of(System.getProperty("user.home"), "AppData", "Local", "RuneLite", "jre");
-    private static final Path MAC_JRE_PATH = Path.of("Applications", "RuneLite.app", "Contents", "Resources", "jre");
+    private static final Path MAC_JRE_PATH = Path.of("/Applications", "RuneLite.app", "Contents", "Resources", "jre");
 
     public static String calculateJreVersion() {
         Path releaseFile = JRE_PATH.resolve("release");
@@ -42,13 +42,13 @@ public class JdkVersionUtil {
 
     @Getter
     public enum Platform {
-        WIN64("WIN64_VERSION"),
-        WIN32("WIN32_VERSION"),
-        WIN_AARCH64("WIN_AARCH64_VERSION"),
-        MAC_AMD64("MAC_AMD64_VERSION"),
-        MAC_AARCH64("MAC_AARCH64_VERSION"),
-        LINUX_AMD64("LINUX_AMD64_VERSION"),
-        LINUX_AARCH64("LINUX_AARCH64_VERSION");
+        WIN64("WIN64_RELEASE"),
+        WIN32("WIN32_RELEASE"),
+        WIN_AARCH64("WIN_AARCH64_RELEASE"),
+        MAC_AMD64("MAC_AMD64_RELEASE"),
+        MAC_AARCH64("MAC_AARCH64_RELEASE"),
+        LINUX_AMD64("LINUX_AMD64_RELEASE"),
+        LINUX_AARCH64("LINUX_AARCH64_RELEASE");
 
         private final String versionKey;
 
@@ -236,12 +236,16 @@ public class JdkVersionUtil {
                     continue;
                 }
 
-                // Look for VERSION= lines
-                if (line.contains("_VERSION=")) {
+                // Look for the platform release declarations.
+                if (line.contains("_RELEASE=")) {
                     String[] parts = line.split("=", 2);
                     if (parts.length == 2) {
                         String key = parts[0].trim();
                         String versionWithBuild = parts[1].trim();
+
+                        if (versionWithBuild.startsWith("jdk-")) {
+                            versionWithBuild = versionWithBuild.substring(4);
+                        }
 
                         // Remove the build number (everything after and including the '+')
                         int plusIndex = versionWithBuild.indexOf('+');

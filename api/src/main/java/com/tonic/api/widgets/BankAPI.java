@@ -62,6 +62,11 @@ public class BankAPI
      */
     public static void setX(int amount)
     {
+        if(amount == 1 || amount == 5 || amount == 10 || amount == -1)
+        {
+            return;
+        }
+
         System.out.println(VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE));
         int withdrawMode = VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE);
         if(withdrawMode != 3)
@@ -361,19 +366,19 @@ public class BankAPI
     public static void withdrawAction(int id, int amount, int slot) {
         setX(amount);
         if(amount == 1) {
-            WidgetAPI.interact(1, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(2, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else if(amount == 5) {
-            WidgetAPI.interact(3, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(3, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else if(amount == 10) {
-            WidgetAPI.interact(4, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(4, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else if(amount == -1) {
-            WidgetAPI.interact(7, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(7, InterfaceID.Bankmain.ITEMS, slot, id);
         }
         else {
-            WidgetAPI.interact(5, InterfaceID.Bankmain.TABS_LINE0, slot, id);
+            WidgetAPI.interact(5, InterfaceID.Bankmain.ITEMS, slot, id);
         }
     }
 
@@ -386,7 +391,7 @@ public class BankAPI
     public static void depositAction(int id, int amount, int slot) {
         setX(amount);
         if(amount == 1) {
-            WidgetAPI.interact(2, InterfaceID.Bankside.ITEMS, slot, id);
+            WidgetAPI.interact(3, InterfaceID.Bankside.ITEMS, slot, id);
         }
         else if(amount == 5) {
             WidgetAPI.interact(4, InterfaceID.Bankside.ITEMS, slot, id);

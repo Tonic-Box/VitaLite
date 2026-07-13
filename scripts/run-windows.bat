@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 :: Configuration
-set "JDK_VERSION=11.0.19+7"
+set "JDK_VERSION=11.0.30+7"
 set "JDK_DIR=%USERPROFILE%\.runelite\vitalite\jdk"
 set "JAR_NAME=VitaLite.jar"
 
@@ -12,7 +12,7 @@ if not exist "%JDK_DIR%\bin\java.exe" (
     echo JDK not found. Downloading JDK %JDK_VERSION%...
     
     :: Download using PowerShell
-    powershell -Command "$ProgressPreference = 'SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (New-Object Net.WebClient).DownloadFile('https://api.adoptium.net/v3/binary/version/jdk-11.0.19+7/windows/x64/jdk/hotspot/normal/eclipse', '%JDK_DIR%\jdk-temp.zip')"
+    powershell -Command "$ProgressPreference = 'SilentlyContinue'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; (New-Object Net.WebClient).DownloadFile('https://api.adoptium.net/v3/binary/version/jdk-11.0.30+7/windows/x64/jdk/hotspot/normal/eclipse', '%JDK_DIR%\jdk-temp.zip')"
     
     if not exist "%JDK_DIR%\jdk-temp.zip" (
         echo Download failed!

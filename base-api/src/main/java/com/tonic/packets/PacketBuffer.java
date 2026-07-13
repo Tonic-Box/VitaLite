@@ -27,6 +27,7 @@ public class PacketBuffer {
         this.payload = ByteBufferPool.allocate(payload.length);
         this.payload.writeBytes(payload);
         this.offset = 0;
+        this.trueLength = payload.length;
     }
 
     public TPacketBufferNode toPacketBufferNode(TClient client)
@@ -346,15 +347,18 @@ public class PacketBuffer {
     }
 
     public String readCESU8() {
-        byte lengthPrefix = payload.getByte(offset);
-        if (lengthPrefix != 0) {
+        if (readByte() != 0) {
             return null;
         }
         int encodedLength = readVarInt();
         if (encodedLength + offset > payload.capacity()) {
             return null;
         }
-        String decodedString = TextUtil.decodeUtf8(payload.array(), offset, encodedLength);
+        byte[] encoded = new byte[encodedLength];
+        for (int i = 0; i < encodedLength; i++) {
+            encoded[i] = payload.getByte(offset + i);
+        }
+        String decodedString = TextUtil.decodeUtf8(encoded, 0, encodedLength);
         offset += encodedLength;
         return decodedString;
     }
@@ -390,10 +394,20 @@ public class PacketBuffer {
     }
 
     public String readStringCp1252NullCircumfixed() {
-        int startPosition = offset;
-        while (payload.getByte(++offset) != 0);
-        int length = offset - startPosition - 1;
-        return length == 0 ? "" : TextUtil.decodeStringCp1252(payload.array(), startPosition, length);
+        if (payload.getByte(offset++) != 0) {
+            throw new IllegalStateException("Missing circumfix prefix");
+        }
+        int start = offset;
+        while (payload.getByte(offset++) != 0);
+        int length = offset - start - 1;
+        if (length == 0) {
+            return "";
+        }
+        byte[] stringBytes = new byte[length];
+        for (int i = 0; i < length; i++) {
+            stringBytes[i] = payload.getByte(start + i);
+        }
+        return TextUtil.decodeStringCp1252(stringBytes, 0, length);
     }
 
     public void writeByte(int value) {
@@ -576,12 +590,11 @@ public class PacketBuffer {
             }
         }
 
-        payload.setByte(offset++, 0);
+        byte[] encoded = new byte[var4];
+        int encodedLength = TextUtil.encodeUtf8(encoded, 0, var1);
+        writeByte(0);
         writeVarInt(var4);
-        trueLength += 4;
-        int temp = TextUtil.encodeUtf8(payload.array(), offset, var1);
-        offset += temp;
-        trueLength += temp;
+        writeBytes(encoded, 0, encodedLength);
     }
 
     public void writeStringCp1252NullTerminated(String var)
@@ -590,10 +603,10 @@ public class PacketBuffer {
         if(var2 >= 0) {
             return;
         } else {
-            int temp = TextUtil.encodeStringCp1252(var, 0, var.length(), payload.array(), offset);
-            offset += temp;
-            trueLength += temp;
-            payload.setByte(offset++, 0);
+            byte[] encoded = new byte[var.length()];
+            int encodedLength = TextUtil.encodeStringCp1252(var, 0, var.length(), encoded, 0);
+            writeBytes(encoded, 0, encodedLength);
+            writeByte(0);
         }
     }
 
@@ -603,17 +616,18 @@ public class PacketBuffer {
         if(var2 >= 0) {
             return;
         } else {
-            payload.setByte(offset++, 0);
-            offset += TextUtil.encodeStringCp1252(var, 0, var.length(), payload.array(), offset);
-            payload.setByte(offset++, 0);
-            trueLength += var.length();
+            byte[] encoded = new byte[var.length()];
+            int encodedLength = TextUtil.encodeStringCp1252(var, 0, var.length(), encoded, 0);
+            writeByte(0);
+            writeBytes(encoded, 0, encodedLength);
+            writeByte(0);
         }
     }
 
     @Override
     public String toString() {
         StringBuilder hex = new StringBuilder(trueLength * 2);
-        for(int i = 0; i < trueLength; i += 2)
+        for(int i = 0; i < trueLength; i++)
             hex.append(String.format("%02x", payload.getByte(i)));
         return hex.toString().toUpperCase();
     }

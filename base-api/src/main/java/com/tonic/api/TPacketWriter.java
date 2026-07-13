@@ -118,8 +118,7 @@ public interface TPacketWriter
     void walkPacket(int x, int y, boolean ctrl);
 
     /**
-     * Sends a minimap walk packet. This uses the multiplexed OP_MINIMAP_WALK
-     * sub-opcode on the same opcode as OP_RESUME_STRINGDIALOG.
+     * Sends a minimap walk packet.
      *
      * @param worldX the world X coordinate
      * @param worldY the world Y coordinate

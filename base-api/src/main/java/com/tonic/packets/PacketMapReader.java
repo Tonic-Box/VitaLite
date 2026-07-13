@@ -90,52 +90,64 @@ public class PacketMapReader
             return "[UNKNOWN(" + buffer.getPacketId() + ")] " + buffer;
         }
 
-        MapEntry entry = resolveEntry(entries, buffer);
-        if(entry.getName().equals("OP_MOUSE_MOVEMENT"))
-            return "[UNKNOWN(" + buffer.getPacketId() + ")] " + buffer;
-
-        StringBuilder out = new StringBuilder("[" + entry.getName() + "(" + entry.getPacket().getId() + ")] ");
-        long num;
-        String name;
-        for(int i = 0; i < entry.getReads().size(); i++)
+        MapEntry entry = null;
+        try
         {
-            if(isParsableAsNumber(entry.getArgs().get(i)))
+            entry = resolveEntry(entries, buffer);
+            if(entry.getName().equals("OP_MOUSE_MOVEMENT"))
+                return "[UNKNOWN(" + buffer.getPacketId() + ")] " + buffer;
+
+            StringBuilder out = new StringBuilder("[" + entry.getName() + "(" + entry.getPacket().getId() + ")] ");
+            long num;
+            String name;
+            for(int i = 0; i < entry.getReads().size(); i++)
             {
-                doRead(buffer, entry.getReads().get(i));
-            }
-            else
-            {
-                num = doRead(buffer, entry.getReads().get(i));
-                if(num == 65535)
+                if(isParsableAsNumber(entry.getArgs().get(i)))
                 {
-                    num = -1;
+                    doRead(buffer, entry.getReads().get(i));
                 }
-                if(Static.getVitaConfig().shouldLogNames())
+                else
                 {
-                    if(entry.getArgs().get(i).toLowerCase().contains("widgetid"))
+                    num = doRead(buffer, entry.getReads().get(i));
+                    if(num == 65535)
                     {
-                        name = StaticIntFinder.find(InterfaceID.class, (int) num);
-                        out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
-                        continue;
+                        num = -1;
                     }
-                    if(entry.getArgs().get(i).toLowerCase().contains("itemid"))
+                    if(Static.getVitaConfig().shouldLogNames())
                     {
-                        name = StaticIntFinder.find(ItemID.class, (int) num);
-                        out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
-                        continue;
+                        if(entry.getArgs().get(i).toLowerCase().contains("widgetid"))
+                        {
+                            name = StaticIntFinder.find(InterfaceID.class, (int) num);
+                            out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
+                            continue;
+                        }
+                        if(entry.getArgs().get(i).toLowerCase().contains("itemid"))
+                        {
+                            name = StaticIntFinder.find(ItemID.class, (int) num);
+                            out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
+                            continue;
+                        }
+                        if((entry.getName().startsWith("OP_GAME_OBJECT_ACTION_") || entry.getName().equals("OP_WIDGET_TARGET_ON_GAME_OBJECT")) && entry.getArgs().get(i).equals("identifier"))
+                        {
+                            name = StaticIntFinder.find(ObjectID.class, (int) num);
+                            out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
+                            continue;
+                        }
                     }
-                    if((entry.getName().startsWith("OP_GAME_OBJECT_ACTION_") || entry.getName().equals("OP_WIDGET_TARGET_ON_GAME_OBJECT")) && entry.getArgs().get(i).equals("identifier"))
-                    {
-                        name = StaticIntFinder.find(ObjectID.class, (int) num);
-                        out.append(entry.getArgs().get(i)).append("=").append(name).append(", ");
-                        continue;
-                    }
+                    out.append(entry.getArgs().get(i)).append("=").append(num).append(", ");
                 }
-                out.append(entry.getArgs().get(i)).append("=").append(num).append(", ");
             }
+            return out.toString();
         }
-        buffer.setOffset(0);
-        return out.toString();
+        catch(IndexOutOfBoundsException e)
+        {
+            String name = entry == null ? "UNKNOWN" : entry.getName();
+            return "[MAPPING_MISMATCH(" + name + ", " + buffer.getPacketId() + ")] " + buffer;
+        }
+        finally
+        {
+            buffer.setOffset(0);
+        }
     }
 
     /**
