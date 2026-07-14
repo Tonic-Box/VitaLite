@@ -212,6 +212,10 @@ val runeliteVersions by lazy { getRuneLiteArtifacts() }
 dependencies {
     compileOnly("net.runelite:runelite-api:$runeliteVersion")
 
+    testImplementation(platform("org.junit:junit-bom:5.9.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("net.runelite:injected-client:$runeliteVersion") { isTransitive = false }
+
     compileOnly("org.projectlombok:lombok:1.18.24")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
     compileOnly("org.jetbrains:annotations:24.1.0")

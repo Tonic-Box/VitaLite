@@ -26064,6 +26064,7 @@
         "isStatic": false
       },
       {
+        "name": "callStackCheck",
         "obfuscatedName": "qa",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -110917,13 +110918,6 @@
         "ownerObfuscatedName": "pk",
         "descriptor": "(I)V",
         "isStatic": false
-      },
-      {
-        "name": "callStackCheck",
-        "obfuscatedName": "ag",
-        "ownerObfuscatedName": "pk",
-        "descriptor": "(J)Ljava/lang/String;",
-        "isStatic": true
       },
       {
         "obfuscatedName": "ay",
