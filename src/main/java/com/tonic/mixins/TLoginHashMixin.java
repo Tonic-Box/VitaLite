@@ -32,8 +32,8 @@ public class TLoginHashMixin
 
     @MethodOverride("callStackCheck")
     public static String callStackCheck(long l) {
-        return "client16718zx\n" +
-                "client6303dh\n" +
+        return "client16718ba\n" +
+                "client6303xf\n" +
                 "nrc.RuneLite302start\n" +
                 "nrc.RuneLite279main\n" +
                 "nrl.ReflectionLa+64lambda$launc+\n" +
