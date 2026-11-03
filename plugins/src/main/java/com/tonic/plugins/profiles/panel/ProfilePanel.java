@@ -77,6 +77,11 @@ public class ProfilePanel extends JPanel {
         if (profile == null)
             return;
 
-        profilesSession.login(profile, false);
+        new SwingWorker<Boolean, Void>() {
+            @Override
+            protected Boolean doInBackground() {
+                return profilesSession.login(profile, false);
+            }
+        }.execute();
     }
 }

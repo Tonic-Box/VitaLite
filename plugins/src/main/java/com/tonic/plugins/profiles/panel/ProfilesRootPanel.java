@@ -1,9 +1,11 @@
 package com.tonic.plugins.profiles.panel;
 
+import com.tonic.plugins.profiles.data.JagexAccount;
+import com.tonic.plugins.profiles.data.JagexAccountCharacter;
 import com.tonic.plugins.profiles.data.Profile;
-import com.tonic.plugins.profiles.jagex.JagexAccountService;
-import com.tonic.plugins.profiles.jagex.model.JagCharacter;
-import com.tonic.plugins.profiles.jagex.model.JagLoginToken;
+import com.tonic.plugins.profiles.jagex.JagexAccounts;
+import com.tonic.plugins.profiles.jagex.JagexAuthClient;
+import com.tonic.plugins.profiles.jagex.JagexLoginException;
 import com.tonic.plugins.profiles.session.ProfilesSession;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.PluginPanel;
@@ -14,34 +16,34 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 public class ProfilesRootPanel extends PluginPanel {
 
     private final JPanel profilesPanel;
+    private final JLabel unreadableBanner;
 
     private final ProfilesSession profiles;
-    private final Set<ProfilePanel> profilePanelSet;
+    private final JagexAccounts jagexAccounts;
+    private final List<JagexAccountCard> jagexCards = new ArrayList<>();
+    private final List<ProfilePanel> legacyPanels = new ArrayList<>();
+    private AddJagexAccountPanel addJagexAccountPanel;
     private JTextField searchField;
 
 
     public ProfilesRootPanel(ProfilesSession profiles) {
         this.profiles = profiles;
-        this.profilePanelSet = new HashSet<>();
+        this.jagexAccounts = new JagexAccounts(profiles, new JagexAuthClient());
         this.profilesPanel = new JPanel();
+        this.unreadableBanner = new JLabel();
 
         this.initialize();
 
         this.profiles.loadProfilesFromFile();
-        loadProfilesList(this.profiles.getProfiles());
+        loadProfilesList();
     }
 
     private void initialize() {
@@ -59,7 +61,7 @@ public class ProfilesRootPanel extends PluginPanel {
         this.add(addProxyPanel, gbc);
 
         gbc.gridy++;
-        AddJagexAccountPanel addJagexAccountPanel = createJagexAccountPanel();
+        addJagexAccountPanel = createJagexAccountPanel();
         this.add(addJagexAccountPanel, gbc);
 
         gbc.gridy++;
@@ -75,21 +77,27 @@ public class ProfilesRootPanel extends PluginPanel {
         this.add(profilesHeader, gbc);
 
         gbc.gridy++;
+        unreadableBanner.setForeground(new Color(255, 120, 120));
+        unreadableBanner.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        unreadableBanner.setVisible(false);
+        this.add(unreadableBanner, gbc);
+
+        gbc.gridy++;
         searchField = new JTextField();
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                updateProfilesList(searchField.getText());
+                showFilteredList();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                updateProfilesList(searchField.getText());
+                showFilteredList();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                updateProfilesList(searchField.getText());
+                showFilteredList();
             }
         });
         this.add(searchField, gbc);
@@ -105,237 +113,103 @@ public class ProfilesRootPanel extends PluginPanel {
         this.repaint();
     }
 
-    private void updateProfilesList(String query) {
-        List<ProfilePanel> filteredList = profilePanelSet.stream()
-                .filter(panel -> {
-                    if (query.isEmpty()) {
-                        return true;
-                    } else {
-                        return panel.getProfile().getIdentifier().toLowerCase().contains(query.toLowerCase());
-                    }
-                })
-                .sorted((p1, p2) -> p1.getProfile().getIdentifier().compareToIgnoreCase(p2.getProfile().getIdentifier()))
-                .collect(Collectors.toList());
-        refreshPanelList(filteredList);
-    }
-
-    private void refreshPanelList(List<ProfilePanel> panels) {
-        profilesPanel.removeAll();
-        for (ProfilePanel panel : panels) {
-            profilesPanel.add(panel);
-        }
-        profilesPanel.revalidate();
-        profilesPanel.repaint();
-    }
-
-    private void onTokenReceived(JagLoginToken token, JagexAccountService service) {
-        if (token == null)
-            return;
-
-        //acc has 0 characters
-        if (token.getCharacters().length == 0) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "This jag account has 0 characters, idk how to handle this, stopping process.",
-                    "Error with Logging in",
-                    JOptionPane.ERROR_MESSAGE
-            );
-            return;
-        }
-
-        SelectCharacterPanel characterSelectPanel = new SelectCharacterPanel(Arrays.asList(token.getCharacters()));
-
-        profiles.loadProfilesFromFile();
-
-        int selectCharacterReponse = JOptionPane.showOptionDialog(null,
-                characterSelectPanel,
-                "Select characters",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                null,
-                null);
-
-        if (selectCharacterReponse != JOptionPane.YES_OPTION) {
-            return;
-        }
-
-        List<JagCharacter> characters = new ArrayList<>(characterSelectPanel.getSelectedCharacters().values());
-
-        while (!characters.isEmpty()) {
-            JagCharacter jagCharacter = characters.get(0);
-            JPanel panel = new JPanel(new GridBagLayout());
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.insets = new Insets(5, 5, 5, 5);
-
-
-            JLabel nameLabel = new JLabel("Identifier:");
-            JLabel bankPinLabel = new JLabel("Bank Pin:");
-            JTextField nameField = new JTextField(32);
-            JTextField bankPin = new JTextField(4);
-
-            JLabel label = new JLabel("Type an identifier and bank pin for this account: " + jagCharacter.getDisplayName() + ", optionally leave pin empty");
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            gbc.anchor = GridBagConstraints.NORTH;
-            panel.add(label, gbc);
-
-            gbc.gridx = 0;
-            gbc.gridy = 1;
-            gbc.anchor = GridBagConstraints.EAST;
-            panel.add(nameLabel, gbc);
-
-            gbc.gridx = 1;
-            gbc.anchor = GridBagConstraints.WEST;
-            panel.add(nameField, gbc);
-
-            gbc.gridx = 0;
-            gbc.gridy = 2;
-            gbc.anchor = GridBagConstraints.EAST;
-            panel.add(bankPinLabel, gbc);
-
-            gbc.gridx = 1;
-            gbc.anchor = GridBagConstraints.WEST;
-            panel.add(bankPin, gbc);
-
-
-            bankPin.setColumns(4);
-            int response = JOptionPane.showConfirmDialog(
-                    null,
-                    panel
-            );
-            if (response == JOptionPane.YES_OPTION)
-            {
-
-                if (nameField.getText().isEmpty()) {
-                    characters.remove(0);
-                    continue;
-                }
-
-                if (profiles.getProfiles().stream().anyMatch(p -> p.getIdentifier().equals(nameField.getText()))) {
-                    characters.remove(0);
-                    continue;
-                }
-
-                String bankPinText = "";
-
-                if (!bankPin.getText().isEmpty() && StringUtils.isNumeric(bankPin.getText())) {
-                    bankPinText = bankPin.getText();
-                }
-
-                String displayName = nameField.getText();
-
-                if (jagCharacter.getDisplayName() != null && !jagCharacter.getDisplayName().isEmpty()) {
-                    displayName = jagCharacter.getDisplayName();
-                }
-
-                Profile profile = new Profile(nameField.getText(), true,
-                        "", "",
-                        displayName, token.getSessionId(),
-                        jagCharacter.getAccountId(), bankPinText);
-
-                profiles.getProfiles().add(profile);
-                characters.remove(0);
-            }
-        }
-
-        profiles.saveProfilesToFile();
-        loadProfilesList(profiles.getProfiles());
-        service.shutdownServer();
-    }
-
     private AddJagexAccountPanel createJagexAccountPanel() {
-        AddJagexAccountPanel addJagexAccountPanel = new AddJagexAccountPanel();
-        addJagexAccountPanel.addJagexAccountActionListener((event) -> {
-
-            new Thread(() -> {
-                try {
-                    JagexAccountService auth = new JagexAccountService();
-                    auth.startServer();
-                    CompletableFuture<JagLoginToken> loginToken = auth.requestLoginToken();
-                    onTokenReceived(loginToken.get(2, TimeUnit.MINUTES), auth);
-                } catch (Exception e) {
-//                    e.printStackTrace();
-                }
-            }).start();
-        });
-
-        addJagexAccountPanel.addImportJagexAccountActionListener((event) -> {
-            importJagexAccountDialog();
-        });
-        return addJagexAccountPanel;
+        AddJagexAccountPanel panel = new AddJagexAccountPanel();
+        panel.addJagexAccountActionListener(event -> addJagexAccount());
+        panel.addImportJagexAccountActionListener(event -> importJagexSession());
+        return panel;
     }
 
-    private void importJagexAccountDialog() {
-        JTextField identifierField = new JTextField(32);
-        JTextField accountIdField = new JTextField(32);
-        JTextField sessionIdField = new JTextField(32);
-        JTextField displayNameField = new JTextField(32);
-        JTextField bankPinField = new JTextField(4);
+    private void addJagexAccount() {
+        String label = askNewName("Name this Jagex account (e.g. Main):", "Add Jagex Account");
+        if (label == null) {
+            return;
+        }
+
+        addJagexAccountPanel.setBusy(true);
+        JagexSignInDialog.run(this, "Add Jagex Account: " + label, idToken -> jagexAccounts.add(label, idToken),
+                account -> {
+                    addJagexAccountPanel.setBusy(false);
+                    loadProfilesList();
+                },
+                failure -> {
+                    addJagexAccountPanel.setBusy(false);
+                    boolean cancelled = failure instanceof JagexLoginException && ((JagexLoginException) failure).getKind() == JagexLoginException.Kind.CANCELLED;
+                    if (!cancelled) {
+                        showError("Couldn't add the Jagex account", failure.getMessage());
+                    }
+                });
+    }
+
+    private void importJagexSession() {
+        JTextField labelField = new JTextField(24);
+        JTextField sessionIdField = new JTextField(24);
 
         JPanel panel = new JPanel(new GridLayout(0, 1));
-        panel.add(new JLabel("Identifier (Nickname):"));
-        panel.add(identifierField);
-        panel.add(new JLabel("Account ID (Character ID):"));
-        panel.add(accountIdField);
+        panel.add(new JLabel("Label (e.g. Main):"));
+        panel.add(labelField);
         panel.add(new JLabel("Session ID:"));
         panel.add(sessionIdField);
-        panel.add(new JLabel("Display Name (Character Name):"));
-        panel.add(displayNameField);
-        panel.add(new JLabel("Bank PIN (Optional):"));
-        panel.add(bankPinField);
 
-        int result = JOptionPane.showConfirmDialog(
-                null,
-                panel,
-                "Import Jagex Account",
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE
-        );
-
-        if (result == JOptionPane.OK_OPTION) {
-            String identifier = identifierField.getText().trim();
-            String accountId = accountIdField.getText().trim();
-            String sessionId = sessionIdField.getText().trim();
-            String displayName = displayNameField.getText().trim();
-            String bankPin = bankPinField.getText().trim();
-
-            if (identifier.isEmpty() || accountId.isEmpty() || sessionId.isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Identifier, Account ID, and Session ID are required.", "Error", JOptionPane.ERROR_MESSAGE);
+        String label;
+        String sessionId;
+        while (true) {
+            int result = JOptionPane.showConfirmDialog(this, panel, "Import Jagex Session", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+            if (result != JOptionPane.OK_OPTION) {
                 return;
             }
+            label = labelField.getText().trim();
+            sessionId = sessionIdField.getText().trim();
+            if (sessionId.isEmpty()) {
+                showError("Couldn't import the session", "Enter the session id.");
+                continue;
+            }
+            try {
+                profiles.checkNewName(label);
+                break;
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                showError("Couldn't import the session", e.getMessage());
+            }
+        }
 
-            profiles.loadProfilesFromFile();
-
-            boolean alreadyExists = profiles.getProfiles().stream()
-                    .anyMatch(p -> p != null && p.getIdentifier().equals(identifier));
-
-            if (alreadyExists) {
-                JOptionPane.showMessageDialog(null, "A profile with that identifier already exists.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
+        String importLabel = label;
+        String importSessionId = sessionId;
+        addJagexAccountPanel.setBusy(true);
+        new SwingWorker<JagexAccount, Void>() {
+            @Override
+            protected JagexAccount doInBackground() throws Exception {
+                return jagexAccounts.importSession(importLabel, importSessionId);
             }
 
-            if (!bankPin.isEmpty() && !bankPin.matches("\\d{4}")) {
-                JOptionPane.showMessageDialog(null, "Bank PIN must be 4 digits.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
+            @Override
+            protected void done() {
+                addJagexAccountPanel.setBusy(false);
+                try {
+                    get();
+                    loadProfilesList();
+                } catch (InterruptedException | ExecutionException e) {
+                    Throwable cause = e instanceof ExecutionException && e.getCause() != null ? e.getCause() : e;
+                    showError("Couldn't import the session", cause.getMessage());
+                }
             }
+        }.execute();
+    }
 
-            Profile profile = new Profile(
-                    identifier,
-                    true,
-                    "",
-                    "",
-                    displayName,
-                    sessionId,
-                    accountId,
-                    bankPin
-            );
-
-            profiles.getProfiles().add(profile);
-            profiles.saveProfilesToFile();
-            loadProfilesList(profiles.getProfiles());
-
-            JOptionPane.showMessageDialog(null, "Jagex account added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+    private String askNewName(String prompt, String title) {
+        String initial = "";
+        while (true) {
+            Object answer = JOptionPane.showInputDialog(this, prompt, title, JOptionPane.PLAIN_MESSAGE, null, null, initial);
+            if (answer == null) {
+                return null;
+            }
+            String name = answer.toString().trim();
+            try {
+                profiles.checkNewName(name);
+                return name;
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                showError(title, e.getMessage());
+                initial = name;
+            }
         }
     }
 
@@ -343,18 +217,12 @@ public class ProfilesRootPanel extends PluginPanel {
         AddLegacyAccountPanel addProxyPanel = new AddLegacyAccountPanel();
 
         addProxyPanel.addRsAccountActionListener((event) -> {
-            profiles.loadProfilesFromFile();
-
-            if (!profiles.getProfiles().isEmpty() && profiles.getProfiles().stream().anyMatch(p -> p != null && p.getIdentifier().equals(addProxyPanel.getIdentifierField().getText()))) {
-                return;
-            }
-
             String bankPin = "";
             if (StringUtils.isNumeric(addProxyPanel.getBankPin())) {
                 bankPin = addProxyPanel.getBankPin();
             }
 
-            Profile profile = new Profile(addProxyPanel.getIdentifierField().getText(),
+            Profile profile = new Profile(addProxyPanel.getIdentifierField().getText().trim(),
                     false,
                     addProxyPanel.getUsername(),
                     addProxyPanel.getPassword(),
@@ -363,25 +231,35 @@ public class ProfilesRootPanel extends PluginPanel {
                     "",
                     bankPin);
 
-
-            profiles.getProfiles().add(profile);
-            profiles.saveProfilesToFile();
-            loadProfilesList(profiles.getProfiles());
+            try {
+                profiles.addLegacy(profile);
+            } catch (Exception e) {
+                showError("Couldn't add the account", e.getMessage());
+                return;
+            }
+            loadProfilesList();
         });
         return addProxyPanel;
     }
 
-    private void loadProfilesList(Set<Profile> profiles) {
-        List<Profile> profileList = new ArrayList<>(profiles);
-        profileList.sort(Comparator.comparing(Profile::getIdentifier));
-        profilesPanel.removeAll();
-        profilePanelSet.clear();
-
-        if (profileList.isEmpty()) {
-            return;
+    private void loadProfilesList() {
+        unreadableBanner.setVisible(profiles.isUnreadable());
+        if (profiles.isUnreadable()) {
+            unreadableBanner.setText("<html><body style='width:180px'>Profiles can't be loaded, so nothing is shown or saved. "
+                    + escape(profiles.getLoadError()) + "</body></html>");
         }
 
-        for (Profile profile : profileList) {
+        jagexCards.clear();
+        List<JagexAccount> accounts = profiles.getJagexAccounts();
+        accounts.sort(Comparator.comparing(JagexAccount::getLabel, String.CASE_INSENSITIVE_ORDER));
+        for (JagexAccount account : accounts) {
+            jagexCards.add(new JagexAccountCard(account, profiles, jagexAccounts, this::loadProfilesList));
+        }
+
+        legacyPanels.clear();
+        List<Profile> legacyProfiles = profiles.getLegacyProfiles();
+        legacyProfiles.sort(Comparator.comparing(Profile::getIdentifier, String.CASE_INSENSITIVE_ORDER));
+        for (Profile profile : legacyProfiles) {
             ProfilePanel panel = new ProfilePanel(profile);
             panel.getDeleteButton().addActionListener(e -> {
                 int result = JOptionPane.showConfirmDialog(null, "Do you want to delete " + profile.getIdentifier() + "?", "Remove account", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null);
@@ -390,57 +268,29 @@ public class ProfilesRootPanel extends PluginPanel {
                     removeProfile(profile);
                 }
             });
+            panel.getEditButton().addActionListener(e -> editLegacyProfile(profile));
+            legacyPanels.add(panel);
+        }
 
+        showFilteredList();
+    }
 
-            if (profile.isJagexAccount()) {
-                panel.getEditButton().addActionListener(e -> {
-                    JTextField tag = new JTextField("Profile Tag");
-                    JTextField bankPin = new JTextField(4);
-                    JPanel editPanel = new JPanel(new GridLayout(2,1));
-                    editPanel.add(tag);
-                    editPanel.add(bankPin);
+    private void showFilteredList() {
+        String query = searchField == null ? "" : searchField.getText().trim().toLowerCase();
+        profilesPanel.removeAll();
 
-                    int result = JOptionPane.showConfirmDialog(null, editPanel, "Editing: " + profile.getIdentifier(),
-                            JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null);
-
-                    if (result == JOptionPane.YES_OPTION) {
-                        if (!bankPin.getText().isEmpty() && (!StringUtils.isNumeric(bankPin.getText()) || bankPin.getText().length() != 4)) {
-                            JOptionPane.showMessageDialog(null, "Invalid bank pin");
-                            return;
-                        }
-
-                        if (tag.getText().isEmpty()) {
-                            JOptionPane.showMessageDialog(null, "Invalid profile tag");
-                            return;
-                        }
-
-                        editProfile(profile, tag.getText(), bankPin.getText());
-                    }
-                });
-            } else {
-                panel.getEditButton().addActionListener(e -> {
-                    JTextField tag = new JTextField("Profile Tag");
-                    JTextField username = new JTextField("username");
-                    JPasswordField password = new JPasswordField();
-                    JTextField bankPin = new JTextField(4);
-                    JPanel editPanel = createEditPanel(tag, username, password, bankPin);
-
-                    int result = JOptionPane.showConfirmDialog(null,
-                            editPanel, "Editing: " + profile.getIdentifier(),
-                            JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null);
-
-                    if (result == JOptionPane.YES_OPTION) {
-                        if (!bankPin.getText().isEmpty() && (!StringUtils.isNumeric(bankPin.getText()) || bankPin.getText().length() != 4)) {
-                            JOptionPane.showMessageDialog(null, "Invalid bank pin");
-                            return;
-                        }
-                        editProfile(profile, tag.getText(), username.getText(), new String(password.getPassword()), bankPin.getText());
-                    }
-                });
+        for (JagexAccountCard card : jagexCards) {
+            if (matches(card.getAccount(), query)) {
+                profilesPanel.add(card);
+                profilesPanel.add(Box.createRigidArea(new Dimension(0, 4)));
             }
-            profilesPanel.add(panel);
-            profilesPanel.add(Box.createRigidArea(new Dimension(0, 4)));
-            profilePanelSet.add(panel);
+        }
+
+        for (ProfilePanel panel : legacyPanels) {
+            if (query.isEmpty() || panel.getProfile().getIdentifier().toLowerCase().contains(query)) {
+                profilesPanel.add(panel);
+                profilesPanel.add(Box.createRigidArea(new Dimension(0, 4)));
+            }
         }
 
         profilesPanel.revalidate();
@@ -449,38 +299,77 @@ public class ProfilesRootPanel extends PluginPanel {
         repaint();
     }
 
+    private static boolean matches(JagexAccount account, String query) {
+        if (query.isEmpty() || account.getLabel().toLowerCase().contains(query)) {
+            return true;
+        }
+        for (JagexAccountCharacter character : account.getCharacters()) {
+            if (character.shownName().toLowerCase().contains(query)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void editLegacyProfile(Profile profile) {
+        JTextField tag = new JTextField(profile.getIdentifier());
+        JTextField username = new JTextField(profile.getUsername());
+        JPasswordField password = new JPasswordField(profile.getPassword());
+        JTextField bankPin = new JTextField(profile.getBankPin(), 4);
+        JPanel editPanel = createEditPanel(tag, username, password, bankPin);
+
+        while (true) {
+            int result = JOptionPane.showConfirmDialog(null,
+                    editPanel, "Editing: " + profile.getIdentifier(),
+                    JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null);
+
+            if (result != JOptionPane.YES_OPTION) {
+                return;
+            }
+            if (!bankPin.getText().isEmpty() && (!StringUtils.isNumeric(bankPin.getText()) || bankPin.getText().length() != 4)) {
+                JOptionPane.showMessageDialog(null, "Invalid bank pin");
+                continue;
+            }
+
+            Profile updated = new Profile(tag.getText().trim(), false, username.getText(), new String(password.getPassword()),
+                    username.getText(), "", "", bankPin.getText());
+            try {
+                profiles.updateLegacy(profile.getIdentifier(), updated);
+            } catch (IllegalArgumentException e) {
+                showError("Couldn't save", e.getMessage());
+                continue;
+            } catch (Exception e) {
+                showError("Couldn't save", e.getMessage());
+                return;
+            }
+            loadProfilesList();
+            return;
+        }
+    }
+
     private void removeProfile(Profile profile) {
-        profiles.getProfiles().remove(profile);
-        profiles.saveProfilesToFile();
-        loadProfilesList(profiles.getProfiles());
+        try {
+            profiles.removeLegacy(profile.getIdentifier());
+        } catch (Exception e) {
+            showError("Couldn't delete", e.getMessage());
+            return;
+        }
+        loadProfilesList();
     }
 
-    private void editProfile(Profile profile, String tag, String bankPin) {
-        profiles.getProfiles().remove(profile);
-        profile.setIdentifier(tag);
-        profile.setBankPin(bankPin);
-        profiles.getProfiles().add(profile);
-        profiles.saveProfilesToFile();
-        loadProfilesList(profiles.getProfiles());
+    private void showError(String title, String message) {
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
     }
 
-    private void editProfile(Profile profile, String tag, String user, String pass, String pin) {
-        profiles.getProfiles().remove(profile);
-        profile.setIdentifier(tag);
-        profile.setUsername(user);
-        profile.setCharacterName(user);
-        profile.setPassword(pass);
-        profile.setBankPin(pin);
-        profiles.getProfiles().add(profile);
-        profiles.saveProfilesToFile();
-        loadProfilesList(profiles.getProfiles());
+    private static String escape(String text) {
+        return text == null ? "" : text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     private JPanel createEditPanel(JTextField tagField, JTextField usernameField, JTextField passwordField, JTextField bankPinField) {
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5); // Add some padding
+        gbc.insets = new Insets(5, 5, 5, 5);
 
 
         JLabel tagLabel = new JLabel("Profile Tag:");

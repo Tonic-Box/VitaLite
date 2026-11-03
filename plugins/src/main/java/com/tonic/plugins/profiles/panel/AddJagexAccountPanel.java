@@ -34,11 +34,11 @@ public class AddJagexAccountPanel extends JPanel {
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-        JLabel addJagexAccountLabel = new JLabel("<html>To add a Jagex Account, clicking the button will give you a prompt to login to your " +
-                "Jagex account via the <b>Official</b> Jagex website, and import the characters you want to add to profiles.  You will name the Profile and customize it's Bank Pin after selecting them to import." +
-                "<br>You can import jagex accounts manually if you have your account and session IDs with Import Jagex Account</html>");
+        JLabel addJagexAccountLabel = new JLabel("<html>Add Jagex Account opens the <b>Official</b> Jagex sign-in in your browser " +
+                "and adds the account with all of its characters as one profile. Bank PINs are set per character with Edit." +
+                "<br>Import Session adds an account from a session id you already have.</html>");
         addJagexAccountButton = new JButton("Add Jagex Account");
-        importJagexAccount = new JButton("Import Jagex Account");
+        importJagexAccount = new JButton("Import Session");
 
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(2, 4, 2, 4);
@@ -69,5 +69,15 @@ public class AddJagexAccountPanel extends JPanel {
 
     public void addImportJagexAccountActionListener(ActionListener actionListener) {
         this.importJagexAccount.addActionListener(actionListener);
+    }
+
+    /**
+     * Disables both buttons while an account is being added.
+     *
+     * @param busy whether an account is being added
+     */
+    public void setBusy(boolean busy) {
+        addJagexAccountButton.setEnabled(!busy);
+        importJagexAccount.setEnabled(!busy);
     }
 }
