@@ -232,15 +232,15 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         ));
         cachingPanel.addVerticalStrut(12);
 
-        ToggleSlider cachedDeviceID = new ToggleSlider();
-        cachedDeviceID.setSelected(Static.getVitaConfig().shouldCacheDeviceId());
-        cachingPanel.addContent(createToggleOption(
-                "Cached DeviceID",
-                "Spoof and cache per-account DeviceID",
-                cachedDeviceID,
-                () -> Static.getVitaConfig().setShouldCacheDeviceId(cachedDeviceID.isSelected())
-        ));
-        cachingPanel.addVerticalStrut(12);
+//      ToggleSlider cachedDeviceID = new ToggleSlider();
+//      cachedDeviceID.setSelected(Static.getVitaConfig().shouldCacheDeviceId());
+//      cachingPanel.addContent(createToggleOption(
+//              "Cached DeviceID",
+//              "Spoof and cache per-account DeviceID",
+//              cachedDeviceID,
+//              () -> Static.getVitaConfig().setShouldCacheDeviceId(cachedDeviceID.isSelected())
+//      ));
+//      cachingPanel.addVerticalStrut(12);
 
         bankCacheToggle = new ToggleSlider();
         bankCacheToggle.setSelected(Static.getVitaConfig().shouldCacheBank());
