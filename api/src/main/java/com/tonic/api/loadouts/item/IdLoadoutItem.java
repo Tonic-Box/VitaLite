@@ -130,7 +130,7 @@ public class IdLoadoutItem extends LoadoutItem
     public Builder noted(boolean noted)
     {
       this.noted = noted;
-      return stackable(noted);
+      return this;
     }
 
     public Builder optional(boolean optional)
