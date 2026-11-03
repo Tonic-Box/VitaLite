@@ -114,3 +114,4 @@ bin/
 /agent/
 /api/src/main/java/com/tonic/services/llmapi/
 /.mcp.json
+/tools/

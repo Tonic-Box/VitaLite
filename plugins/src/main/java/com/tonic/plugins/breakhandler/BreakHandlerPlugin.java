@@ -470,7 +470,7 @@ public class BreakHandlerPlugin extends Plugin
         rsWorld.setActivity(world.getActivity());
         rsWorld.setAddress(world.getAddress());
         rsWorld.setId(world.getId());
-        rsWorld.setLocation(world.getLocation());
+        rsWorld.setLocation(world.getRegion().getId());
         rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
 
         client.changeWorld(rsWorld);

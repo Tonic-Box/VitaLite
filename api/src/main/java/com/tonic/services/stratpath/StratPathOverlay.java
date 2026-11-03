@@ -5,7 +5,6 @@ import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.StrategicPathing;
 import com.tonic.util.WorldPointUtil;
-import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.MenuAction;
 import net.runelite.api.Perspective;

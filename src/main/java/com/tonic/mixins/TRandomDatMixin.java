@@ -2,6 +2,7 @@ package com.tonic.mixins;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.api.TClient;
 import com.tonic.injector.annotations.*;
 import com.tonic.model.RandomDat;
 import com.tonic.util.ReflectBuilder;
@@ -14,9 +15,6 @@ public abstract class TRandomDatMixin
 {
     @Shadow("client")
     public static Client client;
-
-    @Shadow("JX_CHARACTER_ID")
-    public static String characterId;
 
     @Shadow("randomDat")
     public static byte[] randomDat;
@@ -54,7 +52,7 @@ public abstract class TRandomDatMixin
                     .method("getUsername", null, null)
                     .get();
 
-            String identifier = username != null && !username.isEmpty() ? username : characterId;
+            String identifier = username != null && !username.isEmpty() ? username : ((TClient) client).getCharacterId();
             byte[] data = RandomDat.getCachedRandomDatData(identifier);
             if(data != null)
             {

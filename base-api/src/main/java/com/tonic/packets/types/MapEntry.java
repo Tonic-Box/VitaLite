@@ -21,6 +21,15 @@ public class MapEntry
     private List<String> obfuWrites;
     @Expose
     private List<String> args;
+    @Expose
+    private Integer minClientVersion;
+    @Expose
+    private Integer maxClientVersion;
+
+    public boolean appliesTo(int clientVersion)
+    {
+        return (minClientVersion == null || clientVersion >= minClientVersion) && (maxClientVersion == null || clientVersion <= maxClientVersion);
+    }
 
     @Override
     public String toString()

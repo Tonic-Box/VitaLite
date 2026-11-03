@@ -6,6 +6,7 @@ import java.io.*;
 
 public class DeviceID
 {
+    public static final String UNKNOWN_DEVICE_ID = "12345678-0000-0000-0000-123456789012";
     private static final ConfigManager cachedUUIDProperties = new ConfigManager("CachedUUID");
 
     public static String getCachedUUID(String identifier)
@@ -21,7 +22,7 @@ public class DeviceID
     public static String vanillaGetDeviceID(int osType)
     {
         String command = "";
-        String deviceId = "12345678-0000-0000-0000-123456789012";
+        String deviceId = UNKNOWN_DEVICE_ID;
         switch(osType) {
             case 1:
                 command = "wmic csproduct get UUID";
@@ -65,7 +66,7 @@ public class DeviceID
                     output.insert(8, "-");
                     deviceId = output.toString();
                 } else {
-                    deviceId = "12345678-0000-0000-0000-123456789012";
+                    deviceId = UNKNOWN_DEVICE_ID;
                 }
             }
         } catch (Exception ignored) {
@@ -79,6 +80,25 @@ public class DeviceID
 
         }
 
+        if (osType == 1 && (deviceId.isEmpty() || deviceId.equals(UNKNOWN_DEVICE_ID))) {
+            deviceId = windowsProductUuid();
+        }
+
         return deviceId;
+    }
+
+    private static String windowsProductUuid()
+    {
+        try {
+            Process cmdProcess = new ProcessBuilder("powershell", "-NoProfile", "-Command", "(Get-CimInstance Win32_ComputerSystemProduct).UUID").redirectErrorStream(true).start();
+            try (BufferedReader outputReader = new BufferedReader(new InputStreamReader(cmdProcess.getInputStream()))) {
+                String line = outputReader.readLine();
+                if (line != null && !line.trim().isEmpty()) {
+                    return line.trim();
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return UNKNOWN_DEVICE_ID;
     }
 }

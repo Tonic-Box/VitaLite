@@ -145,7 +145,7 @@ public class PacketBuffer {
 
     public byte readByteSub()
     {
-        return (byte)(readByte() + 128);
+        return (byte)(128 - readByte());
     }
 
     public int readLengthByte() {
@@ -244,6 +244,22 @@ public class PacketBuffer {
         return (b1 << 16) | (b2 << 8) | b3;
     }
 
+    public int readMediumHlm() {
+        offset += 3;
+        int high = payload.getByte(offset - 3) & 0xFF;
+        int low = payload.getByte(offset - 2) & 0xFF;
+        int middle = payload.getByte(offset - 1) & 0xFF;
+        return (high << 16) | (middle << 8) | low;
+    }
+
+    public int readMediumMhl() {
+        offset += 3;
+        int middle = payload.getByte(offset - 3) & 0xFF;
+        int high = payload.getByte(offset - 2) & 0xFF;
+        int low = payload.getByte(offset - 1) & 0xFF;
+        return (high << 16) | (middle << 8) | low;
+    }
+
     public int readInt() {
         return ((payload.getByte(offset++) & 0xFF) << 24) |
                 ((payload.getByte(offset++) & 0xFF) << 16) |
@@ -297,7 +313,7 @@ public class PacketBuffer {
         return ((payload.getByte(offset++) & 0xFFL) << 16) |
                 ((payload.getByte(offset++) & 0xFFL) << 24) |
                 (payload.getByte(offset++) & 0xFFL) |
-                ((payload.getByte(offset++) & 0xFFL) << 24);
+                ((payload.getByte(offset++) & 0xFFL) << 8);
     }
 
     public int readVarInt() {
@@ -485,6 +501,18 @@ public class PacketBuffer {
     public void writeMedium(int value) {
         writeByte((byte) (value >> 16));
         writeByte((byte) (value >> 8));
+        writeByte((byte) value);
+    }
+
+    public void writeMediumHlm(int value) {
+        writeByte((byte) (value >> 16));
+        writeByte((byte) value);
+        writeByte((byte) (value >> 8));
+    }
+
+    public void writeMediumMhl(int value) {
+        writeByte((byte) (value >> 8));
+        writeByte((byte) (value >> 16));
         writeByte((byte) value);
     }
 

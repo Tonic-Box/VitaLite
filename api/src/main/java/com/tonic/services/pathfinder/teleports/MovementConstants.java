@@ -1,13 +1,10 @@
 package com.tonic.services.pathfinder.teleports;
 
 import net.runelite.api.ItemID;
-import net.runelite.api.Varbits;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarbitID;
 import org.apache.commons.lang3.tuple.Pair;
-
-import javax.swing.*;
 import java.util.List;
 import java.util.Map;
 

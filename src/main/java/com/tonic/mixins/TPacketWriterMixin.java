@@ -280,7 +280,7 @@ public abstract class TPacketWriterMixin implements TPacketWriter
     {
         MapEntry entry = PacketMapReader.get("OP_RESUME_STRINGDIALOG");
         Map<String,Object> args = new HashMap<>();
-        args.put("length", text.length());
+        args.put("length", text.length() + 1);
         args.put("var7", text);
         this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
     }

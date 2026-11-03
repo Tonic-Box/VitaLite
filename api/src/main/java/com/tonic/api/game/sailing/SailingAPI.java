@@ -154,7 +154,10 @@ public class SailingAPI
      */
     public static boolean isOnBoat()
     {
-        return Static.invoke(() -> !PlayerEx.getLocal().getWorldView().isTopLevel());
+        return Static.invoke(() -> {
+            PlayerEx local = PlayerEx.getLocal();
+            return local != null && !local.getWorldView().isTopLevel();
+        });
     }
 
     /**

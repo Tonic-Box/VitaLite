@@ -3,10 +3,10 @@ package com.tonic.mixins;
 import ch.qos.logback.classic.spi.PlatformInfo;
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.api.TClient;
 import com.tonic.injector.annotations.Inject;
 import com.tonic.injector.annotations.MethodOverride;
 import com.tonic.injector.annotations.Mixin;
-import com.tonic.injector.annotations.Shadow;
 import com.tonic.model.DeviceID;
 import com.tonic.util.ReflectBuilder;
 
@@ -15,9 +15,6 @@ import java.util.UUID;
 @Mixin("PlatformInfo")
 public abstract class TDeviceIDMixin
 {
-    @Shadow("JX_CHARACTER_ID")
-    public static String characterId;
-
 //    @MethodOverride("getDeviceId")
 //    public static String getDeviceId(PlatformInfo info, int os)
 //    {
@@ -35,14 +32,14 @@ public abstract class TDeviceIDMixin
     {
         if (!Static.getVitaConfig().shouldCacheDeviceId())
         {
-            return DeviceID.vanillaGetDeviceID(os);
+            return DeviceID.UNKNOWN_DEVICE_ID;
         }
 
         String username = ReflectBuilder.of(Static.getClient())
                 .method("getUsername", null, null)
                 .get();
 
-        String identifier = username != null && !username.isEmpty() ? username : characterId;
+        String identifier = username != null && !username.isEmpty() ? username : ((TClient) Static.getClient()).getCharacterId();
 
         String cachedDeviceId = DeviceID.getCachedUUID(identifier);
         if (cachedDeviceId == null)
