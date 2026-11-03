@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("0")
+val vitaVersion by extra("1")
 val runeliteVersion by extra("1.13.6")
 
 group = "com.tonic"
@@ -358,9 +358,9 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-subrev"
+    val title = "${tag}-feature"
     val body = "# ${tag}\n" +
-            "- updated to runelite 1.13.6";
+            "- disable hwid spoofing";
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
