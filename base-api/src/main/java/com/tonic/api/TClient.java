@@ -152,4 +152,10 @@ public interface TClient
     int getShipHeading();
 
     void setShipHeading(int heading);
+
+    /**
+     * Gets the client version the gamepack was given (jav_config param 25), which decides the form of version-gated packets.
+     * @return the client version
+     */
+    int getServerRevision();
 }

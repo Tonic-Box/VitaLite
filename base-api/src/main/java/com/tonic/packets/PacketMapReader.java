@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.tonic.Static;
+import com.tonic.api.TClient;
 import com.tonic.packets.types.MapEntry;
 import com.tonic.packets.types.PacketDefinition;
 import com.tonic.util.StaticIntFinder;
@@ -39,23 +40,24 @@ public class PacketMapReader
         {
             fillMaps();
         }
+        int clientVersion = clientVersion();
         return defs.stream()
-                .filter(e -> e.getName().equals(packet))
+                .filter(e -> e.getName().equals(packet) && e.appliesTo(clientVersion))
                 .findFirst().orElse(null);
     }
 
     public static int getId(String packet)
     {
-        if(defs == null)
-        {
-            fillMaps();
-        }
-        var entry = defs.stream()
-                .filter(e -> e.getName().equals(packet))
-                .findFirst().orElse(null);
+        var entry = get(packet);
         if(entry == null)
             return -1;
         return entry.getPacket().getId();
+    }
+
+    private static int clientVersion()
+    {
+        TClient client = Static.getClient();
+        return client == null ? -1 : client.getServerRevision();
     }
 
     public static MapEntry get(int id)
@@ -194,6 +196,10 @@ public class PacketMapReader
                 return buffer.readLengthShort();
             case "readMedium":
                 return buffer.readMedium();
+            case "readMediumHlm":
+                return buffer.readMediumHlm();
+            case "readMediumMhl":
+                return buffer.readMediumMhl();
             case "readInt":
                 return buffer.readInt();
             case "readIntME":
@@ -295,6 +301,12 @@ public class PacketMapReader
                 break;
             case "writeMedium":
                 buffer.writeMedium(value);
+                break;
+            case "writeMediumHlm":
+                buffer.writeMediumHlm(value);
+                break;
+            case "writeMediumMhl":
+                buffer.writeMediumMhl(value);
                 break;
             case "writeInt":
                 buffer.writeInt(value);

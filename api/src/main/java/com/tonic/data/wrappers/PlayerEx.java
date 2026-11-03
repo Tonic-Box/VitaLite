@@ -20,9 +20,14 @@ public class PlayerEx extends ActorEx<Player>
     public static PlayerEx getLocal()
     {
         Client client = Static.getClient();
-        if (localPlayerEx == null || !client.getLocalPlayer().equals(localPlayerEx.getPlayer()))
+        Player localPlayer = client.getLocalPlayer();
+        if (localPlayer == null)
         {
-            localPlayerEx = new PlayerEx(client.getLocalPlayer());
+            return null;
+        }
+        if (localPlayerEx == null || !localPlayer.equals(localPlayerEx.getPlayer()))
+        {
+            localPlayerEx = new PlayerEx(localPlayer);
         }
         return localPlayerEx;
     }

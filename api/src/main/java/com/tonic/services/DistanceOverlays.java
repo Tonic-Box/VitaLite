@@ -11,6 +11,8 @@ import com.tonic.util.Distance;
 import net.runelite.api.GameObject;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
+import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayUtil;
 
 import java.awt.*;
@@ -18,6 +20,13 @@ import java.awt.*;
 public class DistanceOverlays extends Overlay
 {
     private DistanceMode mode;
+
+    public DistanceOverlays()
+    {
+        setPosition(OverlayPosition.DYNAMIC);
+        setPriority(PRIORITY_LOW);
+        setLayer(OverlayLayer.ABOVE_SCENE);
+    }
 
     @Override
     public Dimension render(Graphics2D graphics) {
@@ -99,6 +108,9 @@ public class DistanceOverlays extends Overlay
     {
         for(NpcEx npc : GameManager.npcList())
         {
+            if(npc.getComposition() == null)
+                continue;
+
             int distance = measureDistance(npc.getInteractionPoint());
             String text = npc.getName() + "(" + distance + ")";
             OverlayUtil.renderActorOverlay(graphics, npc.getActor(), text, Color.CYAN);

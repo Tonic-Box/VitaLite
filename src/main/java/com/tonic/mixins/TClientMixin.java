@@ -16,6 +16,16 @@ public abstract class TClientMixin implements TClient
     @Shadow("heading")
     private static int shipHeading;
 
+    @Shadow("serverRevision")
+    private static int serverRevision;
+
+    @Inject
+    @Override
+    public int getServerRevision()
+    {
+        return serverRevision;
+    }
+
     @Inject
     @Override
     public int getShipHeading()

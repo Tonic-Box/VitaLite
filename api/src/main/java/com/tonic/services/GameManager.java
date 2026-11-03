@@ -493,7 +493,7 @@ public class GameManager extends Overlay {
         rsWorld.setAddress(world.getAddress());
         rsWorld.setId(world.getId());
         rsWorld.setPlayerCount(world.getPlayers());
-        rsWorld.setLocation(world.getLocation());
+        rsWorld.setLocation(world.getRegion().getId());
         rsWorld.setTypes(net.runelite.client.util.WorldUtil.toWorldTypes(world.getTypes()));
         if(client.getGameState() == GameState.LOGIN_SCREEN)
         {
