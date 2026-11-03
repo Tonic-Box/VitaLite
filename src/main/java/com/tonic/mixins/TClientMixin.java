@@ -20,7 +20,7 @@ public abstract class TClientMixin implements TClient
     private static int serverRevision;
 
     @Inject
-    @Override
+    //@Override
     public int getServerRevision()
     {
         return serverRevision;
