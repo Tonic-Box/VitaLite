@@ -6,7 +6,6 @@ import com.tonic.services.breakhandler.Break;
 import com.tonic.services.breakhandler.BreakHandler;
 import com.tonic.services.breakhandler.settings.Property;
 import com.tonic.plugins.breakhandler.ui.BreakHandlerPanel;
-import com.tonic.plugins.profiles.data.Profile;
 import com.tonic.plugins.profiles.session.ProfilesSession;
 import com.tonic.services.ConfigManager;
 import net.runelite.api.Client;
@@ -391,9 +390,7 @@ public class BreakHandlerPlugin extends Plugin
         ProfilesSession profilesSession = ProfilesSession.getInstance();
         profilesSession.loadProfilesFromFile();
 
-        Profile profile = profilesSession.getByName(profileName);
-
-        if (profile == null) {
+        if (!profilesSession.getProfileNames().contains(profileName)) {
             breakHandler.log("[%s] Unable to login with null profile - %s, cancelling break",
                     "Break Handler", profileName);
             breakHandler.cancel();
@@ -403,7 +400,7 @@ public class BreakHandlerPlugin extends Plugin
         loginAttempts++;
         loginAttemptDelay = LOGIN_ATTEMPT_BASE_DELAY
                 + ThreadLocalRandom.current().nextInt(0, 15);
-        profilesSession.login(profile, true);
+        profilesSession.loginByName(profileName, true);
         breakHandler.log("[%s] Logging in with profile - %s", "Break Handler", profileName);
     }
 

@@ -2,7 +2,6 @@ package com.tonic.plugins.breakhandler.ui;
 
 import com.tonic.services.breakhandler.BreakHandler;
 import com.tonic.services.breakhandler.settings.Property;
-import com.tonic.plugins.profiles.data.Profile;
 import com.tonic.plugins.profiles.session.ProfilesSession;
 import com.tonic.services.ConfigManager;
 import net.runelite.client.RuneLite;
@@ -11,7 +10,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.util.List;
 import java.awt.*;
-import java.util.Set;
 
 public class BreakSettingsPanel extends JPanel
 {
@@ -169,22 +167,9 @@ public class BreakSettingsPanel extends JPanel
     }
 
     private static List<String> getProfileNames() {
-        List<String> profileNames = new java.util.ArrayList<>();
         ProfilesSession profilesSession = ProfilesSession.getInstance();
         profilesSession.loadProfilesFromFile();
-        try {
-            Set<Profile> profiles = profilesSession.getProfiles();
-            if (profiles != null) {
-                for (Profile pr : profiles) {
-                    if (pr != null) {
-                        profileNames.add(pr.getIdentifier());
-                    }
-                }
-            }
-        } catch (Throwable ignored) {
-
-        }
-        return profileNames;
+        return profilesSession.getProfileNames();
     }
 
 
