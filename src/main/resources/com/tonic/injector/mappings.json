@@ -9450,7 +9450,7 @@
     "obfuscatedName": "bv",
     "fields": [
       {
-        "name": "",
+        "name": "cameraZ",
         "obfuscatedName": "jb",
         "ownerObfuscatedName": "bv",
         "descriptor": "I",
@@ -12929,7 +12929,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "cameraYawRadians",
         "obfuscatedName": "yc",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -13995,7 +13995,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "cameraExactZ",
         "obfuscatedName": "wx",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -14133,7 +14133,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "cameraPitchRadians",
         "obfuscatedName": "fj",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -14405,7 +14405,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "cameraExactX",
         "obfuscatedName": "qk",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -14455,7 +14455,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "cameraPitch",
         "obfuscatedName": "jy",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -14561,7 +14561,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "cameraYaw",
         "obfuscatedName": "ja",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -14777,7 +14777,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "cameraExactY",
         "obfuscatedName": "rk",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -15001,7 +15001,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "mouseCrossState",
         "obfuscatedName": "md",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -15730,6 +15730,7 @@
         "isStatic": true
       },
       {
+        "name": "updateCamera",
         "obfuscatedName": "on",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -26157,6 +26158,7 @@
     ]
   },
   {
+    "name": "Scene",
     "obfuscatedName": "ei",
     "fields": [
       {
@@ -27745,6 +27747,7 @@
         "isStatic": true
       },
       {
+        "name": "drawScene",
         "obfuscatedName": "dz",
         "ownerObfuscatedName": "ei",
         "descriptor": "(IIILvz;Lvz;IIIZ)V",
@@ -29655,7 +29658,7 @@
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "cameraY",
         "obfuscatedName": "jc",
         "ownerObfuscatedName": "es",
         "descriptor": "I",
@@ -33026,6 +33029,7 @@
     ]
   },
   {
+    "name": "Model",
     "obfuscatedName": "fo",
     "fields": [
       {
@@ -33155,7 +33159,7 @@
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "vertexLabels",
         "obfuscatedName": "ce",
         "ownerObfuscatedName": "fo",
         "descriptor": "[[I",
@@ -33659,7 +33663,7 @@
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "faceTransparencies",
         "obfuscatedName": "cu",
         "ownerObfuscatedName": "fo",
         "descriptor": "[B",
@@ -42500,7 +42504,7 @@
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "cameraX",
         "obfuscatedName": "jt",
         "ownerObfuscatedName": "ic",
         "descriptor": "I",
@@ -56519,6 +56523,7 @@
     ]
   },
   {
+    "name": "PlayerComposition",
     "obfuscatedName": "lu",
     "fields": [
       {
@@ -56882,6 +56887,7 @@
         "isStatic": false
       },
       {
+        "name": "buildModelData",
         "obfuscatedName": "aj",
         "ownerObfuscatedName": "lu",
         "descriptor": "([II)Lef;",
@@ -92908,6 +92914,7 @@
     ]
   },
   {
+    "name": "Angle",
     "obfuscatedName": "vz",
     "fields": [
       {
@@ -92918,7 +92925,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "units",
         "obfuscatedName": "ax",
         "ownerObfuscatedName": "vz",
         "descriptor": "I",
