@@ -47,7 +47,7 @@ public enum Standard implements Spell
             new RuneRequirement(1, Rune.LAW)
     ),
     TELEPORT_TO_HOUSE(
-            40, InterfaceID.MagicSpellbook.TELEPORT_HOME_STANDARD, SpellbookEnums.StandardSpell.TELEPORT_TO_HOUSE.index, true,
+            40, InterfaceID.MagicSpellbook.TELEPORT_TO_YOUR_HOUSE, SpellbookEnums.StandardSpell.TELEPORT_TO_HOUSE.index, true,
             new RuneRequirement(1, Rune.AIR),
             new RuneRequirement(1, Rune.EARTH),
             new RuneRequirement(1, Rune.LAW)
@@ -343,7 +343,7 @@ public enum Standard implements Spell
     ),
 
     CHARGE(
-            80, InterfaceID.MagicSpellbook.CHARGE, SpellbookEnums.StandardSpell.TELE_BLOCK.index, true,
+            80, InterfaceID.MagicSpellbook.CHARGE, SpellbookEnums.StandardSpell.CHARGE.index, true,
             new RuneRequirement(3, Rune.AIR),
             new RuneRequirement(3, Rune.FIRE),
             new RuneRequirement(3, Rune.BLOOD)
