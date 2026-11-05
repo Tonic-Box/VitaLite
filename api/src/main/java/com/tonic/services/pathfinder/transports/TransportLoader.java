@@ -432,6 +432,7 @@ public class TransportLoader
                 kourendMinecartNetwork(LAST_TRANSPORT_LIST);
                 gnomeGliders(LAST_TRANSPORT_LIST);
                 fairyRings(LAST_TRANSPORT_LIST);
+                quetzalTransport(LAST_TRANSPORT_LIST);
                 dwarvenCarts(LAST_TRANSPORT_LIST);
                 canoes(LAST_TRANSPORT_LIST);
             }
@@ -518,13 +519,22 @@ public class TransportLoader
                 {
                     HandlerBuilder builder = HandlerBuilder.get()
                             .add(0, () -> {
+                                if (!EquipmentAPI.isEquipped(ItemID.DRAMEN_STAFF) && !EquipmentAPI.isEquipped(ItemID.LUNAR_STAFF)) {
+                                    ItemEx staff = InventoryAPI.getItem(i -> i.getId() == ItemID.DRAMEN_STAFF || i.getId() == ItemID.LUNAR_STAFF);
+                                    if (staff != null) {
+                                        EquipmentAPI.equip(staff.getId());
+                                    }
+                                }
+                                return 1;
+                            })
+                            .add(1, () -> {
                                 TileObjectEx current = new TileObjectQuery()
                                         .withName("Fairy ring")
                                         .first();
                                 TileObjectAPI.interact(current, "Zanaris");
-                                return 1;
+                                return 2;
                             })
-                            .addDelay(1, 7);
+                            .addDelay(2, 7);
 
                     Requirements merged = new Requirements();
                     merged.addRequirements(ring.getRequirements().getAll());
@@ -537,14 +547,23 @@ public class TransportLoader
 
                 HandlerBuilder builder = HandlerBuilder.get()
                         .add(0, () -> {
+                            if (!EquipmentAPI.isEquipped(ItemID.DRAMEN_STAFF) && !EquipmentAPI.isEquipped(ItemID.LUNAR_STAFF)) {
+                                ItemEx staff = InventoryAPI.getItem(i -> i.getId() == ItemID.DRAMEN_STAFF || i.getId() == ItemID.LUNAR_STAFF);
+                                if (staff != null) {
+                                    EquipmentAPI.equip(staff.getId());
+                                }
+                            }
+                            return 1;
+                        })
+                        .add(1, () -> {
                             TileObjectEx current = new TileObjectQuery()
                                     .withName("Fairy ring")
                                     .nearest();
                             TileObjectAPI.interact(current, "Configure");
-                            return 1;
+                            return 2;
                         })
                         .addDelayUntil(2, () -> WidgetAPI.get(InterfaceID.Fairyrings.CONFIRM) != null)
-                        .addDelayUntil(3, () -> !destination.travel())
+                        .addDelayUntil(3, destination::travel)
                         .addDelay(4, 7)
                         .add(5, () -> MovementAPI.walkToWorldPoint(destination.getLocation()))
                         .addDelay(6, 1);
@@ -589,6 +608,39 @@ public class TransportLoader
 
                 Transport transport = new Transport(WorldPointUtil.compress(glider.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 4, builder.build(), destination.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(glider.getLocation()), transport);
+            }
+        }
+    }
+
+    private static void quetzalTransport(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        for (QuetzalTransport start : QuetzalTransport.values())
+        {
+            for (QuetzalTransport destination : QuetzalTransport.values())
+            {
+                if (start == destination)
+                {
+                    continue;
+                }
+
+                HandlerBuilder builder = HandlerBuilder.get()
+                        .add(0, () -> {
+                            NpcEx npc = new NpcQuery().withName("Renu").first();
+                            if (npc != null) {
+                                NpcAPI.interact(npc, "Travel");
+                                return 1;
+                            }
+                            return -1;
+                        })
+                        .addDelayUntil(1, () -> WidgetAPI.get(InterfaceID.QuetzalMenu.ICONS) != null && WidgetAPI.isVisible(InterfaceID.QuetzalMenu.UNIVERSE))
+                        .add(2, () -> {
+                            WidgetAPI.interact(1, InterfaceID.QuetzalMenu.ICONS, destination.getIndex(), -1);
+                            return 3;
+                        })
+                        .addDelay(3, 5);
+
+                Transport transport = new Transport(WorldPointUtil.compress(start.getLocation()), WorldPointUtil.compress(destination.getLocation()), 0, 1, 5, builder.build(), start.getRequirements(), -1);
+                computeIfAbsent(transports, WorldPointUtil.compress(start.getLocation()), transport);
             }
         }
     }

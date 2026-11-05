@@ -246,6 +246,20 @@ public class TeleportLoader {
                 //TODO
             }
 
+            if (getTeleportItem(MovementConstants.XERICS_TALISMAN) != null && inMembers) {
+                teleports.add(new Teleport(new WorldPoint(1579, 3530, 0), 5,
+                        jewelryTeleport("Rub", "Xeric's Lookout", MovementConstants.XERICS_TALISMAN)));
+                teleports.add(new Teleport(new WorldPoint(1752, 3566, 0), 5,
+                        jewelryTeleport("Rub", "Xeric's Glade", MovementConstants.XERICS_TALISMAN)));
+                teleports.add(new Teleport(new WorldPoint(1504, 3817, 0), 5,
+                        jewelryTeleport("Rub", "Xeric's Inferno", MovementConstants.XERICS_TALISMAN)));
+                teleports.add(new Teleport(new WorldPoint(1642, 3674, 0), 5,
+                        jewelryTeleport("Rub", "Xeric's Heart", MovementConstants.XERICS_TALISMAN)));
+                // TODO: Add check for ancient tablet unlock
+                //teleports.add(new Teleport(new WorldPoint(x, x, x), 5,
+                //         jewelryTeleport("Rub", "Xeric's Honour", MovementConstants.XERICS_TALISMAN)));
+            }
+
             return teleports;
         });
     }
@@ -288,11 +302,14 @@ public class TeleportLoader {
 
     public static Teleport itemTeleport(TeleportItem teleportItem) {
         return new Teleport(teleportItem.getDestination(), 5, new ArrayList<>() {{
-            add(() ->
-            {
-                ItemEx item = InventoryAPI.getItem(i -> ArrayUtils.contains(teleportItem.getItemId(), i.getId()));
+            add(() -> {
+                ItemEx item = getTeleportItem(teleportItem.getItemId());
                 if (item != null) {
-                    InventoryAPI.interact(item, teleportItem.getAction());
+                    if (EquipmentAPI.isEquipped(item.getId())) {
+                        EquipmentAPI.interact(item, teleportItem.getEquippedAction());
+                    } else {
+                        InventoryAPI.interact(item, teleportItem.getAction());
+                    }
                 }
             });
         }});
