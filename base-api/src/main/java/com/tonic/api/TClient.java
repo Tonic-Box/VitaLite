@@ -123,31 +123,12 @@ public interface TClient
      */
     void invokeMenuAction(String option, String target, int identifier, int opcode, int param0, int param1, int itemId, int worldView, int x, int y);
 
-    String getDisplayName();
-
-    void setDisplayName(String name);
-
+    /**
+     * @return the Jagex character the client was last given, or null for none
+     */
     String getCharacterId();
 
-    void setCharacterId(String id);
-
-    String getSessionId();
-
-    void setSessionId(String id);
-
-    String getRefreshToken();
-
-    void setRefreshToken(String token);
-
-    String getAccessToken();
-
-    void setAccessToken(String token);
-
     void setLoginIndex(int index);
-
-    void setAccountTypeLegacy();
-
-    void setAccountTypeJagex();
 
     int getShipHeading();
 
