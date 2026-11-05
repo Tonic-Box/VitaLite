@@ -15,11 +15,8 @@ public class LoginService {
                 return false;
             }
 
-            tClient.setSessionId(null);
-            tClient.setCharacterId(null);
-            tClient.setDisplayName(null);
-
-            tClient.setAccountTypeLegacy();
+            // A legacy account is a Jagex account of nothing, as RuneLite's own Jagex Auth panel switches to one
+            client.switchJagexAccount(null, null, null);
 
             tClient.setLoginIndex(2);
 
@@ -36,7 +33,6 @@ public class LoginService {
 
     public static boolean login(String sessionId, String characterId, String displayName, boolean shouldLogin) {
         Client client = Static.getClient();
-        TClient tClient = (TClient) client;
         return Static.invokeLater(() -> {
             if (client.getGameState() != GameState.LOGIN_SCREEN)
             {
@@ -44,11 +40,7 @@ public class LoginService {
             }
             client.setUsername("");
             client.setPassword("");
-            tClient.setAccountTypeJagex();
-            tClient.setLoginIndex(10);
-            tClient.setSessionId(sessionId);
-            tClient.setCharacterId(characterId);
-            tClient.setDisplayName(displayName);
+            client.switchJagexAccount(sessionId, characterId, displayName);
 
             if (shouldLogin)
             {

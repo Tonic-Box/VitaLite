@@ -2335,13 +2335,11 @@
     "methods": []
   },
   {
-    "name": "AccountType",
     "obfuscatedName": "abz",
     "fields": [
       {
         "name": "",
         "obfuscatedName": "as",
-        "owner": "AccountType",
         "ownerObfuscatedName": "abz",
         "descriptor": "I",
         "isStatic": false
@@ -2349,7 +2347,6 @@
       {
         "name": "",
         "obfuscatedName": "ad",
-        "owner": "AccountType",
         "ownerObfuscatedName": "abz",
         "descriptor": "I",
         "getter": 92883599,
@@ -2357,9 +2354,8 @@
         "isStatic": false
       },
       {
-        "name": "jagexType",
+        "name": "",
         "obfuscatedName": "ao",
-        "owner": "AccountType",
         "ownerObfuscatedName": "abz",
         "descriptor": "Labz;",
         "isStatic": true
@@ -2367,7 +2363,6 @@
       {
         "name": "",
         "obfuscatedName": "al",
-        "owner": "AccountType",
         "ownerObfuscatedName": "abz",
         "descriptor": "Labz;",
         "isStatic": true
@@ -2375,7 +2370,6 @@
       {
         "name": "",
         "obfuscatedName": "ai",
-        "owner": "AccountType",
         "ownerObfuscatedName": "abz",
         "descriptor": "Labz;",
         "isStatic": true
@@ -2383,15 +2377,13 @@
       {
         "name": "",
         "obfuscatedName": "ag",
-        "owner": "AccountType",
         "ownerObfuscatedName": "abz",
         "descriptor": "Labz;",
         "isStatic": true
       },
       {
-        "name": "legacyType",
+        "name": "",
         "obfuscatedName": "ax",
-        "owner": "AccountType",
         "ownerObfuscatedName": "abz",
         "descriptor": "Labz;",
         "isStatic": true
@@ -2399,7 +2391,6 @@
       {
         "name": "",
         "obfuscatedName": "au",
-        "owner": "AccountType",
         "ownerObfuscatedName": "abz",
         "descriptor": "Labz;",
         "isStatic": true
@@ -2408,7 +2399,6 @@
     "methods": [
       {
         "obfuscatedName": "ao",
-        "owner": "AccountType",
         "ownerObfuscatedName": "abz",
         "descriptor": "(B)I",
         "garbageValue": 0,
@@ -3598,7 +3588,7 @@
         "isStatic": true
       },
       {
-        "name": "JX_DISPLAY_NAME",
+        "name": "",
         "obfuscatedName": "dg",
         "ownerObfuscatedName": "ak",
         "descriptor": "Ljava/lang/String;",
@@ -13179,7 +13169,7 @@
         "isStatic": true
       },
       {
-        "name": "accountTypeCheck",
+        "name": "",
         "obfuscatedName": "cc",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -15912,7 +15902,6 @@
         "isStatic": true
       },
       {
-        "name": "setJxAccessToken",
         "obfuscatedName": "dq",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -15994,7 +15983,6 @@
         "isStatic": false
       },
       {
-        "name": "setJxRefreshToken",
         "obfuscatedName": "az",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -16200,7 +16188,7 @@
         "isStatic": true
       },
       {
-        "name": "setJxSessionId",
+        "name": "setJxCharacterId",
         "obfuscatedName": "pi",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -16302,7 +16290,6 @@
         "isStatic": false
       },
       {
-        "name": "setJxCharacterId",
         "obfuscatedName": "ob",
         "owner": "Client",
         "ownerObfuscatedName": "client",
