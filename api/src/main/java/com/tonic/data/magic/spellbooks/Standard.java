@@ -5,7 +5,6 @@ import com.tonic.api.game.QuestAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
-import com.tonic.api.widgets.MagicAPI;
 import com.tonic.data.magic.MagicCast;
 import com.tonic.data.magic.Rune;
 import com.tonic.data.magic.RuneRequirement;
@@ -14,8 +13,6 @@ import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
-
-import static com.tonic.data.magic.SpellBook.*;
 
 public enum Standard implements Spell
 {
@@ -95,10 +92,9 @@ public enum Standard implements Spell
             new RuneRequirement(2, Rune.LAW)
     ),
     TELEPORT_TO_KOUREND(
-            69, InterfaceID.MagicSpellbook.KOUREND_TELEPORT, SpellbookEnums.StandardSpell.KOUREND_CASTLE_TELEPORT.index, true,
-            new RuneRequirement(5, Rune.FIRE),
-            new RuneRequirement(4, Rune.WATER),
-            new RuneRequirement(2, Rune.SOUL),
+            48, InterfaceID.MagicSpellbook.KOUREND_TELEPORT, SpellbookEnums.StandardSpell.KOUREND_CASTLE_TELEPORT.index, true,
+            new RuneRequirement(1, Rune.WATER),
+            new RuneRequirement(1, Rune.FIRE),
             new RuneRequirement(2, Rune.LAW)
     ),
     TELEOTHER_LUMBRIDGE(
@@ -246,37 +242,37 @@ public enum Standard implements Spell
     ),
 
     SARADOMIN_STRIKE(
-            60, InterfaceID.MagicSpellbook.SARADOMIN_STRIKE, SpellbookEnums.StandardSpell.SARADOMIN_STRIKE.index, true,
+            60, InterfaceID.MagicSpellbook.SARADOMIN_STRIKE, SpellbookEnums.StandardSpell.SARADOMIN_STRIKE.index, 52, true,
             new RuneRequirement(4, Rune.AIR),
             new RuneRequirement(2, Rune.FIRE),
             new RuneRequirement(2, Rune.BLOOD)
     ),
     CLAWS_OF_GUTHIX(
-            60, InterfaceID.MagicSpellbook.CLAWS_OF_GUTHIX, SpellbookEnums.StandardSpell.CLAWS_OF_GUTHIX.index, true,
+            60, InterfaceID.MagicSpellbook.CLAWS_OF_GUTHIX, SpellbookEnums.StandardSpell.CLAWS_OF_GUTHIX.index, 19, true,
             new RuneRequirement(4, Rune.AIR),
             new RuneRequirement(1, Rune.FIRE),
             new RuneRequirement(2, Rune.BLOOD)
     ),
     FLAMES_OF_ZAMORAK(
-            60, InterfaceID.MagicSpellbook.FLAMES_OF_ZAMORAK, SpellbookEnums.StandardSpell.FLAMES_OF_ZAMORAK.index, true,
+            60, InterfaceID.MagicSpellbook.FLAMES_OF_ZAMORAK, SpellbookEnums.StandardSpell.FLAMES_OF_ZAMORAK.index, 20, true,
             new RuneRequirement(1, Rune.AIR),
             new RuneRequirement(4, Rune.FIRE),
             new RuneRequirement(2, Rune.BLOOD)
     ),
 
     CRUMBLE_UNDEAD(
-            39, InterfaceID.MagicSpellbook.CRUMBLE_UNDEAD, SpellbookEnums.StandardSpell.CRUMBLE_UNDEAD.index, false,
+            39, InterfaceID.MagicSpellbook.CRUMBLE_UNDEAD, SpellbookEnums.StandardSpell.CRUMBLE_UNDEAD.index, 17, false,
             new RuneRequirement(2, Rune.AIR),
             new RuneRequirement(2, Rune.EARTH),
             new RuneRequirement(1, Rune.CHAOS)
     ),
     IBAN_BLAST(
-            50, InterfaceID.MagicSpellbook.IBAN_BLAST, SpellbookEnums.StandardSpell.IBAN_BLAST.index, true,
+            50, InterfaceID.MagicSpellbook.IBAN_BLAST, SpellbookEnums.StandardSpell.IBAN_BLAST.index, 47, true,
             new RuneRequirement(5, Rune.FIRE),
             new RuneRequirement(1, Rune.DEATH)
     ),
     MAGIC_DART(
-            50, InterfaceID.MagicSpellbook.MAGIC_DART, SpellbookEnums.StandardSpell.MAGIC_DART.index, true,
+            50, InterfaceID.MagicSpellbook.MAGIC_DART, SpellbookEnums.StandardSpell.MAGIC_DART.index, 18, true,
             new RuneRequirement(1, Rune.DEATH),
             new RuneRequirement(4, Rune.MIND)
     ),
@@ -436,7 +432,7 @@ public enum Standard implements Spell
             new RuneRequirement(1, Rune.COSMIC)
     ),
     TELEKINETIC_GRAB(
-            31, InterfaceID.MagicSpellbook.TELEGRAB, SpellbookEnums.StandardSpell.TELEKINETIC_GRAB.index, false,
+            33, InterfaceID.MagicSpellbook.TELEGRAB, SpellbookEnums.StandardSpell.TELEKINETIC_GRAB.index, false,
             new RuneRequirement(1, Rune.AIR),
             new RuneRequirement(1, Rune.LAW)
     );
@@ -642,11 +638,6 @@ public enum Standard implements Spell
             return false;
         }
 
-        if (varbitRequirement != -1 && VarAPI.getVar(varbitRequirement) != 1)
-        {
-            return false;
-        }
-
-        return true;
+        return varbitRequirement == -1 || VarAPI.getVar(varbitRequirement) == 1;
     }
 }

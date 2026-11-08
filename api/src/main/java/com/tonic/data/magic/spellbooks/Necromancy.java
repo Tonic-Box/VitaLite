@@ -12,7 +12,7 @@ import net.runelite.api.gameval.InterfaceID;
 public enum Necromancy implements Spell
 {
     ARCEUUS_HOME_TELEPORT(
-            1, InterfaceID.MagicSpellbook.TELEPORT_HOME_ARCEUUS, ArceuusSpell.ARCEUUS_HOME_TELEPORT.index),
+            0, InterfaceID.MagicSpellbook.TELEPORT_HOME_ARCEUUS, ArceuusSpell.ARCEUUS_HOME_TELEPORT.index),
 
     BASIC_REANIMATION(
             16, InterfaceID.MagicSpellbook.REANIMATION_BASIC, ArceuusSpell.BASIC_REANIMATION.index,
@@ -105,33 +105,33 @@ public enum Necromancy implements Spell
             new RuneRequirement(2, Rune.LAW)),
 
     GHOSTLY_GRASP(
-            35, InterfaceID.MagicSpellbook.GHOSTLY_GRASP, ArceuusSpell.GHOSTLY_GRASP.index,
+            35, InterfaceID.MagicSpellbook.GHOSTLY_GRASP, ArceuusSpell.GHOSTLY_GRASP.index, 56,
             new RuneRequirement(4, Rune.AIR),
             new RuneRequirement(1, Rune.CHAOS)),
 
     SKELETAL_GRASP(
-            56, InterfaceID.MagicSpellbook.SKELETAL_GRASP, ArceuusSpell.SKELETAL_GRASP.index,
+            56, InterfaceID.MagicSpellbook.SKELETAL_GRASP, ArceuusSpell.SKELETAL_GRASP.index, 57,
             new RuneRequirement(8, Rune.EARTH),
             new RuneRequirement(1, Rune.DEATH)),
 
     UNDEAD_GRASP(
-            79, InterfaceID.MagicSpellbook.UNDEAD_GRASP, ArceuusSpell.UNDEAD_GRASP.index,
+            79, InterfaceID.MagicSpellbook.UNDEAD_GRASP, ArceuusSpell.UNDEAD_GRASP.index, 58,
             new RuneRequirement(12, Rune.FIRE),
             new RuneRequirement(1, Rune.BLOOD)),
 
     INFERIOR_DEMONBANE(
-            44, InterfaceID.MagicSpellbook.INFERIOR_DEMONBANE, ArceuusSpell.INFERIOR_DEMONBANE.index,
-            new RuneRequirement(4, Rune.FIRE),
+            44, InterfaceID.MagicSpellbook.INFERIOR_DEMONBANE, ArceuusSpell.INFERIOR_DEMONBANE.index, 53,
+            new RuneRequirement(3, Rune.FIRE),
             new RuneRequirement(1, Rune.CHAOS)),
 
     SUPERIOR_DEMONBANE(
-            62, InterfaceID.MagicSpellbook.SUPERIOR_DEMONBANE, ArceuusSpell.SUPERIOR_DEMONBANE.index,
-            new RuneRequirement(8, Rune.FIRE),
+            62, InterfaceID.MagicSpellbook.SUPERIOR_DEMONBANE, ArceuusSpell.SUPERIOR_DEMONBANE.index, 54,
+            new RuneRequirement(5, Rune.FIRE),
             new RuneRequirement(1, Rune.SOUL)),
 
     DARK_DEMONBANE(
-            82, InterfaceID.MagicSpellbook.DARK_DEMONBANE, ArceuusSpell.DARK_DEMONBANE.index,
-            new RuneRequirement(12, Rune.FIRE),
+            82, InterfaceID.MagicSpellbook.DARK_DEMONBANE, ArceuusSpell.DARK_DEMONBANE.index, 55,
+            new RuneRequirement(7, Rune.FIRE),
             new RuneRequirement(2, Rune.SOUL)),
 
     LESSER_CORRUPTION(
