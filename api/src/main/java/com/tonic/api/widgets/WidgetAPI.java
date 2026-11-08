@@ -106,6 +106,14 @@ public class WidgetAPI
      */
     public static void interact(Widget widget, String menu, String action)
     {
+        if (widget == null)
+            return;
+        // getItemDefinition may only be called on the client thread
+        Static.invoke(() -> interactSubOp(widget, menu, action));
+    }
+
+    private static void interactSubOp(Widget widget, String menu, String action)
+    {
         Client client = Static.getClient();
 
         ItemComposition composition = client.getItemDefinition(widget.getItemId());
