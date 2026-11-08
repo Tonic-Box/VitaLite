@@ -27,6 +27,11 @@ public enum SpellBook
         this.varbitValue = varbitValue;
     }
 
+    public int getIndex()
+    {
+        return varbitValue;
+    }
+
     public static SpellBook getCurrent()
     {
         return Static.invoke(() ->

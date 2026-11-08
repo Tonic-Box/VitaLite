@@ -1,13 +1,19 @@
 package com.tonic.data.magic.spellbooks;
 
 import com.tonic.Static;
+import com.tonic.api.game.QuestAPI;
+import com.tonic.api.widgets.EquipmentAPI;
+import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.data.magic.MagicCast;
 import com.tonic.data.magic.Rune;
 import com.tonic.data.magic.RuneRequirement;
 import com.tonic.data.magic.Spell;
 import com.tonic.data.magic.spellbooks.SpellbookEnums.ArceuusSpell;
 import lombok.Getter;
+import net.runelite.api.Quest;
+import net.runelite.api.QuestState;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.ItemID;
 
 public enum Necromancy implements Spell
 {
@@ -283,6 +289,38 @@ public enum Necromancy implements Spell
     @Override
     public boolean canCast()
     {
+        switch (this)
+        {
+            case SALVE_GRAVEYARD_TELEPORT:
+            case FENKENSTRAINS_CASTLE_TELEPORT:
+            case BARROWS_TELEPORT:
+                if (QuestAPI.getState(Quest.PRIEST_IN_PERIL) != QuestState.FINISHED)
+                {
+                    return false;
+                }
+                break;
+            case APE_ATOLL_TELEPORT:
+                if (QuestAPI.getState(Quest.MONKEY_MADNESS_I) != QuestState.FINISHED)
+                {
+                    return false;
+                }
+                break;
+            case RESURRECT_LESSER_GHOST:
+            case RESURRECT_LESSER_SKELETON:
+            case RESURRECT_LESSER_ZOMBIE:
+            case RESURRECT_SUPERIOR_GHOST:
+            case RESURRECT_SUPERIOR_SKELETON:
+            case RESURRECT_SUPERIOR_ZOMBIE:
+            case RESURRECT_GREATER_GHOST:
+            case RESURRECT_GREATER_SKELETON:
+            case RESURRECT_GREATER_ZOMBIE:
+                if (!InventoryAPI.contains(ItemID.BOOK_OF_THE_DEAD) && !EquipmentAPI.isEquipped(i -> i.getId() == ItemID.BOOK_OF_THE_DEAD))
+                {
+                    return false;
+                }
+                break;
+        }
+
         return Static.invoke(() -> MagicCast.canCastNecromancy(spellIndex));
     }
 
@@ -309,14 +347,6 @@ public enum Necromancy implements Spell
 
     public boolean haveRunesAvailable()
     {
-        for (RuneRequirement req : requirements)
-        {
-            if (!req.meetsRequirements())
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return Static.invoke(() -> MagicCast.hasRunesBySpellIndex(BOOK, spellIndex));
     }
 }

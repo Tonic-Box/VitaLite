@@ -1,12 +1,14 @@
 package com.tonic.data.magic.spellbooks;
 
 import com.tonic.Static;
+import com.tonic.api.game.SkillAPI;
 import com.tonic.data.magic.MagicCast;
 import com.tonic.data.magic.Rune;
 import com.tonic.data.magic.RuneRequirement;
 import com.tonic.data.magic.Spell;
 import com.tonic.data.magic.spellbooks.SpellbookEnums.LunarSpell;
 import lombok.Getter;
+import net.runelite.api.Skill;
 import net.runelite.api.gameval.InterfaceID;
 
 public enum Lunar implements Spell
@@ -276,6 +278,7 @@ public enum Lunar implements Spell
             new RuneRequirement(1, Rune.DEATH),
             new RuneRequirement(1, Rune.LAW));
 
+    private static final int MIN_DEFENCE = 40;
     private static final int BOOK = 2; // Lunar spellbook index
 
     private final int level;
@@ -294,19 +297,10 @@ public enum Lunar implements Spell
         this.spellIndex = spellIndex;
     }
 
-    Lunar(int level, int interfaceId, int spellIndex, int autoCastWidgetIndex, RuneRequirement... requirements)
-    {
-        this.level = level;
-        this.interfaceId = interfaceId;
-        this.requirements = requirements;
-        this.autoCastWidgetIndex = autoCastWidgetIndex;
-        this.spellIndex = spellIndex;
-    }
-
     @Override
     public boolean canCast()
     {
-        return Static.invoke(() -> MagicCast.canCastLunar(spellIndex));
+        return SkillAPI.getLevel(Skill.DEFENCE) >= MIN_DEFENCE && Static.invoke(() -> MagicCast.canCastLunar(spellIndex));
     }
 
     @Override
@@ -325,14 +319,6 @@ public enum Lunar implements Spell
 
     public boolean haveRunesAvailable()
     {
-        for (RuneRequirement req : requirements)
-        {
-            if (!req.meetsRequirements())
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return Static.invoke(() -> MagicCast.hasRunesBySpellIndex(BOOK, spellIndex));
     }
 }
