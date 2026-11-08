@@ -15,14 +15,14 @@ public enum Ancient implements Spell
             0, InterfaceID.MagicSpellbook.TELEPORT_HOME_ZAROS, AncientSpell.EDGEVILLE_HOME_TELEPORT.index),
 
     SMOKE_RUSH(
-            50, InterfaceID.MagicSpellbook.SMOKE_RUSH, AncientSpell.SMOKE_RUSH.index,
+            50, InterfaceID.MagicSpellbook.SMOKE_RUSH, AncientSpell.SMOKE_RUSH.index, 31,
             new RuneRequirement(1, Rune.AIR),
             new RuneRequirement(1, Rune.FIRE),
             new RuneRequirement(2, Rune.CHAOS),
             new RuneRequirement(2, Rune.DEATH)),
 
     SHADOW_RUSH(
-            52, InterfaceID.MagicSpellbook.SHADOW_RUSH, AncientSpell.SHADOW_RUSH.index,
+            52, InterfaceID.MagicSpellbook.SHADOW_RUSH, AncientSpell.SHADOW_RUSH.index, 32,
             new RuneRequirement(1, Rune.AIR),
             new RuneRequirement(2, Rune.CHAOS),
             new RuneRequirement(2, Rune.DEATH),
@@ -35,13 +35,13 @@ public enum Ancient implements Spell
             new RuneRequirement(2, Rune.LAW)),
 
     BLOOD_RUSH(
-            56, InterfaceID.MagicSpellbook.BLOOD_RUSH, AncientSpell.BLOOD_RUSH.index,
+            56, InterfaceID.MagicSpellbook.BLOOD_RUSH, AncientSpell.BLOOD_RUSH.index, 33,
             new RuneRequirement(2, Rune.CHAOS),
             new RuneRequirement(2, Rune.DEATH),
             new RuneRequirement(1, Rune.BLOOD)),
 
     ICE_RUSH(
-            58, InterfaceID.MagicSpellbook.ICE_RUSH, AncientSpell.ICE_RUSH.index,
+            58, InterfaceID.MagicSpellbook.ICE_RUSH, AncientSpell.ICE_RUSH.index, 34,
             new RuneRequirement(2, Rune.WATER),
             new RuneRequirement(2, Rune.CHAOS),
             new RuneRequirement(2, Rune.DEATH)),
@@ -52,78 +52,78 @@ public enum Ancient implements Spell
             new RuneRequirement(1, Rune.SOUL)),
 
     SMOKE_BURST(
-            62, InterfaceID.MagicSpellbook.SMOKE_BURST, AncientSpell.SMOKE_BURST.index,
+            62, InterfaceID.MagicSpellbook.SMOKE_BURST, AncientSpell.SMOKE_BURST.index, 35,
             new RuneRequirement(2, Rune.AIR),
             new RuneRequirement(2, Rune.FIRE),
             new RuneRequirement(4, Rune.CHAOS),
             new RuneRequirement(2, Rune.DEATH)),
 
     SHADOW_BURST(
-            64, InterfaceID.MagicSpellbook.SHADOW_BURST, AncientSpell.SHADOW_BURST.index,
+            64, InterfaceID.MagicSpellbook.SHADOW_BURST, AncientSpell.SHADOW_BURST.index, 36,
             new RuneRequirement(1, Rune.AIR),
             new RuneRequirement(4, Rune.CHAOS),
             new RuneRequirement(2, Rune.DEATH),
             new RuneRequirement(2, Rune.SOUL)),
 
     BLOOD_BURST(
-            68, InterfaceID.MagicSpellbook.BLOOD_BURST, AncientSpell.BLOOD_BURST.index,
-            new RuneRequirement(2, Rune.CHAOS),
-            new RuneRequirement(4, Rune.DEATH),
+            68, InterfaceID.MagicSpellbook.BLOOD_BURST, AncientSpell.BLOOD_BURST.index, 37,
+            new RuneRequirement(4, Rune.CHAOS),
+            new RuneRequirement(2, Rune.DEATH),
             new RuneRequirement(2, Rune.BLOOD)),
 
     ICE_BURST(
-            70, InterfaceID.MagicSpellbook.ICE_BURST, AncientSpell.ICE_BURST.index,
+            70, InterfaceID.MagicSpellbook.ICE_BURST, AncientSpell.ICE_BURST.index, 38,
             new RuneRequirement(4, Rune.WATER),
             new RuneRequirement(4, Rune.CHAOS),
             new RuneRequirement(2, Rune.DEATH)),
 
     SMOKE_BLITZ(
-            74, InterfaceID.MagicSpellbook.SMOKE_BLITZ, AncientSpell.SMOKE_BLITZ.index,
+            74, InterfaceID.MagicSpellbook.SMOKE_BLITZ, AncientSpell.SMOKE_BLITZ.index, 39,
             new RuneRequirement(2, Rune.AIR),
             new RuneRequirement(2, Rune.FIRE),
             new RuneRequirement(2, Rune.DEATH),
             new RuneRequirement(2, Rune.BLOOD)),
 
     SHADOW_BLITZ(
-            76, InterfaceID.MagicSpellbook.SHADOW_BLITZ, AncientSpell.SHADOW_BLITZ.index,
+            76, InterfaceID.MagicSpellbook.SHADOW_BLITZ, AncientSpell.SHADOW_BLITZ.index, 40,
             new RuneRequirement(2, Rune.AIR),
             new RuneRequirement(2, Rune.DEATH),
             new RuneRequirement(2, Rune.BLOOD),
             new RuneRequirement(2, Rune.SOUL)),
 
     BLOOD_BLITZ(
-            80, InterfaceID.MagicSpellbook.BLOOD_BLITZ, AncientSpell.BLOOD_BLITZ.index,
+            80, InterfaceID.MagicSpellbook.BLOOD_BLITZ, AncientSpell.BLOOD_BLITZ.index, 41,
             new RuneRequirement(2, Rune.DEATH),
             new RuneRequirement(4, Rune.BLOOD)),
 
     ICE_BLITZ(
-            82, InterfaceID.MagicSpellbook.ICE_BLITZ, AncientSpell.ICE_BLITZ.index,
+            82, InterfaceID.MagicSpellbook.ICE_BLITZ, AncientSpell.ICE_BLITZ.index, 42,
             new RuneRequirement(3, Rune.WATER),
             new RuneRequirement(2, Rune.DEATH),
             new RuneRequirement(2, Rune.BLOOD)),
 
     SMOKE_BARRAGE(
-            86, InterfaceID.MagicSpellbook.SMOKE_BARRAGE, AncientSpell.SMOKE_BARRAGE.index,
+            86, InterfaceID.MagicSpellbook.SMOKE_BARRAGE, AncientSpell.SMOKE_BARRAGE.index, 43,
             new RuneRequirement(4, Rune.AIR),
             new RuneRequirement(4, Rune.FIRE),
             new RuneRequirement(4, Rune.DEATH),
             new RuneRequirement(2, Rune.BLOOD)),
 
     SHADOW_BARRAGE(
-            88, InterfaceID.MagicSpellbook.SHADOW_BARRAGE, AncientSpell.SHADOW_BARRAGE.index,
+            88, InterfaceID.MagicSpellbook.SHADOW_BARRAGE, AncientSpell.SHADOW_BARRAGE.index, 44,
             new RuneRequirement(4, Rune.AIR),
             new RuneRequirement(4, Rune.DEATH),
             new RuneRequirement(2, Rune.BLOOD),
             new RuneRequirement(3, Rune.SOUL)),
 
     BLOOD_BARRAGE(
-            92, InterfaceID.MagicSpellbook.BLOOD_BARRAGE, AncientSpell.BLOOD_BARRAGE.index,
+            92, InterfaceID.MagicSpellbook.BLOOD_BARRAGE, AncientSpell.BLOOD_BARRAGE.index, 45,
             new RuneRequirement(4, Rune.DEATH),
             new RuneRequirement(4, Rune.BLOOD),
             new RuneRequirement(1, Rune.SOUL)),
 
     ICE_BARRAGE(
-            94, InterfaceID.MagicSpellbook.ICE_BARRAGE, AncientSpell.ICE_BARRAGE.index,
+            94, InterfaceID.MagicSpellbook.ICE_BARRAGE, AncientSpell.ICE_BARRAGE.index, 46,
             new RuneRequirement(6, Rune.WATER),
             new RuneRequirement(4, Rune.DEATH),
             new RuneRequirement(2, Rune.BLOOD)),
