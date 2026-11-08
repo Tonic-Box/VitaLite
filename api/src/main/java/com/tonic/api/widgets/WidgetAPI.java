@@ -108,7 +108,6 @@ public class WidgetAPI
     {
         if (widget == null)
             return;
-        // getItemDefinition may only be called on the client thread
         Static.invoke(() -> interactSubOp(widget, menu, action));
     }
 
