@@ -12,6 +12,7 @@ import com.tonic.data.magic.Spell;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 
 public enum Standard implements Spell
@@ -55,7 +56,7 @@ public enum Standard implements Spell
             new RuneRequirement(1, Rune.LAW)
     ),
     SEERS_TELEPORT(
-            45, InterfaceID.MagicSpellbook.CAMELOT_TELEPORT, SpellbookEnums.StandardSpell.CAMELOT_TELEPORT.index, true, Varbits.DIARY_KANDARIN_HARD,
+            45, InterfaceID.MagicSpellbook.CAMELOT_TELEPORT, SpellbookEnums.StandardSpell.CAMELOT_TELEPORT.index, true, VarbitID.KANDARIN_DIARY_HARD_COMPLETE,
             new RuneRequirement(5, Rune.AIR),
             new RuneRequirement(1, Rune.LAW)
     ),
@@ -76,7 +77,7 @@ public enum Standard implements Spell
             new RuneRequirement(2, Rune.LAW)
     ),
     YANILLE_TELEPORT(
-            58, InterfaceID.MagicSpellbook.WATCHTOWER_TELEPORT, SpellbookEnums.StandardSpell.WATCHTOWER_TELEPORT.index, true, Varbits.DIARY_ARDOUGNE_HARD,
+            58, InterfaceID.MagicSpellbook.WATCHTOWER_TELEPORT, SpellbookEnums.StandardSpell.WATCHTOWER_TELEPORT.index, true, VarbitID.ARDOUGNE_DIARY_HARD_COMPLETE,
             new RuneRequirement(2, Rune.EARTH),
             new RuneRequirement(2, Rune.LAW)
     ),
@@ -441,6 +442,7 @@ public enum Standard implements Spell
     private final int level;
     private final int interfaceId;
     private final int autoCastWidgetIndex;
+    @Getter
     private final boolean members;
     @Getter
     private final RuneRequirement[] requirements;
@@ -507,28 +509,20 @@ public enum Standard implements Spell
     @Override
     public int getAction()
     {
-        if (this != VARROCK_TELEPORT && this != CAMELOT_TELEPORT && this != WATCHTOWER_TELEPORT &&
-                this != GRAND_EXCHANGE_TELEPORT && this != SEERS_TELEPORT && this != YANILLE_TELEPORT)
+        switch (this)
         {
-            return 1;
+            case VARROCK_TELEPORT:
+            case GRAND_EXCHANGE_TELEPORT:
+                return getAction(VarbitID.VARROCK_GE_TELEPORT, this, VARROCK_TELEPORT, GRAND_EXCHANGE_TELEPORT);
+            case CAMELOT_TELEPORT:
+            case SEERS_TELEPORT:
+                return getAction(VarbitID.SEERS_CAMELOT_TELEPORT, this, CAMELOT_TELEPORT, SEERS_TELEPORT);
+            case WATCHTOWER_TELEPORT:
+            case YANILLE_TELEPORT:
+                return getAction(VarbitID.YANILLE_TELEPORT_LOCATION, this, WATCHTOWER_TELEPORT, YANILLE_TELEPORT);
+            default:
+                return 1;
         }
-
-        if (this == VARROCK_TELEPORT || this == GRAND_EXCHANGE_TELEPORT)
-        {
-            return getAction(VarbitID.VARROCK_GE_TELEPORT, this, VARROCK_TELEPORT, GRAND_EXCHANGE_TELEPORT);
-        }
-
-        if (this == CAMELOT_TELEPORT || this == SEERS_TELEPORT)
-        {
-            return getAction(VarbitID.SEERS_CAMELOT_TELEPORT, this, CAMELOT_TELEPORT, SEERS_TELEPORT);
-        }
-
-        if (this == WATCHTOWER_TELEPORT || this == YANILLE_TELEPORT)
-        {
-            return getAction(VarbitID.YANILLE_TELEPORT_LOCATION, this, WATCHTOWER_TELEPORT, YANILLE_TELEPORT);
-        }
-
-        return 1;
     }
 
     private int getAction(int varbit, Standard spell, Standard baseSpell, Standard variantSpell)
@@ -561,20 +555,22 @@ public enum Standard implements Spell
     @Override
     public boolean canCast()
     {
+        if (questRequirement != null && QuestAPI.getState(questRequirement) != QuestState.FINISHED)
+        {
+            return false;
+        }
+
+        if (varbitRequirement != -1 && VarAPI.getVar(varbitRequirement) != 1)
+        {
+            return false;
+        }
+
         return Static.invoke(() -> MagicCast.canCastStandard(spellIndex));
     }
 
     public boolean haveRunesAvailable()
     {
-        for (RuneRequirement req : requirements)
-        {
-            if (!req.meetsRequirements())
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return Static.invoke(() -> MagicCast.hasRunesBySpellIndex(BOOK, spellIndex));
     }
 
     public boolean haveEquipment()
@@ -583,12 +579,12 @@ public enum Standard implements Spell
         {
             case IBAN_BLAST:
                 return EquipmentAPI.isEquipped(i ->
-                        i.getId() == ItemID.IBANS_STAFF || i.getId() == ItemID.IBANS_STAFF_1410 || i.getId() == ItemID.IBANS_STAFF_U
+                        i.getId() == ItemID.IBANSTAFF || i.getId() == ItemID.BROKENIBANSTAFF || i.getId() == ItemID.IBANSTAFF_UPGRADED
                 );
             case MAGIC_DART:
                 return EquipmentAPI.isEquipped(i ->
-                        i.getId() == ItemID.SLAYERS_STAFF_E || i.getId() == ItemID.SLAYERS_STAFF || i.getId() == ItemID.STAFF_OF_THE_DEAD ||
-                                i.getId() == ItemID.STAFF_OF_THE_DEAD_23613 || i.getId() == ItemID.TOXIC_STAFF_OF_THE_DEAD || i.getId() == ItemID.STAFF_OF_LIGHT ||
+                        i.getId() == ItemID.SLAYER_STAFF_ENCHANTED || i.getId() == ItemID.SLAYER_STAFF || i.getId() == ItemID.SOTD ||
+                                i.getId() == ItemID.BR_SOTD || i.getId() == ItemID.TOXIC_SOTD_CHARGED || i.getId() == ItemID.STAFF_OF_LIGHT ||
                                 i.getId() == ItemID.STAFF_OF_BALANCE
                 );
             case SARADOMIN_STRIKE:
@@ -597,12 +593,12 @@ public enum Standard implements Spell
                 );
             case FLAMES_OF_ZAMORAK:
                 return EquipmentAPI.isEquipped(i ->
-                        i.getId() == ItemID.ZAMORAK_STAFF || i.getId() == ItemID.STAFF_OF_THE_DEAD || i.getId() == ItemID.STAFF_OF_THE_DEAD_23613
-                                || i.getId() == ItemID.TOXIC_STAFF_OF_THE_DEAD
+                        i.getId() == ItemID.ZAMORAK_STAFF || i.getId() == ItemID.SOTD || i.getId() == ItemID.BR_SOTD
+                                || i.getId() == ItemID.TOXIC_SOTD_CHARGED
                 );
             case CLAWS_OF_GUTHIX:
                 return EquipmentAPI.isEquipped(i ->
-                        i.getId() == ItemID.GUTHIX_STAFF || i.getId() == ItemID.VOID_KNIGHT_MACE || i.getId() == ItemID.STAFF_OF_BALANCE
+                        i.getId() == ItemID.GUTHIX_STAFF || i.getId() == ItemID.PEST_VOID_KNIGHT_MACE || i.getId() == ItemID.STAFF_OF_BALANCE
                 );
             default:
                 return true;
@@ -619,25 +615,9 @@ public enum Standard implements Spell
             case CHARGE_WATER_ORB:
             case CHARGE_EARTH_ORB:
             case CHARGE_FIRE_ORB:
-                return InventoryAPI.contains(ItemID.UNPOWERED_ORB);
+                return InventoryAPI.contains(ItemID.STAFFORB);
             default:
                 return true;
         }
-    }
-
-    public boolean hasRequirements()
-    {
-        Client client = Static.getClient();
-        if (questRequirement == null && varbitRequirement == -1)
-        {
-            return true;
-        }
-
-        if (questRequirement != null && QuestAPI.getState(questRequirement) != QuestState.FINISHED)
-        {
-            return false;
-        }
-
-        return varbitRequirement == -1 || VarAPI.getVar(varbitRequirement) == 1;
     }
 }

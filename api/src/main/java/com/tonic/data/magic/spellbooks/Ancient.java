@@ -192,14 +192,6 @@ public enum Ancient implements Spell
 
     public boolean haveRunesAvailable()
     {
-        for (RuneRequirement req : requirements)
-        {
-            if (!req.meetsRequirements())
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return Static.invoke(() -> MagicCast.hasRunesBySpellIndex(BOOK, spellIndex));
     }
 }
