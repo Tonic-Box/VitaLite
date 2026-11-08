@@ -106,6 +106,13 @@ public class WidgetAPI
      */
     public static void interact(Widget widget, String menu, String action)
     {
+        if (widget == null)
+            return;
+        Static.invoke(() -> interactSubOp(widget, menu, action));
+    }
+
+    private static void interactSubOp(Widget widget, String menu, String action)
+    {
         Client client = Static.getClient();
 
         ItemComposition composition = client.getItemDefinition(widget.getItemId());
