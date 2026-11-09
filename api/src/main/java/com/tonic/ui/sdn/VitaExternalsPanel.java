@@ -284,7 +284,7 @@ public class VitaExternalsPanel extends PluginPanel {
             text = "Nothing installed yet. Open Browse to find plugins.";
         }
         WrappedText label = new WrappedText(text, HubTheme.textFont(), HubTheme.MUTED, 0);
-        label.setCentered(true);
+        label.setCentered();
         label.setBorder(new EmptyBorder(30, 0, 0, 0));
         return label;
     }
@@ -381,7 +381,7 @@ public class VitaExternalsPanel extends PluginPanel {
             primary(model, "Install", HubTheme.INSTALL, () -> hub.install(entry.repo.url, plugin.id));
         }
 
-        if (entry.isInstalled()) {
+        if (installed != null && entry.isInstalled()) {
             controls(model, new File(installed.file));
             model.trash = () -> uninstall(plugin.id, plugin.displayName());
         }
