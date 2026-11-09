@@ -5,6 +5,7 @@ import com.tonic.api.game.QuestAPI;
 import com.tonic.api.game.SkillAPI;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.pathfinder.Walker;
+import com.tonic.services.pathfinder.abstractions.IStep;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
@@ -128,10 +129,15 @@ public enum BankLocations {
 
     public static BankLocations getNearest()
     {
-        WorldPoint source = PlayerEx.getLocal().getWorldPoint();
+        List<IStep> steps = pathToNearest().getSteps();
+        if (steps.isEmpty())
+        {
+            return getNearest(PlayerEx.getLocal().getWorldPoint());
+        }
+        WorldPoint end = steps.get(steps.size() - 1).getPosition();
         return Arrays.stream(values())
                 .filter(BankLocations::test)
-                .min(Comparator.comparingInt(x -> x.getArea().distanceTo2D(source)))
+                .min(Comparator.comparingInt(x -> x.getArea().distanceTo(end)))
                 .orElse(null);
     }
 
