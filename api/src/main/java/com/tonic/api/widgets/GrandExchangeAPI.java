@@ -29,7 +29,8 @@ public class GrandExchangeAPI
 {
 
     private static final Supplier<Widget> COLLECT_BUTTON = () -> {
-        return WidgetAPI.get(465, 6, 0);
+        Widget collect = WidgetAPI.get(InterfaceID.GeOffers.COLLECTALL);
+        return collect == null ? null : collect.getChild(0);
     };
 
     /**
@@ -37,10 +38,11 @@ public class GrandExchangeAPI
      */
     public static void close()
     {
-        Widget exitButton = WidgetAPI.get(465, 2, 11);
+        Widget frame = WidgetAPI.get(InterfaceID.GeOffers.FRAME);
+        Widget exitButton = frame == null ? null : frame.getChild(11);
         if (WidgetAPI.isVisible(exitButton) && GrandExchangeAPI.isOpen())
         {
-            GameAPI.invokeMenuAction(1, 57, 11, 30474242, -1);
+            GameAPI.invokeMenuAction(1, 57, 11, InterfaceID.GeOffers.FRAME, -1);
         }
     }
 
@@ -119,7 +121,7 @@ public class GrandExchangeAPI
         Client client = Static.getClient();
         TClient tclient = Static.getClient();
         Static.invoke(() -> {
-            Widget w = client.getWidget(289, 8);
+            Widget w = client.getWidget(InterfaceID.Popupoverlay.BUTTON_1);
             if(w == null || !WidgetAPI.isVisible(w))
                 return;
 
@@ -153,7 +155,7 @@ public class GrandExchangeAPI
             {
                 WidgetAPI.interact(1, slot.getId(), 2, -1);
             }
-            int option = noted ? 1 : 2;
+            int option = noted == (slot.getQuantity() != 1) ? 1 : 2;
             WidgetAPI.interact(option, InterfaceID.GeOffers.DETAILS_COLLECT, 2, itemId);
             WidgetAPI.interact(1, InterfaceID.GeOffers.DETAILS_COLLECT, 3, ItemID.COINS);
         });
@@ -197,7 +199,6 @@ public class GrandExchangeAPI
         GrandExchangeSlot slot = GrandExchangeSlot.getBySlot(slotNumber);
         if(slot == null)
             return null;
-        TClient client = Static.getClient();
         Static.invoke(() -> {
             WidgetAPI.interact(1, slot.getId(), slot.getBuyChild(), -1);
             DialogueAPI.resumeObjectDialogue(itemId);

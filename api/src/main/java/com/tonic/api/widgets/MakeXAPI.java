@@ -4,6 +4,7 @@ import com.tonic.api.game.VarAPI;
 import com.tonic.data.wrappers.ItemEx;
 import net.runelite.api.Item;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarClientID;
 import net.runelite.api.widgets.Widget;
 import org.apache.commons.lang3.ArrayUtils;
@@ -100,7 +101,7 @@ public class MakeXAPI
   private static List<ItemEx> getResultingItems()
   {
     List<ItemEx> items = new ArrayList<>();
-    for (int i = InterfaceID.Skillmulti.A; i < InterfaceID.Skillmulti.R; i++) //ok jagex...
+    for (int i = InterfaceID.Skillmulti.A; i <= InterfaceID.Skillmulti.R; i++)
     {
       Widget button = WidgetAPI.get(i);
       if (button == null || button.isSelfHidden())
@@ -117,7 +118,7 @@ public class MakeXAPI
       for (Widget part : parts)
       {
         int itemId = part.getItemId();
-        if (itemId == -1 || itemId == 6512)
+        if (itemId == -1 || itemId == ItemID.BLANKOBJECT)
         {
           continue;
         }

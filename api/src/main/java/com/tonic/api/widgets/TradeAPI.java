@@ -12,7 +12,7 @@ import java.util.List;
 public class TradeAPI
 {
 
-  private static final int TRADE_OTHER_INV_ID = 32858;
+  private static final int TRADE_OTHER_INV_ID = InventoryID.TRADEOFFER | 0x8000;
 
   /**
    * @return true if the trade window is open

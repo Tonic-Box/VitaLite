@@ -15,6 +15,7 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.widgets.Widget;
 
 import java.util.List;
 import java.util.Set;
@@ -25,6 +26,8 @@ import java.util.stream.Collectors;
  */
 public class BankAPI
 {
+    private static final int WITHDRAW_LAST_X_OP = 5;
+    private static final int DEPOSIT_LAST_X_OP = 6;
 
     private static class XSnapshot
     {
@@ -62,14 +65,7 @@ public class BankAPI
      */
     public static void setX(int amount)
     {
-        int withdrawMode = VarAPI.getVar(VarbitID.BANK_QUANTITY_TYPE);
-        if(withdrawMode != 3)
-        {
-            WidgetAPI.interact(1, InterfaceID.Bankmain.QUANTITYX, -1, -1);
-        }
-
-        int xQuantity = getX();
-        if(xQuantity != amount && amount != 1 && amount != 5 && amount != 10 && amount != -1)
+        if(getX() != amount)
         {
             WidgetAPI.interact(2, InterfaceID.Bankmain.QUANTITYX, -1, -1);
             DialogueAPI.resumeNumericDialogue(amount);
@@ -358,22 +354,7 @@ public class BankAPI
      * @param slot The slot of the item in the bank.
      */
     public static void withdrawAction(int id, int amount, int slot) {
-        setX(amount);
-        if(amount == 1) {
-            WidgetAPI.interact(2, InterfaceID.Bankmain.ITEMS, slot, id);
-        }
-        else if(amount == 5) {
-            WidgetAPI.interact(3, InterfaceID.Bankmain.ITEMS, slot, id);
-        }
-        else if(amount == 10) {
-            WidgetAPI.interact(4, InterfaceID.Bankmain.ITEMS, slot, id);
-        }
-        else if(amount == -1) {
-            WidgetAPI.interact(7, InterfaceID.Bankmain.ITEMS, slot, id);
-        }
-        else {
-            WidgetAPI.interact(5, InterfaceID.Bankmain.ITEMS, slot, id);
-        }
+        itemAction(InterfaceID.Bankmain.ITEMS, "Withdraw-", WITHDRAW_LAST_X_OP, id, amount, slot);
     }
 
     /**
@@ -383,22 +364,36 @@ public class BankAPI
      * @param slot The slot of the item in the inventory.
      */
     public static void depositAction(int id, int amount, int slot) {
-        setX(amount);
-        if(amount == 1) {
-            WidgetAPI.interact(2, InterfaceID.Bankside.ITEMS, slot, id);
+        itemAction(InterfaceID.Bankside.ITEMS, "Deposit-", DEPOSIT_LAST_X_OP, id, amount, slot);
+    }
+
+    private static void itemAction(int component, String verb, int lastXOp, int id, int amount, int slot)
+    {
+        int op = opNamed(component, slot, verb + (amount == -1 ? "All" : amount));
+        if(op == -1)
+        {
+            setX(amount);
+            op = lastXOp;
         }
-        else if(amount == 5) {
-            WidgetAPI.interact(4, InterfaceID.Bankside.ITEMS, slot, id);
+        WidgetAPI.interact(op, component, slot, id);
+    }
+
+    private static int opNamed(int component, int slot, String name)
+    {
+        Widget item = WidgetAPI.get(component >>> 16, component & 0xFFFF, slot);
+        String[] actions = item == null ? null : item.getActions();
+        if(actions == null)
+        {
+            return -1;
         }
-        else if(amount == 10) {
-            WidgetAPI.interact(5, InterfaceID.Bankside.ITEMS, slot, id);
+        for(int i = 0; i < actions.length; i++)
+        {
+            if(name.equalsIgnoreCase(actions[i]))
+            {
+                return i + 1;
+            }
         }
-        else if(amount == -1) {
-            WidgetAPI.interact(8, InterfaceID.Bankside.ITEMS, slot, id);
-        }
-        else {
-            WidgetAPI.interact(6, InterfaceID.Bankside.ITEMS, slot, id);
-        }
+        return -1;
     }
 
     /**
@@ -439,7 +434,7 @@ public class BankAPI
     {
         if (BankAPI.isOpen())
         {
-            ClientScriptAPI.runScript(29);
+            ClientScriptAPI.closeInterface();
         }
     }
 
@@ -540,7 +535,7 @@ public class BankAPI
      * @param itemId The id of the item to use.
      */
     public static void bankUse(int itemId) {
-        ItemEx item = InventoryQuery.fromInventoryId(InventoryID.INV).withId(itemId).first();
+        ItemEx item = InventoryQuery.fromInventoryId(InventoryID.BANK).withId(itemId).first();
         if(item == null)
             return;
         WidgetAPI.interact(9, InterfaceID.Bankmain.ITEMS, item.getSlot(), itemId);

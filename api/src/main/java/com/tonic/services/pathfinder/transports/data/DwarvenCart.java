@@ -14,8 +14,7 @@ import com.tonic.queries.TileObjectQuery;
 import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.services.pathfinder.requirements.*;
 import lombok.Getter;
-import net.runelite.api.ItemID;
-import net.runelite.api.NPC;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.Quest;
 import net.runelite.api.QuestState;
 import net.runelite.api.coords.WorldPoint;
@@ -38,7 +37,7 @@ public enum DwarvenCart
         this.requirements.addRequirement(new QuestRequirement(Quest.THE_GIANT_DWARF, QuestState.IN_PROGRESS, QuestState.FINISHED));
         this.requirements.addRequirement(new WorldRequirement(true));
         if(tripBackCost > 0)
-            this.requirements.addRequirement(new ItemRequirement(false, tripBackCost, ItemID.COINS_995));
+            this.requirements.addRequirement(new ItemRequirement(false, tripBackCost, ItemID.COINS));
         this.requirements.addRequirements(requirements);
     }
 

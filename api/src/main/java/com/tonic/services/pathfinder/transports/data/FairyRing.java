@@ -4,16 +4,13 @@ import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.services.pathfinder.requirements.*;
 import lombok.Getter;
-import net.runelite.api.ItemID;
 import net.runelite.api.Quest;
 import net.runelite.api.QuestState;
-import net.runelite.api.Varbits;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
-
-import java.util.Arrays;
 
 @Getter
 public enum FairyRing
@@ -95,21 +92,21 @@ public enum FairyRing
         String currentCode = getCurrentCode();
         if (currentCode.charAt(0) != this.code.charAt(0))
         {
-            Widget widget = WidgetAPI.get(WidgetInfo.FAIRY_RING.getGroupId(), TURN_INDICES[0][0]);
+            Widget widget = WidgetAPI.get(InterfaceID.FAIRYRINGS, TURN_INDICES[0][0]);
             WidgetAPI.interact(widget, 1);
             return;
         }
 
         if (currentCode.charAt(1) != this.code.charAt(1))
         {
-            Widget widget = WidgetAPI.get(WidgetInfo.FAIRY_RING.getGroupId(), TURN_INDICES[1][0]);
+            Widget widget = WidgetAPI.get(InterfaceID.FAIRYRINGS, TURN_INDICES[1][0]);
             WidgetAPI.interact(widget, 1);
             return;
         }
 
         if (currentCode.charAt(2) != this.code.charAt(2))
         {
-            Widget widget = WidgetAPI.get(WidgetInfo.FAIRY_RING.getGroupId(), TURN_INDICES[2][0]);
+            Widget widget = WidgetAPI.get(InterfaceID.FAIRYRINGS, TURN_INDICES[2][0]);
             WidgetAPI.interact(widget, 1);
         }
     }
@@ -130,9 +127,9 @@ public enum FairyRing
 
     public static String getCurrentCode()
     {
-        return CODES[0][VarAPI.getVar(Varbits.FAIRY_RING_DIAL_ADCB)]
-                + CODES[1][VarAPI.getVar(Varbits.FAIRY_RIGH_DIAL_ILJK)]
-                + CODES[2][VarAPI.getVar(Varbits.FAIRY_RING_DIAL_PSRQ)];
+        return CODES[0][VarAPI.getVar(VarbitID.FAIRYRING_1)]
+                + CODES[1][VarAPI.getVar(VarbitID.FAIRYRING_2)]
+                + CODES[2][VarAPI.getVar(VarbitID.FAIRYRING_3)];
     }
 
 }

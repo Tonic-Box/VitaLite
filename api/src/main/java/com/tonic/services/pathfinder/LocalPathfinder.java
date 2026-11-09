@@ -123,7 +123,7 @@ public class LocalPathfinder
         {
             for(int y = 0; y < flags[x].length; y++)
             {
-                point = WorldPoint.fromScene(client, x, y, wv.getPlane());
+                point = WorldPoint.fromScene(wv, x, y, wv.getPlane());
                 collisionMap.put(WorldPointUtil.compress(point.getX(), point.getY(), wv.getPlane()), flags[x][y]);
             }
         }

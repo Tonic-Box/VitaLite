@@ -4,13 +4,11 @@ import com.tonic.Static;
 import com.tonic.api.TClient;
 import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.data.VarrockMuseumAnswer;
-import com.tonic.data.WidgetInfoExtended;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
 import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import net.runelite.client.config.ConfigManager;
 
 import java.util.ArrayList;
@@ -22,6 +20,7 @@ import java.util.List;
  */
 public class DialogueAPI
 {
+    private static final int SCRIPT_CLOSE_MESSAGE_LAYER = 101;
     private static final net.runelite.client.config.ConfigManager configManager = Static.getInjector().getInstance(ConfigManager.class);
 
 	/**
@@ -32,13 +31,13 @@ public class DialogueAPI
     public static String getDialogueHeader()
     {
         return Static.invoke(() -> {
-            if (WidgetAPI.get(WidgetInfo.DIALOG_NPC_TEXT) != null) {
-                return WidgetAPI.get(WidgetInfo.DIALOG_NPC_NAME).getText();
+            if (WidgetAPI.get(InterfaceID.ChatLeft.TEXT) != null) {
+                return WidgetAPI.get(InterfaceID.ChatLeft.NAME).getText();
             }
-            else if (WidgetAPI.get(WidgetInfo.DIALOG_PLAYER_TEXT) != null) {
+            else if (WidgetAPI.get(InterfaceID.ChatRight.TEXT) != null) {
                 return "Player";
             }
-            else if (WidgetAPI.get(WidgetInfoExtended.DIALOG_OPTION_OPTION1) != null) {
+            else if (WidgetAPI.get(InterfaceID.Chatmenu.OPTIONS) != null) {
                 return "Select an Option";
             }
             return "UNKNOWN";
@@ -53,24 +52,17 @@ public class DialogueAPI
     public static String getDialogueText()
     {
         return Static.invoke(() -> {
-            if (WidgetAPI.get(WidgetInfo.DIALOG_NPC_TEXT) != null) {
-                return WidgetAPI.get(WidgetInfo.DIALOG_NPC_TEXT).getText();
+            if (WidgetAPI.get(InterfaceID.ChatLeft.TEXT) != null) {
+                return WidgetAPI.get(InterfaceID.ChatLeft.TEXT).getText();
             }
-            else if (WidgetAPI.get(WidgetInfo.DIALOG_PLAYER_TEXT) != null) {
-                return WidgetAPI.get(WidgetInfo.DIALOG_PLAYER_TEXT).getText();
+            else if (WidgetAPI.get(InterfaceID.ChatRight.TEXT) != null) {
+                return WidgetAPI.get(InterfaceID.ChatRight.TEXT).getText();
             }
-            else if (WidgetAPI.get(WidgetInfo.DIALOG_SPRITE_TEXT) != null) {
-                return WidgetAPI.get(WidgetInfo.DIALOG_SPRITE_TEXT).getText();
+            else if (WidgetAPI.get(InterfaceID.Objectbox.TEXT) != null) {
+                return WidgetAPI.get(InterfaceID.Objectbox.TEXT).getText();
             }
-            else if (WidgetAPI.get(WidgetInfoExtended.DIALOG2_SPRITE_TEXT) != null) {
-                return WidgetAPI.get(WidgetInfoExtended.DIALOG2_SPRITE_TEXT).getText();
-            }
-
-            else if (WidgetAPI.get(WidgetInfoExtended.MINIGAME_DIALOG_TEXT) != null) {
-                return WidgetAPI.get(WidgetInfoExtended.MINIGAME_DIALOG_TEXT).getText();
-            }
-            else if (WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_TEXT) != null) {
-                return WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_TEXT).getText();
+            else if (WidgetAPI.get(InterfaceID.ObjectboxDouble.TEXT) != null) {
+                return WidgetAPI.get(InterfaceID.ObjectboxDouble.TEXT).getText();
             }
             else if(WidgetAPI.get(InterfaceID.Messagebox.TEXT) != null) {
                 return WidgetAPI.get(InterfaceID.Messagebox.TEXT).getText();
@@ -87,47 +79,31 @@ public class DialogueAPI
     public static boolean continueDialogue() {
         TClient client = Static.getClient();
         return Static.invoke(() -> {
-            if (WidgetAPI.get(WidgetInfoExtended.DIALOG_NPC_CONTINUE) != null) {
-                client.getPacketWriter().resumePauseWidgetPacket(WidgetInfoExtended.DIALOG_NPC_CONTINUE.getId(), -1);
+            if (WidgetAPI.get(InterfaceID.ChatLeft.CONTINUE) != null) {
+                client.getPacketWriter().resumePauseWidgetPacket(InterfaceID.ChatLeft.CONTINUE, -1);
                 return true;
             }
-            if (WidgetAPI.get(633, 0) != null) {
-                client.getPacketWriter().resumePauseWidgetPacket(WidgetInfo.PACK(633, 0), -1);
+            if (WidgetAPI.get(InterfaceID.Graphicbox.UNIVERSE) != null) {
+                client.getPacketWriter().resumePauseWidgetPacket(InterfaceID.Graphicbox.UNIVERSE, -1);
                 return true;
             }
-            if (WidgetAPI.get(WidgetInfoExtended.DIALOG_PLAYER_CONTINUE) != null) {
-                client.getPacketWriter().resumePauseWidgetPacket(WidgetInfoExtended.DIALOG_PLAYER_CONTINUE.getId(), -1);
+            if (WidgetAPI.get(InterfaceID.ChatRight.CONTINUE) != null) {
+                client.getPacketWriter().resumePauseWidgetPacket(InterfaceID.ChatRight.CONTINUE, -1);
                 return true;
             }
-            if (WidgetAPI.get(WidgetInfo.DIALOG_SPRITE) != null) {
-                client.getPacketWriter().resumePauseWidgetPacket(WidgetInfo.DIALOG_SPRITE.getId(), 0);
+            if (WidgetAPI.get(InterfaceID.Objectbox.UNIVERSE) != null) {
+                client.getPacketWriter().resumePauseWidgetPacket(InterfaceID.Objectbox.UNIVERSE, 0);
                 return true;
             }
-            if (WidgetAPI.get(WidgetInfoExtended.DIALOG2_SPRITE) != null) {
-                client.getPacketWriter().resumePauseWidgetPacket(WidgetInfoExtended.DIALOG2_SPRITE_CONTINUE.getId(), -1);
+            if (WidgetAPI.get(InterfaceID.ObjectboxDouble.UNIVERSE) != null) {
+                client.getPacketWriter().resumePauseWidgetPacket(InterfaceID.ObjectboxDouble.PAUSEBUTTON, -1);
                 return true;
             }
-            if (WidgetAPI.get(WidgetInfoExtended.MINIGAME_DIALOG_CONTINUE) != null) {
-                Widget w = WidgetAPI.get(WidgetInfoExtended.MINIGAME_DIALOG_CONTINUE);
+            if (WidgetAPI.get(InterfaceID.LevelupDisplay.CONTINUE) != null) {
+                Widget w = WidgetAPI.get(InterfaceID.LevelupDisplay.CONTINUE);
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                 {
-                    client.getPacketWriter().resumePauseWidgetPacket(WidgetInfoExtended.MINIGAME_DIALOG_CONTINUE.getId(), -1);
-                    return true;
-                }
-            }
-            if (WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_CONTINUE) != null) {
-                Widget w = WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_CONTINUE);
-                if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
-                {
-                    client.getPacketWriter().resumePauseWidgetPacket(WidgetInfoExtended.DIALOG_NOTIFICATION_CONTINUE.getId(), -1);
-                    return true;
-                }
-            }
-            if (WidgetAPI.get(WidgetInfoExtended.LEVEL_UP_CONTINUE) != null) {
-                Widget w = WidgetAPI.get(WidgetInfoExtended.LEVEL_UP_CONTINUE);
-                if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
-                {
-                    client.getPacketWriter().resumePauseWidgetPacket(WidgetInfoExtended.LEVEL_UP_CONTINUE.getId(), -1);
+                    client.getPacketWriter().resumePauseWidgetPacket(InterfaceID.LevelupDisplay.CONTINUE, -1);
                     return true;
                 }
             }
@@ -143,7 +119,7 @@ public class DialogueAPI
                 Widget w = WidgetAPI.get(InterfaceID.Chatbox.MES_TEXT2);
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                 {
-                    ((Client) client).runScript(101, 1);
+                    ((Client) client).runScript(SCRIPT_CLOSE_MESSAGE_LAYER, 1);
                     return true;
                 }
             }
@@ -158,33 +134,23 @@ public class DialogueAPI
      */
     public static boolean dialoguePresent() {
         return Static.invoke(() -> {
-            if (WidgetAPI.get(WidgetInfoExtended.DIALOG_NPC_CONTINUE) != null) {
+            if (WidgetAPI.get(InterfaceID.ChatLeft.CONTINUE) != null) {
                 return true;
             }
-            if (WidgetAPI.get(633, 0) != null) {
+            if (WidgetAPI.get(InterfaceID.Graphicbox.UNIVERSE) != null) {
                 return true;
             }
-            if (WidgetAPI.get(WidgetInfoExtended.DIALOG_PLAYER_CONTINUE) != null) {
+            if (WidgetAPI.get(InterfaceID.ChatRight.CONTINUE) != null) {
                 return true;
             }
-            if (WidgetAPI.get(WidgetInfo.DIALOG_SPRITE) != null) {
+            if (WidgetAPI.get(InterfaceID.Objectbox.UNIVERSE) != null) {
                 return true;
             }
-            if (WidgetAPI.get(WidgetInfoExtended.DIALOG2_SPRITE) != null) {
+            if (WidgetAPI.get(InterfaceID.ObjectboxDouble.UNIVERSE) != null) {
                 return true;
             }
-            if (WidgetAPI.get(WidgetInfoExtended.MINIGAME_DIALOG_CONTINUE) != null) {
-                Widget w = WidgetAPI.get(WidgetInfoExtended.MINIGAME_DIALOG_CONTINUE);
-                if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
-                    return true;
-            }
-            if (WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_CONTINUE) != null) {
-                Widget w = WidgetAPI.get(WidgetInfoExtended.DIALOG_NOTIFICATION_CONTINUE);
-                if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
-                    return true;
-            }
-            if(WidgetAPI.get(WidgetInfoExtended.LEVEL_UP_CONTINUE) != null) {
-                Widget w = WidgetAPI.get(WidgetInfoExtended.LEVEL_UP_CONTINUE);
+            if(WidgetAPI.get(InterfaceID.LevelupDisplay.CONTINUE) != null) {
+                Widget w = WidgetAPI.get(InterfaceID.LevelupDisplay.CONTINUE);
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                     return true;
             }
@@ -198,7 +164,7 @@ public class DialogueAPI
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                     return true;
             }
-            return WidgetAPI.get(WidgetInfoExtended.DIALOG_OPTION_OPTION1) != null || WidgetAPI.get(WidgetInfo.DIALOG_OPTION_OPTIONS) != null;
+            return WidgetAPI.get(InterfaceID.Chatmenu.OPTIONS) != null;
         });
     }
 
@@ -208,7 +174,7 @@ public class DialogueAPI
      * @param option The index of the option to select (0-based).
      */
     public static void selectOption(int option) {
-        resumePause(WidgetInfoExtended.DIALOG_OPTION_OPTION1.getId(), option);
+        resumePause(InterfaceID.Chatmenu.OPTIONS, option);
     }
 
     /**
@@ -220,7 +186,7 @@ public class DialogueAPI
     public static boolean selectOption(String option) {
 
         return Static.invoke(() -> {
-            Widget widget = WidgetAPI.get(WidgetInfoExtended.DIALOG_OPTION_OPTION1);
+            Widget widget = WidgetAPI.get(InterfaceID.Chatmenu.OPTIONS);
             if(widget == null)
                 return false;
             Widget[] dialogOption1kids = widget.getChildren();
@@ -296,20 +262,6 @@ public class DialogueAPI
     }
 
     /**
-     * Sends a "make X" dialogue input with the specified quantity.
-     *
-     * @param quantity The quantity to input in the "make X" dialogue.
-     */
-    public static void makeX(int quantity)
-    {
-        TClient client = Static.getClient();
-        Static.invoke(() -> {
-            ClickManager.click(ClickType.WIDGET);
-            client.getPacketWriter().resumePauseWidgetPacket(17694734, quantity);
-        });
-    }
-
-    /**
      * Retrieves a list of available dialogue options.
      *
      * @return A list of dialogue option texts. If no options are present, returns an empty list.
@@ -317,7 +269,7 @@ public class DialogueAPI
     public static List<String> getOptions() {
         return Static.invoke(() -> {
             List<String> options = new ArrayList<>();
-            Widget widget = WidgetAPI.get(WidgetInfoExtended.DIALOG_OPTION_OPTION1);
+            Widget widget = WidgetAPI.get(InterfaceID.Chatmenu.OPTIONS);
             if(widget == null)
                 return options;
             Widget[] dialogOption1kids = widget.getChildren();
@@ -374,7 +326,7 @@ public class DialogueAPI
      * @return true if an option was selected, false otherwise.
      */
     public static boolean continueQuestHelper() {
-        Widget widget = WidgetAPI.get(WidgetInfoExtended.DIALOG_OPTION_OPTION1);
+        Widget widget = WidgetAPI.get(InterfaceID.Chatmenu.OPTIONS);
         if (widget == null)
             return false;
         Widget[] dialogOption1kids = widget.getChildren();
@@ -400,16 +352,16 @@ public class DialogueAPI
      * @return true if an answer was selected, false otherwise.
      */
     public static boolean continueMuseumQuiz() {
-        Widget questionWidget = WidgetAPI.get(WidgetInfo.VARROCK_MUSEUM_QUESTION);
+        Widget questionWidget = WidgetAPI.get(InterfaceID.VmNaturalHistory.VM_NATHIS_QUESTION);
         if(questionWidget == null)
             return false;
 
         final Widget answerWidget = VarrockMuseumAnswer.findCorrect(
                 Static.getClient(),
                 questionWidget.getText(),
-                WidgetInfo.VARROCK_MUSEUM_FIRST_ANSWER,
-                WidgetInfo.VARROCK_MUSEUM_SECOND_ANSWER,
-                WidgetInfo.VARROCK_MUSEUM_THIRD_ANSWER);
+                InterfaceID.VmNaturalHistory.VM_NATHIS_ANSWER_01,
+                InterfaceID.VmNaturalHistory.VM_NATHIS_ANSWER_02,
+                InterfaceID.VmNaturalHistory.VM_NATHIS_ANSWER_03);
 
         if (answerWidget == null)
             return false;

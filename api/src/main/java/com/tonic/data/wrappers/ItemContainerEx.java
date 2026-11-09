@@ -1,10 +1,8 @@
 package com.tonic.data.wrappers;
 
 import com.tonic.Static;
-import com.tonic.data.wrappers.ItemEx;
 import lombok.Getter;
 import net.runelite.api.Client;
-import net.runelite.api.InventoryID;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemContainer;
 
@@ -17,10 +15,6 @@ public class ItemContainerEx
     private final int containerId;
     private final List<ItemEx> items;
 
-    public ItemContainerEx(InventoryID inventoryID)
-    {
-        this(inventoryID.getId());
-    }
     public ItemContainerEx(int containerId)
     {
         this.containerId = containerId;

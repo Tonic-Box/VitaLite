@@ -5,7 +5,7 @@ import com.tonic.services.pathfinder.requirements.Requirements;
 import com.tonic.services.pathfinder.requirements.WorldRequirement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import net.runelite.api.ItemID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.coords.WorldPoint;
 
 @AllArgsConstructor
@@ -36,7 +36,7 @@ public enum MinecartNetwork
     static
     {
         requirements = new Requirements();
-        requirements.addRequirement(new ItemRequirement(false, 20, ItemID.COINS_995));
+        requirements.addRequirement(new ItemRequirement(false, 20, ItemID.COINS));
         requirements.addRequirement(new WorldRequirement(true));
     }
 }

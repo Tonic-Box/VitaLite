@@ -1,6 +1,6 @@
 package com.tonic.api.handlers;
 
-import com.tonic.api.entities.PlayerAPI;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.util.DialogueNode;
@@ -100,7 +100,7 @@ public class TileObjectBuilder extends AbstractHandlerBuilder<TileObjectBuilder>
                 return step;
             }
         });
-        addDelayUntil(() -> PlayerAPI.isIdle());
+        addDelayUntil(() -> PlayerEx.getLocal().isIdle());
         if(node != null)
         {
             addDelayUntil(() -> !node.processStep());

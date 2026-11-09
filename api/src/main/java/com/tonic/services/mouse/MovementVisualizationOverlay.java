@@ -4,7 +4,6 @@ import com.tonic.services.mouserecorder.MovementVisualization;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
 import java.awt.*;
 
 /**
@@ -17,7 +16,7 @@ public class MovementVisualizationOverlay extends Overlay
     {
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ALWAYS_ON_TOP);
-        setPriority(OverlayPriority.HIGH);
+        setPriority(Overlay.PRIORITY_HIGH);
     }
 
     @Override

@@ -4,13 +4,23 @@ import com.tonic.Static;
 import com.tonic.data.Tab;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.api.gameval.InterfaceID;
 
 /**
  * ClientScript API
  */
 public class ClientScriptAPI
 {
+    private static final int SCRIPT_CLOSE_INTERFACE = 29;
+
+    /**
+     * Closes the currently open interface
+     */
+    public static void closeInterface()
+    {
+        runScript(SCRIPT_CLOSE_INTERFACE);
+    }
+
     /**
      * Closes the numeric input dialogue if it is open
      */
@@ -18,8 +28,8 @@ public class ClientScriptAPI
     {
         Client client = Static.getClient();
         Static.invoke(() -> {
-            Widget w = client.getWidget(WidgetInfo.CHATBOX_INPUT);
-            Widget w2 = client.getWidget(WidgetInfo.CHATBOX_FULL_INPUT);
+            Widget w = client.getWidget(InterfaceID.Chatbox.INPUT);
+            Widget w2 = client.getWidget(InterfaceID.Chatbox.MES_TEXT2);
             if(w != null || w2 != null)
             {
                 client.runScript(138);

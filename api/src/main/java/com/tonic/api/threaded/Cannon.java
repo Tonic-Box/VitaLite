@@ -1,8 +1,6 @@
 package com.tonic.api.threaded;
 
 import com.tonic.Logger;
-import com.tonic.Static;
-import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.InventoryAPI;
@@ -14,8 +12,7 @@ import com.tonic.services.pathfinder.Walker;
 import com.tonic.util.DialogueNode;
 import com.tonic.util.WorldPointUtil;
 import lombok.Setter;
-import net.runelite.api.Client;
-import net.runelite.api.ItemID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarPlayerID;
 import java.util.function.Supplier;
@@ -81,7 +78,6 @@ public class Cannon
      */
     public static boolean place()
     {
-        Client client = Static.getClient();
         return place(PlayerEx.getLocal().getWorldPoint());
     }
 
@@ -119,7 +115,7 @@ public class Cannon
                 Logger.warn("Spot already occupied by cannon");
                 return false;
             }
-            InventoryAPI.interact(ItemID.CANNON_BASE, "Set-up");
+            InventoryAPI.interact(ItemID.TWPART1, "Set-up");
             Delays.waitUntil(Cannon::isPlaced, 30);
         }
 
@@ -155,7 +151,6 @@ public class Cannon
         }
 
         WorldPoint location = getLocation();
-        Client client = Static.getClient();
         if(!PlayerEx.getLocal().getWorldPoint().equals(location))
             Walker.walkTo(location);
 
@@ -280,7 +275,7 @@ public class Cannon
      */
     public static boolean ensureCannon()
     {
-        return InventoryAPI.contains(ItemID.CANNON_BASE, ItemID.CANNON_STAND, ItemID.CANNON_BARRELS, ItemID.CANNON_FURNACE) || getLocation() != null;
+        return InventoryAPI.contains(ItemID.TWPART1, ItemID.TWPART2, ItemID.TWPART3, ItemID.TWPART4) || getLocation() != null;
     }
 
     /**
@@ -289,7 +284,7 @@ public class Cannon
      */
     public static boolean ensureBalls()
     {
-        return InventoryAPI.containsAny(ItemID.STEEL_CANNONBALL);
+        return InventoryAPI.containsAny(ItemID.MCANNONBALL);
     }
 
     public static void reclaimCannon()

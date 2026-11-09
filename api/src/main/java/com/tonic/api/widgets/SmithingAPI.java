@@ -59,7 +59,7 @@ public class SmithingAPI {
      * Closes the smithing interface if it is open.
      */
     public static void close() {
-        GameAPI.invokeMenuAction(0, 57, 11, 20447233, -1);
+        GameAPI.invokeMenuAction(0, 57, 11, InterfaceID.Smithing.FRAME, -1);
     }
 
     /**

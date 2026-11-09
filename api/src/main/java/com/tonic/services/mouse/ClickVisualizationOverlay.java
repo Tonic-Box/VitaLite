@@ -15,7 +15,6 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.awt.*;
@@ -38,7 +37,7 @@ public class ClickVisualizationOverlay extends Overlay {
     public ClickVisualizationOverlay() {
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ALWAYS_ON_TOP);
-        setPriority(OverlayPriority.HIGH);
+        setPriority(Overlay.PRIORITY_HIGH);
         EventBus eventBus = Static.getInjector().getInstance(EventBus.class);
         eventBus.register(this);
     }
@@ -166,7 +165,7 @@ public class ClickVisualizationOverlay extends Overlay {
         try {
             LocalPoint localPoint = LocalPoint.fromWorld(client, destination);
             if (localPoint != null) {
-                Point screenPoint = Perspective.localToCanvas(client, localPoint, client.getPlane());
+                Point screenPoint = Perspective.localToCanvas(client, localPoint, client.getTopLevelWorldView().getPlane());
 
                 boolean isValidScreenPoint = false;
                 if (screenPoint != null) {

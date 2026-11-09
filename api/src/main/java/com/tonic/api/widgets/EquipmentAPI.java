@@ -18,6 +18,8 @@ import java.util.function.Predicate;
  */
 public class EquipmentAPI
 {
+    private static final String[] EQUIP_ACTIONS = {"Wear", "Wield", "Equip"};
+
     /**
      * Creates an instance of InventoryQuery from equipment
      * @return InventoryQuery
@@ -133,7 +135,7 @@ public class EquipmentAPI
 
             for (ItemEx equippable : carried)
             {
-                InventoryAPI.interact(equippable, 3);
+                InventoryAPI.interact(equippable, EQUIP_ACTIONS);
             }
         }
     }
@@ -144,7 +146,11 @@ public class EquipmentAPI
      */
     public static void equip(int itemId)
     {
-        InventoryAPI.interact(itemId, 3);
+        ItemEx item = InventoryAPI.getItem(itemId);
+        if (item != null)
+        {
+            InventoryAPI.interact(item, EQUIP_ACTIONS);
+        }
     }
 
     /**
@@ -153,7 +159,11 @@ public class EquipmentAPI
      */
     public static void equip(String itemName)
     {
-        InventoryAPI.interact(itemName, 3);
+        ItemEx item = InventoryAPI.getItem(itemName);
+        if (item != null)
+        {
+            InventoryAPI.interact(item, EQUIP_ACTIONS);
+        }
     }
 
     /**
@@ -186,7 +196,7 @@ public class EquipmentAPI
         TClient client = Static.getClient();
         Static.invoke(() -> {
             ClickManager.click(ClickType.WIDGET);
-            client.getPacketWriter().widgetActionPacket(action, EquipmentSlot.findBySlot(slot).getWidgetInfo().getId(), -1, -1);
+            client.getPacketWriter().widgetActionPacket(action, EquipmentSlot.findBySlot(slot).getWidgetId(), -1, -1);
         });
     }
 

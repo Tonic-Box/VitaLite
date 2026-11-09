@@ -34,7 +34,6 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 import org.apache.commons.lang3.ArrayUtils;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -136,12 +135,11 @@ public class WalkerPath
         this.canceled = true;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     private void repath()
     {
         steps.clear();
         final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
-        ((List) steps).addAll(engine.find(destination));
+        steps.addAll(engine.find(destination));
     }
 
     /**
@@ -446,7 +444,7 @@ public class WalkerPath
 
         if(!MovementAPI.isRunEnabled() && energy > Setting.toggleRunThreshold)
         {
-            WidgetAPI.interact(1, WidgetInfo.MINIMAP_TOGGLE_RUN_ORB, -1, -1);
+            WidgetAPI.interact(1, InterfaceID.Orbs.RUNBUTTON, -1, -1);
             Setting.toggleRunThreshold = Setting.toggleRunRange.randomEnclosed();
         }
 
