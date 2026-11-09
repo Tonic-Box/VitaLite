@@ -243,6 +243,24 @@ public class TeleportLoader {
                             addAll(jewelryTeleport("Rub", "Eagles' Eyrie", MovementConstants.NECKLACE_OF_PASSAGE));
                         }}));
             }
+            if (getTeleportItem(MovementConstants.XERICS_TALISMAN) != null && inMembers && VarAPI.getVar(VarbitID.CHARGES_XERICS_TALISMAN_QUANTITY) > 0) {
+                teleports.add(new Teleport(new WorldPoint(1579, 3530, 0), 5,
+                        new ArrayList<>() {{
+                            addAll(jewelryTeleport("Rub", "Xeric's Lookout", MovementConstants.XERICS_TALISMAN));
+                        }}));
+                teleports.add(new Teleport(new WorldPoint(1752, 3566, 0), 5,
+                        new ArrayList<>() {{
+                            addAll(jewelryTeleport("Rub", "Xeric's Glade", MovementConstants.XERICS_TALISMAN));
+                        }}));
+                teleports.add(new Teleport(new WorldPoint(1504, 3815, 0), 5,
+                        new ArrayList<>() {{
+                            addAll(jewelryTeleport("Rub", "Xeric's Inferno", MovementConstants.XERICS_TALISMAN));
+                        }}));
+                teleports.add(new Teleport(new WorldPoint(1644, 3673, 0), 5,
+                        new ArrayList<>() {{
+                            addAll(jewelryTeleport("Rub", "Xeric's Heart", MovementConstants.XERICS_TALISMAN));
+                        }}));
+            }
             if (InventoryAPI.getItem(i -> ArrayUtils.contains(MovementConstants.BURNING_AMULET, i.getId())) != null) {
                 //TODO
             }

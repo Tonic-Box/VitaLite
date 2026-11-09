@@ -97,6 +97,11 @@ public class MovementConstants
                     ItemID.NECKLACE_OF_PASSAGE_5,
             };
 
+    public static final int[] XERICS_TALISMAN = new int[]
+            {
+                    ItemID.XERIC_TALISMAN,
+            };
+
     public static final int[] BURNING_AMULET = new int[]
             {
                     ItemID.BURNING_AMULET_5,

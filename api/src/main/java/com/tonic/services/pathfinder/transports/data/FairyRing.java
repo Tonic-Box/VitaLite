@@ -76,7 +76,19 @@ public enum FairyRing
         this.requirements = new Requirements();
         this.requirements.addRequirements(requirements);
         this.requirements.addRequirement(new QuestRequirement(Quest.FAIRYTALE_II__CURE_A_QUEEN, QuestState.IN_PROGRESS, QuestState.FINISHED));
-        this.requirements.addRequirement(new ItemRequirement(true, 1, ItemID.DRAMEN_STAFF));
+        this.requirements.addRequirement(new OtherRequirement(FairyRing::hasStaff));
+    }
+
+    public static final int[] STAFFS = {ItemID.DRAMEN_STAFF, ItemID.LUNAR_MOONCLAN_LIMINAL_STAFF};
+
+    public static boolean needsStaff()
+    {
+        return VarAPI.getVar(VarbitID.LUMBRIDGE_DIARY_ELITE_COMPLETE) != 1;
+    }
+
+    private static boolean hasStaff()
+    {
+        return !needsStaff() || new ItemRequirement(null, 1, STAFFS).get();
     }
 
     private static final int[][] TURN_INDICES = {{19, 20}, {21, 22}, {23, 24}};

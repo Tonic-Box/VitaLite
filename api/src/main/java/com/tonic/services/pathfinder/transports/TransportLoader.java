@@ -437,6 +437,7 @@ public class TransportLoader
                 kourendMinecartNetwork(LAST_TRANSPORT_LIST);
                 gnomeGliders(LAST_TRANSPORT_LIST);
                 fairyRings(LAST_TRANSPORT_LIST);
+                quetzals(LAST_TRANSPORT_LIST);
                 dwarvenCarts(LAST_TRANSPORT_LIST);
                 canoes(LAST_TRANSPORT_LIST);
             }
@@ -522,14 +523,15 @@ public class TransportLoader
                 if (destination == FairyRing.ZANARIS)
                 {
                     HandlerBuilder builder = HandlerBuilder.get()
-                            .add(0, () -> {
+                            .add(0, () -> wieldFairyStaff(1))
+                            .add(1, () -> {
                                 TileObjectEx current = new TileObjectQuery()
                                         .withName("Fairy ring")
                                         .first();
                                 TileObjectAPI.interact(current, "Zanaris");
-                                return 1;
+                                return 2;
                             })
-                            .addDelay(1, 7);
+                            .addDelay(2, 7);
 
                     Requirements merged = new Requirements();
                     merged.addRequirements(ring.getRequirements().getAll());
@@ -541,18 +543,19 @@ public class TransportLoader
                 }
 
                 HandlerBuilder builder = HandlerBuilder.get()
-                        .add(0, () -> {
+                        .add(0, () -> wieldFairyStaff(1))
+                        .add(1, () -> {
                             TileObjectEx current = new TileObjectQuery()
                                     .withName("Fairy ring")
                                     .nearest();
                             TileObjectAPI.interact(current, "Configure");
-                            return 1;
+                            return 2;
                         })
-                        .addDelayUntil(1, () -> WidgetAPI.get(InterfaceID.Fairyrings.CONFIRM) != null)
-                        .addDelayUntil(2, 20, destination::travel, () -> {})
-                        .addDelay(3, 7)
-                        .add(4, () -> MovementAPI.walkToWorldPoint(destination.getLocation()))
-                        .addDelay(5, 1);
+                        .addDelayUntil(2, () -> WidgetAPI.get(InterfaceID.Fairyrings.CONFIRM) != null)
+                        .addDelayUntil(3, 20, destination::travel, () -> {})
+                        .addDelay(4, 7)
+                        .add(5, () -> MovementAPI.walkToWorldPoint(destination.getLocation()))
+                        .addDelay(6, 1);
 
                 Requirements merged = new Requirements();
                 merged.addRequirements(ring.getRequirements().getAll());
@@ -562,6 +565,75 @@ public class TransportLoader
                 computeIfAbsent(transports, WorldPointUtil.compress(ring.getLocation()), transport);
             }
         }
+    }
+
+    private static int wieldFairyStaff(int next)
+    {
+        if (FairyRing.needsStaff() && !EquipmentAPI.isEquipped(i -> ArrayUtils.contains(FairyRing.STAFFS, i.getId())))
+        {
+            ItemEx staff = InventoryAPI.getItem(i -> ArrayUtils.contains(FairyRing.STAFFS, i.getId()));
+            if (staff != null)
+            {
+                EquipmentAPI.equip(staff.getId());
+            }
+        }
+        return next;
+    }
+
+    private static void quetzals(final TIntObjectHashMap<ArrayList<Transport>> transports)
+    {
+        for (QuetzalLanding landing : QuetzalLanding.values())
+        {
+            for (QuetzalLanding destination : QuetzalLanding.values())
+            {
+                if (landing == destination)
+                {
+                    continue;
+                }
+
+                HandlerBuilder builder = HandlerBuilder.get()
+                        .add(0, () -> {
+                            NpcEx renu = new NpcQuery().withName("Renu").withAction("Travel").nearest();
+                            if (renu == null)
+                                return HandlerBuilder.END_EXECUTION;
+                            NpcAPI.interact(renu, "Travel");
+                            return 1;
+                        })
+                        .addDelayUntil(1, MENU_TIMEOUT, () -> quetzalIcon(destination.getName()) != -1, () -> {})
+                        .add(2, () -> {
+                            int icon = quetzalIcon(destination.getName());
+                            if (icon == -1)
+                                return HandlerBuilder.END_EXECUTION;
+                            WidgetAPI.interact(1, InterfaceID.QuetzalMenu.ICONS, icon, -1);
+                            return 3;
+                        })
+                        .addDelay(3, 5);
+
+                Requirements merged = new Requirements();
+                merged.addRequirements(landing.getRequirements().getAll());
+                merged.addRequirements(destination.getRequirements().getAll());
+
+                Transport transport = new Transport(WorldPointUtil.compress(landing.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 5, builder.build(), merged, -1);
+                computeIfAbsent(transports, WorldPointUtil.compress(landing.getLocation()), transport);
+            }
+        }
+    }
+
+    private static int quetzalIcon(String destination)
+    {
+        return Static.invoke(() -> {
+            Widget icons = WidgetAPI.get(InterfaceID.QuetzalMenu.ICONS);
+            Widget[] children = icons == null ? null : icons.getChildren();
+            if (children == null)
+                return -1;
+            for (Widget child : children)
+            {
+                String[] actions = child == null ? null : child.getActions();
+                if (actions != null && actions.length > 0 && actions[0] != null && TextUtil.sanitize(actions[0]).equalsIgnoreCase(destination))
+                    return child.getIndex();
+            }
+            return -1;
+        });
     }
 
     private static void gnomeGliders(final TIntObjectHashMap<ArrayList<Transport>> transports)
@@ -1030,7 +1102,6 @@ public class TransportLoader
                 .addDelayUntil(1, () -> !MovementAPI.isMoving())
                 .addDelay(2, delay)
                 .add(3, () -> {
-                    Client client = Static.getClient();
                     WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
                     if(worldPoint.getPlane() != 1)
                     {
