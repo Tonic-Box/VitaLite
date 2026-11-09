@@ -1,15 +1,13 @@
 package com.tonic.services.pathfinder.transports.data;
 
 import com.tonic.api.game.VarAPI;
-import com.tonic.services.pathfinder.requirements.OtherRequirement;
-import com.tonic.services.pathfinder.requirements.QuestRequirement;
-import com.tonic.services.pathfinder.requirements.Requirements;
-import com.tonic.services.pathfinder.requirements.WorldRequirement;
+import com.tonic.services.pathfinder.requirements.*;
 import lombok.Getter;
 import net.runelite.api.Quest;
 import net.runelite.api.QuestState;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarPlayerID;
+import net.runelite.api.gameval.VarbitID;
 
 @Getter
 public enum QuetzalLanding
@@ -45,6 +43,7 @@ public enum QuetzalLanding
         this.requirements = new Requirements();
         this.requirements.addRequirement(new WorldRequirement(true));
         this.requirements.addRequirement(new QuestRequirement(Quest.TWILIGHTS_PROMISE, QuestState.FINISHED));
+        this.requirements.addRequirement(new VarRequirement(Comparison.GREATER_THAN_EQUAL, VarType.VARBIT, VarbitID.QUETZAL_FORTIS, 2));
         this.requirements.addRequirement(new OtherRequirement(this::isUnlocked));
     }
 
