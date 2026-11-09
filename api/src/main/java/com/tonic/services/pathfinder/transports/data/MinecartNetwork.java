@@ -19,7 +19,7 @@ public enum MinecartNetwork
     KINGSTOWN(new WorldPoint(1700, 3659, 0), "Hordal"),
     KOUREND_WOODLAND(new WorldPoint(1572, 3466, 0), "Buneir"),
     LOVAKENGJ(new WorldPoint(1518, 3733, 0), "Miriam"),
-    MOUNT_QUIDAMORTUM(new WorldPoint(1255, 3548, 0), "Stuliette"),
+    MOUNT_QUIDAMORTEM(new WorldPoint(1255, 3548, 0), "Stuliette"),
     NORTHERN_TUNDRAS(new WorldPoint(1647, 3929, 0), "Lassin"),
     PORT_PISCARILIUS(new WorldPoint(1761, 3710, 0), "Raeli"),
     SHAYZIEN_EAST(new WorldPoint(1590, 3620, 0), "Mogrim"),
@@ -28,7 +28,6 @@ public enum MinecartNetwork
     ;
     private final WorldPoint location;
     private final String npcName;
-    private final int index = ordinal();
 
     @Getter
     private static final Requirements requirements;

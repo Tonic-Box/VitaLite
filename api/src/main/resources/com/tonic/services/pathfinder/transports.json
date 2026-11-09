@@ -4282,7 +4282,7 @@
       "y": 9771,
       "plane": 0
     },
-    "action": "Walk-Down",
+    "action": "Climb-down",
     "objectId": 2616
   },
   {
@@ -4296,7 +4296,7 @@
       "y": 3356,
       "plane": 0
     },
-    "action": "Walk-Up",
+    "action": "Climb-up",
     "objectId": 2617
   },
   {
@@ -4310,7 +4310,7 @@
       "y": 9771,
       "plane": 0
     },
-    "action": "Walk-Down",
+    "action": "Climb-down",
     "objectId": 2616
   },
   {
@@ -4324,7 +4324,7 @@
       "y": 3356,
       "plane": 0
     },
-    "action": "Walk-Up",
+    "action": "Climb-up",
     "objectId": 2617
   },
   {
@@ -4338,7 +4338,7 @@
       "y": 3356,
       "plane": 0
     },
-    "action": "Walk-Up",
+    "action": "Climb-up",
     "objectId": 2617
   },
   {
@@ -4352,7 +4352,7 @@
       "y": 3356,
       "plane": 0
     },
-    "action": "Walk-Up",
+    "action": "Climb-up",
     "objectId": 2617
   },
   {
@@ -4366,7 +4366,7 @@
       "y": 3356,
       "plane": 0
     },
-    "action": "Walk-Up",
+    "action": "Climb-up",
     "objectId": 2617
   },
   {
@@ -4380,7 +4380,7 @@
       "y": 3356,
       "plane": 0
     },
-    "action": "Walk-Up",
+    "action": "Climb-up",
     "objectId": 2617
   },
   {
@@ -4394,7 +4394,7 @@
       "y": 3356,
       "plane": 0
     },
-    "action": "Walk-Up",
+    "action": "Climb-up",
     "objectId": 2617
   },
   {
@@ -4408,7 +4408,7 @@
       "y": 3356,
       "plane": 0
     },
-    "action": "Walk-Up",
+    "action": "Climb-up",
     "objectId": 2617
   },
   {
@@ -20613,7 +20613,7 @@
       "y": 3413,
       "plane": 0
     },
-    "action": "Get_in",
+    "action": "Get in",
     "objectId": 2022
   },
   {
@@ -20641,7 +20641,7 @@
       "y": 3413,
       "plane": 0
     },
-    "action": "Swim_to",
+    "action": "Swim to",
     "objectId": 1996
   },
   {
@@ -73225,20 +73225,6 @@
   },
   {
     "source": {
-      "x": 2620,
-      "y": 3692,
-      "plane": 0
-    },
-    "destination": {
-      "x": 2213,
-      "y": 3794,
-      "plane": 0
-    },
-    "action": "Pirate\u0027s Cove",
-    "objectId": 3855
-  },
-  {
-    "source": {
       "x": 1469,
       "y": 3653,
       "plane": 0
@@ -77176,7 +77162,7 @@
       "y": 3450,
       "plane": 0
     },
-    "action": "Enter",
+    "action": "Climb",
     "objectId": 31691
   },
   {

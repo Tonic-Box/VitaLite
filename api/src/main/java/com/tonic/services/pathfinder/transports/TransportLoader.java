@@ -21,6 +21,7 @@ import com.tonic.queries.NpcQuery;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.util.Distance;
+import com.tonic.util.TextUtil;
 import com.tonic.util.handler.HandlerBuilder;
 import com.tonic.services.pathfinder.model.TransportDto;
 import com.tonic.services.pathfinder.requirements.*;
@@ -36,6 +37,7 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.widgets.Widget;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -545,11 +547,11 @@ public class TransportLoader
                             TileObjectAPI.interact(current, "Configure");
                             return 1;
                         })
-                        .addDelayUntil(2, () -> WidgetAPI.get(InterfaceID.Fairyrings.CONFIRM) != null)
-                        .addDelayUntil(3, () -> !destination.travel())
-                        .addDelay(4, 7)
-                        .add(5, () -> MovementAPI.walkToWorldPoint(destination.getLocation()))
-                        .addDelay(6, 1);
+                        .addDelayUntil(1, () -> WidgetAPI.get(InterfaceID.Fairyrings.CONFIRM) != null)
+                        .addDelayUntil(2, 20, destination::travel, () -> {})
+                        .addDelay(3, 7)
+                        .add(4, () -> MovementAPI.walkToWorldPoint(destination.getLocation()))
+                        .addDelay(5, 1);
 
                 Requirements merged = new Requirements();
                 merged.addRequirements(ring.getRequirements().getAll());
@@ -582,7 +584,7 @@ public class TransportLoader
                             NpcAPI.interact(npc, "Glider");
                             return 1;
                         })
-                        .addDelayUntil(1, () -> WidgetAPI.get(138, 0) != null)
+                        .addDelayUntil(1, () -> WidgetAPI.get(InterfaceID.Glidermap.UNIVERSE) != null)
                         .add(2, () -> {
                             WidgetAPI.interact(1, destination.getIndex(), -1, -1);
                             return 3;
@@ -615,7 +617,10 @@ public class TransportLoader
                         .addDelayUntil(1, () -> PlayerEx.getLocal().isIdle())
                         .add(2, () -> 3)
                         .add(3, () -> {
-                            DialogueAPI.resumePause(12255235, destination.getIndex());
+                            int slot = menuSlot(destination.name());
+                            if(slot == -1)
+                                return 3;
+                            DialogueAPI.resumePause(InterfaceID.Menu.LJ_LAYER1, slot);
                             return 4;
                         })
                         .addDelay(4, 5);
@@ -654,9 +659,12 @@ public class TransportLoader
                             TileObjectAPI.interact(current, "Travel");
                             return 1;
                         })
-                        .addDelayUntil(1, () -> WidgetAPI.get(12255235) != null)
+                        .addDelayUntil(1, () -> WidgetAPI.get(InterfaceID.Menu.LJ_LAYER1) != null)
                         .add(2, () -> {
-                            DialogueAPI.resumePause(12255235, destination.getIndex());
+                            int slot = menuSlot(destination.name());
+                            if(slot == -1)
+                                return 2;
+                            DialogueAPI.resumePause(InterfaceID.Menu.LJ_LAYER1, slot);
                             return 3;
                         })
                         .addDelay(3, 4);
@@ -665,6 +673,23 @@ public class TransportLoader
                 computeIfAbsent(transports, WorldPointUtil.compress(tree.getLocation()), transport);
             }
         }
+    }
+
+    private static int menuSlot(String destination)
+    {
+        String wanted = destination.toLowerCase().replace('_', ' ');
+        return Static.invoke(() -> {
+            Widget menu = WidgetAPI.get(InterfaceID.Menu.LJ_LAYER1);
+            Widget[] lines = menu == null ? null : menu.getChildren();
+            if(lines == null)
+                return -1;
+            for(Widget line : lines)
+            {
+                if(line != null && line.getText() != null && TextUtil.sanitize(line.getText()).toLowerCase().contains(wanted))
+                    return line.getIndex();
+            }
+            return -1;
+        });
     }
 
     private static void charterShip(final TIntObjectHashMap<ArrayList<Transport>> transports)
@@ -678,7 +703,7 @@ public class TransportLoader
             for(CharterShip destination : map.getDestinations()) {
                 HandlerBuilder builder = HandlerBuilder.get()
                         .add(0, () -> {
-                            NpcEx npc = new NpcQuery().withName("Trader Crewmember").sortNearest().first();
+                            NpcEx npc = new NpcQuery().withAction("Charter").sortNearest().first();
                             NpcAPI.interact(npc, "Charter");
                             return 1;
                         })
@@ -687,7 +712,10 @@ public class TransportLoader
                             return client.getWidget(InterfaceID.SailingMenu.UNIVERSE) != null;
                         })
                         .add(2, () -> {
-                            WidgetAPI.interact(1, InterfaceID.CharteringMenuSide.LIST_CONTENT, destination.getIndex(), -1);
+                            int index = destination.getIndex();
+                            if(index == -1)
+                                return 2;
+                            WidgetAPI.interact(1, InterfaceID.CharteringMenuSide.LIST_CONTENT, index, -1);
                             return 3;
                         })
                         .add(3, () -> 4)
@@ -1457,7 +1485,7 @@ public class TransportLoader
 
         // Digsite gate
         Requirements requirements2 = new Requirements();
-        requirements.getVarRequirements().add(new VarRequirement(Comparison.GREATER_THAN_EQUAL, VarType.VARP, 3637, 153));
+        requirements2.getVarRequirements().add(new VarRequirement(Comparison.GREATER_THAN_EQUAL, VarType.VARBIT, VarbitID.VM_KUDOS, 153));
         addObjectTransport(transports, 2, requirements2, new WorldPoint(3295, 3429, 0), new WorldPoint(3296, 3429, 0), 24561, "Open");
         addObjectTransport(transports, 2, requirements2, new WorldPoint(3296, 3429, 0), new WorldPoint(3295, 3429, 0), 24561, "Open");
         addObjectTransport(transports, 2, requirements2, new WorldPoint(3295, 3428, 0), new WorldPoint(3296, 3428, 0), 24561, "Open");
