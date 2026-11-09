@@ -3,8 +3,18 @@ package com.tonic.ui.sdn;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.services.hotswapper.PluginReloader;
+import com.tonic.services.hub.HubFetcher;
+import com.tonic.services.hub.HubPlugin;
+import com.tonic.services.hub.HubRepo;
+import com.tonic.services.hub.HubService;
+import com.tonic.services.hub.HubState;
 import com.tonic.util.ThreadPool;
+import net.runelite.client.plugins.Plugin;
+import net.runelite.client.ui.DynamicGridLayout;
 import net.runelite.client.ui.PluginPanel;
+import net.runelite.client.ui.components.IconTextField;
+import net.runelite.client.ui.components.materialtabs.MaterialTab;
+import net.runelite.client.ui.components.materialtabs.MaterialTabGroup;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -13,12 +23,22 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
+/**
+ * The Vita Hub tab: Installed lists the plugins you have, from the Hub and sideloaded, and Browse what the enabled
+ * repositories offer; repositories are managed on a page of their own.
+ */
 public class VitaExternalsPanel extends PluginPanel {
-
     private static VitaExternalsPanel INSTANCE = null;
 
+    /** @return the panel, created the first time */
     public static VitaExternalsPanel get() {
         if (INSTANCE == null) {
             INSTANCE = new VitaExternalsPanel();
@@ -26,265 +46,472 @@ public class VitaExternalsPanel extends PluginPanel {
         return INSTANCE;
     }
 
-    private static final Color BACKGROUND = new Color(24, 26, 31);
-    private static final Color SURFACE = new Color(32, 34, 42);
-    private static final Color SURFACE_LIGHT = new Color(42, 44, 54);
-    private static final Color ACCENT_BLUE = new Color(59, 142, 255);
-    private static final Color TEXT_PRIMARY = new Color(240, 240, 245);
-    private static final Color TEXT_SECONDARY = new Color(160, 165, 180);
-    private static final Color SUCCESS = new Color(46, 204, 113);
-    private static final Color DANGER = new Color(231, 76, 60);
+    private static final String MAIN = "main";
+    private static final String REPOS = "repos";
+    private static final String ALL_REPOS = "All repositories";
 
-    private static final Font TITLE_FONT = new Font("Segoe UI", Font.BOLD, 12);
-    private static final Font NORMAL_FONT = new Font("Segoe UI", Font.PLAIN, 10);
-
-    private final File pluginDirectory;
-    private final List<PluginEntry> localPlugins = new ArrayList<>();
-    private final List<PluginEntry> sdnPlugins = new ArrayList<>();
-
-    private JPanel cardContainer;
-    private JTextField searchField;
-    private JLabel statusLabel;
-    private boolean showingLocal = true;
+    private final HubService hub = HubService.get();
+    private final File pluginDirectory = Static.RUNELITE_DIR.resolve("sideloaded-plugins").toFile();
+    private final CardLayout pages = new CardLayout();
+    private final MaterialTabGroup tabs = new MaterialTabGroup();
+    private final MaterialTab installedTab = new MaterialTab("Installed", tabs, null);
+    private final MaterialTab browseTab = new MaterialTab("Browse", tabs, null);
+    private final IconTextField search = new IconTextField();
+    private final JComboBox<String> repoFilter = new JComboBox<>();
+    private final Map<String, String> repoUrls = new LinkedHashMap<>();
+    private final JPanel list = HubTheme.row(new DynamicGridLayout(0, 1, 0, HubTheme.GAP));
+    private final ReposPage reposPage = new ReposPage(() -> showPage(MAIN));
+    private final Set<String> expanded = new HashSet<>();
+    private boolean browsing;
+    private boolean showIncompatible;
+    private boolean showingRepos;
+    private boolean updatingFilter;
+    private boolean rebuildQueued;
+    private String notice;
+    private JButton moreButton;
 
     public VitaExternalsPanel() {
-        this.pluginDirectory = Static.RUNELITE_DIR.resolve("sideloaded-plugins").toFile();
+        super(false);
+        setLayout(pages);
+        setBackground(HubTheme.BACKGROUND);
         if (!pluginDirectory.exists()) {
             pluginDirectory.mkdirs();
         }
 
-        setLayout(new BorderLayout());
-        setBackground(BACKGROUND);
+        JPanel main = new JPanel(new BorderLayout());
+        main.setBackground(HubTheme.BACKGROUND);
+        main.add(header(), BorderLayout.NORTH);
 
-        add(createHeaderPanel(), BorderLayout.NORTH);
+        ReposPage.ScrollColumn column = new ReposPage.ScrollColumn();
+        column.setLayout(new BorderLayout());
+        column.setBorder(new EmptyBorder(0, 10, 10, 10));
+        column.add(list, BorderLayout.NORTH);
+        JScrollPane scroll = new JScrollPane(column, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.getViewport().setBackground(HubTheme.BACKGROUND);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        main.add(scroll, BorderLayout.CENTER);
 
-        cardContainer = new JPanel();
-        cardContainer.setLayout(new GridBagLayout());
-        cardContainer.setBackground(BACKGROUND);
+        add(main, MAIN);
+        add(reposPage, REPOS);
 
-        add(cardContainer, BorderLayout.CENTER);
+        hub.addListener(this::queueRebuild);
+        HubIcons.addListener(this::queueRebuild);
+        try {
+            PluginControls.onPluginChanged(this::queueRebuild);
+        } catch (RuntimeException e) {
+            Logger.error("Vita Hub: could not follow plugin changes: " + e.getMessage());
+        }
 
-        statusLabel = new JLabel("Ready");
-        statusLabel.setForeground(TEXT_SECONDARY);
-        statusLabel.setFont(NORMAL_FONT);
-        statusLabel.setBorder(new EmptyBorder(8, 12, 8, 12));
-        statusLabel.setBackground(SURFACE);
-        statusLabel.setOpaque(true);
-        add(statusLabel, BorderLayout.SOUTH);
-
-        loadLocalPlugins();
-        displayPlugins();
+        tabs.select(installedTab);
+        rebuild();
     }
 
-    private JPanel createHeaderPanel() {
-        JPanel header = new JPanel();
-        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
-        header.setBackground(SURFACE);
+    @Override
+    public void onActivate() {
+        if (!hub.hasFetched() && !hub.isBusy()) {
+            hub.refresh();
+        }
+        rebuild();
+    }
 
-        JPanel tabPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        tabPanel.setBackground(SURFACE);
-        tabPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+    private JPanel header() {
+        JPanel header = HubTheme.row(new DynamicGridLayout(0, 1, 0, 8));
+        header.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        JButton localTab = createTabButton("Local", true);
-        JButton sdnTab = createTabButton("SDN", false);
+        installedTab.setOnSelectEvent(() -> {
+            browsing = false;
+            queueRebuild();
+            return true;
+        });
+        browseTab.setOnSelectEvent(() -> {
+            browsing = true;
+            if (!hub.hasFetched() && !hub.isBusy()) {
+                hub.refresh();
+            }
+            queueRebuild();
+            return true;
+        });
+        installedTab.setFont(HubTheme.regularFont());
+        browseTab.setFont(HubTheme.regularFont());
+        tabs.addTab(installedTab);
+        tabs.addTab(browseTab);
+        header.add(tabs);
 
-        localTab.addActionListener(e -> {
-            showingLocal = true;
-            localTab.setForeground(TEXT_PRIMARY);
-            sdnTab.setForeground(TEXT_SECONDARY);
-            displayPlugins();
-            refresh();
+        search.setIcon(IconTextField.Icon.SEARCH);
+        search.setBackground(HubTheme.CARD);
+        search.setHoverBackgroundColor(HubTheme.CARD_HOVER);
+        search.setPreferredSize(new Dimension(0, 30));
+        search.getDocument().addDocumentListener(new DocumentListener() {
+            public void insertUpdate(DocumentEvent e) { queueRebuild(); }
+            public void removeUpdate(DocumentEvent e) { queueRebuild(); }
+            public void changedUpdate(DocumentEvent e) { queueRebuild(); }
+        });
+        search.addClearListener(this::queueRebuild);
+        header.add(search);
+
+        repoFilter.setFont(HubTheme.textFont());
+        repoFilter.setFocusable(false);
+        repoFilter.setToolTipText("Show one repository's plugins");
+        repoFilter.addActionListener(e -> {
+            if (!updatingFilter) {
+                queueRebuild();
+            }
         });
 
-        sdnTab.addActionListener(e -> {
-            showingLocal = false;
-            sdnTab.setForeground(TEXT_PRIMARY);
-            localTab.setForeground(TEXT_SECONDARY);
-            displayPlugins();
-            refresh();
-        });
+        JPanel buttons = HubTheme.row(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+        buttons.add(HubTheme.iconButton(HubTheme.reload(), "Check repositories for new plugins and updates", hub::refresh));
+        moreButton = HubTheme.iconButton(HubTheme.more(), "More", this::showMenu);
+        buttons.add(moreButton);
 
-        tabPanel.add(localTab);
-        tabPanel.add(sdnTab);
-        header.add(tabPanel);
-
-        JPanel searchPanel = new JPanel(new BorderLayout(10, 0));
-        searchPanel.setBackground(SURFACE);
-        searchPanel.setBorder(new EmptyBorder(0, 0, 12, 0));
-        searchPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
-
-        searchField = new JTextField();
-        searchField.setBackground(SURFACE_LIGHT);
-        searchField.setForeground(TEXT_PRIMARY);
-        searchField.setCaretColor(ACCENT_BLUE);
-        searchField.setFont(NORMAL_FONT);
-        searchField.setBorder(new EmptyBorder(8, 12, 8, 12));
-
-        searchField.getDocument().addDocumentListener(new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) { filterPlugins(); }
-            public void removeUpdate(DocumentEvent e) { filterPlugins(); }
-            public void changedUpdate(DocumentEvent e) { filterPlugins(); }
-        });
-
-        JPanel buttonPanel = new JPanel(new BorderLayout(10, 0));
-        buttonPanel.setBackground(SURFACE);
-
-        JButton addRepoButton = new JButton("Add Repo");
-        addRepoButton.setBackground(ACCENT_BLUE);
-        addRepoButton.setForeground(Color.WHITE);
-        addRepoButton.setFocusPainted(false);
-        addRepoButton.setBorderPainted(false);
-        addRepoButton.setFont(NORMAL_FONT.deriveFont(Font.BOLD));
-
-        JButton refreshButton = new JButton("Refresh");
-        refreshButton.setBackground(ACCENT_BLUE);
-        refreshButton.setForeground(TEXT_PRIMARY);
-        refreshButton.setFocusPainted(false);
-        refreshButton.setBorderPainted(false);
-        refreshButton.setFont(NORMAL_FONT.deriveFont(Font.BOLD));
-        refreshButton.addActionListener(e -> refresh());
-
-        buttonPanel.add(addRepoButton, BorderLayout.WEST);
-        buttonPanel.add(refreshButton, BorderLayout.CENTER);
-
-        searchPanel.add(searchField, BorderLayout.NORTH);
-        searchPanel.add(buttonPanel, BorderLayout.SOUTH);
-        header.add(searchPanel);
-
+        JPanel toolbar = HubTheme.row(new BorderLayout(HubTheme.GAP, 0));
+        toolbar.add(repoFilter, BorderLayout.CENTER);
+        toolbar.add(buttons, BorderLayout.EAST);
+        header.add(toolbar);
         return header;
     }
 
-    private JButton createTabButton(String text, boolean active) {
-        JButton button = new JButton(text);
-        button.setBackground(SURFACE);
-        button.setForeground(active ? TEXT_PRIMARY : TEXT_SECONDARY);
-        button.setFont(NORMAL_FONT.deriveFont(Font.BOLD));
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
-        button.setContentAreaFilled(false);
-        button.setPreferredSize(new Dimension(100, 36));
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        return button;
+    private void showMenu() {
+        menu().show(moreButton, 0, moreButton.getHeight());
     }
 
-    private void loadLocalPlugins() {
-        localPlugins.clear();
-        File[] files = pluginDirectory.listFiles((dir, name) -> name.endsWith(".jar"));
-        if (files != null) {
-            for (File file : files) {
-                String name = file.getName().replace(".jar", "");
-                localPlugins.add(new PluginEntry(name, file));
-            }
+    private JPopupMenu menu() {
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem repos = new JMenuItem("Repositories…");
+        repos.addActionListener(e -> showPage(REPOS));
+        menu.add(repos);
+        JCheckBoxMenuItem incompatible = new JCheckBoxMenuItem("Show incompatible plugins", showIncompatible);
+        incompatible.addActionListener(e -> {
+            showIncompatible = incompatible.isSelected();
+            queueRebuild();
+        });
+        menu.add(incompatible);
+        return menu;
+    }
+
+    private void showPage(String page) {
+        showingRepos = REPOS.equals(page);
+        pages.show(this, page);
+        rebuild();
+    }
+
+    private void queueRebuild() {
+        if (rebuildQueued) {
+            return;
         }
+        rebuildQueued = true;
+        SwingUtilities.invokeLater(() -> {
+            rebuildQueued = false;
+            rebuild();
+        });
     }
 
-    public void addSDNPlugin(String name, String version, String author) {
-        sdnPlugins.add(new PluginEntry(name, null));
-        if (!showingLocal) {
-            displayPlugins();
+    private void rebuild() {
+        if (showingRepos) {
+            reposPage.rebuild();
+            return;
         }
-    }
+        int updates = hub.updateCount();
+        installedTab.setText(updates > 0 ? "Installed (" + updates + ")" : "Installed");
+        repoFilter.setVisible(browsing);
+        updateRepoFilter();
 
-    private void displayPlugins() {
-        cardContainer.removeAll();
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(4, 8, 4, 8);
-
-        List<PluginEntry> plugins = showingLocal ? localPlugins : sdnPlugins;
-
-        for (int i = 0; i < plugins.size(); i++) {
-            gbc.gridy = i;
-            cardContainer.add(createPluginCard(plugins.get(i)), gbc);
+        list.removeAll();
+        for (JComponent banner : banners(updates)) {
+            list.add(banner);
         }
-
-        gbc.gridy = plugins.size();
-        gbc.weighty = 1.0;
-        cardContainer.add(Box.createVerticalGlue(), gbc);
-
-        cardContainer.revalidate();
-        cardContainer.repaint();
-    }
-
-    private JPanel createPluginCard(PluginEntry plugin) {
-        JPanel card = new JPanel();
-        card.setLayout(new GridBagLayout());
-        card.setBackground(SURFACE);
-        card.setBorder(BorderFactory.createEmptyBorder());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        JLabel nameLabel = new JLabel(plugin.name);
-        nameLabel.setFont(TITLE_FONT);
-        nameLabel.setForeground(TEXT_PRIMARY);
-        nameLabel.setBorder(new EmptyBorder(10, 10, 10, 10));
-        gbc.gridy = 0;
-        card.add(nameLabel, gbc);
-
-        JButton actionButton = new JButton(showingLocal ? "Reload" : "Install");
-        actionButton.setBackground(showingLocal ? ACCENT_BLUE : SUCCESS);
-        actionButton.setForeground(Color.WHITE);
-        actionButton.setFont(NORMAL_FONT.deriveFont(Font.BOLD));
-        actionButton.setFocusPainted(false);
-        actionButton.setBorderPainted(false);
-        actionButton.setOpaque(true);
-        actionButton.setPreferredSize(new Dimension(0, 16));
-        actionButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        if (showingLocal) {
-            actionButton.addActionListener(e -> ThreadPool.submit(() -> {
-                if(!PluginReloader.reloadPlugin(plugin.file))
-                {
-                    PluginReloader.forceRebuildPluginList();
-                    Logger.error("Failed to reload plugin: " + plugin.file.getName());
-                    return;
+        List<PluginCard.Model> models = browsing ? browseModels() : installedModels();
+        for (PluginCard.Model model : models) {
+            list.add(new PluginCard(model, expanded.contains(model.key), open -> {
+                if (open) {
+                    expanded.add(model.key);
+                } else {
+                    expanded.remove(model.key);
                 }
-                PluginReloader.forceRebuildPluginList();
-                Logger.info("Reloaded plugin: " + plugin.file.getName());
             }));
         }
-
-        gbc.gridy = 1;
-        card.add(actionButton, gbc);
-
-        return card;
+        if (models.isEmpty()) {
+            list.add(empty());
+        }
+        list.revalidate();
+        list.repaint();
     }
 
-    private void removePlugin(PluginEntry plugin) {
-        if (plugin.file != null && plugin.file.exists()) {
-            plugin.file.delete();
-            localPlugins.remove(plugin);
-            displayPlugins();
-            statusLabel.setText("Removed " + plugin.name);
+    private List<JComponent> banners(int updates) {
+        List<JComponent> banners = new ArrayList<>();
+        String error = hub.error();
+        if (error != null) {
+            banners.add(banner(error, HubTheme.ERROR, "Dismiss", HubTheme.BUSY, hub::clearError));
+        }
+        if (notice != null) {
+            banners.add(banner(notice, HubTheme.TEXT, "Dismiss", HubTheme.BUSY, () -> {
+                notice = null;
+                queueRebuild();
+            }));
+        }
+        for (HubFetcher.Result result : hub.results()) {
+            if (result.error != null) {
+                String text = "Couldn't load " + repoName(result.repo) + ": " + result.error + ".";
+                banners.add(banner(text, result.manifest == null ? HubTheme.ERROR : HubTheme.WARNING, "Retry", HubTheme.BUSY, hub::refresh));
+            }
+        }
+        if (!browsing && updates > 0) {
+            String text = updates == 1 ? "1 update available" : updates + " updates available";
+            banners.add(banner(text, HubTheme.TITLE, "Update all", HubTheme.accent(), hub::updateAll));
+        }
+        return banners;
+    }
+
+    private JComponent banner(String text, Color color, String action, Color actionColor, Runnable onAction) {
+        JPanel banner = new JPanel(new BorderLayout(HubTheme.GAP, 0));
+        banner.setBackground(HubTheme.CARD);
+        banner.setBorder(new EmptyBorder(6, HubTheme.PADDING, 6, HubTheme.PADDING));
+        banner.add(new WrappedText(text, HubTheme.textFont(), color, 0), BorderLayout.CENTER);
+        JPanel button = HubTheme.row(new GridBagLayout());
+        button.add(HubTheme.textButton(action, actionColor, onAction));
+        banner.add(button, BorderLayout.EAST);
+        return banner;
+    }
+
+    private JComponent empty() {
+        String query = query();
+        String text;
+        if (!query.isEmpty()) {
+            text = "No plugins match “" + search.getText().trim() + "”.";
+        } else if (browsing) {
+            text = hub.isBusy() || !hub.hasFetched() ? "Loading plugins…" : "No repository offers any plugins yet.";
+        } else {
+            text = "Nothing installed yet. Open Browse to find plugins.";
+        }
+        WrappedText label = new WrappedText(text, HubTheme.textFont(), HubTheme.MUTED, 0);
+        label.setCentered(true);
+        label.setBorder(new EmptyBorder(30, 0, 0, 0));
+        return label;
+    }
+
+    private void updateRepoFilter() {
+        String selected = selectedRepo();
+        updatingFilter = true;
+        repoUrls.clear();
+        repoFilter.removeAllItems();
+        repoFilter.addItem(ALL_REPOS);
+        for (HubFetcher.Result result : hub.results()) {
+            String label = repoName(result.repo);
+            repoUrls.put(label, result.repo.url);
+            repoFilter.addItem(label);
+        }
+        repoFilter.setSelectedItem(selected != null && repoUrls.containsKey(selected) ? selected : ALL_REPOS);
+        updatingFilter = false;
+    }
+
+    private String selectedRepo() {
+        return (String) repoFilter.getSelectedItem();
+    }
+
+    private List<PluginCard.Model> browseModels() {
+        String selected = selectedRepo();
+        String repoUrl = selected == null || ALL_REPOS.equals(selected) ? null : repoUrls.get(selected);
+        List<PluginCard.Model> models = new ArrayList<>();
+        for (HubService.Entry entry : hub.entries()) {
+            if (repoUrl != null && !repoUrl.equals(entry.repo.url) || !matches(entry.plugin)) {
+                continue;
+            }
+            if (!entry.isCompatible() && !entry.isInstalled() && !showIncompatible) {
+                continue;
+            }
+            models.add(hubModel(entry));
+        }
+        return models;
+    }
+
+    private List<PluginCard.Model> installedModels() {
+        List<PluginCard.Model> models = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+        for (HubService.Entry entry : hub.entries()) {
+            if (entry.isInstalled() && seen.add(entry.plugin.id) && matches(entry.plugin)) {
+                models.add(hubModel(entry));
+            }
+        }
+        for (HubState.Installed installed : hub.unlisted()) {
+            PluginCard.Model model = unlistedModel(installed);
+            if (matches(model.name, installed.id)) {
+                models.add(model);
+            }
+        }
+        File[] jars = pluginDirectory.listFiles((dir, name) -> name.endsWith(".jar"));
+        if (jars != null) {
+            for (File jar : jars) {
+                PluginCard.Model model = localModel(jar);
+                if (matches(model.name, model.description)) {
+                    models.add(model);
+                }
+            }
+        }
+        models.sort(Comparator.comparing((PluginCard.Model model) -> model.primary == null).thenComparing(model -> model.name.toLowerCase(Locale.ROOT)));
+        return models;
+    }
+
+    private PluginCard.Model hubModel(HubService.Entry entry) {
+        HubPlugin plugin = entry.plugin;
+        HubState.Installed installed = entry.installed;
+        PluginCard.Model model = new PluginCard.Model();
+        model.key = entry.repo.url + "|" + plugin.id;
+        model.icon = HubIcons.of(plugin);
+        model.name = plugin.displayName();
+        model.meta = join(plugin.author, repoName(entry.repo));
+        model.description = plugin.description;
+        model.requires = plugin.required();
+        model.source = plugin.source;
+
+        if (installed != null && !entry.isInstalled()) {
+            model.version = "Installed from another repository";
+        } else if (installed != null && entry.hasUpdate()) {
+            model.version = installed.version + " → " + plugin.version;
+            model.versionColor = HubTheme.accent();
+            primary(model, "Update", HubTheme.accent(), () -> hub.update(plugin.id));
+        } else if (installed != null) {
+            model.version = browsing ? "Installed " + installed.version : installed.version;
+            model.versionColor = browsing ? HubTheme.INSTALL : null;
+        } else if (!entry.isCompatible()) {
+            model.version = "Needs VitaLite " + plugin.minVita + " or newer";
+            model.versionColor = HubTheme.ERROR;
+            primary(model, "Unavailable", HubTheme.BUSY, null);
+        } else {
+            model.version = plugin.version;
+            primary(model, "Install", HubTheme.INSTALL, () -> hub.install(entry.repo.url, plugin.id));
+        }
+
+        if (entry.isInstalled()) {
+            controls(model, new File(installed.file));
+            model.trash = () -> uninstall(plugin.id, plugin.displayName());
+        }
+        busy(model, plugin.id);
+        return model;
+    }
+
+    private PluginCard.Model unlistedModel(HubState.Installed installed) {
+        File jar = new File(installed.file);
+        List<Plugin> plugins = PluginControls.plugins(jar);
+        PluginCard.Model model = new PluginCard.Model();
+        model.key = "unlisted|" + installed.id;
+        model.icon = HubIcons.fallback();
+        model.name = plugins.isEmpty() ? installed.id : PluginControls.name(plugins.get(0));
+        model.meta = "No enabled repository lists it";
+        model.description = plugins.isEmpty() ? null : PluginControls.description(plugins.get(0));
+        model.version = installed.version;
+        controls(model, jar);
+        model.trash = () -> uninstall(installed.id, model.name);
+        busy(model, installed.id);
+        return model;
+    }
+
+    private PluginCard.Model localModel(File jar) {
+        List<Plugin> plugins = PluginControls.plugins(jar);
+        PluginCard.Model model = new PluginCard.Model();
+        model.key = "local|" + jar.getAbsolutePath();
+        model.icon = HubIcons.fallback();
+        model.name = plugins.isEmpty() ? jar.getName().replaceFirst("\\.jar$", "") : PluginControls.name(plugins.get(0));
+        model.meta = plugins.isEmpty() ? "Local · not loaded" : "Local";
+        model.description = plugins.isEmpty() ? null : PluginControls.description(plugins.get(0));
+        controls(model, jar);
+        model.reload = () -> ThreadPool.submit(() -> reloadLocal(jar));
+        model.trash = () -> removeLocal(jar, model.name);
+        return model;
+    }
+
+    private void controls(PluginCard.Model model, File jar) {
+        List<Plugin> plugins = PluginControls.plugins(jar);
+        if (plugins.isEmpty()) {
+            return;
+        }
+        if (PluginControls.hasConfig(plugins)) {
+            model.openConfig = () -> PluginControls.openConfig(plugins);
+        }
+        model.active = PluginControls.isActive(plugins);
+        model.setActive = active -> {
+            PluginControls.setActive(plugins, active);
+            queueRebuild();
+        };
+    }
+
+    private void busy(PluginCard.Model model, String id) {
+        String operation = hub.operation(id);
+        if (operation != null) {
+            primary(model, operation + "…", HubTheme.BUSY, null);
+            model.trash = null;
         }
     }
 
-    private void filterPlugins() {
-        String search = searchField.getText().toLowerCase();
-        displayPlugins();
+    private static void primary(PluginCard.Model model, String label, Color color, Runnable action) {
+        model.primary = label;
+        model.primaryColor = color;
+        model.primaryAction = action;
     }
 
-    private void refresh() {
-        loadLocalPlugins();
-        displayPlugins();
-        statusLabel.setText("Refreshed");
-        revalidate();
-        repaint();
-    }
-
-    private static class PluginEntry {
-        final String name;
-        final File file;
-
-        PluginEntry(String name, File file) {
-            this.name = name;
-            this.file = file;
+    private void uninstall(String id, String name) {
+        List<String> dependents = hub.dependentsOf(id);
+        String message = dependents.isEmpty() ? "Uninstall " + name + "?" : name + " is required by " + String.join(", ", dependents) + ".\nUninstall them too?";
+        int choice = JOptionPane.showConfirmDialog(this, message, "Vita Hub", JOptionPane.OK_CANCEL_OPTION, dependents.isEmpty() ? JOptionPane.QUESTION_MESSAGE : JOptionPane.WARNING_MESSAGE);
+        if (choice == JOptionPane.OK_OPTION) {
+            hub.uninstall(id, !dependents.isEmpty());
         }
+    }
+
+    private void reloadLocal(File jar) {
+        boolean reloaded = PluginReloader.reloadPlugin(jar);
+        PluginReloader.forceRebuildPluginList();
+        notice = reloaded ? null : "Couldn't reload " + jar.getName() + ".";
+        queueRebuild();
+    }
+
+    private void removeLocal(File jar, String name) {
+        int choice = JOptionPane.showConfirmDialog(this, "Remove " + name + "?\nThis deletes " + jar.getName() + " from sideloaded-plugins.", "Vita Hub", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (choice != JOptionPane.OK_OPTION) {
+            return;
+        }
+        ThreadPool.submit(() -> {
+            if (!PluginReloader.unloadPlugin(jar)) {
+                notice = name + " would not stop, so it was not removed.";
+            } else if (jar.delete() || !jar.exists()) {
+                notice = null;
+            } else {
+                jar.deleteOnExit();
+                notice = name + " is turned off and is deleted when the client closes.";
+            }
+            PluginReloader.forceRebuildPluginList();
+            queueRebuild();
+        });
+    }
+
+    private boolean matches(HubPlugin plugin) {
+        return matches(plugin.displayName(), plugin.author, plugin.description, plugin.id, plugin.tags == null ? null : String.join(" ", plugin.tags));
+    }
+
+    private boolean matches(String... fields) {
+        String query = query();
+        if (query.isEmpty()) {
+            return true;
+        }
+        for (String field : fields) {
+            if (field != null && field.toLowerCase(Locale.ROOT).contains(query)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String query() {
+        return search.getText() == null ? "" : search.getText().trim().toLowerCase(Locale.ROOT);
+    }
+
+    private static String repoName(HubRepo repo) {
+        return repo.official ? "Official" : repo.label();
+    }
+
+    private static String join(String first, String second) {
+        if (first == null || first.isEmpty()) {
+            return second;
+        }
+        return first + " · " + second;
     }
 }

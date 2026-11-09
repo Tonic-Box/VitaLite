@@ -3,8 +3,6 @@ package com.tonic.services.hotswapper;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.util.ReflectBuilder;
-import lombok.Getter;
-import lombok.Setter;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginManager;
 import javax.swing.*;
@@ -88,40 +86,84 @@ public class PluginReloader {
 
     public static boolean reloadPlugin(File jarFile) {
         try {
-            PluginContext oldContext = PluginContext.getLoadedPlugins().remove(jarFile.getAbsolutePath());
-            if (oldContext != null) {
-                for (Plugin plugin : oldContext.getPlugins()) {
-                    if (pluginManager.isPluginActive(plugin)) {
-                        if(!pluginManager.stopPlugin(plugin)) {
-                            Logger.error("Failed to stop plugin: " + plugin.getClass().getName());
-                            //Dont want an infinite hang of the service if some other factor is preventing the stopping of
-                            //this plugin.
-                            return true;
-                        }
-                    }
-                    pluginManager.remove(plugin);
-                }
-
-                oldContext.cleanup();
+            if (!unloadPlugin(jarFile)) {
+                return true;
             }
-
-            PluginClassLoader newClassLoader = new PluginClassLoader(jarFile, Static.getClassLoader());
-            List<Class<?>> newClasses = newClassLoader.getClasses();
-            List<Plugin> newPlugins = pluginManager.loadPlugins(newClasses, null);
-            PluginContext.getLoadedPlugins().put(jarFile.getAbsolutePath(), new PluginContext(
-                    newClassLoader, newPlugins, jarFile.lastModified()
-            ));
-
-            pluginManager.loadDefaultPluginConfiguration(newPlugins);
-            for(Plugin plugin : newPlugins)
-            {
-                pluginManager.startPlugin(plugin);
-            }
+            loadPlugin(jarFile, List.of(), true);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    /**
+     * Stops and removes every plugin a jar loaded and closes its class loader, so the jar can be replaced or deleted.
+     *
+     * @param jarFile the plugin jar
+     * @return false when a plugin refused to stop and the jar stays loaded
+     */
+    public static boolean unloadPlugin(File jarFile) {
+        PluginManager manager = pluginManager();
+        PluginContext oldContext = PluginContext.getLoadedPlugins().get(jarFile.getAbsolutePath());
+        if (oldContext == null) {
+            return true;
+        }
+        for (Plugin plugin : new ArrayList<>(oldContext.getPlugins())) {
+            try {
+                if (manager.isPluginActive(plugin) && !manager.stopPlugin(plugin)) {
+                    Logger.error("Failed to stop plugin: " + plugin.getClass().getName());
+                    return false;
+                }
+            } catch (Exception e) {
+                Logger.error("Failed to stop plugin: " + plugin.getClass().getName() + ": " + e.getMessage());
+                return false;
+            }
+            manager.remove(plugin);
+        }
+        PluginContext.getLoadedPlugins().remove(jarFile.getAbsolutePath());
+        oldContext.cleanup();
+        return true;
+    }
+
+    /**
+     * Loads a plugin jar, optionally starting its plugins.
+     *
+     * @param jarFile      the plugin jar
+     * @param dependencies the class loaders of the plugins it requires
+     * @param start        whether to apply default configuration and start its plugins now, as when installing into a
+     *                     running client; at client startup RuneLite starts them itself
+     * @return the plugins it loaded
+     * @throws Exception if the jar cannot be loaded
+     */
+    public static List<Plugin> loadPlugin(File jarFile, List<ClassLoader> dependencies, boolean start) throws Exception {
+        PluginManager manager = pluginManager();
+        PluginClassLoader classLoader = new PluginClassLoader(jarFile, Static.getClassLoader(), dependencies);
+        List<Plugin> plugins = manager.loadPlugins(classLoader.getClasses(), null);
+        PluginContext.getLoadedPlugins().put(jarFile.getAbsolutePath(), new PluginContext(classLoader, plugins, jarFile.lastModified()));
+        if (start) {
+            manager.loadDefaultPluginConfiguration(plugins);
+            for (Plugin plugin : plugins) {
+                manager.startPlugin(plugin);
+            }
+        }
+        return plugins;
+    }
+
+    /**
+     * @param manager the plugin manager, when it is known before the injector hands it out
+     */
+    public static void usePluginManager(PluginManager manager) {
+        if (pluginManager == null) {
+            pluginManager = manager;
+        }
+    }
+
+    private static PluginManager pluginManager() {
+        if (pluginManager == null) {
+            pluginManager = Static.getInjector().getInstance(PluginManager.class);
+        }
+        return pluginManager;
     }
 
     public static void forceRebuildPluginList() {

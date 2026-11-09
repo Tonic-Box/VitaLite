@@ -17,10 +17,23 @@ import java.util.zip.ZipFile;
 public class PluginClassLoader extends URLClassLoader {
     private final ClassLoader parent;
     private final JarFile jarFile;
+    private final List<ClassLoader> dependencies;
 
     public PluginClassLoader(File plugin, ClassLoader parent) throws MalformedURLException
     {
+        this(plugin, parent, List.of());
+    }
+
+    /**
+     * @param plugin       the plugin jar
+     * @param parent       the loader of VitaLite and RuneLite
+     * @param dependencies the loaders of the plugins this one requires, searched after its own jar and before the parent
+     * @throws MalformedURLException if the jar's path is not a valid URL
+     */
+    public PluginClassLoader(File plugin, ClassLoader parent, List<ClassLoader> dependencies) throws MalformedURLException
+    {
         super(new URL[]{plugin.toURI().toURL()}, null);
+        this.dependencies = List.copyOf(dependencies);
         try
         {
             jarFile = new JarFile(plugin, true, ZipFile.OPEN_READ, JarFile.runtimeVersion());
@@ -67,6 +80,16 @@ public class PluginClassLoader extends URLClassLoader {
         }
         catch (Throwable ex)
         {
+            for (ClassLoader dependency : dependencies)
+            {
+                try
+                {
+                    return dependency.loadClass(name);
+                }
+                catch (ClassNotFoundException ignored)
+                {
+                }
+            }
             return parent.loadClass(name);
         }
     }

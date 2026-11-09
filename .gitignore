@@ -115,3 +115,5 @@ bin/
 /api/src/main/java/com/tonic/services/llmapi/
 /.mcp.json
 /tools/
+
+/VitaLitePlugins/
