@@ -62,6 +62,8 @@ public class TileItemAPI
             return;
 
         int actionIndex = getActionIndex(item, actions);
+        if (actionIndex == -1)
+            return;
 
         interact(actionIndex, item.getId(), item.getWorldPoint().getX(), item.getWorldPoint().getY(), false);
     }
@@ -88,6 +90,8 @@ public class TileItemAPI
             return;
 
         int actionIndex = getActionIndex(item, action);
+        if (actionIndex == -1)
+            return;
 
         interact(actionIndex, item.getId(), item.getWorldPoint().getX(), item.getWorldPoint().getY(), ctrlDown);
     }
@@ -146,6 +150,8 @@ public class TileItemAPI
         });
 
         int actionIndex = getActionIndex(actions, action);
+        if (actionIndex == -1)
+            return;
 
         interact(actionIndex, item.getId(), location.getX(), location.getY(), ctrl);
     }
