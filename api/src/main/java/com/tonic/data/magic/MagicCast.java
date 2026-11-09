@@ -20,6 +20,7 @@ public final class MagicCast
     private static final int SCRIPT_SPELL_CASTABLE = 2614;
     private static final int SCRIPT_SPELL_UNLOCKED = 4131;
     private static final int SCRIPT_HOME_TELEPORT_UNTIMED = 9712;
+    private static final int SCRIPT_RUNE_COUNT = 19;
     private static final int PARAM_SPELLBOOK = 336;
     private static final int ANY_SPELLBOOK = -1;
     private static final int ICON_SIZE = 24;
@@ -75,6 +76,12 @@ public final class MagicCast
     private static int spellAt(Client c, int spellbookIndex, int spellIndex)
     {
         return c.getEnum(c.getEnum(EnumID.SPELLBOOKS).getIntValue(spellbookIndex)).getIntValue(spellIndex);
+    }
+
+    public static int runeCount(int runeId)
+    {
+        Client c = Static.getClient();
+        return run(c, SCRIPT_RUNE_COUNT, runeId, worn(c, EquipmentInventorySlot.WEAPON), worn(c, EquipmentInventorySlot.SHIELD));
     }
 
     private static boolean hasRunes(Client c, int spell)

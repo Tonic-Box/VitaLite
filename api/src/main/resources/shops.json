@@ -461,7 +461,7 @@
     "map_id": "0",
     "items": [
       {
-        "item_name": "Agility",
+        "item_name": "Agility hood",
         "item_id": 9773,
         "shop_id": 7,
         "stock": "inf",
@@ -6980,7 +6980,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Bronze sword",
+        "item_name": "Bronze shortsword",
         "item_id": 1277,
         "shop_id": 86,
         "stock": "5",
@@ -6988,7 +6988,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Iron sword",
+        "item_name": "Iron shortsword",
         "item_id": 1279,
         "shop_id": 86,
         "stock": "4",
@@ -6996,7 +6996,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Steel sword",
+        "item_name": "Steel shortsword",
         "item_id": 1281,
         "shop_id": 86,
         "stock": "4",
@@ -7004,7 +7004,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Black sword",
+        "item_name": "Black shortsword",
         "item_id": 1283,
         "shop_id": 86,
         "stock": "3",
@@ -7012,7 +7012,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Mithril sword",
+        "item_name": "Mithril shortsword",
         "item_id": 1285,
         "shop_id": 86,
         "stock": "3",
@@ -7020,7 +7020,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Adamant sword",
+        "item_name": "Adamant shortsword",
         "item_id": 1287,
         "shop_id": 86,
         "stock": "2",
@@ -7414,7 +7414,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Bronze sword",
+        "item_name": "Bronze shortsword",
         "item_id": 1277,
         "shop_id": 88,
         "stock": "5",
@@ -7422,7 +7422,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Iron sword",
+        "item_name": "Iron shortsword",
         "item_id": 1279,
         "shop_id": 88,
         "stock": "4",
@@ -7430,7 +7430,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Steel sword",
+        "item_name": "Steel shortsword",
         "item_id": 1281,
         "shop_id": 88,
         "stock": "4",
@@ -7438,7 +7438,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Mithril sword",
+        "item_name": "Mithril shortsword",
         "item_id": 1285,
         "shop_id": 88,
         "stock": "3",
@@ -7446,7 +7446,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Adamant sword",
+        "item_name": "Adamant shortsword",
         "item_id": 1287,
         "shop_id": 88,
         "stock": "2",
@@ -13996,7 +13996,7 @@
         "sell_price": "0"
       },
       {
-        "item_name": "Mask of balance",
+        "item_name": "Mask of Balance",
         "item_id": 13203,
         "shop_id": 142,
         "stock": "inf",
@@ -15124,7 +15124,7 @@
         "sell_price": "0"
       },
       {
-        "item_name": "Book of egg",
+        "item_name": "Book of Egg",
         "item_id": 29433,
         "shop_id": 142,
         "stock": "inf",
@@ -15285,7 +15285,7 @@
     "map_id": "0",
     "items": [
       {
-        "item_name": "Disk of returning",
+        "item_name": "Disk of Returning",
         "item_id": 981,
         "shop_id": 143,
         "stock": "7",
@@ -15397,7 +15397,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Mask of balance",
+        "item_name": "Mask of Balance",
         "item_id": 13203,
         "shop_id": 143,
         "stock": "100",
@@ -15751,7 +15751,7 @@
         "sell_price": "9500"
       },
       {
-        "item_name": "Scroll of redirection",
+        "item_name": "Scroll of Redirection",
         "item_id": 11740,
         "shop_id": 145,
         "stock": "inf",
@@ -25689,7 +25689,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Rod of ivandis (10)",
+        "item_name": "Rod of Ivandis (10)",
         "item_id": 7639,
         "shop_id": 267,
         "stock": "20",
@@ -28692,7 +28692,7 @@
         "sell_price": "2000"
       },
       {
-        "item_name": "Raging echoes npc contact scroll",
+        "item_name": "Raging echoes astral contact scroll",
         "item_id": 30457,
         "shop_id": 302,
         "stock": "inf",
@@ -28895,7 +28895,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Cape of legends",
+        "item_name": "Cape of Legends",
         "item_id": 1052,
         "shop_id": 305,
         "stock": "3",
@@ -29697,7 +29697,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Crystal of ithell",
+        "item_name": "Crystal of Ithell",
         "item_id": 23927,
         "shop_id": 315,
         "stock": "10",
@@ -29705,7 +29705,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Crystal of iorwerth",
+        "item_name": "Crystal of Iorwerth",
         "item_id": 23929,
         "shop_id": 315,
         "stock": "10",
@@ -29713,7 +29713,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Crystal of trahaearn",
+        "item_name": "Crystal of Trahaearn",
         "item_id": 23931,
         "shop_id": 315,
         "stock": "10",
@@ -29721,7 +29721,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Crystal of cadarn",
+        "item_name": "Crystal of Cadarn",
         "item_id": 23933,
         "shop_id": 315,
         "stock": "10",
@@ -29729,7 +29729,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Crystal of crwys",
+        "item_name": "Crystal of Crwys",
         "item_id": 23935,
         "shop_id": 315,
         "stock": "10",
@@ -29737,7 +29737,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Crystal of meilyr",
+        "item_name": "Crystal of Meilyr",
         "item_id": 23937,
         "shop_id": 315,
         "stock": "10",
@@ -29745,7 +29745,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Crystal of hefin",
+        "item_name": "Crystal of Hefin",
         "item_id": 23939,
         "shop_id": 315,
         "stock": "10",
@@ -29753,7 +29753,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Crystal of amlodd",
+        "item_name": "Crystal of Amlodd",
         "item_id": 23941,
         "shop_id": 315,
         "stock": "10",
@@ -29987,7 +29987,7 @@
         "sell_price": "9800"
       },
       {
-        "item_name": "Cape of legends",
+        "item_name": "Cape of Legends",
         "item_id": 1052,
         "shop_id": 317,
         "stock": "inf",
@@ -30035,7 +30035,7 @@
         "sell_price": "12000"
       },
       {
-        "item_name": "Book of balance",
+        "item_name": "Book of Balance",
         "item_id": 3844,
         "shop_id": 317,
         "stock": "inf",
@@ -30203,7 +30203,7 @@
         "sell_price": "25000"
       },
       {
-        "item_name": "Helm of neitiznot",
+        "item_name": "Helm of Neitiznot",
         "item_id": 10828,
         "shop_id": 317,
         "stock": "inf",
@@ -30227,7 +30227,7 @@
         "sell_price": "6000"
       },
       {
-        "item_name": "Karamja gloves",
+        "item_name": "Karamja gloves 1",
         "item_id": 11136,
         "shop_id": 317,
         "stock": "inf",
@@ -30243,7 +30243,7 @@
         "sell_price": "115000"
       },
       {
-        "item_name": "Book of war",
+        "item_name": "Book of War",
         "item_id": 12608,
         "shop_id": 317,
         "stock": "inf",
@@ -30251,7 +30251,7 @@
         "sell_price": "14000"
       },
       {
-        "item_name": "Book of law",
+        "item_name": "Book of Law",
         "item_id": 12610,
         "shop_id": 317,
         "stock": "inf",
@@ -30259,7 +30259,7 @@
         "sell_price": "14000"
       },
       {
-        "item_name": "Book of darkness",
+        "item_name": "Book of Darkness",
         "item_id": 12612,
         "shop_id": 317,
         "stock": "inf",
@@ -30267,7 +30267,7 @@
         "sell_price": "14000"
       },
       {
-        "item_name": "Varrock armour",
+        "item_name": "Varrock armour 3",
         "item_id": 13106,
         "shop_id": 317,
         "stock": "inf",
@@ -30275,7 +30275,7 @@
         "sell_price": "200"
       },
       {
-        "item_name": "Wilderness sword",
+        "item_name": "Wilderness sword 3",
         "item_id": 13110,
         "shop_id": 317,
         "stock": "inf",
@@ -30283,7 +30283,7 @@
         "sell_price": "200"
       },
       {
-        "item_name": "Morytania legs",
+        "item_name": "Morytania legs 3",
         "item_id": 13114,
         "shop_id": 317,
         "stock": "inf",
@@ -30291,7 +30291,7 @@
         "sell_price": "200"
       },
       {
-        "item_name": "Falador shield",
+        "item_name": "Falador shield 1",
         "item_id": 13117,
         "shop_id": 317,
         "stock": "inf",
@@ -30299,7 +30299,7 @@
         "sell_price": "200"
       },
       {
-        "item_name": "Ardougne cloak",
+        "item_name": "Ardougne cloak 4",
         "item_id": 13124,
         "shop_id": 317,
         "stock": "inf",
@@ -30307,7 +30307,7 @@
         "sell_price": "200"
       },
       {
-        "item_name": "Explorer's ring",
+        "item_name": "Explorer's ring 2",
         "item_id": 13126,
         "shop_id": 317,
         "stock": "inf",
@@ -30315,7 +30315,7 @@
         "sell_price": "200"
       },
       {
-        "item_name": "Fremennik sea boots",
+        "item_name": "Fremennik sea boots 2",
         "item_id": 13130,
         "shop_id": 317,
         "stock": "inf",
@@ -30323,7 +30323,7 @@
         "sell_price": "200"
       },
       {
-        "item_name": "Desert amulet",
+        "item_name": "Desert amulet 3",
         "item_id": 13135,
         "shop_id": 317,
         "stock": "inf",
@@ -30331,7 +30331,7 @@
         "sell_price": "200"
       },
       {
-        "item_name": "Kandarin headgear",
+        "item_name": "Kandarin headgear 1",
         "item_id": 13137,
         "shop_id": 317,
         "stock": "inf",
@@ -30339,7 +30339,7 @@
         "sell_price": "200"
       },
       {
-        "item_name": "Western banner",
+        "item_name": "Western banner 1",
         "item_id": 13141,
         "shop_id": 317,
         "stock": "inf",
@@ -30355,7 +30355,7 @@
         "sell_price": "500"
       },
       {
-        "item_name": "Imbued saradomin cape",
+        "item_name": "Imbued Saradomin cape",
         "item_id": 21791,
         "shop_id": 317,
         "stock": "inf",
@@ -30363,7 +30363,7 @@
         "sell_price": "250000"
       },
       {
-        "item_name": "Imbued guthix cape",
+        "item_name": "Imbued Guthix cape",
         "item_id": 21793,
         "shop_id": 317,
         "stock": "inf",
@@ -30371,7 +30371,7 @@
         "sell_price": "250000"
       },
       {
-        "item_name": "Imbued zamorak cape",
+        "item_name": "Imbued Zamorak cape",
         "item_id": 21795,
         "shop_id": 317,
         "stock": "inf",
@@ -30403,7 +30403,7 @@
         "sell_price": "30000"
       },
       {
-        "item_name": "Rada's blessing",
+        "item_name": "Rada's blessing 2",
         "item_id": 22943,
         "shop_id": 317,
         "stock": "inf",
@@ -30411,7 +30411,7 @@
         "sell_price": "200"
       },
       {
-        "item_name": "Book of the dead",
+        "item_name": "Book of the Dead",
         "item_id": 25818,
         "shop_id": 317,
         "stock": "inf",
@@ -32078,7 +32078,7 @@
     "map_id": "0",
     "items": [
       {
-        "item_name": "Helm of neitiznot",
+        "item_name": "Helm of Neitiznot",
         "item_id": 10828,
         "shop_id": 344,
         "stock": "inf",
@@ -36967,7 +36967,7 @@
         "sell_price": "10"
       },
       {
-        "item_name": "Scroll of imbuing",
+        "item_name": "Scroll of Imbuing",
         "item_id": 26706,
         "shop_id": 409,
         "stock": "inf",
@@ -37097,7 +37097,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Mithril sword",
+        "item_name": "Mithril shortsword",
         "item_id": 1285,
         "shop_id": 411,
         "stock": "3",
@@ -37105,7 +37105,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Adamant sword",
+        "item_name": "Adamant shortsword",
         "item_id": 1287,
         "shop_id": 411,
         "stock": "2",
@@ -39738,7 +39738,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Rune sword",
+        "item_name": "Rune shortsword",
         "item_id": 1289,
         "shop_id": 444,
         "stock": "1",
@@ -41034,7 +41034,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Fungicide spray",
+        "item_name": "Fungicide spray 1",
         "item_id": 7430,
         "shop_id": 460,
         "stock": "50",
@@ -41417,7 +41417,7 @@
         "sell_price": "250"
       },
       {
-        "item_name": "Spoils of war",
+        "item_name": "Spoils of War",
         "item_id": 25342,
         "shop_id": 467,
         "stock": "inf",
@@ -42801,7 +42801,7 @@
         "sell_price": "3000"
       },
       {
-        "item_name": "Hat of the eye",
+        "item_name": "Hat of the Eye",
         "item_id": 26850,
         "shop_id": 483,
         "stock": "100",
@@ -42809,7 +42809,7 @@
         "sell_price": "400"
       },
       {
-        "item_name": "Robe top of the eye",
+        "item_name": "Robe top of the Eye",
         "item_id": 26852,
         "shop_id": 483,
         "stock": "100",
@@ -42817,7 +42817,7 @@
         "sell_price": "350"
       },
       {
-        "item_name": "Robe bottoms of the eye",
+        "item_name": "Robe bottoms of the Eye",
         "item_id": 26854,
         "shop_id": 483,
         "stock": "100",
@@ -42825,7 +42825,7 @@
         "sell_price": "350"
       },
       {
-        "item_name": "Boots of the eye",
+        "item_name": "Boots of the Eye",
         "item_id": 26856,
         "shop_id": 483,
         "stock": "100",
@@ -47654,7 +47654,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Bronze sword",
+        "item_name": "Bronze shortsword",
         "item_id": 1277,
         "shop_id": 544,
         "stock": "5",
@@ -47662,7 +47662,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Iron sword",
+        "item_name": "Iron shortsword",
         "item_id": 1279,
         "shop_id": 544,
         "stock": "4",
@@ -47670,7 +47670,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Steel sword",
+        "item_name": "Steel shortsword",
         "item_id": 1281,
         "shop_id": 544,
         "stock": "4",
@@ -47678,7 +47678,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Black sword",
+        "item_name": "Black shortsword",
         "item_id": 1283,
         "shop_id": 544,
         "stock": "3",
@@ -47686,7 +47686,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Mithril sword",
+        "item_name": "Mithril shortsword",
         "item_id": 1285,
         "shop_id": 544,
         "stock": "3",
@@ -47694,7 +47694,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Adamant sword",
+        "item_name": "Adamant shortsword",
         "item_id": 1287,
         "shop_id": 544,
         "stock": "2",
@@ -48349,7 +48349,7 @@
         "sell_price": "200"
       },
       {
-        "item_name": "Void seal",
+        "item_name": "Void seal(3)",
         "item_id": 11671,
         "shop_id": 551,
         "stock": "inf",
@@ -48768,7 +48768,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Bronze sword",
+        "item_name": "Bronze shortsword",
         "item_id": 1277,
         "shop_id": 554,
         "stock": "5",
@@ -48776,7 +48776,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Iron sword",
+        "item_name": "Iron shortsword",
         "item_id": 1279,
         "shop_id": 554,
         "stock": "4",
@@ -48784,7 +48784,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Steel sword",
+        "item_name": "Steel shortsword",
         "item_id": 1281,
         "shop_id": 554,
         "stock": "4",
@@ -48792,7 +48792,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Black sword",
+        "item_name": "Black shortsword",
         "item_id": 1283,
         "shop_id": 554,
         "stock": "3",
@@ -48800,7 +48800,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Mithril sword",
+        "item_name": "Mithril shortsword",
         "item_id": 1285,
         "shop_id": 554,
         "stock": "3",
@@ -48808,7 +48808,7 @@
         "sell_price": null
       },
       {
-        "item_name": "Adamant sword",
+        "item_name": "Adamant shortsword",
         "item_id": 1287,
         "shop_id": 554,
         "stock": "2",
@@ -49342,7 +49342,7 @@
         "sell_price": null
       },
       {
-        "item_name": "White sword",
+        "item_name": "White shortsword",
         "item_id": 6605,
         "shop_id": 560,
         "stock": "20",
@@ -49519,7 +49519,7 @@
         "sell_price": null
       },
       {
-        "item_name": "White sword",
+        "item_name": "White shortsword",
         "item_id": 6605,
         "shop_id": 561,
         "stock": "20",
@@ -49696,7 +49696,7 @@
         "sell_price": null
       },
       {
-        "item_name": "White sword",
+        "item_name": "White shortsword",
         "item_id": 6605,
         "shop_id": 562,
         "stock": "10",
@@ -49873,7 +49873,7 @@
         "sell_price": null
       },
       {
-        "item_name": "White sword",
+        "item_name": "White shortsword",
         "item_id": 6605,
         "shop_id": 563,
         "stock": "0",
@@ -50050,7 +50050,7 @@
         "sell_price": null
       },
       {
-        "item_name": "White sword",
+        "item_name": "White shortsword",
         "item_id": 6605,
         "shop_id": 564,
         "stock": "10",
@@ -50227,7 +50227,7 @@
         "sell_price": null
       },
       {
-        "item_name": "White sword",
+        "item_name": "White shortsword",
         "item_id": 6605,
         "shop_id": 565,
         "stock": "10",
@@ -50610,7 +50610,7 @@
         "sell_price": "N/A"
       },
       {
-        "item_name": "Beads of the dead",
+        "item_name": "Beads of the Dead",
         "item_id": 616,
         "shop_id": 572,
         "stock": "inf",

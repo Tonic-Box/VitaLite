@@ -9,6 +9,7 @@ import lombok.*;
 import net.runelite.api.Client;
 import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
+import net.runelite.api.ParamID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.Widget;
@@ -31,7 +32,7 @@ public class ItemEx implements Interactable, Identifiable
 
     public boolean isNoted() {
         Client client = Static.getClient();
-        return Static.invoke(() -> client.getItemDefinition(item.getId()).getNote()) == 799;
+        return Static.invoke(() -> client.getItemDefinition(item.getId()).getNote()) == ItemID.TEMPLATE_FOR_CERT;
     }
 
     public boolean isPlaceholder() {
@@ -88,14 +89,14 @@ public class ItemEx implements Interactable, Identifiable
     }
 
     private static final int[] EQUIP_OP_PARAMS = {
-            451, // OP1
-            452, // OP2
-            453, // OP3
-            454, // OP4
-            455, // OP5
-            456, // OP6
-            457, // OP7
-            458  // OP8
+            ParamID.OC_ITEM_OP1,
+            ParamID.OC_ITEM_OP2,
+            ParamID.OC_ITEM_OP3,
+            ParamID.OC_ITEM_OP4,
+            ParamID.OC_ITEM_OP5,
+            ParamID.OC_ITEM_OP6,
+            ParamID.OC_ITEM_OP7,
+            ParamID.OC_ITEM_OP8
     };
     /**
      * Resolve an **equipped item action index** by reading ItemComposition param opcodes.

@@ -63,6 +63,8 @@ public enum EmoteID
     PARTY(51),
     TRICK(52),
     FORTIS_SALUTE(53),
+    SIT_DOWN(54),
+    CRAB_DANCE(55),
     ;
 
     public static final int EMOTES_WIDGET_ID = InterfaceID.Emote.CONTENTS;

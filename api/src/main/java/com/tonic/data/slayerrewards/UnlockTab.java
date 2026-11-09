@@ -17,11 +17,11 @@ public class UnlockTab extends AbstractTabImpl
         SLUG_SALTER(1, 10),
         REPTILE_FREEZER(2, 10),
         SHROOM_SPRAYER(3, 110),
-        MALEVOLENT_MMASQUERADE(5, 400),
-        RING_BLING(6150, 150),
+        MALEVOLENT_MASQUERADE(5, 400),
+        RING_BLING(6, 150),
         BROADER_FLETCHING(7, 300),
         SEEING_RED(34, 50),
-        WATCH_THE_BRIDE(17, 80),
+        WATCH_THE_BIRDIE(17, 80),
         HOT_STUFF(18, 100),
         LIKE_A_BOSS(19, 200),
         REPTILE_GOT_RIPPED(30, 75),
@@ -37,11 +37,16 @@ public class UnlockTab extends AbstractTabImpl
         USE_MORE_HEAD(45, 1000),
         EYE_SEE_YOU(56, 1000),
         BASILOCKED(47, 80),
-        TWISTED_VISION(48, 1000),
-        ACTUAL_VAMPIRE_SLAYER(50, 80),
+        TWISTED_VISION(48, 200),
+        ACTUAL_VAMPYRE_SLAYER(50, 80),
         TASK_STORAGE(51, 500),
         I_WILDY_MORE_SLAYER(52, 0),
-        WARPED_REALITY(54, 60)
+        WARPED_REALITY(54, 60),
+        WINGS_SPREAD(60, 80),
+        LURED_IN(61, 80),
+        ABSOLUTELY_SLAYIN(62, 1000),
+        OATH_BREAKER(64, 200),
+        CHANCE_OF_HEAVY_FROST(66, 100)
         ;
         private final int index;
         private final int cost;
