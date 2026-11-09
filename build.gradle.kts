@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("3")
+val vitaVersion by extra("4")
 val runeliteVersion by extra("1.13.6")
 
 group = "com.tonic"
@@ -358,14 +358,14 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-cleanup"
+    val title = "${tag}-feature"
     val body = "# ${tag}\n" +
-            "- Magic spell data and cast checks now use the game's own scripts\n" +
-            "- Fixed bank, inventory, dialogue, make-x, trade and GE interactions\n" +
-            "- Fixed broken transports (fairy rings, charters, canoes, spirit trees, minecarts, teleport items)\n" +
-            "- Fixed stale game data (minigames, prayers, autocast, runes, slayer, emotes, shops)\n" +
-            "- Timed handler waits now time out\n" +
-            "- Removed deprecated RuneLite id use, raw ids now gameval";
+            "- Implemented pluginhub feature for vita along with an official plugin repository baked in\n" +
+            "- Ground item interactions by name do nothing when the item has no such option\n" +
+            "- interactableFrom handles wall objects\n" +
+            "- BankLocations.getNearest picks the bank the pathfinder reaches first\n" +
+            "- Inventory ops resolve against the item's shown options\n" +
+            "- Quetzal transport from the game's quetzal table";
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {

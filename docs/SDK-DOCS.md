@@ -1,106 +1,24 @@
-# VitaLite SDK Documentation
+# VitaLite SDK
 
-## Overview
+VitaLite runs RuneLite plugins and gives them more to work with: a game API for reading the game and acting in it, queries, automation helpers, a world walker, and client services such as multi-client messaging and break scheduling. These pages list what exists and what each piece is for. They aren't a full reference; the code and its Javadoc have the details.
 
-### Key Classes
-```
-📦 VitaLite SDK
-├──Static       # Static access to client object, and others. Also Static access
-│               # to helper methods such as inboking on/getting returns from client 
-│               # thread.
-│
-├──Logger       # Static logger for logging to the embedded console window.
-```
+## Pages
 
-### API
-Everything in the built-in API is designed with thread safety in mind
-```
-📦 VitaLite SDK
-├── 🎮 Game APIs
-│   ├── 🏃‍♂️ entities/
-│   │   ├── ActorAPI          # Actor api
-│   │   ├── NpcAPI            # NPC api
-│   │   ├── PlayerAPI         # Player api
-│   │   ├── TileItemAPI       # Tile item api
-│   │   └── TileObjectAPI     # Tile object api
-│   │
-│   ├── 🎯 game/
-│   │   ├── ClientScriptAPI   # CS2 script execution
-│   │   ├── CombatAPI         # Combat calculations & state
-│   │   ├── GameAPI           # Core game utilities
-│   │   ├── HouseAPI          # Player-owned house api
-│   │   ├── MovementAPI       # Walking api
-│   │   ├── QuestAPI          # Quest progress & completion
-│   │   ├── SceneAPI          # Scene/region management
-│   │   ├── SkillAPI          # Skill levels & experience
-│   │   └── VarAPI            # Game variable access
-│   │
-│   └── 🔄 threaded/
-│       ├── Cannon            # Dwarf cannon automation
-│       ├── Delays            # Smart timing utilities
-│       ├── Dialogues         # Dialogue interaction system
-│       ├── GrandExchange     # GE trading automation
-│       ├── Minigames         # Minigame-teleport API
-│       └── WorldsAPI         # World hopping & selection
-│
-├── 🎨 Widget APIs
-│   ├── BankAPI               # Banking operations
-│   ├── DialogueAPI           # Chat & dialogue handling
-│   ├── EmoteAPI              # Emote api
-│   ├── EquipmentAPI          # Equipment api
-│   ├── GrandExchangeAPI      # Grand Exchange automation
-│   ├── InventoryAPI          # Inventory api
-│   ├── MagicAPI              # Spellcasting & magic
-│   ├── PrayerAPI             # Prayer api
-│   ├── ShopAPI               # Shop interface handling
-│   ├── SlayerRewardsAPI      # Slayer rewards interface api
-│   ├── TabsAPI               # Inventory tabs management
-│   ├── WidgetAPI             # General widget api
-│   ├── MiniMapAPI            # Minimap api
-│   └── WorldMapAPI           # World map api
-│
-├── 🗺️ Advanced Services
-│   ├─── 🧭 ipc/
-│   │   ├── ChannelBuilder      # Builder class for Channel instance
-│   │   └── Channel             # Stateless inter-client comunications service
-│   └─── 🧭 pathfinder/
-│       ├── Pathfinder          # OSRS Pathfinding
-│       └── Walker              # World walker
-│
-├── 🔍 Query System
-│   ├── InventoryQuery           # Inventory filtering & search
-│   ├── NpcQuery                 # NPC filtering & selection
-│   ├── PlayerQuery              # Player filtering & search
-│   ├── TileItemQuery            # Ground item queries
-│   ├── TileObjectQuery          # Game object queries
-│   ├── WidgetQuery              # UI widget queries
-│   └── WorldQuery               # World queries
-│
-├── 🎨 UI Components
-│   ├── VPluginPanel             # Base plugin panel
-│   ├── FancyButton              # Styled button component
-│   ├── FancyDropdown            # Enhanced dropdown menus
-│   ├── ToggleSlider             # Modern toggle switches
-│   └── UI utilities             # Layout & styling helpers
-│
-└── 🔧 Utilities
-    ├── ActorPathing             # NPC/player movement utilities
-    ├── ClickManagerUtil         # Click interaction helpers
-    ├── ClientConfig             # Client configuration management
-    ├── Coroutine                # Async task management
-    ├── Location                 # Location & coordinate utilities
-    ├── MessageUtil              # Game message handling
-    ├── Profiler                 # Performance profiling
-    ├── ReflectBuilder           # Fluent reflection API
-    ├── ReflectUtil              # Reflection helpers
-    ├── ResourceUtil             # Resource loading utilities
-    ├── RuneliteConfigUtil       # RuneLite config integration
-    ├── TextUtil                 # Text processing utilities
-    ├── ThreadPool               # Thread management
-    └── WorldPointUtil           # World coordinate utilities
-```
+1. [Getting started](sdk/getting-started.md): depending on VitaLite, `Static`, the threading rule, `VitaPlugin`, `Logger`.
+2. [Game API](sdk/game-api.md): entities, game state, sailing, interfaces, and the threaded task classes.
+3. [Queries and wrappers](sdk/queries-and-wrappers.md): searching NPCs, items, objects, widgets and worlds, and the objects queries return.
+4. [Automation](sdk/automation.md): step handlers and their builders, the Script DSL, loadouts, dialogue trees.
+5. [Navigation](sdk/navigation.md): the walker, pathfinding, transports and sailing routes.
+6. [Game data](sdk/game-data.md): enums and constants for spells, skills, shops, locations and ids.
+7. [Services](sdk/services.md): game state caches, break handler, messaging between clients, clicks and mouse, settings storage, proxies, packet events.
+8. [UI](sdk/ui.md): Swing components and overlay drawing helpers.
+9. [Utilities](sdk/utilities.md): threads, reflection, text, distances and points.
+10. [Client features](sdk/client-features.md): sideloading, Vita Hub, built-in plugins, the settings panel and launch options.
 
-**Key Features:**
-- 🚀 **High-Performance**: Optimized for speed with advanced caching
-- 🧠 **Smart Automation**: Built-in pathfinding, dialogue, and interaction systems
-- 🔌 **Plugin Ecosystem**: Hot-swappable plugin architecture
+## Other docs
+
+- [Plugin Dev Guide](EXTERNALPLUGIN.md): setting up a plugin project.
+- [Script DSL](SCRIPT-DSL.md): writing tasks as scripts.
+- [Click Manager](CLICKMANAGER.md): click strategies and where clicks land.
+- [Mouse Movement](MOUSE-MOVEMENT.md): recording and generating mouse movement.
+- [Profiler](PROFILER.md): the built-in JVM profiler.

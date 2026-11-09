@@ -23,7 +23,13 @@ VitaLite is a launcher for RuneLite that offers additional features and customiz
 
 [Plugin Dev Guide](./docs/EXTERNALPLUGIN.md)
 
+[Script DSL](./docs/SCRIPT-DSL.md)
+
 [Click Manager Docs](./docs/CLICKMANAGER.md)
+
+[Mouse Movement](./docs/MOUSE-MOVEMENT.md)
+
+[Profiler](./docs/PROFILER.md)
 
 [Plugin Repo Hosting](https://github.com/Tonic-Box/VitaLitePlugins)
 
@@ -46,7 +52,7 @@ VitaLite is a launcher for RuneLite that offers additional features and customiz
 | `-runInjector` | Boolean | Run the injector on startup and update patch difs (for mixin development)                         |
 | `--rsdump`     | String  | Path to dump the gamepack to (optional)                                                           |
 | `-noPlugins`   | Boolean | Disables loading of core plugins                                                                  |
-| `-min`         | Boolean | Runs jvm with minimal alotted memory.                                                             |
+| `-min`         | Boolean | Runs jvm with minimal alotted memory. Also turns on `-noPlugins` and `-noMusic`.                  |
 | `-noMusic`     | Boolean | Prevent the loading of music tracks                                                               |
 | `-incognito`   | Boolean | Visually display as 'RuneLite' instead of 'VitaLite'                                              |
 | `-help`        | Boolean | Displays help information about command line options                                              |
@@ -54,6 +60,9 @@ VitaLite is a launcher for RuneLite that offers additional features and customiz
 | `--jagexLogin` | String | details for logging int (sessionID:characterID:displayName)  or path to runelite credentials file |
 | `--proxy`      | String  | Set a proxy server to use (e.g., ip:port or ip:port:username:password)                            |
 | `-disableMouseHook` | Boolean | Disable RuneLite's mousehook rlicn DLL from being loaded or called |
+| `--world`      | Integer | World to log in to                                                                                |
+| `--autoEnterGame` | Boolean | Whether to enter the game automatically after logging in (default `true`; pass `--autoEnterGame false` to log in without entering the world) |
+| `--targetBootstrap` | String | Run a specific RuneLite version                                                               |
 
 
 ## Disclaimer

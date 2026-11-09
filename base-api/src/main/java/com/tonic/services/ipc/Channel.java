@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * <p>Usage example:
  * <pre>{@code
- * Channel channel = new Channel.Builder("MyClient")
+ * Channel channel = new ChannelBuilder("MyClient")
  *     .port(5000)
  *     .group("230.0.0.1")
  *     .build();
