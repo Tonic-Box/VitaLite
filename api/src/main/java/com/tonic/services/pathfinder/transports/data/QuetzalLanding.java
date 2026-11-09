@@ -42,7 +42,6 @@ public enum QuetzalLanding
         this.autoUnlocked = autoUnlocked;
         this.requirements = new Requirements();
         this.requirements.addRequirement(new WorldRequirement(true));
-        this.requirements.addRequirement(new QuestRequirement(Quest.TWILIGHTS_PROMISE, QuestState.FINISHED));
         this.requirements.addRequirement(new VarRequirement(Comparison.GREATER_THAN_EQUAL, VarType.VARBIT, VarbitID.QUETZAL_FORTIS, 2));
         this.requirements.addRequirement(new OtherRequirement(this::isUnlocked));
     }
