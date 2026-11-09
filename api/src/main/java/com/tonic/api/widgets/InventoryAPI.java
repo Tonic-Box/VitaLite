@@ -4,10 +4,12 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.data.wrappers.*;
 import com.tonic.queries.InventoryQuery;
+import com.tonic.util.TextUtil;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.api.widgets.Widget;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -281,6 +283,18 @@ public class InventoryAPI
         {
             return EXAMINE_OP;
         }
+        String[] shown = shownActions(item);
+        if (shown != null)
+        {
+            for (int i = 0; i < shown.length; i++)
+            {
+                if (shown[i] != null && TextUtil.sanitize(shown[i]).toLowerCase().contains(option))
+                {
+                    return i + 1;
+                }
+            }
+            return -1;
+        }
         String[] actions = item.getActions();
         for (int i = 0; i < actions.length && i < ITEM_OPS.length; i++)
         {
@@ -290,6 +304,14 @@ public class InventoryAPI
             }
         }
         return -1;
+    }
+
+    private static String[] shownActions(ItemEx item)
+    {
+        return Static.invoke(() -> {
+            Widget widget = item.getWidget();
+            return widget == null || widget.getItemId() != item.getId() ? null : widget.getActions();
+        });
     }
 
     /**
