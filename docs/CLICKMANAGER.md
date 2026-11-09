@@ -1,5 +1,5 @@
 # Click Manager
-The click manager enables users to control the behavior of how clicks are crafted. This includes clicking at static points, clicking at random points, clicking in defined controlled areas (must be supported by plugin developer), or not sending clicks at all. WHat you set the strategy to `STATIC` you will see a panel show where you can define the x/y for the static click location.
+The click manager enables users to control the behavior of how clicks are crafted. This includes clicking at static points, clicking at random points, clicking in defined controlled areas (must be supported by plugin developer), or not sending clicks at all. When you set the strategy to `STATIC` you will see a panel show where you can define the x/y for the static click location.
 
 ## Configuration
 In the VitaLite options sidebar, there is a dropdown for configuring this option.
@@ -9,10 +9,10 @@ If you want to support controlled clicks, you will need to integrate your automa
 
 At any point during your automation you can call:
 ```
-ClickManager::queueClickBox(Rectangle rectangle)
+ClickManager.queueClickBox(Shape shape)
 ```
 
-this wills et the area for which the click manager will select a random point from when set to `CONTROLLED` strategy. It will stay persistent until its either cleared or set to a new Rectangle.
+This sets the area the click manager picks a random point from when the strategy is `CONTROLLED`. It stays set until it's cleared with `ClickManager.clearClickBox()` or replaced by a new shape.
 
 There is also a Util class for setting this up easier:
 ## ClickManagerUtil
@@ -21,10 +21,17 @@ There is also a Util class for setting this up easier:
 ClickManagerUtil.queueClickBox(TileObjectEx object)
 
 //Queue click on an actor
-ClickManagerUtil.queueClickBox(Actor actor)
+ClickManagerUtil.queueClickBox(ActorEx<?> actor)
 
 //Queue click on an item
 ClickManagerUtil.queueClickBox(ItemEx item)
+
+//Queue click on a ground item
+ClickManagerUtil.queueClickBox(TileItemEx item)
+
+//Queue click on a widget, or an interface by id
+ClickManagerUtil.queueClickBox(Widget widget)
+ClickManagerUtil.queueClickBoxInterface(int interfaceId)
 ```
 
 ## Notes

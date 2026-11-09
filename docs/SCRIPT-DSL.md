@@ -11,7 +11,7 @@ import com.tonic.util.handler.script.*;
 StepHandler handler = Script.build(s -> {
     s.action(() -> openBank());
     s.await(BankAPI::isOpen);
-    s.action(() -> BankAPI.depositInventory());
+    s.action(() -> BankAPI.depositAll());
 });
 
 // Execute it
@@ -87,7 +87,7 @@ Script.execute(s -> {
 
     s.action(ctx -> {
         ctx.set(COUNT, ctx.get(COUNT) + 1);
-        NpcAPI.attack(ctx.get(TARGET));
+        NpcAPI.interact(ctx.get(TARGET), "Attack");
     });
 
     s.await(ctx -> ctx.get(TARGET).isDead());
@@ -130,14 +130,14 @@ Script.execute(s -> {
 ```java
 // Simple conditional (skip if false)
 s.when(() -> shouldDeposit(), body -> {
-    body.action(() -> BankAPI.depositInventory());
+    body.action(() -> BankAPI.depositAll());
 });
 
 // If-then
 s.ifThen(() -> inventoryFull(), body -> {
     body.action(() -> walkToBank());
     body.await(BankAPI::isOpen);
-    body.action(() -> BankAPI.depositInventory());
+    body.action(() -> BankAPI.depositAll());
 });
 
 // If-then-else
@@ -169,13 +169,13 @@ s.loop(5, body -> {
 // Loop while condition is true
 s.loopWhile(() -> !inventoryFull(), body -> {
     body.action(() -> mine());
-    body.await(PlayerAPI::isIdle);
+    body.await(() -> PlayerEx.getLocal().isIdle());
 });
 
 // Loop until condition becomes true
 s.loopUntil(InventoryAPI::isFull, body -> {
     body.action(() -> fish());
-    body.await(PlayerAPI::isIdle);
+    body.await(() -> PlayerEx.getLocal().isIdle());
 });
 
 // Infinite loop (use exit() to break)
@@ -215,7 +215,7 @@ s.exitIf(ctx -> ctx.get(ATTEMPTS) >= 5);
 // Include another script inline
 Consumer<ScriptBuilder> depositItems = sub -> {
     sub.await(BankAPI::isOpen);
-    sub.action(() -> BankAPI.depositInventory());
+    sub.action(() -> BankAPI.depositAll());
 };
 
 Script.execute(s -> {
@@ -229,7 +229,7 @@ StepHandler walkingHandler = BankBuilder.get().open().build();
 
 Script.execute(s -> {
     s.include(walkingHandler);
-    s.action(() -> BankAPI.depositInventory());
+    s.action(() -> BankAPI.depositAll());
 });
 ```
 
@@ -270,8 +270,7 @@ public StepHandler createBankingHandler() {
         s.jumpIf(ctx -> ctx.get(FOUND_BANK), "wait_open");
 
         // Walk to nearest bank
-        s.action(() -> MovementAPI.walkTo(BankLocations.getNearest()));
-        s.await(PlayerAPI::isIdle);
+        s.action(BankLocations::walkToNearest);
 
         // Wait for bank to open
         s.label("wait_open");
@@ -298,7 +297,7 @@ public void mineWithBanking(WorldPoint miningSpot, int targetOres) {
 
                 mineLoop.when(ctx -> ctx.get(ROCK) != null, mine -> {
                     mine.action(ctx -> TileObjectAPI.interact(ctx.get(ROCK), "Mine"));
-                    mine.await(PlayerAPI::isIdle);
+                    mine.await(() -> PlayerEx.getLocal().isIdle());
                     mine.action(ctx -> ctx.set(ORES_MINED, ctx.get(ORES_MINED) + 1));
                 });
 
@@ -306,17 +305,17 @@ public void mineWithBanking(WorldPoint miningSpot, int targetOres) {
             });
 
             // Bank the ores
-            loop.action(() -> MovementAPI.walkTo(BankLocations.getNearest()));
-            loop.await(() -> BankAPI.isNearBank());
-            loop.action(() -> BankAPI.open());
+            loop.action(BankLocations::walkToNearest);
+            loop.action(() -> TileObjectAPI.interact(TileObjectAPI.search()
+                .withNameContains("Bank booth")
+                .nearest(), "Bank"));
             loop.await(BankAPI::isOpen);
-            loop.action(() -> BankAPI.depositInventory());
+            loop.action(() -> BankAPI.depositAll());
             loop.yield(2);
             loop.action(() -> BankAPI.close());
 
             // Return to mining spot
-            loop.action(() -> MovementAPI.walkTo(miningSpot));
-            loop.await(PlayerAPI::isIdle);
+            loop.action(() -> Walker.walkTo(miningSpot));
         });
     });
 }
@@ -340,8 +339,7 @@ public StepHandler talkToNpc(String npcName, String... dialogueOptions) {
         s.loopWhile(DialogueAPI::dialoguePresent, loop -> {
             loop.action(() -> {
                 for (String option : dialogueOptions) {
-                    if (DialogueAPI.hasOption(option)) {
-                        DialogueAPI.selectOption(option);
+                    if (DialogueAPI.selectOption(option)) {
                         return;
                     }
                 }
@@ -398,7 +396,7 @@ add(context -> {
     }
     return step + 1;
 });
-addDelayUntil(() -> PlayerAPI.isIdle());
+addDelayUntil(() -> PlayerEx.getLocal().isIdle());
 add("end", context -> { /* ... */ });
 ```
 
@@ -417,7 +415,7 @@ Script.build(s -> {
     });
     s.jumpIf(ctx -> ctx.get(FOUND), "end");
 
-    s.await(PlayerAPI::isIdle);
+    s.await(() -> PlayerEx.getLocal().isIdle());
 
     s.label("end");
 });
@@ -432,13 +430,18 @@ Script.build(s -> {
 | `Script.build(Consumer<ScriptBuilder>)` | Builds a StepHandler without executing |
 | `Script.execute(Consumer<ScriptBuilder>)` | Builds and executes immediately |
 | `Script.run(Consumer<ScriptBuilder>)` | Alias for build() |
+| `Script.build(Class<? extends IScript>)` | Builds a StepHandler from a script class |
+
+### IScript (Scripts as Classes)
+
+A class implementing `IScript` puts its main script in `main(ScriptBuilder)`. Its other non-static methods that take a `ScriptBuilder` and return void become subroutines. Run it with `IScript.execute(MyScript.class)` (blocks, so not on the client thread) or build it with `IScript.build(MyScript.class)`.
 
 ### ScriptBuilder Methods
 
 | Category | Methods |
 |----------|---------|
 | **Actions** | `action(Runnable)`, `action(Consumer<ScriptContext>)`, `action(Var<T>, Supplier<T>)` |
-| **Yield/Await** | `yield()`, `yield(int)`, `await(BooleanSupplier)`, `await(Predicate<ScriptContext>)`, `await(int, BooleanSupplier, Runnable)` |
+| **Yield/Await** | `yield()`, `yield(int)`, `await(BooleanSupplier)`, `await(Predicate<ScriptContext>)`, `await(int, BooleanSupplier, Runnable)`, `awaitAndYield(condition, ticks)`, `awaitIdle()` |
 | **Branching** | `when()`, `ifThen()`, `ifThenElse()` |
 | **Loops** | `loop(Consumer)`, `loop(int, Consumer)`, `loopWhile()`, `loopUntil()` |
 | **Control** | `exit()`, `exitIf()`, `label(String)`, `jump(String)`, `jumpIf()` |
