@@ -305,8 +305,7 @@ public class TileObjectEx implements Entity
 
     /**
      * Gets all WorldPoints from which this object can be interacted with.
-     * Takes into account walls that may block access. Does not account for reachability
-     * Only works for GameObjects (type 2).
+     * Takes into account walls that may block access. Does not account for reachability.
      *
      * @return A set of WorldPoints from which the object can be interacted with.
      */
@@ -340,6 +339,11 @@ public class TileObjectEx implements Entity
             {
                 accessibleFrom.add(objPos);
                 return accessibleFrom;
+            }
+
+            if(tileObject instanceof WallObject)
+            {
+                return wallAccess((WallObject) tileObject, objPos);
             }
 
             if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_NORTH) == 0) {
@@ -392,6 +396,37 @@ public class TileObjectEx implements Entity
 
             return accessibleFrom;
         });
+    }
+
+    private static Set<WorldPoint> wallAccess(WallObject wall, WorldPoint position)
+    {
+        Walls faces = Walls.of(wall);
+        Set<WorldPoint> accessibleFrom = new HashSet<>();
+        accessibleFrom.add(position);
+        for(Walls.Wall side : Walls.Wall.values())
+        {
+            WorldPoint next = neighbour(position, side);
+            if(!LocalCollisionMap.canStep(next.getX(), next.getY(), next.getPlane()))
+                continue;
+            if(faces.hasWall(side) || !Walls.of(next).hasWall(side.negate()))
+                accessibleFrom.add(next);
+        }
+        return accessibleFrom;
+    }
+
+    private static WorldPoint neighbour(WorldPoint position, Walls.Wall side)
+    {
+        switch(side)
+        {
+            case WEST:
+                return position.dx(-1);
+            case EAST:
+                return position.dx(1);
+            case NORTH:
+                return position.dy(1);
+            default:
+                return position.dy(-1);
+        }
     }
 
     public int getConfig()
