@@ -6,15 +6,15 @@ import com.tonic.services.pathfinder.requirements.Requirements;
 import com.tonic.services.pathfinder.requirements.RequirementsBuilder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import net.runelite.api.gameval.InterfaceID;
 
 @RequiredArgsConstructor
 @Getter
 public enum Canoe
 {
-    LOG(1, 12, 27262996),
-    DUGOUT(2, 27, 27262994),
-    STABLE_DUGOUT(3, 42, 27262988),
-    //WAKA(Integer.MAX_VALUE, 57, 27262990),
+    LOG(1, 12, InterfaceID.Canoeing.LOG),
+    DUGOUT(2, 27, InterfaceID.Canoeing.DUGOUT),
+    STABLE_DUGOUT(3, 42, InterfaceID.Canoeing.STABLE_DUGOUT),
     ;
 
     private final int distance;

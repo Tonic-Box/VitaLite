@@ -78,7 +78,7 @@ public enum DwarvenCart
                     TileObjectAPI.interact(object, "Ride");
                     return 4;
                 })
-                .addDelay(5, 22);
+                .addDelay(4, 22);
         return builder.build();
     }
 

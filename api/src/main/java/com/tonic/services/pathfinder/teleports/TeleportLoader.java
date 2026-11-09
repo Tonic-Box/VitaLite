@@ -2,6 +2,7 @@ package com.tonic.services.pathfinder.teleports;
 
 import com.tonic.Static;
 import com.tonic.api.game.GameAPI;
+import com.tonic.api.game.QuestAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.game.WorldsAPI;
 import com.tonic.api.widgets.EquipmentAPI;
@@ -11,6 +12,8 @@ import com.tonic.data.magic.SpellBook;
 import com.tonic.data.wrappers.ItemEx;
 import com.tonic.data.wrappers.PlayerEx;
 import net.runelite.api.Client;
+import net.runelite.api.Quest;
+import net.runelite.api.QuestState;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
@@ -63,25 +66,27 @@ public class TeleportLoader {
 
             boolean inMembers = WorldsAPI.inMembersWorld();
 
-            if (getTeleportItem(MovementConstants.SLAYER_RING) != null && inMembers) {
+            if (InventoryAPI.getItem(i -> ArrayUtils.contains(MovementConstants.SLAYER_RING, i.getId())) != null && inMembers) {
                 teleports.add(new Teleport(new WorldPoint(2432, 3423, 0), 2,
                         new ArrayList<>() {{
                             addAll(jewelryTeleport("Teleport", "Stronghold", MovementConstants.SLAYER_RING));
                         }}));
-                // todo if we have priest in peril
-                teleports.add(new Teleport(new WorldPoint(3422, 3537, 0), 2,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Teleport", "Slayer Tower", MovementConstants.SLAYER_RING));
-                        }}));
+                if (QuestAPI.getState(Quest.PRIEST_IN_PERIL) == QuestState.FINISHED) {
+                    teleports.add(new Teleport(new WorldPoint(3422, 3537, 0), 2,
+                            new ArrayList<>() {{
+                                addAll(jewelryTeleport("Teleport", "Slayer Tower", MovementConstants.SLAYER_RING));
+                            }}));
+                }
                 teleports.add(new Teleport(new WorldPoint(2802, 10000, 0), 2,
                         new ArrayList<>() {{
-                            addAll(jewelryTeleport("Teleport", "Fremennik", MovementConstants.SLAYER_RING));
+                            addAll(jewelryTeleport("Teleport", "Fremennik Dungeon", MovementConstants.SLAYER_RING));
                         }}));
-                // todo if we have haunted mine
-                teleports.add(new Teleport(new WorldPoint(3185, 4601, 0), 2,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Teleport", "Tarn's Lair", MovementConstants.SLAYER_RING));
-                        }}));
+                if (QuestAPI.getState(Quest.HAUNTED_MINE) == QuestState.FINISHED) {
+                    teleports.add(new Teleport(new WorldPoint(3185, 4601, 0), 2,
+                            new ArrayList<>() {{
+                                addAll(jewelryTeleport("Teleport", "Tarn's Lair", MovementConstants.SLAYER_RING));
+                            }}));
+                }
             }
             if (getTeleportItem(MovementConstants.AMULET_OF_GLORY) != null && inMembers) {
                 teleports.add(new Teleport(new WorldPoint(3087, 3496, 0), 5,
@@ -136,11 +141,12 @@ public class TeleportLoader {
                         new ArrayList<>() {{
                             addAll(jewelryTeleport("Rub", "Falador", MovementConstants.RING_OF_WEALTH));
                         }}));
-                // todo if we have the "between a rock" quest
-                teleports.add(new Teleport(new WorldPoint(2831, 10165, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Dondakan", MovementConstants.RING_OF_WEALTH));
-                        }}));
+                if (QuestAPI.getState(Quest.BETWEEN_A_ROCK) == QuestState.FINISHED) {
+                    teleports.add(new Teleport(new WorldPoint(2831, 10165, 0), 5,
+                            new ArrayList<>() {{
+                                addAll(jewelryTeleport("Rub", "Dondakan", MovementConstants.RING_OF_WEALTH));
+                            }}));
+                }
             }
             if (getTeleportItem(MovementConstants.RING_OF_DUELING) != null && inMembers) {
                 teleports.add(new Teleport(new WorldPoint(3315, 3235, 0), 5,
@@ -287,7 +293,16 @@ public class TeleportLoader {
             {
                 ItemEx item = InventoryAPI.getItem(i -> ArrayUtils.contains(teleportItem.getItemId(), i.getId()));
                 if (item != null) {
-                    InventoryAPI.interact(item, teleportItem.getAction());
+                    if (teleportItem.getMenu() != null) {
+                        InventoryAPI.interactSubOp(item, teleportItem.getMenu(), teleportItem.getAction());
+                    } else {
+                        InventoryAPI.interact(item, teleportItem.getAction());
+                    }
+                    return;
+                }
+                ItemEx worn = teleportItem.getWornAction() == null ? null : EquipmentAPI.getItem(i -> ArrayUtils.contains(teleportItem.getItemId(), i.getId()));
+                if (worn != null) {
+                    EquipmentAPI.interact(worn, teleportItem.getWornAction());
                 }
             });
         }});
@@ -304,7 +319,7 @@ public class TeleportLoader {
         return new ArrayList<>() {{
             add(() -> {
                 ItemEx equipmentItem = EquipmentAPI.getItem(i -> ArrayUtils.contains(ids, i.getId()));
-                if (equipmentItem != null) {
+                if (equipmentItem != null && ItemEx.getEquippedActionIndex(equipmentItem, target) != -1) {
                     EquipmentAPI.interact(equipmentItem, target);
                     return;
                 }

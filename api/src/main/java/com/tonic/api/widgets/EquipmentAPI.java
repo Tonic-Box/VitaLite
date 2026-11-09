@@ -193,6 +193,8 @@ public class EquipmentAPI
      */
     public static void itemAction(int slot, int action)
     {
+        if (action == -1)
+            return;
         TClient client = Static.getClient();
         Static.invoke(() -> {
             ClickManager.click(ClickType.WIDGET);

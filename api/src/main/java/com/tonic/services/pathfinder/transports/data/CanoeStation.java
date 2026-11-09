@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.InterfaceID;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +21,10 @@ import java.util.List;
 @Getter
 public enum CanoeStation
 {
-    LUMBRIDGE(new WorldPoint(3243, 3235, 0), 42401807),
-    CHAMPION_GUILD(new WorldPoint(3204, 3343, 0), 42401808),
-    BARBARIAN_VILLAGE(new WorldPoint(3112, 3409, 0), 42401809),
-    EDGEVILLE(new WorldPoint(3132, 3508, 0), 42401806)
+    LUMBRIDGE(new WorldPoint(3243, 3235, 0), InterfaceID.CanoeStationsMap.CANOEING_LUMBRIDGE_BUTTON),
+    CHAMPION_GUILD(new WorldPoint(3204, 3343, 0), InterfaceID.CanoeStationsMap.CANOEING_CHAMPIONS_BUTTON),
+    BARBARIAN_VILLAGE(new WorldPoint(3112, 3409, 0), InterfaceID.CanoeStationsMap.CANOEING_BARBARIAN_BUTTON),
+    EDGEVILLE(new WorldPoint(3132, 3508, 0), InterfaceID.CanoeStationsMap.CANOEING_EDGEVILLE_BUTTON)
     ;
 
     private final WorldPoint location;
@@ -52,7 +53,7 @@ public enum CanoeStation
                     }
                     return 2;
                 })
-                .addDelayUntil(3, () -> WidgetAPI.get(416, 3) != null)
+                .addDelayUntil(3, () -> WidgetAPI.get(InterfaceID.Canoeing.CONTENT) != null)
                 .add(4, () -> WidgetAPI.interact(1, canoe.getWidgetId(), 0))
                 .add(5, () -> {
                     TileObjectEx station = new TileObjectQuery()
@@ -79,8 +80,8 @@ public enum CanoeStation
                     }
                     return 6;
                 })
-                .addDelayUntil(7, () -> WidgetAPI.get(647, 13) != null)
-                .add(8, () -> WidgetAPI.interact(1, destination.getWidgetId(), 0))
+                .addDelayUntil(7, () -> WidgetAPI.get(InterfaceID.CanoeStationsMap.CANOEING_BACKGROUND_LAYER) != null)
+                .add(8, () -> WidgetAPI.interact(1, destination.getWidgetId(), -1))
                 .addDelay(9, 29)
                 .build();
     }

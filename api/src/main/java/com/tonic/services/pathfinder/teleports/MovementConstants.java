@@ -23,8 +23,6 @@ public class MovementConstants
             VarbitID.ERNESTDOOR_2TO5, Pair.of(new WorldPoint(3102, 9764, 0), new WorldPoint(3102, 9762, 0)),
             VarbitID.ERNESTDOOR_8TO9, Pair.of(new WorldPoint(3101, 9755, 0), new WorldPoint(3099, 9755, 0))
     );
-    public static WorldPoint HOUSE_POINT = new WorldPoint(10000, 4000, 1);
-
     public static final int[] RING_OF_DUELING = new int[]
             {
                     ItemID.RING_OF_DUELING_8,
@@ -66,6 +64,11 @@ public class MovementConstants
                     ItemID.RING_OF_WEALTH_3,
                     ItemID.RING_OF_WEALTH_2,
                     ItemID.RING_OF_WEALTH_1,
+                    ItemID.RING_OF_WEALTH_I5,
+                    ItemID.RING_OF_WEALTH_I4,
+                    ItemID.RING_OF_WEALTH_I3,
+                    ItemID.RING_OF_WEALTH_I2,
+                    ItemID.RING_OF_WEALTH_I1,
             };
 
     public static final int[] AMULET_OF_GLORY = new int[]
@@ -77,6 +80,12 @@ public class MovementConstants
                     ItemID.AMULET_OF_GLORY_2,
                     ItemID.AMULET_OF_GLORY_1,
                     ItemID.AMULET_OF_GLORY_INF,
+                    ItemID.TRAIL_AMULET_OF_GLORY_6,
+                    ItemID.TRAIL_AMULET_OF_GLORY_5,
+                    ItemID.TRAIL_AMULET_OF_GLORY_4,
+                    ItemID.TRAIL_AMULET_OF_GLORY_3,
+                    ItemID.TRAIL_AMULET_OF_GLORY_2,
+                    ItemID.TRAIL_AMULET_OF_GLORY_1,
             };
 
     public static final int[] NECKLACE_OF_PASSAGE = new int[]
@@ -95,11 +104,6 @@ public class MovementConstants
                     ItemID.BURNING_AMULET_3,
                     ItemID.BURNING_AMULET_2,
                     ItemID.BURNING_AMULET_1,
-            };
-
-    public static final int[] XERICS_TALISMAN = new int[]
-            {
-                    ItemID.XERIC_TALISMAN
             };
 
     public static final int[] SLAYER_RING = new int[]
@@ -124,11 +128,6 @@ public class MovementConstants
                     ItemID.NECKLACE_OF_DIGSITE_1,
             };
 
-    public static final int[] DRAKANS_MEDALLION = new int[]
-            {
-                    ItemID.DRAKANS_MEDALLION
-            };
-
     public static final int[] SKILLS_NECKLACE = new int[]
             {
                     ItemID.JEWL_NECKLACE_OF_SKILLS_6,
@@ -144,7 +143,7 @@ public class MovementConstants
                     ItemID.PRIF_TELEPORT_CRYSTAL,
                     ItemID.MOURNING_TELEPORT_CRYSTAL_5,
                     ItemID.MOURNING_TELEPORT_CRYSTAL_4,
-                    ItemID.MOURNING_TELEPORT_CRYSTAL_5,
+                    ItemID.MOURNING_TELEPORT_CRYSTAL_3,
                     ItemID.MOURNING_TELEPORT_CRYSTAL_2,
                     ItemID.MOURNING_TELEPORT_CRYSTAL_1
             };
@@ -300,49 +299,21 @@ public class MovementConstants
             Pair.of(new WorldPoint(1847, 9920, 0), new WorldPoint(1847, 9918, 0))
     );
 
-    public static final int[] geTransports = {
-            ItemID.POH_TABLET_VARROCKTELEPORT,
-            ItemID.JEWL_NECKLACE_OF_SKILLS_1,
-            ItemID.JEWL_NECKLACE_OF_SKILLS_2,
-            ItemID.JEWL_NECKLACE_OF_SKILLS_3,
-            ItemID.JEWL_NECKLACE_OF_SKILLS_4,
-            ItemID.JEWL_NECKLACE_OF_SKILLS_5,
-            ItemID.JEWL_NECKLACE_OF_SKILLS_6,
-            ItemID.JEWL_BRACELET_OF_COMBAT_1,
-            ItemID.JEWL_BRACELET_OF_COMBAT_2,
-            ItemID.JEWL_BRACELET_OF_COMBAT_3,
-            ItemID.JEWL_BRACELET_OF_COMBAT_4,
-            ItemID.JEWL_BRACELET_OF_COMBAT_5,
-            ItemID.JEWL_BRACELET_OF_COMBAT_6,
-            ItemID.RING_OF_WEALTH_1,
-            ItemID.RING_OF_WEALTH_2,
-            ItemID.RING_OF_WEALTH_3,
-            ItemID.RING_OF_WEALTH_4,
-            ItemID.RING_OF_WEALTH_5,
-            ItemID.RING_OF_WEALTH_I1,
-            ItemID.RING_OF_WEALTH_I2,
-            ItemID.RING_OF_WEALTH_I3,
-            ItemID.RING_OF_WEALTH_I4,
-            ItemID.RING_OF_WEALTH_I5,
-            ItemID.TELEPORTSCROLL_LUMBERYARD,
-            ItemID.AMULET_OF_GLORY_INF,
-            ItemID.AMULET_OF_GLORY_1,
-            ItemID.AMULET_OF_GLORY_2,
-            ItemID.AMULET_OF_GLORY_3,
-            ItemID.AMULET_OF_GLORY_4,
-            ItemID.AMULET_OF_GLORY_5,
-            ItemID.AMULET_OF_GLORY_6,
-            ItemID.POH_TABLET_LUMBRIDGETELEPORT
-    };
-
     public static final int[] QUETZAL_WHISTLE = {
             ItemID.HG_QUETZALWHISTLE_BASIC,
             ItemID.HG_QUETZALWHISTLE_ENHANCED,
-            ItemID.HG_QUETZALWHISTLE_PERFECTED
+            ItemID.HG_QUETZALWHISTLE_PERFECTED,
+            ItemID.HG_QUETZALWHISTLE_PERFECTED_INFINITE
     };
 
     public static final int[] ARDOUGNE_CLOAK = {
             ItemID.ARDY_CAPE_EASY,
+            ItemID.ARDY_CAPE_MEDIUM,
+            ItemID.ARDY_CAPE_HARD,
+            ItemID.ARDY_CAPE_ELITE
+    };
+
+    public static final int[] ARDOUGNE_CLOAK_FARM = {
             ItemID.ARDY_CAPE_MEDIUM,
             ItemID.ARDY_CAPE_HARD,
             ItemID.ARDY_CAPE_ELITE
