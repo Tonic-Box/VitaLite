@@ -16,6 +16,7 @@ import net.runelite.api.*;
 import net.runelite.api.gameval.SpotanimID;
 import net.runelite.api.gameval.VarClientID;
 import net.runelite.api.gameval.VarPlayerID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
@@ -266,7 +267,7 @@ public class Minigames
                 case GIANTS_FOUNDARY:
                     return true;
                 case BARBARIAN_ASSAULT:
-                    return VarAPI.getVar(3251) >= 1;
+                    return VarAPI.getVar(VarbitID.BARBASSULT_ROLELEVEL_ATT) >= 1;
                 case BLAST_FURNACE:
                     return Quest.THE_GIANT_DWARF.getState(client) != QuestState.NOT_STARTED;
                 case FISHING_TRAWLER:

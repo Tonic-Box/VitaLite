@@ -129,29 +129,29 @@ public class TransportLoader
 
             List<Transport> transports = new ArrayList<>();
 
-            int gold = InventoryAPI.getItem(995) != null ? InventoryAPI.getItem(995).getQuantity() : 0;
+            int gold = InventoryAPI.getItem(ItemID.COINS) != null ? InventoryAPI.getItem(ItemID.COINS).getQuantity() : 0;
 
             if (WorldsAPI.inMembersWorld() || !filter)
             {
                 //Shamans
-                transports.add(objectTransport(new WorldPoint(1312, 3685, 0), new WorldPoint(1312, 10086, 0), 34405, "Enter"));
+                transports.add(objectTransport(new WorldPoint(1312, 3685, 0), new WorldPoint(1312, 10086, 0), ObjectID.MOLCH_TEMPLE_LIZARD_DWELLING4, "Enter"));
 
                 //Doors for shamans
-                transports.add(objectTransport(new WorldPoint(1293, 10090, 0), new WorldPoint(1293, 10093, 0), 34642, "Pass"));
-                transports.add(objectTransport(new WorldPoint(1293, 10093, 0), new WorldPoint(1293, 10091, 0), 34642, "Pass"));
-                transports.add(objectTransport(new WorldPoint(1296, 10096, 0), new WorldPoint(1298, 10096, 0), 34642, "Pass"));
-                transports.add(objectTransport(new WorldPoint(1298, 10096, 0), new WorldPoint(1296, 10096, 0), 34642, "Pass"));
-                transports.add(objectTransport(new WorldPoint(1307, 10096, 0), new WorldPoint(1309, 10096, 0), 34642, "Pass"));
-                transports.add(objectTransport(new WorldPoint(1309, 10096, 0), new WorldPoint(1307, 10096, 0), 34642, "Pass"));
-                transports.add(objectTransport(new WorldPoint(1316, 10096, 0), new WorldPoint(1318, 10096, 0), 34642, "Pass"));
-                transports.add(objectTransport(new WorldPoint(1318, 10096, 0), new WorldPoint(1316, 10096, 0), 34642, "Pass"));
-                transports.add(objectTransport(new WorldPoint(1324, 10096, 0), new WorldPoint(1326, 10096, 0), 34642, "Pass"));
-                transports.add(objectTransport(new WorldPoint(1326, 10096, 0), new WorldPoint(1324, 10096, 0), 34642, "Pass"));
+                transports.add(objectTransport(new WorldPoint(1293, 10090, 0), new WorldPoint(1293, 10093, 0), ObjectID.MOLCH_TEMPLE_BARRIER1, "Pass"));
+                transports.add(objectTransport(new WorldPoint(1293, 10093, 0), new WorldPoint(1293, 10091, 0), ObjectID.MOLCH_TEMPLE_BARRIER1, "Pass"));
+                transports.add(objectTransport(new WorldPoint(1296, 10096, 0), new WorldPoint(1298, 10096, 0), ObjectID.MOLCH_TEMPLE_BARRIER1, "Pass"));
+                transports.add(objectTransport(new WorldPoint(1298, 10096, 0), new WorldPoint(1296, 10096, 0), ObjectID.MOLCH_TEMPLE_BARRIER1, "Pass"));
+                transports.add(objectTransport(new WorldPoint(1307, 10096, 0), new WorldPoint(1309, 10096, 0), ObjectID.MOLCH_TEMPLE_BARRIER1, "Pass"));
+                transports.add(objectTransport(new WorldPoint(1309, 10096, 0), new WorldPoint(1307, 10096, 0), ObjectID.MOLCH_TEMPLE_BARRIER1, "Pass"));
+                transports.add(objectTransport(new WorldPoint(1316, 10096, 0), new WorldPoint(1318, 10096, 0), ObjectID.MOLCH_TEMPLE_BARRIER1, "Pass"));
+                transports.add(objectTransport(new WorldPoint(1318, 10096, 0), new WorldPoint(1316, 10096, 0), ObjectID.MOLCH_TEMPLE_BARRIER1, "Pass"));
+                transports.add(objectTransport(new WorldPoint(1324, 10096, 0), new WorldPoint(1326, 10096, 0), ObjectID.MOLCH_TEMPLE_BARRIER1, "Pass"));
+                transports.add(objectTransport(new WorldPoint(1326, 10096, 0), new WorldPoint(1324, 10096, 0), ObjectID.MOLCH_TEMPLE_BARRIER1, "Pass"));
 
                 // Crabclaw island
                 if (gold >= 10_000 || !filter)
                 {
-                    transports.add(npcTransport(new WorldPoint(1782, 3458, 0), new WorldPoint(1778, 3417, 0), 7483, "Travel"));
+                    transports.add(npcTransport(new WorldPoint(1782, 3458, 0), new WorldPoint(1778, 3417, 0), NpcID.TRIBES_BOATMAN, "Travel"));
                 }
 
                 if(QuestAPI.isCompleted(Quest.CHILDREN_OF_THE_SUN))
@@ -160,7 +160,7 @@ public class TransportLoader
                     transports.add(npcTransport(new WorldPoint(1703, 3140, 0), new WorldPoint(3280, 3412, 0), "Primio", "Travel"));
                 }
 
-                transports.add(npcTransport(new WorldPoint(1779, 3418, 0), new WorldPoint(1784, 3458, 0), 7484, "Travel"));
+                transports.add(npcTransport(new WorldPoint(1779, 3418, 0), new WorldPoint(1784, 3458, 0), NpcID.TRIBES_BOATMAN_ISLAND, "Travel"));
 
                 // Port sarim
                 if (VarAPI.getVar(VarbitID.ZEAH_PLAYERHASVISITED) == 0 || !filter) // First time talking to Veos
@@ -169,14 +169,14 @@ public class TransportLoader
                     {
                         transports.add(npcDialogTransport(new WorldPoint(3055, 3245, 0),
                                 new WorldPoint(1824, 3691, 0),
-                                8484,
+                                NpcID.VEOS_VISIBLE,
                                 "Can you take me to Great Kourend?"));
                     }
                     else
                     {
                         transports.add(npcDialogTransport(new WorldPoint(3055, 3245, 0),
                                 new WorldPoint(3055, 3245, 0),
-                                8484,
+                                NpcID.VEOS_VISIBLE,
                                 "That's great, can you take me there please?"));
                     }
                 }
@@ -223,32 +223,32 @@ public class TransportLoader
                 // Tree Gnome Village
                 if (QuestAPI.getState(Quest.TREE_GNOME_VILLAGE) != QuestState.NOT_STARTED || !filter)
                 {
-                    transports.add(npcTransport(new WorldPoint(2504, 3192, 0), new WorldPoint(2515, 3159, 0), 4968, "Follow"));
-                    transports.add(npcTransport(new WorldPoint(2515, 3159, 0), new WorldPoint(2504, 3192, 0), 4968, "Follow"));
+                    transports.add(npcTransport(new WorldPoint(2504, 3192, 0), new WorldPoint(2515, 3159, 0), NpcID.ELKOY_2OPS, "Follow"));
+                    transports.add(npcTransport(new WorldPoint(2515, 3159, 0), new WorldPoint(2504, 3192, 0), NpcID.ELKOY_2OPS, "Follow"));
                 }
 
                 // Gnome Battlefield
                 if (VarAPI.getVarp(VarPlayerID.TREEQUEST) >= 5 || !filter)
                 {
                     transports.add(objectDialogTransport(new WorldPoint(2509, 3252, 0),
-                            new WorldPoint(2509, 3254, 0), 2185,
+                            new WorldPoint(2509, 3254, 0), ObjectID.KHAZZACKLOWWALL,
                             "Climb-over"));
                 }
                 // Eagles peak cave
-                if (VarAPI.getVarp(934) >= 15 || !filter)
+                if (VarAPI.getVarp(VarPlayerID.EAGLEPEAK) >= 15 || !filter)
                 {
                     // Entrance
-                    transports.add(objectTransport(new WorldPoint(2328, 3496, 0), new WorldPoint(1994, 4983, 3), 19790,
+                    transports.add(objectTransport(new WorldPoint(2328, 3496, 0), new WorldPoint(1994, 4983, 3), ObjectID.EAGLEPEAK_ENTRANCE_CAVE_MULTI,
                             "Enter"));
-                    transports.add(objectTransport(new WorldPoint(1994, 4983, 3), new WorldPoint(2328, 3496, 0), 19891,
+                    transports.add(objectTransport(new WorldPoint(1994, 4983, 3), new WorldPoint(2328, 3496, 0), ObjectID.EAGLEPEAK_HUMAN_EXITMID,
                             "Exit"));
                 }
 
                 // Waterbirth island
                 if (QuestAPI.isCompleted(Quest.THE_FREMENNIK_TRIALS) || gold >= 1000 || !filter)
                 {
-                    transports.add(npcTransport(new WorldPoint(2544, 3760, 0), new WorldPoint(2620, 3682, 0), 10407, "Rellekka"));
-                    transports.add(npcTransport(new WorldPoint(2620, 3682, 0), new WorldPoint(2547, 3759, 0), 5937, "Waterbirth Island"));
+                    transports.add(npcTransport(new WorldPoint(2544, 3760, 0), new WorldPoint(2620, 3682, 0), NpcID.VIKING_DAGGANOTH_CAVE_WATERBIRTH_ISLAND, "Rellekka"));
+                    transports.add(npcTransport(new WorldPoint(2620, 3682, 0), new WorldPoint(2547, 3759, 0), NpcID.VIKING_DAGGANOTH_CAVE_FERRYMAN_ISLAND, "Waterbirth Island"));
                 }
 
                 // Pirates cove
@@ -258,9 +258,9 @@ public class TransportLoader
                 // Corsair's Cove
                 if (SkillAPI.getBoostedLevel(Skill.AGILITY) >= 10 || !filter)
                 {
-                    transports.add(objectTransport(new WorldPoint(2546, 2871, 0), new WorldPoint(2546, 2873, 0), 31757,
+                    transports.add(objectTransport(new WorldPoint(2546, 2871, 0), new WorldPoint(2546, 2873, 0), ObjectID.DS2_CORSAIR_COVE_SHORTCUT,
                             "Climb"));
-                    transports.add(objectTransport(new WorldPoint(2546, 2873, 0), new WorldPoint(2546, 2871, 0), 31757,
+                    transports.add(objectTransport(new WorldPoint(2546, 2873, 0), new WorldPoint(2546, 2871, 0), ObjectID.DS2_CORSAIR_COVE_SHORTCUT,
                             "Climb"));
                 }
 
@@ -268,24 +268,24 @@ public class TransportLoader
                 if (QuestAPI.getState(Quest.RECIPE_FOR_DISASTER) != QuestState.IN_PROGRESS || !filter)
                 {
 
-                    transports.add(objectTransport(new WorldPoint(3213, 3221, 0), new WorldPoint(3212, 3221, 0), 12349, "Open"));
-                    transports.add(objectTransport(new WorldPoint(3212, 3221, 0), new WorldPoint(3213, 3221, 0), 12349, "Open"));
-                    transports.add(objectTransport(new WorldPoint(3213, 3222, 0), new WorldPoint(3212, 3222, 0), 12350, "Open"));
-                    transports.add(objectTransport(new WorldPoint(3212, 3222, 0), new WorldPoint(3213, 3222, 0), 12350, "Open"));
-                    transports.add(objectTransport(new WorldPoint(3207, 3218, 0), new WorldPoint(3207, 3217, 0), 12348, "Open"));
-                    transports.add(objectTransport(new WorldPoint(3207, 3217, 0), new WorldPoint(3207, 3218, 0), 12348, "Open"));
+                    transports.add(objectTransport(new WorldPoint(3213, 3221, 0), new WorldPoint(3212, 3221, 0), ObjectID.HUNDRED_LUMBRIDGE_DOUBLEDOORL, "Open"));
+                    transports.add(objectTransport(new WorldPoint(3212, 3221, 0), new WorldPoint(3213, 3221, 0), ObjectID.HUNDRED_LUMBRIDGE_DOUBLEDOORL, "Open"));
+                    transports.add(objectTransport(new WorldPoint(3213, 3222, 0), new WorldPoint(3212, 3222, 0), ObjectID.HUNDRED_LUMBRIDGE_DOUBLEDOORR, "Open"));
+                    transports.add(objectTransport(new WorldPoint(3212, 3222, 0), new WorldPoint(3213, 3222, 0), ObjectID.HUNDRED_LUMBRIDGE_DOUBLEDOORR, "Open"));
+                    transports.add(objectTransport(new WorldPoint(3207, 3218, 0), new WorldPoint(3207, 3217, 0), ObjectID.HUNDRED_LUMBRIDGE_DOOR, "Open"));
+                    transports.add(objectTransport(new WorldPoint(3207, 3217, 0), new WorldPoint(3207, 3218, 0), ObjectID.HUNDRED_LUMBRIDGE_DOOR, "Open"));
                 }
 
                 // Digsite gate
                 if (VarAPI.getVar(VarbitID.VM_KUDOS) >= 153 || !filter)
                 {
-                    transports.add(objectTransport(new WorldPoint(3295, 3429, 0), new WorldPoint(3296, 3429, 0), 24561,
+                    transports.add(objectTransport(new WorldPoint(3295, 3429, 0), new WorldPoint(3296, 3429, 0), ObjectID.VM_FENCEGATE_R,
                             "Open"));
-                    transports.add(objectTransport(new WorldPoint(3296, 3429, 0), new WorldPoint(3295, 3429, 0), 24561,
+                    transports.add(objectTransport(new WorldPoint(3296, 3429, 0), new WorldPoint(3295, 3429, 0), ObjectID.VM_FENCEGATE_R,
                             "Open"));
-                    transports.add(objectTransport(new WorldPoint(3295, 3428, 0), new WorldPoint(3296, 3428, 0), 24561,
+                    transports.add(objectTransport(new WorldPoint(3295, 3428, 0), new WorldPoint(3296, 3428, 0), ObjectID.VM_FENCEGATE_R,
                             "Open"));
-                    transports.add(objectTransport(new WorldPoint(3296, 3428, 0), new WorldPoint(3295, 3428, 0), 24561,
+                    transports.add(objectTransport(new WorldPoint(3296, 3428, 0), new WorldPoint(3295, 3428, 0), ObjectID.VM_FENCEGATE_R,
                             "Open"));
                 }
 
@@ -294,22 +294,22 @@ public class TransportLoader
                 transports.add(npcTransport(new WorldPoint(3148, 2842, 0), new WorldPoint(3272, 3144, 0), NpcID.TEMPOROSS_FERRY_FROM_LOBBY_NPC, "Ferry"));
 
                 // Entrana
-                transports.add(npcTransport(new WorldPoint(3041, 3237, 0), new WorldPoint(2834, 3331, 1), 1166, "Take-boat"));
-                transports.add(npcTransport(new WorldPoint(2834, 3335, 0), new WorldPoint(3048, 3231, 1), 1170, "Take-boat"));
+                transports.add(npcTransport(new WorldPoint(3041, 3237, 0), new WorldPoint(2834, 3331, 1), NpcID.SHIPMONK1_B, "Take-boat"));
+                transports.add(npcTransport(new WorldPoint(2834, 3335, 0), new WorldPoint(3048, 3231, 1), NpcID.SHIPMONK2_C, "Take-boat"));
                 transports.add(npcDialogTransport(new WorldPoint(2821, 3374, 0),
                         new WorldPoint(2822, 9774, 0),
-                        1164,
+                        NpcID.CAVE_MONK,
                         "Well that is a risk I will have to take."));
 
                 // Fossil Island
                 transports.add(npcTransport(new WorldPoint(3362, 3445, 0),
                         new WorldPoint(3724, 3808, 0),
-                        8012,
+                        NpcID.FOSSILQUEST_BARGE_GUARD_PORT_POSTQUEST,
                         "Quick-Travel"));
 
                 transports.add(objectDialogTransport(new WorldPoint(3724, 3808, 0),
                         new WorldPoint(3362, 3445, 0),
-                        30914,
+                        ObjectID.FOSSIL_ROWBOAT_CAMP,
                         "Travel",
                         "Row to the barge and travel to the Digsite."));
 
@@ -318,14 +318,14 @@ public class TransportLoader
                 transports.add(objectTransport(new WorldPoint(3038, 4376, 0), new WorldPoint(2649, 3212, 0), ObjectID.AREA_SANGUINE_GHETTO_LADDER_UP, "Climb-up"));
 
                 // Gnome stronghold
-                transports.add(objectDialogTransport(new WorldPoint(2460, 3382, 0), new WorldPoint(2461, 3385, 0), 190, "Open", "Sorry, I'm a bit busy."));
-                transports.add(objectDialogTransport(new WorldPoint(2461, 3382, 0), new WorldPoint(2461, 3385, 0), 190, "Open", "Sorry, I'm a bit busy."));
-                transports.add(objectDialogTransport(new WorldPoint(2462, 3382, 0), new WorldPoint(2461, 3385, 0), 190, "Open", "Sorry, I'm a bit busy."));
+                transports.add(objectDialogTransport(new WorldPoint(2460, 3382, 0), new WorldPoint(2461, 3385, 0), ObjectID.GNOME_AREAGATE, "Open", "Sorry, I'm a bit busy."));
+                transports.add(objectDialogTransport(new WorldPoint(2461, 3382, 0), new WorldPoint(2461, 3385, 0), ObjectID.GNOME_AREAGATE, "Open", "Sorry, I'm a bit busy."));
+                transports.add(objectDialogTransport(new WorldPoint(2462, 3382, 0), new WorldPoint(2461, 3385, 0), ObjectID.GNOME_AREAGATE, "Open", "Sorry, I'm a bit busy."));
 
                 // Paterdomus
-                transports.add(trapDoorTransport(new WorldPoint(3405, 3506, 0), new WorldPoint(3405, 9906, 0), 1579, 1581));
-                transports.add(trapDoorTransport(new WorldPoint(3423, 3485, 0), new WorldPoint(3440, 9887, 0), 3432, 3433));
-                transports.add(trapDoorTransport(new WorldPoint(3422, 3484, 0), new WorldPoint(3440, 9887, 0), 3432, 3433));
+                transports.add(trapDoorTransport(new WorldPoint(3405, 3506, 0), new WorldPoint(3405, 9906, 0), ObjectID.TRAPDOOR, ObjectID.TRAPDOOR_OPEN));
+                transports.add(trapDoorTransport(new WorldPoint(3423, 3485, 0), new WorldPoint(3440, 9887, 0), ObjectID.PIPEASTSIDETRAPDOOR, ObjectID.PIPEASTSIDETRAPDOOR_OPEN));
+                transports.add(trapDoorTransport(new WorldPoint(3422, 3484, 0), new WorldPoint(3440, 9887, 0), ObjectID.PIPEASTSIDETRAPDOOR, ObjectID.PIPEASTSIDETRAPDOOR_OPEN));
 
                 // Port Piscarilius
 //                if (QuestAPI.isCompleted(Quest.A_KINGDOM_DIVIDED) || !filter) // Veos is replaced during/after quest
@@ -339,28 +339,28 @@ public class TransportLoader
 //                }
 
                 // Land's End
-                transports.add(npcBoatTransport(new WorldPoint(1504, 3399, 0), new WorldPoint(3055, 3245, 0), 7471, "Port Sarim", 4));
-                transports.add(npcBoatTransport(new WorldPoint(1504, 3399, 0), new WorldPoint(1824, 3691, 0), 7471, "Port Piscarilius", 4));
+                transports.add(npcBoatTransport(new WorldPoint(1504, 3399, 0), new WorldPoint(3055, 3245, 0), NpcID.ZEAH_MAGORO, "Port Sarim", 4));
+                transports.add(npcBoatTransport(new WorldPoint(1504, 3399, 0), new WorldPoint(1824, 3691, 0), NpcID.ZEAH_MAGORO, "Port Piscarilius", 4));
 
                 // Glarial's tomb
-                transports.add(itemUseTransport(new WorldPoint(2557, 3444, 0), new WorldPoint(2555, 9844, 0), 294, 1992));
-                transports.add(itemUseTransport(new WorldPoint(2557, 3445, 0), new WorldPoint(2555, 9844, 0), 294, 1992));
-                transports.add(itemUseTransport(new WorldPoint(2558, 3443, 0), new WorldPoint(2555, 9844, 0), 294, 1992));
-                transports.add(itemUseTransport(new WorldPoint(2559, 3443, 0), new WorldPoint(2555, 9844, 0), 294, 1992));
-                transports.add(itemUseTransport(new WorldPoint(2560, 3444, 0), new WorldPoint(2555, 9844, 0), 294, 1992));
-                transports.add(itemUseTransport(new WorldPoint(2560, 3445, 0), new WorldPoint(2555, 9844, 0), 294, 1992));
-                transports.add(itemUseTransport(new WorldPoint(2558, 3446, 0), new WorldPoint(2555, 9844, 0), 294, 1992));
-                transports.add(itemUseTransport(new WorldPoint(2559, 3446, 0), new WorldPoint(2555, 9844, 0), 294, 1992));
+                transports.add(itemUseTransport(new WorldPoint(2557, 3444, 0), new WorldPoint(2555, 9844, 0), ItemID.GLARIALS_PEBBLE_WATERFALL_QUEST, ObjectID.GLARIALS_TOMBSTONE_WATERFALL_QUEST));
+                transports.add(itemUseTransport(new WorldPoint(2557, 3445, 0), new WorldPoint(2555, 9844, 0), ItemID.GLARIALS_PEBBLE_WATERFALL_QUEST, ObjectID.GLARIALS_TOMBSTONE_WATERFALL_QUEST));
+                transports.add(itemUseTransport(new WorldPoint(2558, 3443, 0), new WorldPoint(2555, 9844, 0), ItemID.GLARIALS_PEBBLE_WATERFALL_QUEST, ObjectID.GLARIALS_TOMBSTONE_WATERFALL_QUEST));
+                transports.add(itemUseTransport(new WorldPoint(2559, 3443, 0), new WorldPoint(2555, 9844, 0), ItemID.GLARIALS_PEBBLE_WATERFALL_QUEST, ObjectID.GLARIALS_TOMBSTONE_WATERFALL_QUEST));
+                transports.add(itemUseTransport(new WorldPoint(2560, 3444, 0), new WorldPoint(2555, 9844, 0), ItemID.GLARIALS_PEBBLE_WATERFALL_QUEST, ObjectID.GLARIALS_TOMBSTONE_WATERFALL_QUEST));
+                transports.add(itemUseTransport(new WorldPoint(2560, 3445, 0), new WorldPoint(2555, 9844, 0), ItemID.GLARIALS_PEBBLE_WATERFALL_QUEST, ObjectID.GLARIALS_TOMBSTONE_WATERFALL_QUEST));
+                transports.add(itemUseTransport(new WorldPoint(2558, 3446, 0), new WorldPoint(2555, 9844, 0), ItemID.GLARIALS_PEBBLE_WATERFALL_QUEST, ObjectID.GLARIALS_TOMBSTONE_WATERFALL_QUEST));
+                transports.add(itemUseTransport(new WorldPoint(2559, 3446, 0), new WorldPoint(2555, 9844, 0), ItemID.GLARIALS_PEBBLE_WATERFALL_QUEST, ObjectID.GLARIALS_TOMBSTONE_WATERFALL_QUEST));
 
                 // Waterfall Island
-                transports.add(itemUseTransport(new WorldPoint(2512, 3476, 0), new WorldPoint(2513, 3468, 0), 954, 1996));
-                transports.add(itemUseTransport(new WorldPoint(2512, 3466, 0), new WorldPoint(2511, 3463, 0), 954, 2020));
+                transports.add(itemUseTransport(new WorldPoint(2512, 3476, 0), new WorldPoint(2513, 3468, 0), ItemID.ROPE, ObjectID.CROSSING_ROCK_WATERFALL_QUEST));
+                transports.add(itemUseTransport(new WorldPoint(2512, 3466, 0), new WorldPoint(2511, 3463, 0), ItemID.ROPE, ObjectID.OVERHANGING_TREE1_WATERFALL_QUEST));
 
                 // Edgeville Dungeon
-                transports.add(trapDoorTransport(new WorldPoint(3096, 3468, 0), new WorldPoint(3096, 9867, 0), 1579, 1581));
+                transports.add(trapDoorTransport(new WorldPoint(3096, 3468, 0), new WorldPoint(3096, 9867, 0), ObjectID.TRAPDOOR, ObjectID.TRAPDOOR_OPEN));
 
                 // Varrock Castle manhole
-                transports.add(trapDoorTransport(new WorldPoint(3237, 3459, 0), new WorldPoint(3237, 9859, 0), 881, 882));
+                transports.add(trapDoorTransport(new WorldPoint(3237, 3459, 0), new WorldPoint(3237, 9859, 0), ObjectID.MANHOLECLOSED, ObjectID.MANHOLEOPEN));
 
                 // Draynor manor basement
                 for (var entry : MovementConstants.DRAYNOR_MANOR_BASEMENT_DOORS.entrySet())
@@ -368,22 +368,22 @@ public class TransportLoader
                     if (VarAPI.getVar(entry.getKey()) == 1 || !filter)
                     {
                         var points = entry.getValue();
-                        transports.add(lockingDoorTransport(points.getLeft(), points.getRight(), 11450));
-                        transports.add(lockingDoorTransport(points.getRight(), points.getLeft(), 11450));
+                        transports.add(lockingDoorTransport(points.getLeft(), points.getRight(), ObjectID.ERNEST_DOORAJAR));
+                        transports.add(lockingDoorTransport(points.getRight(), points.getLeft(), ObjectID.ERNEST_DOORAJAR));
                     }
                 }
 
                 // Corsair Cove, Captain Tock's ship's gangplank
-                transports.add(objectTransport(new WorldPoint(2578, 2837, 1), new WorldPoint(2578, 2840, 0), 31756, "Cross"));
-                transports.add(objectTransport(new WorldPoint(2578, 2840, 0), new WorldPoint(2578, 2837, 1), 31756, "Cross"));
+                transports.add(objectTransport(new WorldPoint(2578, 2837, 1), new WorldPoint(2578, 2840, 0), ObjectID.DS2_CORSAIR_COVE_SHIPPLANK, "Cross"));
+                transports.add(objectTransport(new WorldPoint(2578, 2840, 0), new WorldPoint(2578, 2837, 1), ObjectID.DS2_CORSAIR_COVE_SHIPPLANK, "Cross"));
 
                 // Corsair Cove, Ithoi the Navigator's hut stairs
-                transports.add(objectTransport(new WorldPoint(2532, 2833, 0), new WorldPoint(2529, 2835, 1), 31735, "Climb"));
-                transports.add(objectTransport(new WorldPoint(2529, 2835, 1), new WorldPoint(2532, 2833, 0), 31735, "Climb"));
+                transports.add(objectTransport(new WorldPoint(2532, 2833, 0), new WorldPoint(2529, 2835, 1), ObjectID.DS2_CORSAIR_COVE_STAIRS_RAMP, "Climb"));
+                transports.add(objectTransport(new WorldPoint(2529, 2835, 1), new WorldPoint(2532, 2833, 0), ObjectID.DS2_CORSAIR_COVE_STAIRS_RAMP, "Climb"));
 
                 // Corsair Cove, Dungeon hole to Ogress Warriors/Vine ladder
-                transports.add(objectTransport(new WorldPoint(2523, 2860, 0), new WorldPoint(2012, 9004, 1), 31791, "Enter"));
-                transports.add(objectTransport(new WorldPoint(2012, 9004, 1), new WorldPoint(2523, 2860, 0), 31790, "Climb"));
+                transports.add(objectTransport(new WorldPoint(2523, 2860, 0), new WorldPoint(2012, 9004, 1), ObjectID.DS2_OGRE_CORSAIR_VINE_LADDER_ENTRANCE, "Enter"));
+                transports.add(objectTransport(new WorldPoint(2012, 9004, 1), new WorldPoint(2523, 2860, 0), ObjectID.DS2_OGRE_CORSAIR_VINE_LADDER, "Climb"));
 
                 // Rimmington docks to and from Corsair Cove using Captain Tock's ship
                 if (QuestAPI.isCompleted(Quest.THE_CORSAIR_CURSE) || !filter)
@@ -439,7 +439,7 @@ public class TransportLoader
                 dwarvenCarts(LAST_TRANSPORT_LIST);
                 canoes(LAST_TRANSPORT_LIST);
             }
-            if(VarAPI.getVar(279) == 1 || InventoryAPI.contains(ItemID.ROPE) || !filter)
+            if(VarAPI.getVar(VarbitID.SWAMP_CAVES_ROPED_ENTRANCE) == 1 || InventoryAPI.contains(ItemID.ROPE) || !filter)
             {
                 computeIfAbsent(LAST_TRANSPORT_LIST, lumbyCave());
             }
@@ -816,7 +816,7 @@ public class TransportLoader
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
                     TileObjectEx object = new TileObjectQuery()
-                            .withId(2406)
+                            .withId(ObjectID.ZANARISDOOR)
                             .sortNearest()
                             .first();
                     if(object != null)
@@ -1299,8 +1299,8 @@ public class TransportLoader
                 transports,
                 new WorldPoint(3236, 3458, 0),
                 new WorldPoint(3237, 9858, 0),
-                882,
-                881
+                ObjectID.MANHOLEOPEN,
+                ObjectID.MANHOLECLOSED
         );
 
         //edgvile dungeon
@@ -1308,16 +1308,16 @@ public class TransportLoader
                 transports,
                 new WorldPoint(3096, 3468, 0),
                 new WorldPoint(3096, 9867, 0),
-                1581,
-                1579
+                ObjectID.TRAPDOOR_OPEN,
+                ObjectID.TRAPDOOR
         );
 
         manhole(
                 transports,
                 new WorldPoint(3654, 3519, 0),
                 new WorldPoint(3669, 9888, 3),
-                16114,
-                16113
+                ObjectID.AHOY_TRAPDOOR_OPEN,
+                ObjectID.AHOY_TRAPDOOR
         );
     }
 
@@ -1401,7 +1401,7 @@ public class TransportLoader
 
         HandlerBuilder builder = HandlerBuilder.get()
                 .add(0, () -> {
-                    if(VarAPI.getVar(279) != 1 && InventoryAPI.contains(ItemID.ROPE))
+                    if(VarAPI.getVar(VarbitID.SWAMP_CAVES_ROPED_ENTRANCE) != 1 && InventoryAPI.contains(ItemID.ROPE))
                     {
                         ItemEx rope = InventoryAPI.getItem(ItemID.ROPE);
                         TileObjectEx object = new TileObjectQuery()
@@ -1429,7 +1429,7 @@ public class TransportLoader
 
     private static Requirements getGoldReq(int amount) {
         Requirements requirements = new Requirements();
-        requirements.getItemRequirements().add(new ItemRequirement(false, amount, 995));
+        requirements.getItemRequirements().add(new ItemRequirement(false, amount, ItemID.COINS));
         return requirements;
     }
 
@@ -1474,9 +1474,9 @@ public class TransportLoader
 
         // Eagles peak cave
         Requirements requirements = new Requirements();
-        requirements.getVarRequirements().add(new VarRequirement(Comparison.GREATER_THAN_EQUAL, VarType.VARP, 934, 15));
-        addObjectTransport(transports, 2, requirements, new WorldPoint(2328, 3496, 0), new WorldPoint(1994, 4983, 3), 19790, "Enter");
-        addObjectTransport(transports, 2, requirements, new WorldPoint(1994, 4983, 3), new WorldPoint(2328, 3496, 0), 19891, "Exit");
+        requirements.getVarRequirements().add(new VarRequirement(Comparison.GREATER_THAN_EQUAL, VarType.VARP, VarPlayerID.EAGLEPEAK, 15));
+        addObjectTransport(transports, 2, requirements, new WorldPoint(2328, 3496, 0), new WorldPoint(1994, 4983, 3), ObjectID.EAGLEPEAK_ENTRANCE_CAVE_MULTI, "Enter");
+        addObjectTransport(transports, 2, requirements, new WorldPoint(1994, 4983, 3), new WorldPoint(2328, 3496, 0), ObjectID.EAGLEPEAK_HUMAN_EXITMID, "Exit");
 
         // Waterbirth island
         Requirements req = getGoldReq(1000);
@@ -1486,10 +1486,10 @@ public class TransportLoader
         // Digsite gate
         Requirements requirements2 = new Requirements();
         requirements2.getVarRequirements().add(new VarRequirement(Comparison.GREATER_THAN_EQUAL, VarType.VARBIT, VarbitID.VM_KUDOS, 153));
-        addObjectTransport(transports, 2, requirements2, new WorldPoint(3295, 3429, 0), new WorldPoint(3296, 3429, 0), 24561, "Open");
-        addObjectTransport(transports, 2, requirements2, new WorldPoint(3296, 3429, 0), new WorldPoint(3295, 3429, 0), 24561, "Open");
-        addObjectTransport(transports, 2, requirements2, new WorldPoint(3295, 3428, 0), new WorldPoint(3296, 3428, 0), 24561, "Open");
-        addObjectTransport(transports, 2, requirements2, new WorldPoint(3296, 3428, 0), new WorldPoint(3295, 3428, 0), 24561, "Open");
+        addObjectTransport(transports, 2, requirements2, new WorldPoint(3295, 3429, 0), new WorldPoint(3296, 3429, 0), ObjectID.VM_FENCEGATE_R, "Open");
+        addObjectTransport(transports, 2, requirements2, new WorldPoint(3296, 3429, 0), new WorldPoint(3295, 3429, 0), ObjectID.VM_FENCEGATE_R, "Open");
+        addObjectTransport(transports, 2, requirements2, new WorldPoint(3295, 3428, 0), new WorldPoint(3296, 3428, 0), ObjectID.VM_FENCEGATE_R, "Open");
+        addObjectTransport(transports, 2, requirements2, new WorldPoint(3296, 3428, 0), new WorldPoint(3295, 3428, 0), ObjectID.VM_FENCEGATE_R, "Open");
 
         //sarim
         if (QuestAPI.isCompleted(Quest.PIRATES_TREASURE))
