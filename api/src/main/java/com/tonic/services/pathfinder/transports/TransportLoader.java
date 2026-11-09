@@ -51,6 +51,7 @@ import static com.tonic.services.pathfinder.teleports.MovementConstants.SLASH_WE
 
 public class TransportLoader
 {
+    private static final int MENU_TIMEOUT = 20;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private static final TIntObjectHashMap<ArrayList<Transport>> ALL_STATIC_TRANSPORTS = new TIntObjectHashMap<>();
@@ -614,16 +615,9 @@ public class TransportLoader
                             NpcAPI.interact(npc, "Travel");
                             return 1;
                         })
-                        .addDelayUntil(1, () -> PlayerEx.getLocal().isIdle())
-                        .add(2, () -> 3)
-                        .add(3, () -> {
-                            int slot = menuSlot(destination.name());
-                            if(slot == -1)
-                                return 3;
-                            DialogueAPI.resumePause(InterfaceID.Menu.LJ_LAYER1, slot);
-                            return 4;
-                        })
-                        .addDelay(4, 5);
+                        .addDelayUntil(1, MENU_TIMEOUT, () -> menuSlot(destination.name()) != -1, () -> {})
+                        .add(2, () -> resumeMenu(destination.name(), 3))
+                        .addDelay(3, 5);
 
                 Transport transport = new Transport(WorldPointUtil.compress(minecart.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 5, builder.build(), MinecartNetwork.getRequirements(), -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(minecart.getLocation()), transport);
@@ -659,20 +653,23 @@ public class TransportLoader
                             TileObjectAPI.interact(current, "Travel");
                             return 1;
                         })
-                        .addDelayUntil(1, () -> WidgetAPI.get(InterfaceID.Menu.LJ_LAYER1) != null)
-                        .add(2, () -> {
-                            int slot = menuSlot(destination.name());
-                            if(slot == -1)
-                                return 2;
-                            DialogueAPI.resumePause(InterfaceID.Menu.LJ_LAYER1, slot);
-                            return 3;
-                        })
+                        .addDelayUntil(1, MENU_TIMEOUT, () -> menuSlot(destination.name()) != -1, () -> {})
+                        .add(2, () -> resumeMenu(destination.name(), 3))
                         .addDelay(3, 4);
 
                 Transport transport = new Transport(WorldPointUtil.compress(tree.getLocation()), WorldPointUtil.compress(destination.getLocation()), 6, 1, 3, builder.build(), req, -1);
                 computeIfAbsent(transports, WorldPointUtil.compress(tree.getLocation()), transport);
             }
         }
+    }
+
+    private static int resumeMenu(String destination, int next)
+    {
+        int slot = menuSlot(destination);
+        if(slot == -1)
+            return HandlerBuilder.END_EXECUTION;
+        DialogueAPI.resumePause(InterfaceID.Menu.LJ_LAYER1, slot);
+        return next;
     }
 
     private static int menuSlot(String destination)
