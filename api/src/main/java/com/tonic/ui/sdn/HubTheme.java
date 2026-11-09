@@ -28,7 +28,6 @@ final class HubTheme {
     static final Color TEXT = ColorScheme.TEXT_COLOR;
     static final Color MUTED = ColorScheme.LIGHT_GRAY_COLOR;
     static final Color INSTALL = new Color(0x28BE28);
-    static final Color DANGER = new Color(0xBE2828);
     static final Color WARNING = ColorScheme.PROGRESS_INPROGRESS_COLOR;
     static final Color ERROR = new Color(0xE05050);
     static final Color BUSY = ColorScheme.MEDIUM_GRAY_COLOR;

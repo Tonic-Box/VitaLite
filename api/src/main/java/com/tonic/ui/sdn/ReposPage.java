@@ -160,7 +160,7 @@ final class ReposPage extends JPanel {
             if (result.manifest == null) {
                 return new String[]{result.error == null ? "No plugins loaded" : capitalize(result.error), result.error == null ? null : ""};
             }
-            String count = plural(result.manifest.plugins.size(), "plugin");
+            String count = plural(result.manifest.plugins.size());
             String summary = repo.official ? count + " · signed" : count;
             return new String[]{summary, result.error};
         }
@@ -189,7 +189,7 @@ final class ReposPage extends JPanel {
         localStatus = null;
         HubState state = HubState.get();
         if (!state.thirdPartyWarned) {
-            if (!confirm(THIRD_PARTY_WARNING) || !confirmAfterCountdown(THIRD_PARTY_CONFIRM, "Yes, add it", CONFIRM_SECONDS)) {
+            if (!confirm() || !confirmAfterCountdown()) {
                 return;
             }
             synchronized (state) {
@@ -201,29 +201,29 @@ final class ReposPage extends JPanel {
         hub.addRepo(text);
     }
 
-    private boolean confirm(String message) {
+    private boolean confirm() {
         Object[] options = {"Add anyway", "Cancel"};
-        int choice = JOptionPane.showOptionDialog(this, message, "Unofficial repository", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+        int choice = JOptionPane.showOptionDialog(this, ReposPage.THIRD_PARTY_WARNING, "Unofficial repository", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
         return choice == 0;
     }
 
-    private boolean confirmAfterCountdown(String message, String accept, int seconds) {
+    private boolean confirmAfterCountdown() {
         JButton cancel = new JButton("Cancel");
-        JButton confirm = new JButton(accept + " (" + seconds + ")");
+        JButton confirm = new JButton("Yes, add it" + " (" + ReposPage.CONFIRM_SECONDS + ")");
         confirm.setPreferredSize(confirm.getPreferredSize());
         confirm.setEnabled(false);
-        JOptionPane pane = new JOptionPane(message, JOptionPane.WARNING_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{cancel, confirm}, cancel);
+        JOptionPane pane = new JOptionPane(ReposPage.THIRD_PARTY_CONFIRM, JOptionPane.WARNING_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{cancel, confirm}, cancel);
         cancel.addActionListener(e -> pane.setValue(cancel));
         confirm.addActionListener(e -> pane.setValue(confirm));
 
-        int[] remaining = {seconds};
+        int[] remaining = {ReposPage.CONFIRM_SECONDS};
         Timer countdown = new Timer(1000, e -> {
             remaining[0]--;
             if (remaining[0] > 0) {
-                confirm.setText(accept + " (" + remaining[0] + ")");
+                confirm.setText("Yes, add it" + " (" + remaining[0] + ")");
                 return;
             }
-            confirm.setText(accept);
+            confirm.setText("Yes, add it");
             confirm.setEnabled(true);
             ((Timer) e.getSource()).stop();
         });
@@ -240,8 +240,8 @@ final class ReposPage extends JPanel {
         return text.isEmpty() ? text : Character.toUpperCase(text.charAt(0)) + text.substring(1);
     }
 
-    static String plural(int count, String noun) {
-        return count + " " + noun + (count == 1 ? "" : "s");
+    static String plural(int count) {
+        return count + " " + "plugin" + (count == 1 ? "" : "s");
     }
 
     /** A panel that always takes the scroll pane's width, so its contents wrap rather than scroll sideways. */

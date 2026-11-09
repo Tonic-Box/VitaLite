@@ -55,10 +55,10 @@ final class WrappedText extends JComponent {
     }
 
     /**
-     * @param centered whether each line is centred
+     *
      */
-    void setCentered(boolean centered) {
-        this.centered = centered;
+    void setCentered() {
+        this.centered = true;
         repaint();
     }
 
