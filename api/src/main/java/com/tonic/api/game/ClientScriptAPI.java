@@ -12,6 +12,8 @@ import net.runelite.api.gameval.InterfaceID;
 public class ClientScriptAPI
 {
     private static final int SCRIPT_CLOSE_INTERFACE = 29;
+    private static final int SCRIPT_CLOSE_CHATBOX_INPUT = 138;
+    private static final int SCRIPT_SWITCH_TAB = 915;
 
     /**
      * Closes the currently open interface
@@ -32,7 +34,7 @@ public class ClientScriptAPI
             Widget w2 = client.getWidget(InterfaceID.Chatbox.MES_TEXT2);
             if(w != null || w2 != null)
             {
-                client.runScript(138);
+                client.runScript(SCRIPT_CLOSE_CHATBOX_INPUT);
             }
         });
     }
@@ -45,7 +47,7 @@ public class ClientScriptAPI
     public static void switchTabs(int tab)
     {
         Client client = Static.getClient();
-        Static.invoke(() -> client.runScript(915, tab));
+        Static.invoke(() -> client.runScript(SCRIPT_SWITCH_TAB, tab));
     }
 
     /**
@@ -55,7 +57,7 @@ public class ClientScriptAPI
     public static void switchTabs(Tab tab)
     {
         Client client = Static.getClient();
-        Static.invoke(() -> client.runScript(915, tab.getTabVarbit()));
+        Static.invoke(() -> client.runScript(SCRIPT_SWITCH_TAB, tab.getTabVarbit()));
     }
 
     /**

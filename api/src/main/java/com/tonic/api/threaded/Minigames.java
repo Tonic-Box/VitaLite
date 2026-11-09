@@ -13,7 +13,8 @@ import com.tonic.data.wrappers.PlayerEx;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.api.*;
-import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.gameval.SpotanimID;
+import net.runelite.api.gameval.VarClientID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
@@ -21,7 +22,6 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.http.api.worlds.WorldType;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -71,8 +71,10 @@ public class Minigames
             Quest.WITCHS_HOUSE
     );
 
+    private static final int SCRIPT_SELECT_MINIGAME = 124;
+    private static final int TELEPORT_COOLDOWN_MINUTES = 20;
     private static final int[] teleportGraphics = new int[] {
-            800, 802, 803, 804
+            SpotanimID.AIDE_CHALK_CIRCLE, SpotanimID.AIDE_PLAYER_BOOK_GET, SpotanimID.AIDE_PLAYER_BOOK_PORTAL, SpotanimID.AIDE_PLAYER_TELEPORT
     };
 
     /**
@@ -82,7 +84,7 @@ public class Minigames
      */
     public static boolean canTeleport()
     {
-        return getLastMinigameTeleportUsage().plus(20, ChronoUnit.MINUTES).isBefore(Instant.now());
+        return VarAPI.getVarp(VarPlayerID.DATE_MINUTES) - VarAPI.getVarp(VarPlayerID.SLUG2_REGIONUID) >= TELEPORT_COOLDOWN_MINUTES;
     }
 
     /**
@@ -107,7 +109,7 @@ public class Minigames
         {
             if (Destination.getCurrent() != destination)
             {
-                ClientScriptAPI.runScript(124, destination.index);
+                ClientScriptAPI.runScript(SCRIPT_SELECT_MINIGAME, destination.index);
                 Delays.tick();
             }
 
@@ -210,7 +212,7 @@ public class Minigames
         GOD_WARS(10, "God Wars", null, true),
         GUARDIANS_OF_THE_RIFT(11, "Guardians of the Rift", new WorldPoint(3616, 9478, 0), true),
         LAST_MAN_STANDING(12, "Last Man Standing", new WorldPoint(3149, 3635, 0), false),
-        MAGE_TRAINING_ARENA(13, "Nightmare Zone", new WorldPoint(3363, 3304, 0), true),
+        MAGE_TRAINING_ARENA(13, "Mage Training Arena", new WorldPoint(3363, 3304, 0), true),
         MASTERING_MIXOLOGY(14, "Mastering Mixology", new WorldPoint(1389, 2919, 0), true),
         NIGHTMARE_ZONE(15, "Nightmare Zone", new WorldPoint(2611, 3121, 0), true),
         PEST_CONTROL(16, "Pest Control", new WorldPoint(2653, 2655, 0), true),
@@ -266,7 +268,7 @@ public class Minigames
                 case BARBARIAN_ASSAULT:
                     return VarAPI.getVar(3251) >= 1;
                 case BLAST_FURNACE:
-                    return VarAPI.getVar(575) >= 1;
+                    return Quest.THE_GIANT_DWARF.getState(client) != QuestState.NOT_STARTED;
                 case FISHING_TRAWLER:
                     return Static.invoke(() -> client.getRealSkillLevel(Skill.FISHING) >= 15);
                 case GUARDIANS_OF_THE_RIFT:
@@ -282,7 +284,7 @@ public class Minigames
                 case TROUBLE_BREWING:
                     return Quest.CABIN_FEVER.getState(client) == QuestState.FINISHED && Static.invoke(() -> client.getRealSkillLevel(Skill.COOKING) >= 40);
                 case TITHE_FARM:
-					return Static.invoke(() -> client.getRealSkillLevel(Skill.FARMING) >= 34) && (VarAPI.getVar(VarbitID.ZEAH_HOSIDIUS) / 10) >= 100;
+					return Static.invoke(() -> client.getRealSkillLevel(Skill.FARMING) >= 34);
             }
             return false;
         }
@@ -304,13 +306,7 @@ public class Minigames
          */
         public static Destination getCurrent()
         {
-            Widget selectedTeleport = WidgetAPI.get(76, 11);
-            if (WidgetAPI.isVisible(selectedTeleport))
-            {
-                return byName(selectedTeleport.getText());
-            }
-
-            return NONE;
+            return of(VarAPI.getVarcInteger(VarClientID.GROUPING_GAMEID));
         }
 
         /**

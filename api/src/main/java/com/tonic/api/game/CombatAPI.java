@@ -3,7 +3,6 @@ package com.tonic.api.game;
 import com.tonic.Static;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.AttackStyle;
-import com.tonic.data.LayoutView;
 import net.runelite.api.Client;
 import net.runelite.api.Skill;
 import net.runelite.api.gameval.InterfaceID;
@@ -179,7 +178,7 @@ public class CombatAPI
      */
     public static AttackStyle getAttackStyle()
     {
-        return AttackStyle.fromIndex(VarAPI.getVarp(43));
+        return AttackStyle.fromIndex(VarAPI.getVarp(VarPlayerID.COM_MODE));
     }
 
     /**

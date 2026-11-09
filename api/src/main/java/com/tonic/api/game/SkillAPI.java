@@ -71,6 +71,7 @@ public class SkillAPI {
                 .put(Skill.FLETCHING, InterfaceID.Xpreward.FLETCHING)
                 .put(Skill.CONSTRUCTION, InterfaceID.Xpreward.CONSTRUCTION)
                 .put(Skill.HUNTER, InterfaceID.Xpreward.HUNTER)
+                .put(Skill.SAILING, InterfaceID.Xpreward.SAILING)
                 .build();
     }
 

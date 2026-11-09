@@ -249,6 +249,10 @@ public class WorldQuery extends AbstractQuery<World, WorldQuery>
     public WorldQuery isMainGame()
     {
         return withOutTypes(
+                WorldType.PVP,
+                WorldType.BOUNTY,
+                WorldType.HIGH_RISK,
+                WorldType.LAST_MAN_STANDING,
                 WorldType.PVP_ARENA,
                 WorldType.QUEST_SPEEDRUNNING,
                 WorldType.BETA_WORLD,

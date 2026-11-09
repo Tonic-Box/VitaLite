@@ -77,7 +77,7 @@ public class GameAPI
                     local.getLocalLocation().getX(),
                     local.getLocalLocation().getY(),
                     worldView.getPlane()).getY();
-            return 2 + (y - 3528) / 8;
+            return (y - 3520) / 8 + 1;
         }
         String levelText = widgetText.contains("<br>") ? widgetText.substring(0, widgetText.indexOf("<br>")) : widgetText;
         return Integer.parseInt(levelText.replace("Level: ", ""));

@@ -5,6 +5,7 @@ import com.tonic.api.game.QuestAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.widgets.EquipmentAPI;
 import com.tonic.api.widgets.InventoryAPI;
+import lombok.Getter;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.Quest;
 import net.runelite.api.QuestState;
@@ -90,11 +91,15 @@ public enum TeleportItem
     ARDOUGNE_CLOAK_FARM(new WorldPoint(2664, 3374, 0), "Farm Teleport", null, "Ardougne Farm", null, MovementConstants.ARDOUGNE_CLOAK_FARM)
     ;
 
+    @Getter
     private final WorldPoint destination;
     private final Quest requirement;
     private final int[] itemIds;
+    @Getter
     private final String action;
+    @Getter
     private final String menu;
+    @Getter
     private final String wornAction;
 
     TeleportItem(WorldPoint destination, String action, Quest requirement, int... itemIds)
@@ -112,29 +117,9 @@ public enum TeleportItem
         this.wornAction = wornAction;
     }
 
-    public WorldPoint getDestination()
-    {
-        return destination;
-    }
-
     public int[] getItemId()
     {
         return itemIds;
-    }
-
-    public String getAction()
-    {
-        return action;
-    }
-
-    public String getMenu()
-    {
-        return menu;
-    }
-
-    public String getWornAction()
-    {
-        return wornAction;
     }
 
     public boolean canUse()

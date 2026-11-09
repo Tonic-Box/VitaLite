@@ -5,14 +5,14 @@ import com.tonic.api.game.SkillAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.data.magic.Spell;
 import com.tonic.data.magic.SpellBook;
-import com.tonic.data.magic.spellbooks.Standard;
 import com.tonic.data.wrappers.*;
 import net.runelite.api.Skill;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 /**
  * MagicAPI provides utility methods for managing magic-related functionalities,
@@ -20,8 +20,8 @@ import java.time.temporal.ChronoUnit;
  */
 public class MagicAPI
 {
-    private static final int AUTOCAST_VARP = 108;
-    private static final int AUTOCAST_USABLE_VARP = 843;
+    private static final int[] AUTOCAST_WEAPON_CATEGORIES = {18, 21, 22};
+    private static final int HOME_TELEPORT_COOLDOWN_MINUTES = 30;
 
     /**
      * Checks if autocasting is currently enabled.
@@ -30,17 +30,17 @@ public class MagicAPI
      */
     public static boolean isAutoCasting()
     {
-        return VarAPI.getVarp(AUTOCAST_VARP) != 0;
+        return VarAPI.getVar(VarbitID.AUTOCAST_SET) == 1;
     }
 
     public static boolean isAutoCastUsable()
     {
-        return VarAPI.getVarp(AUTOCAST_USABLE_VARP) == 18;
+        return ArrayUtils.contains(AUTOCAST_WEAPON_CATEGORIES, VarAPI.getVar(VarbitID.COMBAT_WEAPON_CATEGORY));
     }
 
     public static boolean isDefensiveCasting()
     {
-        return !isAutoCasting() && VarAPI.getVar(VarbitID.AUTOCAST_DEFMODE) == 1;
+        return isAutoCasting() && VarAPI.getVar(VarbitID.AUTOCAST_DEFMODE) == 1;
     }
 
     /**
@@ -60,7 +60,7 @@ public class MagicAPI
      */
     public static boolean isHomeTeleportOnCooldown()
     {
-        return getLastHomeTeleportUsage().plus(30, ChronoUnit.MINUTES).isAfter(Instant.now());
+        return VarAPI.getVarp(VarPlayerID.DATE_MINUTES) - VarAPI.getVarp(VarPlayerID.AIDE_TELE_TIMER) < HOME_TELEPORT_COOLDOWN_MINUTES;
     }
 
     /**

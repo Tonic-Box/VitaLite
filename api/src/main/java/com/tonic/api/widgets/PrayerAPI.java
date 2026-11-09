@@ -103,6 +103,14 @@ public enum PrayerAPI {
      */
     MYSTIC_MIGHT(VarbitID.PRAYER_MYSTICMIGHT, 20.0, InterfaceID.Prayerbook.PRAYER24, 45, 23),
     /**
+     * Deadeye (Level 62, Ranging), replaces Eagle Eye once unlocked.
+     */
+    DEADEYE(VarbitID.PRAYER_DEADEYE, 20.0, InterfaceID.Prayerbook.PRAYER21, 62, 22),
+    /**
+     * Mystic Vigour (Level 63, Magic), replaces Mystic Might once unlocked.
+     */
+    MYSTIC_VIGOUR(VarbitID.PRAYER_MYSTICVIGOUR, 20.0, InterfaceID.Prayerbook.PRAYER24, 63, 23),
+    /**
      * Retribution (Level 46).
      */
     RETRIBUTION(VarbitID.PRAYER_RETRIBUTION, 5.0, InterfaceID.Prayerbook.PRAYER16, 46, 15),
@@ -190,7 +198,7 @@ public enum PrayerAPI {
     public boolean isQuickPrayer()
     {
         Client client = Static.getClient();
-        return Static.invoke(() -> (client.getVarbitValue(4102) & (int) Math.pow(2, quickPrayerIndex)) == Math.pow(2, quickPrayerIndex));
+        return Static.invoke(() -> (client.getVarbitValue(VarbitID.QUICKPRAYER_SELECTED) & (int) Math.pow(2, quickPrayerIndex)) == Math.pow(2, quickPrayerIndex));
     }
 
     /**
@@ -453,9 +461,9 @@ public enum PrayerAPI {
 
     private enum PrayerGroup
     {
-        RANGED(SHARP_EYE, HAWK_EYE, EAGLE_EYE, RIGOUR),
+        RANGED(SHARP_EYE, HAWK_EYE, EAGLE_EYE, DEADEYE, RIGOUR),
         MELEE(CHIVALRY, PIETY),
-        MAGIC(MYSTIC_WILL, MYSTIC_LORE, MYSTIC_MIGHT, AUGURY),
+        MAGIC(MYSTIC_WILL, MYSTIC_LORE, MYSTIC_MIGHT, MYSTIC_VIGOUR, AUGURY),
         MELEE_STRENGTH(BURST_OF_STRENGTH, SUPERHUMAN_STRENGTH, ULTIMATE_STRENGTH),
         MELEE_ATTACK(CLARITY_OF_THOUGHT, IMPROVED_REFLEXES, INCREDIBLE_REFLEXES),
         MELEE_DEFENSE(THICK_SKIN, ROCK_SKIN, STEEL_SKIN),
@@ -494,11 +502,21 @@ public enum PrayerAPI {
                         break;
                     case RIGOUR:
                         if(VarAPI.getVar(VarbitID.PRAYER_RIGOUR_UNLOCKED) != 1){
+                            highestPrayer = VarAPI.getVar(VarbitID.PRAYER_DEADEYE_UNLOCKED) == 1 ? DEADEYE : EAGLE_EYE;
+                        }
+                        break;
+                    case DEADEYE:
+                        if(VarAPI.getVar(VarbitID.PRAYER_DEADEYE_UNLOCKED) != 1){
                             highestPrayer = EAGLE_EYE;
                         }
                         break;
                     case AUGURY:
                         if(VarAPI.getVar(VarbitID.PRAYER_AUGURY_UNLOCKED) != 1){
+                            highestPrayer = VarAPI.getVar(VarbitID.PRAYER_MYSTIC_VIGOUR_UNLOCKED) == 1 ? MYSTIC_VIGOUR : MYSTIC_MIGHT;
+                        }
+                        break;
+                    case MYSTIC_VIGOUR:
+                        if(VarAPI.getVar(VarbitID.PRAYER_MYSTIC_VIGOUR_UNLOCKED) != 1){
                             highestPrayer = MYSTIC_MIGHT;
                         }
                         break;
