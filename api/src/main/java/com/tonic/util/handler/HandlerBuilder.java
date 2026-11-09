@@ -1,14 +1,10 @@
 package com.tonic.util.handler;
 
-import com.tonic.Static;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.pathfinder.model.WalkerPath;
-import net.runelite.api.Client;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +141,7 @@ public class HandlerBuilder
                 context.put("SPEED_UP", true);
                 return step + 1;
             }
-            if (remaining.get() <= 1) {
+            if (remaining.decrementAndGet() <= 0) {
                 remaining.set(timeout);
                 onTimeout.accept(context);
                 return END_EXECUTION;
