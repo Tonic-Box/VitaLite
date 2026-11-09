@@ -14,6 +14,9 @@ import java.nio.file.Path;
 import java.nio.file.FileVisitOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -111,7 +114,7 @@ public class PluginReloader {
         }
         for (Plugin plugin : new ArrayList<>(oldContext.getPlugins())) {
             try {
-                if (manager.isPluginActive(plugin) && !manager.stopPlugin(plugin)) {
+                if (manager.isPluginActive(plugin) && !onEventThread(() -> manager.stopPlugin(plugin))) {
                     Logger.error("Failed to stop plugin: " + plugin.getClass().getName());
                     return false;
                 }
@@ -143,9 +146,12 @@ public class PluginReloader {
         PluginContext.getLoadedPlugins().put(jarFile.getAbsolutePath(), new PluginContext(classLoader, plugins, jarFile.lastModified()));
         if (start) {
             manager.loadDefaultPluginConfiguration(plugins);
-            for (Plugin plugin : plugins) {
-                manager.startPlugin(plugin);
-            }
+            onEventThread(() -> {
+                for (Plugin plugin : plugins) {
+                    manager.startPlugin(plugin);
+                }
+                return null;
+            });
         }
         return plugins;
     }
@@ -156,6 +162,23 @@ public class PluginReloader {
     public static void usePluginManager(PluginManager manager) {
         if (pluginManager == null) {
             pluginManager = manager;
+        }
+    }
+
+    private static <T> T onEventThread(Callable<T> task) throws Exception {
+        if (SwingUtilities.isEventDispatchThread()) {
+            return task.call();
+        }
+        FutureTask<T> future = new FutureTask<>(task);
+        SwingUtilities.invokeAndWait(future);
+        try {
+            return future.get();
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof Error) {
+                throw (Error) cause;
+            }
+            throw (Exception) cause;
         }
     }
 
