@@ -7,8 +7,8 @@ import com.tonic.data.AccountType;
 import com.tonic.data.locatables.NpcLocations;
 import com.tonic.services.pathfinder.requirements.*;
 
+import lombok.Getter;
 import net.runelite.api.Client;
-import net.runelite.api.ItemContainer;
 import net.runelite.api.Quest;
 import net.runelite.api.Skill;
 import net.runelite.api.coords.WorldPoint;
@@ -20,6 +20,7 @@ import static com.tonic.data.trading.ShopRequirements.*;
  * Enumeration of all shops in Old School RuneScape.
  * Shops are organized by region for easier navigation.
  */
+@Getter
 public enum Shop {
     // ============================================
     // ASGARNIA
@@ -1962,12 +1963,21 @@ public enum Shop {
                 return null;
             }
 
-            // Iterate over all known shops to find active ItemContainer
+            WorldPoint player = client.getLocalPlayer().getWorldLocation();
+            Shop nearest = null;
+            int nearestDistance = Integer.MAX_VALUE;
             for (Shop shop : Shop.values()) {
-                ItemContainer container = client.getItemContainer(shop.inventoryId);
-                if (container != null) {
-                    return shop;
+                if (client.getItemContainer(shop.inventoryId) == null) {
+                    continue;
                 }
+                int distance = shop.shopkeeper == null ? Integer.MAX_VALUE - 1 : shop.shopkeeper.getLocation().distanceTo(player);
+                if (distance < nearestDistance) {
+                    nearest = shop;
+                    nearestDistance = distance;
+                }
+            }
+            if (nearest != null) {
+                return nearest;
             }
 
             Logger.error("Shop is open but is not defined in Shop enum. " +
@@ -1999,30 +2009,4 @@ public enum Shop {
         return shopkeeper != null ? shopkeeper.getLocation() : null;
     }
 
-    /**
-     * Gets the RuneLite inventory ID for this shop's interface.
-     *
-     * @return the inventory ID used to identify this shop's container
-     */
-    public int getInventoryId() {
-        return inventoryId;
-    }
-
-    /**
-     * Gets the shopkeeper NPC location enum for this shop.
-     *
-     * @return the NpcLocations enum value for the shopkeeper
-     */
-    public NpcLocations getShopkeeper() {
-        return shopkeeper;
-    }
-
-    /**
-     * Gets the requirement object for this shop.
-     *
-     * @return the Requirements object, or null if there are no requirements
-     */
-    public Requirements getRequirements() {
-        return requirements;
-    }
 }

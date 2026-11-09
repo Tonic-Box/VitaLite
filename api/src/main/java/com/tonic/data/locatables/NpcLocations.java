@@ -409,7 +409,7 @@ public enum NpcLocations {
 
     // --- HEMENSTER ---
     BONZO("Bonzo", new WorldPoint(2641, 3438, 0)),
-    GRANDPA_JACK("Grandpa", new WorldPoint(2649, 3452, 0)),
+    GRANDPA_JACK("Grandpa Jack", new WorldPoint(2649, 3452, 0)),
 
     // --- PORT KHAZARD ---
     SHOP_KEEPER_KHAZARD("Shop keeper", new WorldPoint(2656, 3153, 0)),
@@ -570,7 +570,7 @@ public enum NpcLocations {
     ASYFF("Asyff", new WorldPoint(3280, 3397, 0)),
     AUBURY("Aubury", new WorldPoint(3253, 3401, 0)),
     BARAEK("Baraek", new WorldPoint(3216, 3434, 0)),
-    BOB_BARTER("Bob Barter", new WorldPoint(3157, 3481, 0)),
+    BOB_BARTER("Bob Barter (herbs)", new WorldPoint(3157, 3481, 0)),
     CAPTAIN_ROVIN("Captain Rovin", new WorldPoint(3204, 3496, 2)),
     CHANCY_VARROCK("Chancy", new WorldPoint(3269, 3390, 0)),
     CHARLIE_THE_TRAMP("Charlie the Tramp", new WorldPoint(3210, 3392, 0)),
@@ -588,7 +588,7 @@ public enum NpcLocations {
     KING_ROALD("King Roald", new WorldPoint(3220, 3472, 0)),
     LOWE("Lowe", new WorldPoint(3233, 3423, 0)),
     MARLO("Marlo", new WorldPoint(3238, 3472, 0)),
-    MURKY_MATT("Murky Matt", new WorldPoint(3172, 3481, 0)),
+    MURKY_MATT("Murky Matt (runes)", new WorldPoint(3172, 3481, 0)),
     OLD_MAN_YARLO("Old Man Yarlo", new WorldPoint(3241, 3395, 0)),
     ORLANDO_SMITH("Orlando Smith", new WorldPoint(1759, 4956, 0)),
     RELDO("Reldo", new WorldPoint(3210, 3494, 0)),
@@ -617,7 +617,6 @@ public enum NpcLocations {
     FATHER_URHNEY("Father Urhney", new WorldPoint(3147, 3174, 0)),
     FAYETH("Fayeth", new WorldPoint(3190, 3232, 0)),
     FRED_THE_FARMER("Fred the Farmer", new WorldPoint(3190, 3273, 0)),
-    MELEE_COMBAT_TUTOR("Melee Combat Tutor", new WorldPoint(3218, 3239, 0)),
     SHOP_KEEPER_LUMBRIDGE("Shop Keeper", new WorldPoint(3213, 3245, 0)),
     VEOS_LUMBRIDGE("Veos", new WorldPoint(3228, 3241, 0)),
 
@@ -648,7 +647,7 @@ public enum NpcLocations {
     VANNAKA("Vannaka", new WorldPoint(3145, 9914, 0)),
 
     // --- WIZARDS' TOWER ---
-    ARCHMAGE_WIZARDS_TOWER("Archmage", new WorldPoint(3105, 9571, 0)),
+    ARCHMAGE_WIZARDS_TOWER("Archmage Sedridor", new WorldPoint(3105, 9571, 0)),
     WIZARD_JALARAST("Wizard Jalarast", new WorldPoint(3107, 3161, 1)),
     WIZARD_MIZGOG("Wizard Mizgog", new WorldPoint(3104, 3163, 2)),
     WIZARD_TRAIBORN("Wizard Traiborn", new WorldPoint(3111, 3162, 1)),

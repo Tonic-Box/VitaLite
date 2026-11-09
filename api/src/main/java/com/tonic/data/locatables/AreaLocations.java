@@ -23,7 +23,7 @@ public enum AreaLocations {
     PORT_SARIM(new WorldArea(3008, 3177, 55, 86, 0)),
     FALADOR(new WorldArea(2934, 3307, 135, 90, 0)),
     TAVERLY(new WorldArea(2873, 3403, 64, 83, 0)),
-    BURTHORPE(new WorldArea(2881, 2937, 56, 56, 0)),
+    BURTHORPE(new WorldArea(2881, 3521, 56, 56, 0)),
     CATHERBY(new WorldArea(2789, 3409, 51, 48, 0)),
     SEERS(new WorldArea(2682, 3455, 61, 57, 0)),
     RELLEKKA(new WorldArea(2617, 3652, 71, 64, 0)),

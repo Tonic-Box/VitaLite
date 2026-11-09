@@ -6,7 +6,10 @@ public class ItemConstants {
     public static final int[] TRIDENT_OF_THE_SEAS = new int[]{
             ItemID.TOTS_CHARGED,
             ItemID.TOTS,
-            ItemID.TOTS_I_CHARGED
+            ItemID.TOTS_I_CHARGED,
+            ItemID.TOTS_CHARGED_ORN,
+            ItemID.TOTS_ORN,
+            ItemID.TOTS_I_CHARGED_ORN
     };
 
     public static final int[] AHRIMS_STAFF = new int[]{
@@ -69,7 +72,55 @@ public class ItemConstants {
             ItemID.SLAYER_HELM,
             ItemID.SLAYER_HELM_I,
             ItemID.SW_SLAYER_HELM_I,
-            ItemID.PVPA_SLAYER_HELM_I
+            ItemID.PVPA_SLAYER_HELM_I,
+            ItemID.SLAYER_HELM_BLACK,
+            ItemID.SLAYER_HELM_I_BLACK,
+            ItemID.SW_SLAYER_HELM_I_BLACK,
+            ItemID.PVPA_SLAYER_HELM_I_BLACK,
+            ItemID.SLAYER_HELM_GREEN,
+            ItemID.SLAYER_HELM_I_GREEN,
+            ItemID.SW_SLAYER_HELM_I_GREEN,
+            ItemID.PVPA_SLAYER_HELM_I_GREEN,
+            ItemID.SLAYER_HELM_RED,
+            ItemID.SLAYER_HELM_I_RED,
+            ItemID.SW_SLAYER_HELM_I_RED,
+            ItemID.PVPA_SLAYER_HELM_I_RED,
+            ItemID.SLAYER_HELM_PURPLE,
+            ItemID.SLAYER_HELM_I_PURPLE,
+            ItemID.SW_SLAYER_HELM_I_PURPLE,
+            ItemID.PVPA_SLAYER_HELM_I_PURPLE,
+            ItemID.SLAYER_HELM_TURQUOISE,
+            ItemID.SLAYER_HELM_I_TURQUOISE,
+            ItemID.SW_SLAYER_HELM_I_TURQUOISE,
+            ItemID.PVPA_SLAYER_HELM_I_TURQUOISE,
+            ItemID.SLAYER_HELM_HYDRA,
+            ItemID.SLAYER_HELM_I_HYDRA,
+            ItemID.SW_SLAYER_HELM_I_HYDRA,
+            ItemID.PVPA_SLAYER_HELM_I_HYDRA,
+            ItemID.SLAYER_HELM_TWISTED,
+            ItemID.SLAYER_HELM_I_TWISTED,
+            ItemID.SW_SLAYER_HELM_I_TWISTED,
+            ItemID.PVPA_SLAYER_HELM_I_TWISTED,
+            ItemID.SLAYER_HELM_JAD,
+            ItemID.SLAYER_HELM_I_JAD,
+            ItemID.SW_SLAYER_HELM_I_JAD,
+            ItemID.PVPA_SLAYER_HELM_I_JAD,
+            ItemID.SLAYER_HELM_VERZIK,
+            ItemID.SLAYER_HELM_I_VERZIK,
+            ItemID.SW_SLAYER_HELM_I_VERZIK,
+            ItemID.PVPA_SLAYER_HELM_I_VERZIK,
+            ItemID.SLAYER_HELM_ZUK,
+            ItemID.SLAYER_HELM_I_ZUK,
+            ItemID.SW_SLAYER_HELM_I_ZUK,
+            ItemID.PVPA_SLAYER_HELM_I_ZUK,
+            ItemID.SLAYER_HELM_ARAXYTE,
+            ItemID.SLAYER_HELM_I_ARAXYTE,
+            ItemID.SW_SLAYER_HELM_I_ARAXYTE,
+            ItemID.PVPA_SLAYER_HELM_I_ARAXYTE,
+            ItemID.SLAYER_HELM_HOODED,
+            ItemID.SLAYER_HELM_I_HOODED,
+            ItemID.SW_SLAYER_HELM_I_HOODED,
+            ItemID.PVPA_SLAYER_HELM_I_HOODED
     };
 
     public static final int[] SEERS_RING_I = new int[]{
@@ -83,6 +134,7 @@ public class ItemConstants {
             ItemID.NZONE_BERZERKER_RING,
             ItemID.SW_BERZERKER_RING,
             ItemID.PVPA_BERZERKER_RING,
+            ItemID.BR_BERZERKER_RING,
     };
 
     public static final int[] ARCHERS_RING_I = new int[]{
@@ -245,7 +297,14 @@ public class ItemConstants {
                     ItemID.AMULET_OF_GLORY_4,
                     ItemID.AMULET_OF_GLORY_3,
                     ItemID.AMULET_OF_GLORY_2,
-                    ItemID.AMULET_OF_GLORY_1
+                    ItemID.AMULET_OF_GLORY_1,
+                    ItemID.TRAIL_AMULET_OF_GLORY_6,
+                    ItemID.TRAIL_AMULET_OF_GLORY_5,
+                    ItemID.TRAIL_AMULET_OF_GLORY_4,
+                    ItemID.TRAIL_AMULET_OF_GLORY_3,
+                    ItemID.TRAIL_AMULET_OF_GLORY_2,
+                    ItemID.TRAIL_AMULET_OF_GLORY_1,
+                    ItemID.AMULET_OF_GLORY_INF
             };
     public static final int[] COMBAT_BRACELET = new int[]
             {
@@ -326,7 +385,17 @@ public class ItemConstants {
                     ItemID.RUNE_AXE,
                     ItemID.DRAGON_AXE,
                     ItemID.INFERNAL_AXE,
-                    ItemID.CRYSTAL_AXE
+                    ItemID.CRYSTAL_AXE,
+                    ItemID.INFERNAL_AXE_EMPTY,
+                    ItemID.CRYSTAL_AXE_INACTIVE,
+                    ItemID._3A_AXE,
+                    ItemID.TRAIL_GILDED_AXE,
+                    ItemID.TRAILBLAZER_AXE,
+                    ItemID.TRAILBLAZER_AXE_EMPTY,
+                    ItemID.TRAILBLAZER_AXE_NO_INFERNAL,
+                    ItemID.TRAILBLAZER_RELOADED_AXE,
+                    ItemID.TRAILBLAZER_RELOADED_AXE_EMPTY,
+                    ItemID.TRAILBLAZER_RELOADED_AXE_NO_INFERNAL
             };
 
     public static final int[] REJUVINATTION_POTION = new int[]

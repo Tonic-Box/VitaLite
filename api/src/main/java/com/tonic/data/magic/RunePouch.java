@@ -9,6 +9,8 @@ import com.tonic.api.widgets.DialogueAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.util.ThreadPool;
+import net.runelite.api.Client;
+import net.runelite.api.EnumID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
@@ -202,7 +204,7 @@ public enum RunePouch {
             if(pRune == 0) continue;
 
             // the pRune is not the itemId
-            int runeItemId = RunePouchRune.getRune(pRune).getItemId();
+            int runeItemId = Static.invoke(() -> ((Client) Static.getClient()).getEnum(EnumID.RUNEPOUCH_RUNE).getIntValue(pRune));
 
             // TODO: support combination runes
             if(runeItemId != rune.getRuneId()) continue;
@@ -310,11 +312,7 @@ public enum RunePouch {
             return false;
         }
 
-        if(!Delays.waitUntil(RunePouch::isInConfigureMode, 2000)){
-            return false;
-        }
-
-        return true;
+        return Delays.waitUntil(RunePouch::isInConfigureMode, 2000);
     }
 
     private static boolean isInConfigureMode(){

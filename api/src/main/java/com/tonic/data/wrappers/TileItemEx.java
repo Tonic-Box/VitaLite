@@ -64,7 +64,7 @@ public class TileItemEx implements Entity
 
     public boolean isNoted() {
         Client client = Static.getClient();
-        return Static.invoke(() -> client.getItemDefinition(item.getId()).getNote()) == 799;
+        return Static.invoke(() -> client.getItemDefinition(item.getId()).getNote()) == ItemID.TEMPLATE_FOR_CERT;
     }
 
     public int getCanonicalId() {
