@@ -3,6 +3,7 @@ package com.tonic.data;
 import com.tonic.api.widgets.EmoteAPI;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.runelite.api.gameval.InterfaceID;
 
 @AllArgsConstructor
 @Getter
@@ -64,7 +65,7 @@ public enum EmoteID
     FORTIS_SALUTE(53),
     ;
 
-    public static final int EMOTES_WIDGET_ID = 14155778;
+    public static final int EMOTES_WIDGET_ID = InterfaceID.Emote.CONTENTS;
     private final int id;
 
     public void perform()

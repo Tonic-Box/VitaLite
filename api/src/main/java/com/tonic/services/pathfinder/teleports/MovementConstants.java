@@ -1,6 +1,6 @@
 package com.tonic.services.pathfinder.teleports;
 
-import net.runelite.api.ItemID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.VarbitID;
@@ -27,36 +27,36 @@ public class MovementConstants
 
     public static final int[] RING_OF_DUELING = new int[]
             {
-                    ItemID.RING_OF_DUELING8,
-                    ItemID.RING_OF_DUELING7,
-                    ItemID.RING_OF_DUELING6,
-                    ItemID.RING_OF_DUELING5,
-                    ItemID.RING_OF_DUELING4,
-                    ItemID.RING_OF_DUELING3,
-                    ItemID.RING_OF_DUELING2,
-                    ItemID.RING_OF_DUELING1,
+                    ItemID.RING_OF_DUELING_8,
+                    ItemID.RING_OF_DUELING_7,
+                    ItemID.RING_OF_DUELING_6,
+                    ItemID.RING_OF_DUELING_5,
+                    ItemID.RING_OF_DUELING_4,
+                    ItemID.RING_OF_DUELING_3,
+                    ItemID.RING_OF_DUELING_2,
+                    ItemID.RING_OF_DUELING_1,
             };
 
     public static final int[] GAMES_NECKLACE = new int[]
             {
-                    ItemID.GAMES_NECKLACE8,
-                    ItemID.GAMES_NECKLACE7,
-                    ItemID.GAMES_NECKLACE6,
-                    ItemID.GAMES_NECKLACE5,
-                    ItemID.GAMES_NECKLACE4,
-                    ItemID.GAMES_NECKLACE3,
-                    ItemID.GAMES_NECKLACE2,
-                    ItemID.GAMES_NECKLACE1,
+                    ItemID.NECKLACE_OF_MINIGAMES_8,
+                    ItemID.NECKLACE_OF_MINIGAMES_7,
+                    ItemID.NECKLACE_OF_MINIGAMES_6,
+                    ItemID.NECKLACE_OF_MINIGAMES_5,
+                    ItemID.NECKLACE_OF_MINIGAMES_4,
+                    ItemID.NECKLACE_OF_MINIGAMES_3,
+                    ItemID.NECKLACE_OF_MINIGAMES_2,
+                    ItemID.NECKLACE_OF_MINIGAMES_1,
             };
 
     public static final int[] COMBAT_BRACELET = new int[]
             {
-                    ItemID.COMBAT_BRACELET1,
-                    ItemID.COMBAT_BRACELET2,
-                    ItemID.COMBAT_BRACELET3,
-                    ItemID.COMBAT_BRACELET4,
-                    ItemID.COMBAT_BRACELET5,
-                    ItemID.COMBAT_BRACELET6,
+                    ItemID.JEWL_BRACELET_OF_COMBAT_1,
+                    ItemID.JEWL_BRACELET_OF_COMBAT_2,
+                    ItemID.JEWL_BRACELET_OF_COMBAT_3,
+                    ItemID.JEWL_BRACELET_OF_COMBAT_4,
+                    ItemID.JEWL_BRACELET_OF_COMBAT_5,
+                    ItemID.JEWL_BRACELET_OF_COMBAT_6,
             };
 
     public static final int[] RING_OF_WEALTH = new int[]
@@ -70,36 +70,36 @@ public class MovementConstants
 
     public static final int[] AMULET_OF_GLORY = new int[]
             {
-                    ItemID.AMULET_OF_GLORY6,
-                    ItemID.AMULET_OF_GLORY5,
-                    ItemID.AMULET_OF_GLORY4,
-                    ItemID.AMULET_OF_GLORY3,
-                    ItemID.AMULET_OF_GLORY2,
-                    ItemID.AMULET_OF_GLORY1,
-                    ItemID.AMULET_OF_ETERNAL_GLORY,
+                    ItemID.AMULET_OF_GLORY_6,
+                    ItemID.AMULET_OF_GLORY_5,
+                    ItemID.AMULET_OF_GLORY_4,
+                    ItemID.AMULET_OF_GLORY_3,
+                    ItemID.AMULET_OF_GLORY_2,
+                    ItemID.AMULET_OF_GLORY_1,
+                    ItemID.AMULET_OF_GLORY_INF,
             };
 
     public static final int[] NECKLACE_OF_PASSAGE = new int[]
             {
-                    ItemID.NECKLACE_OF_PASSAGE1,
-                    ItemID.NECKLACE_OF_PASSAGE2,
-                    ItemID.NECKLACE_OF_PASSAGE3,
-                    ItemID.NECKLACE_OF_PASSAGE4,
-                    ItemID.NECKLACE_OF_PASSAGE5,
+                    ItemID.NECKLACE_OF_PASSAGE_1,
+                    ItemID.NECKLACE_OF_PASSAGE_2,
+                    ItemID.NECKLACE_OF_PASSAGE_3,
+                    ItemID.NECKLACE_OF_PASSAGE_4,
+                    ItemID.NECKLACE_OF_PASSAGE_5,
             };
 
     public static final int[] BURNING_AMULET = new int[]
             {
-                    ItemID.BURNING_AMULET5,
-                    ItemID.BURNING_AMULET4,
-                    ItemID.BURNING_AMULET3,
-                    ItemID.BURNING_AMULET2,
-                    ItemID.BURNING_AMULET1,
+                    ItemID.BURNING_AMULET_5,
+                    ItemID.BURNING_AMULET_4,
+                    ItemID.BURNING_AMULET_3,
+                    ItemID.BURNING_AMULET_2,
+                    ItemID.BURNING_AMULET_1,
             };
 
     public static final int[] XERICS_TALISMAN = new int[]
             {
-                    ItemID.XERICS_TALISMAN
+                    ItemID.XERIC_TALISMAN
             };
 
     public static final int[] SLAYER_RING = new int[]
@@ -117,11 +117,11 @@ public class MovementConstants
 
     public static final int[] DIGSITE_PENDANT = new int[]
             {
-                    ItemID.DIGSITE_PENDANT_5,
-                    ItemID.DIGSITE_PENDANT_4,
-                    ItemID.DIGSITE_PENDANT_3,
-                    ItemID.DIGSITE_PENDANT_2,
-                    ItemID.DIGSITE_PENDANT_1,
+                    ItemID.NECKLACE_OF_DIGSITE_5,
+                    ItemID.NECKLACE_OF_DIGSITE_4,
+                    ItemID.NECKLACE_OF_DIGSITE_3,
+                    ItemID.NECKLACE_OF_DIGSITE_2,
+                    ItemID.NECKLACE_OF_DIGSITE_1,
             };
 
     public static final int[] DRAKANS_MEDALLION = new int[]
@@ -131,103 +131,103 @@ public class MovementConstants
 
     public static final int[] SKILLS_NECKLACE = new int[]
             {
-                    ItemID.SKILLS_NECKLACE6,
-                    ItemID.SKILLS_NECKLACE5,
-                    ItemID.SKILLS_NECKLACE4,
-                    ItemID.SKILLS_NECKLACE3,
-                    ItemID.SKILLS_NECKLACE2,
-                    ItemID.SKILLS_NECKLACE1,
+                    ItemID.JEWL_NECKLACE_OF_SKILLS_6,
+                    ItemID.JEWL_NECKLACE_OF_SKILLS_5,
+                    ItemID.JEWL_NECKLACE_OF_SKILLS_4,
+                    ItemID.JEWL_NECKLACE_OF_SKILLS_3,
+                    ItemID.JEWL_NECKLACE_OF_SKILLS_2,
+                    ItemID.JEWL_NECKLACE_OF_SKILLS_1,
             };
 
     public static final int[] TELEPORT_CRYSTAL = new int[]
             {
-                    ItemID.ETERNAL_TELEPORT_CRYSTAL,
-                    ItemID.TELEPORT_CRYSTAL_5,
-                    ItemID.TELEPORT_CRYSTAL_4,
-                    ItemID.TELEPORT_CRYSTAL_5,
-                    ItemID.TELEPORT_CRYSTAL_2,
-                    ItemID.TELEPORT_CRYSTAL_1
+                    ItemID.PRIF_TELEPORT_CRYSTAL,
+                    ItemID.MOURNING_TELEPORT_CRYSTAL_5,
+                    ItemID.MOURNING_TELEPORT_CRYSTAL_4,
+                    ItemID.MOURNING_TELEPORT_CRYSTAL_5,
+                    ItemID.MOURNING_TELEPORT_CRYSTAL_2,
+                    ItemID.MOURNING_TELEPORT_CRYSTAL_1
             };
 
     public static final int[] ENCHANTED_LYRE = new int[]
             {
-                    ItemID.ENCHANTED_LYREI,
-                    ItemID.ENCHANTED_LYRE5,
-                    ItemID.ENCHANTED_LYRE4,
-                    ItemID.ENCHANTED_LYRE3,
-                    ItemID.ENCHANTED_LYRE2,
-                    ItemID.ENCHANTED_LYRE1
+                    ItemID.MAGIC_STRUNG_LYRE_INFINITE,
+                    ItemID.MAGIC_STRUNG_LYRE_5,
+                    ItemID.MAGIC_STRUNG_LYRE_4,
+                    ItemID.MAGIC_STRUNG_LYRE_3,
+                    ItemID.MAGIC_STRUNG_LYRE_2,
+                    ItemID.MAGIC_STRUNG_LYRE
             };
 
     public static final int[] SLASH_ITEMS = new int[]
             {
                     ItemID.KNIFE,
-                    ItemID.WILDERNESS_SWORD_1,
-                    ItemID.WILDERNESS_SWORD_2,
-                    ItemID.WILDERNESS_SWORD_3,
-                    ItemID.WILDERNESS_SWORD_4,
+                    ItemID.WILDERNESS_SWORD_EASY,
+                    ItemID.WILDERNESS_SWORD_MEDIUM,
+                    ItemID.WILDERNESS_SWORD_HARD,
+                    ItemID.WILDERNESS_SWORD_ELITE,
                     ItemID.ADAMANT_LONGSWORD,
                     ItemID.ADAMANT_SCIMITAR,
-                    ItemID.AMYS_SAW,
+                    ItemID.WEARABLE_SAW,
                     ItemID.ARCLIGHT,
                     ItemID.ARKAN_BLADE,
                     ItemID.BLACK_LONGSWORD,
                     ItemID.BLACK_SCIMITAR,
                     ItemID.BLADE_OF_SAELDOR,
-                    ItemID.BLADE_OF_SAELDOR_C,
+                    ItemID.BLADE_OF_SAELDOR_INFINITE,
                     ItemID.BLISTERWOOD_SICKLE,
-                    ItemID.BLURITE_SWORD,
-                    ItemID.BRINE_SABRE,
+                    ItemID.FALADIAN_SWORD,
+                    ItemID.OLAF2_BRINE_SABRE,
                     ItemID.BRONZE_LONGSWORD,
                     ItemID.BRONZE_SCIMITAR,
-                    ItemID.CLEAVER,
-                    ItemID.CORRUPTED_VOIDWAKER,
+                    ItemID.HUNDRED_CLEAVER,
+                    ItemID.DEADMAN_BLIGHTED_VOIDWAKER,
                     ItemID.DARKLIGHT,
                     ItemID.DRAGON_LONGSWORD,
-                    ItemID.DRAGON_LONGSWORD_BH,
-                    ItemID.DRAGON_LONGSWORD_CR,
+                    ItemID.BH_DRAGON_LONGSWORD_IMBUE,
+                    ItemID.BH_DRAGON_LONGSWORD_CORRUPTED,
                     ItemID.DRAGON_SCIMITAR,
-                    ItemID.DRAGON_SCIMITAR_CR,
-                    ItemID.DRAGON_SCIMITAR_OR,
+                    ItemID.BH_DRAGON_SCIMITAR_CORRUPTED,
+                    ItemID.DRAGON_SCIMITAR_ORNAMENT,
                     ItemID.EMBERLIGHT,
-                    ItemID.EMERALD_SICKLE_B,
-                    ItemID.ENCHANTED_EMERALD_SICKLE_B,
-                    ItemID.ENCHANTED_RUBY_SICKLE_B,
+                    ItemID.SILVER_SICKLE_EMERALD,
+                    ItemID.SILVER_SICKLE_ENCHANTED,
+                    ItemID.SILVER_SICKLE_RUBY_ENCHANTED,
                     ItemID.EXCALIBUR,
-                    ItemID.FREMENNIK_BLADE,
-                    ItemID.GILDED_SCIMITAR,
+                    ItemID.VIKING_SWORD,
+                    ItemID.RUNE_SCIMITAR_GOLD,
                     ItemID.GRANITE_LONGSWORD,
-                    ItemID.HARRYS_CUTLASS,
+                    ItemID.FEVER_CUTLASS_BRASSHAND_HARRY,
                     ItemID.IRON_LONGSWORD,
                     ItemID.IRON_SCIMITAR,
                     ItemID.IRON_SICKLE,
-                    ItemID.JADE_MACHETE,
+                    ItemID.MACHETTE_JADE,
                     ItemID.KATANA,
-                    ItemID.LUCKY_CUTLASS,
-                    ItemID.MACHETE,
+                    ItemID.FEVER_CUTLASS_UNLUCKY_JENKINS_LUCKY_CUTLASS,
+                    ItemID.MACHETTE,
                     ItemID.MITHRIL_LONGSWORD,
                     ItemID.MITHRIL_SCIMITAR,
-                    ItemID.OPAL_MACHETE,
-                    ItemID.RED_TOPAZ_MACHETE,
-                    ItemID.RUBY_SICKLE_B,
+                    ItemID.MACHETTE_OPAL,
+                    ItemID.MACHETTE_REDTOPAZ,
+                    ItemID.SILVER_SICKLE_RUBY,
                     ItemID.RUNE_LONGSWORD,
                     ItemID.RUNE_SCIMITAR,
                     ItemID.SILVER_SICKLE,
-                    ItemID.SILVER_SICKLE_B,
+                    ItemID.SILVER_SICKLE_BLESSED,
                     ItemID.SILVERLIGHT,
-                    ItemID.SKEWER,
-                    ItemID.STARTER_SWORD,
+                    ItemID.HUNDRED_SKEWER,
+                    ItemID.DEADMAN_STARTER_SWORD,
                     ItemID.STEEL_LONGSWORD,
                     ItemID.STEEL_SCIMITAR,
                     ItemID.SULPHUR_BLADES,
-                    ItemID.TOKTZXILEK,
-                    ItemID.VESTAS_BLIGHTED_LONGSWORD,
+                    ItemID.TZHAAR_KNIFE,
+                    ItemID.BH_VESTAS_LONGSWORD,
                     ItemID.VESTAS_LONGSWORD_BH,
                     ItemID.VOIDWAKER,
-                    ItemID.VOIDWAKER_DEADMAN,
+                    ItemID.DEADMAN_VOIDWAKER,
                     ItemID.WHITE_LONGSWORD,
                     ItemID.WHITE_SCIMITAR,
-                    ItemID.WOODEN_SPOON
+                    ItemID.HUNDRED_SPOON
             };
 
     public static final List<Pair<WorldPoint, WorldPoint>> SLASH_WEB_POINTS = List.<Pair<WorldPoint, WorldPoint>>of(
@@ -301,19 +301,19 @@ public class MovementConstants
     );
 
     public static final int[] geTransports = {
-            ItemID.VARROCK_TELEPORT,
-            ItemID.SKILLS_NECKLACE1,
-            ItemID.SKILLS_NECKLACE2,
-            ItemID.SKILLS_NECKLACE3,
-            ItemID.SKILLS_NECKLACE4,
-            ItemID.SKILLS_NECKLACE5,
-            ItemID.SKILLS_NECKLACE6,
-            ItemID.COMBAT_BRACELET1,
-            ItemID.COMBAT_BRACELET2,
-            ItemID.COMBAT_BRACELET3,
-            ItemID.COMBAT_BRACELET4,
-            ItemID.COMBAT_BRACELET5,
-            ItemID.COMBAT_BRACELET6,
+            ItemID.POH_TABLET_VARROCKTELEPORT,
+            ItemID.JEWL_NECKLACE_OF_SKILLS_1,
+            ItemID.JEWL_NECKLACE_OF_SKILLS_2,
+            ItemID.JEWL_NECKLACE_OF_SKILLS_3,
+            ItemID.JEWL_NECKLACE_OF_SKILLS_4,
+            ItemID.JEWL_NECKLACE_OF_SKILLS_5,
+            ItemID.JEWL_NECKLACE_OF_SKILLS_6,
+            ItemID.JEWL_BRACELET_OF_COMBAT_1,
+            ItemID.JEWL_BRACELET_OF_COMBAT_2,
+            ItemID.JEWL_BRACELET_OF_COMBAT_3,
+            ItemID.JEWL_BRACELET_OF_COMBAT_4,
+            ItemID.JEWL_BRACELET_OF_COMBAT_5,
+            ItemID.JEWL_BRACELET_OF_COMBAT_6,
             ItemID.RING_OF_WEALTH_1,
             ItemID.RING_OF_WEALTH_2,
             ItemID.RING_OF_WEALTH_3,
@@ -324,27 +324,27 @@ public class MovementConstants
             ItemID.RING_OF_WEALTH_I3,
             ItemID.RING_OF_WEALTH_I4,
             ItemID.RING_OF_WEALTH_I5,
-            ItemID.LUMBERYARD_TELEPORT,
-            ItemID.AMULET_OF_ETERNAL_GLORY,
-            ItemID.AMULET_OF_GLORY1,
-            ItemID.AMULET_OF_GLORY2,
-            ItemID.AMULET_OF_GLORY3,
-            ItemID.AMULET_OF_GLORY4,
-            ItemID.AMULET_OF_GLORY5,
-            ItemID.AMULET_OF_GLORY6,
-            ItemID.LUMBRIDGE_TELEPORT
+            ItemID.TELEPORTSCROLL_LUMBERYARD,
+            ItemID.AMULET_OF_GLORY_INF,
+            ItemID.AMULET_OF_GLORY_1,
+            ItemID.AMULET_OF_GLORY_2,
+            ItemID.AMULET_OF_GLORY_3,
+            ItemID.AMULET_OF_GLORY_4,
+            ItemID.AMULET_OF_GLORY_5,
+            ItemID.AMULET_OF_GLORY_6,
+            ItemID.POH_TABLET_LUMBRIDGETELEPORT
     };
 
     public static final int[] QUETZAL_WHISTLE = {
-            ItemID.BASIC_QUETZAL_WHISTLE,
-            ItemID.ENHANCED_QUETZAL_WHISTLE,
-            ItemID.PERFECTED_QUETZAL_WHISTLE
+            ItemID.HG_QUETZALWHISTLE_BASIC,
+            ItemID.HG_QUETZALWHISTLE_ENHANCED,
+            ItemID.HG_QUETZALWHISTLE_PERFECTED
     };
 
     public static final int[] ARDOUGNE_CLOAK = {
-            ItemID.ARDOUGNE_CLOAK_1,
-            ItemID.ARDOUGNE_CLOAK_2,
-            ItemID.ARDOUGNE_CLOAK_3,
-            ItemID.ARDOUGNE_CLOAK_4
+            ItemID.ARDY_CAPE_EASY,
+            ItemID.ARDY_CAPE_MEDIUM,
+            ItemID.ARDY_CAPE_HARD,
+            ItemID.ARDY_CAPE_ELITE
     };
 }

@@ -2,7 +2,7 @@ package com.tonic.api.widgets;
 
 import com.tonic.Static;
 import com.tonic.api.TClient;
-import com.tonic.data.WidgetInfoExtended;
+import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.queries.WidgetQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
@@ -12,10 +12,6 @@ import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.TileObject;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
-
-import java.awt.*;
-import java.awt.event.KeyEvent;
 
 /**
  * Widget API
@@ -106,7 +102,7 @@ public class WidgetAPI
      */
     public static void interact(Widget widget, String menu, String action)
     {
-        if (widget == null)
+        if (widget == null || menu == null || action == null)
             return;
         Static.invoke(() -> interactSubOp(widget, menu, action));
     }
@@ -117,102 +113,28 @@ public class WidgetAPI
 
         ItemComposition composition = client.getItemDefinition(widget.getItemId());
 
-        String[] actions = widget.getActions();
+        String[] actions = composition.getInventoryActions();
         String[][] subOps = composition.getSubops();
 
-        if (subOps == null)
+        if (actions == null || subOps == null)
         {
             return;
         }
 
-        int menuIndex = -1;
-        int actionIndex = -1;
-
-        for (int i = 0; i < actions.length; i++)
+        for (int i = 0; i < actions.length && i < subOps.length && i < InventoryAPI.ITEM_OPS.length; i++)
         {
-            String a = actions[i];
-
-            if (a != null && a.equalsIgnoreCase(menu))
-            {
-                menuIndex = i + 1;
-                break;
-            }
-        }
-
-        for (String[] subOp : subOps)
-        {
-            if (actionIndex != -1)
-                break;
-
-            if (subOp == null)
+            if (subOps[i] == null || !menu.equalsIgnoreCase(actions[i]))
                 continue;
 
-            for (int i = 0; i < subOp.length; i++)
+            for (int j = 0; j < subOps[i].length; j++)
             {
-                String op = subOp[i];
-
-                if (op != null && op.equalsIgnoreCase(action))
+                if (action.equalsIgnoreCase(subOps[i][j]))
                 {
-                    actionIndex = i;
-                    break;
+                    interact(InventoryAPI.ITEM_OPS[i], j, widget.getId(), widget.getIndex(), widget.getItemId());
+                    return;
                 }
             }
         }
-
-        if (menuIndex == -1 || actionIndex == -1)
-        {
-            return;
-        }
-
-        interact(menuIndex, actionIndex, widget.getId(), widget.getIndex(), widget.getItemId());
-    }
-
-    /**
-     * invoke a widget action
-     * @param action action type
-     * @param widgetInfo widget info
-     * @param childId child ID
-     * @param itemId item ID
-     */
-    @SuppressWarnings("deprecation")
-    public static void interact(int action, WidgetInfo widgetInfo, int childId, int itemId)
-    {
-        interact(action, widgetInfo.getId(), childId, itemId);
-    }
-
-    /**
-     * invoke a widget action
-     * @param action action type
-     * @param widgetInfo widget info
-     * @param childId child ID
-     * @param itemId item ID
-     */
-    public static void interact(int action, WidgetInfoExtended widgetInfo, int childId, int itemId)
-    {
-        interact(action, widgetInfo.getId(), childId, itemId);
-    }
-
-    /**
-     * invoke a widget action
-     * @param action action type
-     * @param widgetInfo widget info
-     * @param childId child ID
-     */
-    public static void interact(int action, WidgetInfoExtended widgetInfo, int childId)
-    {
-        interact(action, widgetInfo.getId(), childId);
-    }
-
-    /**
-     * invoke a widget action
-     * @param action action type
-     * @param widgetInfo widget info
-     * @param childId child ID
-     */
-    @SuppressWarnings("deprecation")
-    public static void interact(int action, WidgetInfo widgetInfo, int childId)
-    {
-        interact(action, widgetInfo.getId(), childId, -1);
     }
 
     /**
@@ -431,17 +353,6 @@ public class WidgetAPI
 
     /**
      * Get the text of a widget
-     * @param widgetInfo widget info
-     * @return text
-     */
-    @SuppressWarnings("deprecation")
-    public static String getText(WidgetInfo widgetInfo)
-    {
-        return getText(widgetInfo.getGroupId(), widgetInfo.getChildId());
-    }
-
-    /**
-     * Get the text of a widget
      * @param groupId groupId
      * @param childId childId
      * @return text
@@ -486,30 +397,6 @@ public class WidgetAPI
 
             return widget.getText();
         });
-    }
-
-    /**
-     * Get a widget by WidgetInfo
-     * @param info widget info
-     * @return widget
-     */
-    @SuppressWarnings("deprecation")
-    public static Widget get(WidgetInfo info)
-    {
-        Client client = Static.getClient();
-        return Static.invoke(() -> client.getWidget(info));
-    }
-
-    /**
-     * Get a widget by WidgetInfoExtended
-     * @param info widget info
-     * @return widget
-     */
-    @SuppressWarnings("deprecation")
-    public static Widget get(WidgetInfoExtended info)
-    {
-        Client client = Static.getClient();
-        return Static.invoke(() -> client.getWidget(info.getGroupId(), info.getChildId()));
     }
 
     /**
@@ -589,34 +476,10 @@ public class WidgetAPI
     }
 
     /**
-     * Closes the currently open interface by simulating an ESC key press
-     * TODO: Hack until I get un-lazy and add close int packet to mappings
+     * Closes the currently open interface
      */
     public static void closeInterface()
     {
-        Client client = Static.getClient();
-        Canvas canvas = client.getCanvas();
-        long when = System.currentTimeMillis();
-
-        KeyEvent pressed = new KeyEvent(
-                canvas,
-                KeyEvent.KEY_PRESSED,
-                when,
-                0,
-                KeyEvent.VK_ESCAPE,
-                KeyEvent.CHAR_UNDEFINED
-        );
-
-        KeyEvent released = new KeyEvent(
-                canvas,
-                KeyEvent.KEY_RELEASED,
-                when + 50,
-                0,
-                KeyEvent.VK_ESCAPE,
-                KeyEvent.CHAR_UNDEFINED
-        );
-
-        canvas.dispatchEvent(pressed);
-        canvas.dispatchEvent(released);
+        ClientScriptAPI.closeInterface();
     }
 }

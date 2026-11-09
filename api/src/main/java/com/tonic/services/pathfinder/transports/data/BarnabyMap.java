@@ -4,7 +4,7 @@ import com.tonic.services.pathfinder.requirements.ItemRequirement;
 import com.tonic.services.pathfinder.requirements.Requirements;
 import com.tonic.services.pathfinder.requirements.WorldRequirement;
 import lombok.Getter;
-import net.runelite.api.ItemID;
+import net.runelite.api.gameval.ItemID;
 
 @Getter
 public enum BarnabyMap
@@ -20,7 +20,7 @@ public enum BarnabyMap
         this.barnabyShip = barnabyShip;
         this.destinations = destinations;
         this.requirements = new Requirements();
-        requirements.getItemRequirements().add(new ItemRequirement(false, 30, ItemID.COINS_995));
+        requirements.getItemRequirements().add(new ItemRequirement(false, 30, ItemID.COINS));
         requirements.getWorldRequirements().add(new WorldRequirement(true));
     }
 

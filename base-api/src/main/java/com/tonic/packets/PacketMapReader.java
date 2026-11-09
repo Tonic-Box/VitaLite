@@ -8,8 +8,6 @@ import com.tonic.api.TClient;
 import com.tonic.packets.types.MapEntry;
 import com.tonic.packets.types.PacketDefinition;
 import com.tonic.util.StaticIntFinder;
-import net.runelite.api.NullNpcID;
-import net.runelite.api.NullObjectID;
 import net.runelite.api.gameval.*;
 
 import java.io.*;

@@ -1,11 +1,13 @@
 package com.tonic.api.widgets;
 
+import com.tonic.api.game.VarAPI;
 import com.tonic.data.slayerrewards.BuyTab;
 import com.tonic.data.slayerrewards.ExtendTab;
 import com.tonic.data.slayerrewards.TasksTab;
 import com.tonic.data.slayerrewards.UnlockTab;
 import lombok.Getter;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 
 public class SlayerRewardsAPI
@@ -27,8 +29,6 @@ public class SlayerRewardsAPI
 
     public static int getPoints()
     {
-        Widget widget = WidgetAPI.get(InterfaceID.SlayerRewards.TABS).getChild(8);
-        String text = WidgetAPI.getText(widget);
-        return Integer.parseInt(text.replaceAll("[^0-9]", ""));
+        return VarAPI.getVar(VarbitID.SLAYER_POINTS);
     }
 }

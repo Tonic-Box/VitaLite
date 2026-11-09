@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.Client;
 import net.runelite.api.widgets.Widget;
-import net.runelite.api.widgets.WidgetInfo;
 
 import java.util.Map;
 
@@ -128,13 +127,17 @@ public enum VarrockMuseumAnswer
     private final String question;
     private final String answer;
 
-    public static Widget findCorrect(final Client client, final String question, final WidgetInfo... widgets)
+    public static Widget findCorrect(final Client client, final String question, final int... widgets)
     {
         final String s = MATCHES.get(question);
-
-        for (WidgetInfo widgetInfo : widgets)
+        if (s == null)
         {
-            final Widget widget = client.getWidget(widgetInfo);
+            return null;
+        }
+
+        for (int widgetId : widgets)
+        {
+            final Widget widget = client.getWidget(widgetId);
 
             if (widget != null && widget.getText().toLowerCase().contains(s.toLowerCase()))
             {

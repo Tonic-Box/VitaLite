@@ -1,6 +1,6 @@
 package com.tonic.api.handlers;
 
-import com.tonic.api.entities.PlayerAPI;
+import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.api.entities.TileItemAPI;
 import com.tonic.api.widgets.InventoryAPI;
 import com.tonic.data.wrappers.TileItemEx;
@@ -38,7 +38,7 @@ public class TileItemBuilder extends AbstractHandlerBuilder<TileItemBuilder>
                 TileItemAPI.interact(item, action);
             }
         });
-        addDelayUntil(() -> PlayerAPI.isIdle());
+        addDelayUntil(() -> PlayerEx.getLocal().isIdle());
         return this;
     }
 
@@ -58,7 +58,7 @@ public class TileItemBuilder extends AbstractHandlerBuilder<TileItemBuilder>
                 TileItemAPI.interact(item, action);
             }
         });
-        addDelayUntil(() -> PlayerAPI.isIdle());
+        addDelayUntil(() -> PlayerEx.getLocal().isIdle());
         return this;
     }
 
@@ -78,7 +78,7 @@ public class TileItemBuilder extends AbstractHandlerBuilder<TileItemBuilder>
                 TileItemAPI.interact(item, action);
             }
         });
-        addDelayUntil(() -> PlayerAPI.isIdle());
+        addDelayUntil(() -> PlayerEx.getLocal().isIdle());
         return this;
     }
 
@@ -98,7 +98,7 @@ public class TileItemBuilder extends AbstractHandlerBuilder<TileItemBuilder>
                 TileItemAPI.interact(item, action);
             }
         });
-        addDelayUntil(() -> PlayerAPI.isIdle());
+        addDelayUntil(() -> PlayerEx.getLocal().isIdle());
         return this;
     }
 

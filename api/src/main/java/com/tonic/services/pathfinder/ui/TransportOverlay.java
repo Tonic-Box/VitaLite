@@ -1,10 +1,8 @@
 package com.tonic.services.pathfinder.ui;
 
 import com.google.common.base.Strings;
-import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.ClientScriptAPI;
-import com.tonic.api.threaded.Delays;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.pathfinder.model.TransportDto;
 import com.tonic.services.pathfinder.transports.Transport;
@@ -16,7 +14,6 @@ import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.MenuEntryAdded;
-import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.Overlay;
@@ -70,7 +67,7 @@ public class TransportOverlay extends Overlay
                 {
                     if(t.getId() == -1)
                     {
-                        client.createMenuEntry(1)
+                        client.getMenu().createMenuEntry(1)
                                 .setOption("Hardcoded Transport [-> " + WorldPointUtil.fromCompressed(t.getDestination()) + "]")
                                 .setTarget(color + "Transport ")
                                 .setType(MenuAction.RUNELITE);
@@ -86,7 +83,7 @@ public class TransportOverlay extends Overlay
 
                 TransportDto finalTransport = transport;
                 int finalI = i;
-                client.createMenuEntry(1)
+                client.getMenu().createMenuEntry(1)
                         .setOption("Edit Transport [-> " + transport.getDestination() + "]")
                         .setTarget(color + "Transport ")
                         .setType(MenuAction.RUNELITE)

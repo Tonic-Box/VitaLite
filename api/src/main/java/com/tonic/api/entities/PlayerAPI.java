@@ -6,8 +6,6 @@ import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.queries.PlayerQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
-import net.runelite.api.Client;
-import net.runelite.api.Player;
 
 /**
  * Player API
@@ -67,24 +65,5 @@ public class PlayerAPI extends ActorAPI
             ClickManager.click(ClickType.ACTOR);
             client.getPacketWriter().playerActionPacket(option, index, false);
         });
-    }
-
-    /**
-     * @return The current player
-     */
-    @Deprecated
-    public static PlayerEx getLocal()
-    {
-        return PlayerEx.getLocal();
-    }
-
-    /**
-     * check if the local player is idle
-     * @return true if idle
-     */
-    @Deprecated
-    public static boolean isIdle()
-    {
-        return PlayerEx.getLocal().isIdle();
     }
 }

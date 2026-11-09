@@ -5,7 +5,6 @@ import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.data.wrappers.ItemContainerEx;
 import com.tonic.data.wrappers.ItemEx;
 import com.tonic.data.trading.Shop;
-import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
 import net.runelite.client.util.Text;
 import net.runelite.client.util.WildcardMatcher;
@@ -49,17 +48,6 @@ public class InventoryQuery extends AbstractQuery<ItemEx, InventoryQuery>
     public static InventoryQuery fromContainer(ItemContainer itemContainer)
     {
         return fromInventoryId(itemContainer.getId());
-    }
-
-    /**
-     * Create a query from an InventoryID
-     * @param inventoryId The inventory ID to query from
-     * @return A new InventoryQuery instance
-     */
-    @SuppressWarnings("deprecation")
-    public static InventoryQuery fromInventoryId(InventoryID inventoryId)
-    {
-        return fromInventoryId(inventoryId.getId());
     }
 
     /**

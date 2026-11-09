@@ -17,6 +17,9 @@ import java.util.function.Predicate;
  */
 public class InventoryAPI
 {
+    static final int[] ITEM_OPS = {2, 3, 4, 6, 7};
+    private static final int EXAMINE_OP = 10;
+
     /**
      * Creates an instance of InventoryQuery from the Inventory
      * @return InventoryQuery
@@ -199,7 +202,7 @@ public class InventoryAPI
      * @param action action index
      */
     public static void itemAction(int slot, int id, int action) {
-        if(id == 6512 || id == -1)
+        if(id == ItemID.BLANKOBJECT || id == -1 || action == -1)
             return;
 
         WidgetAPI.interact(action, InterfaceID.Inventory.ITEMS, slot, id);
@@ -274,34 +277,19 @@ public class InventoryAPI
     private static int getAction(ItemEx item, String option)
     {
         option = option.toLowerCase();
-        switch (option)
+        if (option.equals("examine"))
         {
-            case "drop":
-                return 7;
-            case "examine":
-                return 10;
-            case "wear":
-            case "wield":
-            case "equip":
-                return 3;
-            case "rub":
-                return 6;
+            return EXAMINE_OP;
         }
         String[] actions = item.getActions();
-        int index = -1;
-        for(int i = 0; i < actions.length; i++)
+        for (int i = 0; i < actions.length && i < ITEM_OPS.length; i++)
         {
-            if(actions[i] != null && actions[i].toLowerCase().contains(option))
+            if (actions[i] != null && actions[i].toLowerCase().contains(option))
             {
-                index = i;
-                break;
+                return ITEM_OPS[i];
             }
         }
-        if(index == -1)
-        {
-            return -1;
-        }
-        return (index < 4) ? index + 2 : index + 3;
+        return -1;
     }
 
     /**

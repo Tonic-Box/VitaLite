@@ -2,7 +2,6 @@ package com.tonic.api.threaded;
 
 import com.tonic.Logger;
 import com.tonic.Static;
-import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.api.game.VarAPI;
 import com.tonic.api.game.WorldsAPI;
@@ -11,11 +10,11 @@ import com.tonic.api.widgets.TabsAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.data.Tab;
 import com.tonic.data.wrappers.PlayerEx;
-import com.tonic.util.handler.HandlerBuilder;
-import com.tonic.util.handler.StepHandler;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import net.runelite.api.*;
+import net.runelite.api.gameval.VarbitID;
+import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
@@ -24,7 +23,6 @@ import net.runelite.http.api.worlds.WorldType;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -107,8 +105,6 @@ public class Minigames
 
         if (isOpen() && minigamesTeleportButton != null)
         {
-            Client client = Static.getClient();
-
             if (Destination.getCurrent() != destination)
             {
                 ClientScriptAPI.runScript(124, destination.index);
@@ -195,7 +191,7 @@ public class Minigames
      */
     public static Instant getLastMinigameTeleportUsage()
     {
-        return Instant.ofEpochSecond(VarAPI.getVarp(VarPlayer.LAST_MINIGAME_TELEPORT) * 60L);
+        return Instant.ofEpochSecond(VarAPI.getVarp(VarPlayerID.SLUG2_REGIONUID) * 60L);
     }
 
     @Getter
@@ -286,7 +282,7 @@ public class Minigames
                 case TROUBLE_BREWING:
                     return Quest.CABIN_FEVER.getState(client) == QuestState.FINISHED && Static.invoke(() -> client.getRealSkillLevel(Skill.COOKING) >= 40);
                 case TITHE_FARM:
-					return Static.invoke(() -> client.getRealSkillLevel(Skill.FARMING) >= 34) && (VarAPI.getVar(Varbits.KOUREND_FAVOR_HOSIDIUS) / 10) >= 100;
+					return Static.invoke(() -> client.getRealSkillLevel(Skill.FARMING) >= 34) && (VarAPI.getVar(VarbitID.ZEAH_HOSIDIUS) / 10) >= 100;
             }
             return false;
         }

@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.tonic.Static;
 import com.tonic.api.entities.NpcAPI;
-import com.tonic.api.entities.PlayerAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.*;
 import com.tonic.api.handlers.GenericHandlerBuilder;
@@ -30,6 +29,9 @@ import com.tonic.services.pathfinder.transports.data.*;
 import com.tonic.util.WorldPointUtil;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import net.runelite.api.*;
+import net.runelite.api.gameval.ObjectID;
+import net.runelite.api.gameval.NpcID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarPlayerID;
@@ -197,11 +199,11 @@ public class TransportLoader
 
                 if (QuestAPI.getState(Quest.LUNAR_DIPLOMACY) != QuestState.NOT_STARTED || !filter)
                 {
-                    transports.add(npcTransport(new WorldPoint(2222, 3796, 2), new WorldPoint(2130, 3899, 2), NpcID.CAPTAIN_BENTLEY_6650, "Travel"));
-                    transports.add(npcTransport(new WorldPoint(2130, 3899, 2), new WorldPoint(2222, 3796, 2), NpcID.CAPTAIN_BENTLEY_6650, "Travel"));
+                    transports.add(npcTransport(new WorldPoint(2222, 3796, 2), new WorldPoint(2130, 3899, 2), NpcID.LUNAR_PIRATE_CAPTAIN_2OPS, "Travel"));
+                    transports.add(npcTransport(new WorldPoint(2130, 3899, 2), new WorldPoint(2222, 3796, 2), NpcID.LUNAR_PIRATE_CAPTAIN_2OPS, "Travel"));
                 }
 
-                if(QuestAPI.isCompleted(Quest.PANDEMONIUM) && InventoryAPI.count(ItemID.COINS_995) >= 30)
+                if(QuestAPI.isCompleted(Quest.PANDEMONIUM) && InventoryAPI.count(ItemID.COINS) >= 30)
                 {
                     transports.add(npcTransport(new WorldPoint(3027, 3217, 0), new WorldPoint(3065, 3002, 0), "Captain Tobias", "The Pandemonium"));
                     transports.add(npcTransport(new WorldPoint(3064, 3002, 0), new WorldPoint(3029, 3217, 0), "Seaman Morris", "Port Sarim"));
@@ -248,8 +250,8 @@ public class TransportLoader
                 }
 
                 // Pirates cove
-                transports.add(npcTransport(new WorldPoint(2620, 3692, 0), new WorldPoint(2213, 3794, 0), NpcID.LOKAR_SEARUNNER, "Pirate's Cove"));
-                transports.add(npcTransport(new WorldPoint(2213, 3794, 0), new WorldPoint(2620, 3692, 0), NpcID.LOKAR_SEARUNNER_9306, "Rellekka"));
+                transports.add(npcTransport(new WorldPoint(2620, 3692, 0), new WorldPoint(2213, 3794, 0), NpcID.LUNAR_FREMENNIK_PIRATE_BY_PIRATESHIP, "Pirate's Cove"));
+                transports.add(npcTransport(new WorldPoint(2213, 3794, 0), new WorldPoint(2620, 3692, 0), NpcID.LUNAR_FREMENNIK_PIRATE_PIRATECOVE, "Rellekka"));
 
                 // Corsair's Cove
                 if (SkillAPI.getBoostedLevel(Skill.AGILITY) >= 10 || !filter)
@@ -286,8 +288,8 @@ public class TransportLoader
                 }
 
                 // Al Kharid to and from Ruins of Unkah
-                transports.add(npcTransport(new WorldPoint(3272, 3144, 0), new WorldPoint(3148, 2842, 0), NpcID.FERRYMAN_SATHWOOD, "Ferry"));
-                transports.add(npcTransport(new WorldPoint(3148, 2842, 0), new WorldPoint(3272, 3144, 0), NpcID.FERRYMAN_NATHWOOD, "Ferry"));
+                transports.add(npcTransport(new WorldPoint(3272, 3144, 0), new WorldPoint(3148, 2842, 0), NpcID.TEMPOROSS_FERRY_TO_LOBBY_NPC, "Ferry"));
+                transports.add(npcTransport(new WorldPoint(3148, 2842, 0), new WorldPoint(3272, 3144, 0), NpcID.TEMPOROSS_FERRY_FROM_LOBBY_NPC, "Ferry"));
 
                 // Entrana
                 transports.add(npcTransport(new WorldPoint(3041, 3237, 0), new WorldPoint(2834, 3331, 1), 1166, "Take-boat"));
@@ -310,8 +312,8 @@ public class TransportLoader
                         "Row to the barge and travel to the Digsite."));
 
                 // Tower of Life
-                transports.add(trapDoorTransport(new WorldPoint(2648, 3213, 0), new WorldPoint(3038, 4376, 0), ObjectID.TRAPDOOR_21921, ObjectID.TRAPDOOR_21922));
-                transports.add(objectTransport(new WorldPoint(3038, 4376, 0), new WorldPoint(2649, 3212, 0), ObjectID.LADDER_17974, "Climb-up"));
+                transports.add(trapDoorTransport(new WorldPoint(2648, 3213, 0), new WorldPoint(3038, 4376, 0), ObjectID.TOL_TRAPDOOR01, ObjectID.TOL_TRAPDOOR_OPEN));
+                transports.add(objectTransport(new WorldPoint(3038, 4376, 0), new WorldPoint(2649, 3212, 0), ObjectID.AREA_SANGUINE_GHETTO_LADDER_UP, "Climb-up"));
 
                 // Gnome stronghold
                 transports.add(objectDialogTransport(new WorldPoint(2460, 3382, 0), new WorldPoint(2461, 3385, 0), 190, "Open", "Sorry, I'm a bit busy."));
@@ -384,18 +386,18 @@ public class TransportLoader
                 // Rimmington docks to and from Corsair Cove using Captain Tock's ship
                 if (QuestAPI.isCompleted(Quest.THE_CORSAIR_CURSE) || !filter)
                 {
-                    transports.add(npcTransport(new WorldPoint(2910, 3226, 0), new WorldPoint(2578, 2837, 1), NpcID.CABIN_BOY_COLIN_7967, "Travel"));
-                    transports.add(npcTransport(new WorldPoint(2574, 2835, 1), new WorldPoint(2909, 3230, 1), NpcID.CABIN_BOY_COLIN_7967, "Travel"));
+                    transports.add(npcTransport(new WorldPoint(2910, 3226, 0), new WorldPoint(2578, 2837, 1), NpcID.CORSCURS_CABINBOY_2OPS, "Travel"));
+                    transports.add(npcTransport(new WorldPoint(2574, 2835, 1), new WorldPoint(2909, 3230, 1), NpcID.CORSCURS_CABINBOY_2OPS, "Travel"));
                 }
                 else if (VarAPI.getVar(VarbitID.CORSCURS_PROGRESS) >= 15 || !filter)
                 {
-                    transports.add(npcTransport(new WorldPoint(2910, 3226, 0), new WorldPoint(2578, 2837, 1), NpcID.CAPTAIN_TOCK_7958, "Travel"));
-                    transports.add(npcTransport(new WorldPoint(2574, 2835, 1), new WorldPoint(2909, 3230, 1), NpcID.CAPTAIN_TOCK_7958, "Travel"));
+                    transports.add(npcTransport(new WorldPoint(2910, 3226, 0), new WorldPoint(2578, 2837, 1), NpcID.CORSAIR_CAPTAIN_2OPS, "Travel"));
+                    transports.add(npcTransport(new WorldPoint(2574, 2835, 1), new WorldPoint(2909, 3230, 1), NpcID.CORSAIR_CAPTAIN_2OPS, "Travel"));
                 }
 
                 // Draynor Jail
-                transports.add(lockingDoorTransport(new WorldPoint(3123, 3244, 0), new WorldPoint(3123, 3243, 0), ObjectID.PRISON_GATE_2881));
-                transports.add(lockingDoorTransport(new WorldPoint(3123, 3243, 0), new WorldPoint(3123, 3244, 0), ObjectID.PRISON_GATE_2881));
+                transports.add(lockingDoorTransport(new WorldPoint(3123, 3244, 0), new WorldPoint(3123, 3243, 0), ObjectID.ALIDOOR));
+                transports.add(lockingDoorTransport(new WorldPoint(3123, 3243, 0), new WorldPoint(3123, 3244, 0), ObjectID.ALIDOOR));
 
                 // Varrock <-> Varlamore via Regulus Cento
                 if (QuestAPI.isCompleted(Quest.CHILDREN_OF_THE_SUN) || !filter)
@@ -439,7 +441,7 @@ public class TransportLoader
             {
                 computeIfAbsent(LAST_TRANSPORT_LIST, lumbyCave());
             }
-            if(InventoryAPI.count(ItemID.COINS_995) > 10 || InventoryAPI.contains(ItemID.SHANTAY_PASS) || !filter)
+            if(InventoryAPI.count(ItemID.COINS) > 10 || InventoryAPI.contains(ItemID.SHANTAY_PASS) || !filter)
             {
                 computeIfAbsent(LAST_TRANSPORT_LIST, shantyPass());
             }
@@ -1342,14 +1344,14 @@ public class TransportLoader
                         return 1;
                     }
                     TileObjectEx object = new TileObjectQuery()
-                            .withId(ObjectID.SHANTAY_PASS)
+                            .withId(ObjectID.SHANTAY_PASS_HENGE_DOORWAY)
                             .first();
                     TileObjectAPI.interact(object, 0);
                     return 2;
                 })
                 .add(1, () -> {
                     TileObjectEx object = new TileObjectQuery()
-                            .withId(ObjectID.SHANTAY_PASS)
+                            .withId(ObjectID.SHANTAY_PASS_HENGE_DOORWAY)
                             .first();
                     TileObjectAPI.interact(object, 0);
                 })
@@ -1375,20 +1377,20 @@ public class TransportLoader
                     {
                         ItemEx rope = InventoryAPI.getItem(ItemID.ROPE);
                         TileObjectEx object = new TileObjectQuery()
-                                .withId(ObjectID.DARK_HOLE)
+                                .withId(ObjectID.GOBLIN_CAVE_ENTRANCE)
                                 .first();
                         InventoryAPI.useOn(rope, object);
                         return 1;
                     }
                     TileObjectEx object = new TileObjectQuery()
-                            .withId(ObjectID.DARK_HOLE)
+                            .withId(ObjectID.GOBLIN_CAVE_ENTRANCE)
                             .first();
                     TileObjectAPI.interact(object, 0);
                     return 2;
                 })
                 .add(1, () -> {
                     TileObjectEx object = new TileObjectQuery()
-                            .withId(ObjectID.DARK_HOLE)
+                            .withId(ObjectID.GOBLIN_CAVE_ENTRANCE)
                             .first();
                     TileObjectAPI.interact(object, 0);
                     return 2;
