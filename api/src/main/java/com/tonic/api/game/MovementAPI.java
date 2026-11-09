@@ -13,6 +13,8 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarPlayerID;
+import net.runelite.api.gameval.VarbitID;
 
 import java.util.List;
 import java.util.Random;
@@ -22,8 +24,8 @@ import java.util.Random;
  */
 public class MovementAPI {
     private static final Random random = new Random();
-    private static final int STAMINA_VARBIT = 25;
-    private static final int RUN_VARP = 173;
+    private static final int STAMINA_VARBIT = VarbitID.STAMINA_ACTIVE;
+    private static final int RUN_VARP = VarPlayerID.OPTION_RUN;
 
     /**
      * Gets the destination world point of the player
@@ -225,9 +227,7 @@ public class MovementAPI {
         WorldPoint dest = null;
 
         // Define the bounds of the NPC's area
-        int leftBound = x;
         int rightBound = x + width;
-        int bottomBound = y;
         int topBound = y + height;
 
         // Define potential cardinal direction movements
@@ -244,7 +244,7 @@ public class MovementAPI {
             int newY = localPlayer.getY() + dir[1] * distance;
 
             // Ensure the destination is outside the NPC's area and within the specified distance
-            if ((newX < leftBound - distance || newX > rightBound + distance || newY < bottomBound - distance || newY > topBound + distance) &&
+            if ((newX < x - distance || newX > rightBound + distance || newY < y - distance || newY > topBound + distance) &&
                     (newX != localPlayer.getX() || newY != localPlayer.getY())) {
 
                 // Create a new potential destination WorldPoint

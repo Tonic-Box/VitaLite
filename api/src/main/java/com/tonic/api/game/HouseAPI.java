@@ -2,14 +2,14 @@ package com.tonic.api.game;
 
 import com.tonic.data.WorldLocation;
 import com.tonic.util.WorldPointUtil;
-import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.gameval.VarbitID;
 
 /**
  * POH API
  */
 public class HouseAPI {
-    public static final int HOUSE_LOCATION_VARBIT = 2187;
+    public static final int HOUSE_LOCATION_VARBIT = VarbitID.POH_HOUSE_LOCATION;
     public static final WorldLocation[] HOUSE_LOCATIONS = {
             WorldLocation.RIMMINGTON_PORTAL,
             WorldLocation.TAVERLY_POH_PORTAL,
@@ -33,7 +33,7 @@ public class HouseAPI {
         }
 
         int idx = VarAPI.getVar(HOUSE_LOCATION_VARBIT);
-        if (idx >= HOUSE_LOCATIONS.length || idx <= 0)
+        if (idx > HOUSE_LOCATIONS.length || idx <= 0)
         {
             return null;
         }

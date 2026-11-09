@@ -284,7 +284,7 @@ public class Cannon
      */
     public static boolean ensureBalls()
     {
-        return InventoryAPI.containsAny(ItemID.MCANNONBALL);
+        return InventoryAPI.containsAny(ItemID.MCANNONBALL, ItemID.GRANITE_CANNONBALL);
     }
 
     public static void reclaimCannon()
