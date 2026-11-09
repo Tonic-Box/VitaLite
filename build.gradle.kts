@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("2")
+val vitaVersion by extra("3")
 val runeliteVersion by extra("1.13.6")
 
 group = "com.tonic"
@@ -358,9 +358,14 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-bugfix"
+    val title = "${tag}-cleanup"
     val body = "# ${tag}\n" +
-            "- Fixes Jagex Login for profiles plugin\n- New mixin work for VR support";
+            "- Magic spell data and cast checks now use the game's own scripts\n" +
+            "- Fixed bank, inventory, dialogue, make-x, trade and GE interactions\n" +
+            "- Fixed broken transports (fairy rings, charters, canoes, spirit trees, minecarts, teleport items)\n" +
+            "- Fixed stale game data (minigames, prayers, autocast, runes, slayer, emotes, shops)\n" +
+            "- Timed handler waits now time out\n" +
+            "- Removed deprecated RuneLite id use, raw ids now gameval";
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
