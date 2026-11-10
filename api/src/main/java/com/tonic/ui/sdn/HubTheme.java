@@ -14,6 +14,8 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BaseMultiResolutionImage;
 import java.awt.image.BufferedImage;
 
@@ -40,6 +42,7 @@ final class HubTheme {
     private static ImageIcon cog;
     private static ImageIcon trash;
     private static ImageIcon github;
+    private static ImageIcon info;
     private static ImageIcon back;
     private static ImageIcon reload;
     private static ImageIcon more;
@@ -88,6 +91,13 @@ final class HubTheme {
             github = icon(load("/net/runelite/client/plugins/info/github_icon.png"), 16, MUTED);
         }
         return github;
+    }
+
+    static ImageIcon info() {
+        if (info == null) {
+            info = new ImageIcon(new BaseMultiResolutionImage(infoGlyph(1), infoGlyph(2)));
+        }
+        return info;
     }
 
     static ImageIcon back() {
@@ -242,6 +252,20 @@ final class HubTheme {
         for (int index = 0; index < 3; index++) {
             graphics.fillOval((2 + index * 5) * scale - 1 + scale, 8 * scale - size / 2, size, size);
         }
+        graphics.dispose();
+        return image;
+    }
+
+    private static BufferedImage infoGlyph(int scale) {
+        BufferedImage image = new BufferedImage(16 * scale, 16 * scale, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+        graphics.setColor(MUTED);
+        graphics.setStroke(new BasicStroke(1.5f * scale));
+        graphics.draw(new Ellipse2D.Float(1.75f * scale, 1.75f * scale, 12.5f * scale, 12.5f * scale));
+        graphics.fill(new Ellipse2D.Float(7f * scale, 4f * scale, 2f * scale, 2f * scale));
+        graphics.fill(new RoundRectangle2D.Float(7.1f * scale, 7f * scale, 1.8f * scale, 5f * scale, 0.8f * scale, 0.8f * scale));
         graphics.dispose();
         return image;
     }

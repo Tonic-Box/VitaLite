@@ -362,6 +362,7 @@ public class VitaExternalsPanel extends PluginPanel {
         model.description = plugin.description;
         model.requires = plugin.required();
         model.source = plugin.source;
+        model.readme = plugin.readme;
 
         if (installed != null && !entry.isInstalled()) {
             model.version = "Installed from another repository";

@@ -20,6 +20,7 @@ public final class HubPlugin {
     public String sha256;
     public long size;
     public String source;
+    public String readme;
     public String icon;
     public String iconSha256;
 

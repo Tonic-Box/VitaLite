@@ -28,6 +28,7 @@ final class PluginCard extends JPanel {
         Color versionColor;
         List<String> requires = List.of();
         String source;
+        String readme;
         Runnable openConfig;
         Boolean active;
         Consumer<Boolean> setActive;
@@ -165,6 +166,9 @@ final class PluginCard extends JPanel {
 
     private JPanel actions() {
         JPanel actions = HubTheme.row(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+        if (isWebLink(model.readme)) {
+            actions.add(HubTheme.iconButton(HubTheme.info(), "Open the readme in your browser", () -> LinkBrowser.browse(model.readme)));
+        }
         if (hasSource()) {
             actions.add(HubTheme.iconButton(HubTheme.github(), "Open the source on GitHub", () -> LinkBrowser.browse(model.source)));
         }
@@ -181,7 +185,11 @@ final class PluginCard extends JPanel {
     }
 
     private boolean hasSource() {
-        return model.source != null && model.source.startsWith("https://");
+        return isWebLink(model.source);
+    }
+
+    private static boolean isWebLink(String link) {
+        return link != null && link.startsWith("https://");
     }
 
     private boolean canExpand() {
