@@ -36,8 +36,6 @@ public class GCPauseEvent {
         } else if (combined.contains("old") || combined.contains("major") ||
                    combined.contains("full") || combined.contains("mark")) {
             return GCType.OLD;
-        } else if (combined.contains("mixed")) {
-            return GCType.MIXED;
         }
 
         return GCType.UNKNOWN;
@@ -90,7 +88,6 @@ public class GCPauseEvent {
     public enum GCType {
         YOUNG("Young Gen", "Minor collection"),
         OLD("Old Gen", "Major/Full collection"),
-        MIXED("Mixed", "Both generations"),
         UNKNOWN("Unknown", "Unclassified");
 
         private final String label;

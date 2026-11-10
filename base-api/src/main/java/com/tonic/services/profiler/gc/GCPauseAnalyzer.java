@@ -9,257 +9,177 @@ import javax.management.NotificationListener;
 import javax.management.openmbean.CompositeData;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryPoolMXBean;
+import java.lang.management.MemoryType;
 import java.lang.management.MemoryUsage;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Monitors and analyzes GC pause events in real-time
+ * Listens for GC notifications and keeps the most recent pauses, with heap use before and after each
  */
 public class GCPauseAnalyzer implements NotificationListener {
-    private final List<GCPauseEvent> pauseEvents;
-    private final int maxEvents;
-    private volatile boolean monitoring = false;
-    private final List<NotificationEmitter> registeredEmitters;
+    private final int capacity;
+    private final ArrayDeque<GCPauseEvent> events = new ArrayDeque<>();
+    private final List<NotificationEmitter> emitters = new ArrayList<>();
+    private final Set<String> heapPools = new HashSet<>();
+    private final long vmStart = ManagementFactory.getRuntimeMXBean().getStartTime();
 
-    // Statistics
-    private long totalPauses = 0;
-    private long totalPauseTime = 0;
-    private long longestPause = 0;
-    private GCPauseEvent longestPauseEvent = null;
-
-    public GCPauseAnalyzer(int maxEvents) {
-        this.pauseEvents = new CopyOnWriteArrayList<>();
-        this.maxEvents = maxEvents;
-        this.registeredEmitters = new ArrayList<>();
+    /**
+     * Creates the analyzer
+     * @param capacity the number of most recent pauses kept
+     */
+    public GCPauseAnalyzer(int capacity) {
+        this.capacity = capacity;
+        for (MemoryPoolMXBean pool : ManagementFactory.getMemoryPoolMXBeans()) {
+            if (pool.getType() == MemoryType.HEAP) {
+                heapPools.add(pool.getName());
+            }
+        }
     }
 
     /**
-     * Start monitoring GC events
+     * Starts listening to every garbage collector
      */
-    public void startMonitoring() {
-        if (monitoring) {
+    public synchronized void startMonitoring() {
+        if (!emitters.isEmpty()) {
             return;
         }
-
-        monitoring = true;
-
-        // Register listener with all GC beans
-        List<GarbageCollectorMXBean> gcBeans = ManagementFactory.getGarbageCollectorMXBeans();
-        for (GarbageCollectorMXBean gcBean : gcBeans) {
-            if (gcBean instanceof NotificationEmitter) {
-                NotificationEmitter emitter = (NotificationEmitter) gcBean;
+        for (GarbageCollectorMXBean collector : ManagementFactory.getGarbageCollectorMXBeans()) {
+            if (collector instanceof NotificationEmitter) {
+                NotificationEmitter emitter = (NotificationEmitter) collector;
                 emitter.addNotificationListener(this, null, null);
-                registeredEmitters.add(emitter);
+                emitters.add(emitter);
             }
         }
     }
 
     /**
-     * Stop monitoring
+     * Stops listening, safe to call more than once
      */
-    public void stopMonitoring() {
-        monitoring = false;
-
-        // Unregister listeners
-        for (NotificationEmitter emitter : registeredEmitters) {
+    public synchronized void stopMonitoring() {
+        for (NotificationEmitter emitter : emitters) {
             try {
                 emitter.removeNotificationListener(this);
-            } catch (Exception e) {
-                // Ignore
+            } catch (Exception ignored) {
             }
         }
-        registeredEmitters.clear();
+        emitters.clear();
     }
 
     @Override
     public void handleNotification(Notification notification, Object handback) {
-        if (!monitoring) {
+        if (!GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION.equals(notification.getType())) {
             return;
         }
-
-        String notifType = notification.getType();
-        if (!notifType.equals(GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION)) {
-            return;
-        }
-
-        try {
-            CompositeData cd = (CompositeData) notification.getUserData();
-            GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo.from(cd);
-            GcInfo gcInfo = info.getGcInfo();
-
-            String gcName = info.getGcName();
-            String gcAction = info.getGcAction();
-            String gcCause = info.getGcCause();
-            long duration = gcInfo.getDuration();
-            long timestamp = System.currentTimeMillis();
-
-            // Get memory usage before and after
-            Map<String, MemoryUsage> memBefore = gcInfo.getMemoryUsageBeforeGc();
-            Map<String, MemoryUsage> memAfter = gcInfo.getMemoryUsageAfterGc();
-
-            long beforeGC = getTotalUsed(memBefore);
-            long afterGC = getTotalUsed(memAfter);
-            long maxMemory = getTotalMax(memAfter);
-
-            // Create event
-            GCPauseEvent event = new GCPauseEvent(
-                timestamp, gcName, gcAction, gcCause,
-                duration, beforeGC, afterGC, maxMemory
-            );
-
-            // Add to history
-            pauseEvents.add(event);
-            if (pauseEvents.size() > maxEvents) {
-                pauseEvents.remove(0);
-            }
-
-            // Update statistics
-            totalPauses++;
-            totalPauseTime += duration;
-            if (duration > longestPause) {
-                longestPause = duration;
-                longestPauseEvent = event;
-            }
-
-        } catch (Exception e) {
-            System.err.println("Error processing GC notification: " + e.getMessage());
-        }
-    }
-
-    private long getTotalUsed(Map<String, MemoryUsage> memUsage) {
-        long total = 0;
-        for (MemoryUsage usage : memUsage.values()) {
-            total += usage.getUsed();
-        }
-        return total;
-    }
-
-    private long getTotalMax(Map<String, MemoryUsage> memUsage) {
-        long total = 0;
-        for (MemoryUsage usage : memUsage.values()) {
-            long max = usage.getMax();
-            if (max > 0) {
-                total += max;
-            } else {
-                total += usage.getCommitted();
-            }
-        }
-        return total;
+        GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo.from((CompositeData) notification.getUserData());
+        GcInfo gc = info.getGcInfo();
+        Map<String, MemoryUsage> before = gc.getMemoryUsageBeforeGc();
+        Map<String, MemoryUsage> after = gc.getMemoryUsageAfterGc();
+        add(new GCPauseEvent(vmStart + gc.getStartTime(), info.getGcName(), info.getGcAction(), info.getGcCause(), gc.getDuration(), heapUsed(before), heapUsed(after), heapMax(after)));
     }
 
     /**
-     * Get recent pause events
+     * Records a pause, dropping the oldest when full
+     * @param event the pause
      */
-    public List<GCPauseEvent> getRecentEvents(int count) {
-        int size = pauseEvents.size();
-        if (size <= count) {
-            return new ArrayList<>(pauseEvents);
+    public synchronized void add(GCPauseEvent event) {
+        events.addLast(event);
+        while (events.size() > capacity) {
+            events.removeFirst();
         }
-        return new ArrayList<>(pauseEvents.subList(size - count, size));
     }
 
     /**
-     * Get all pause events
+     * Gets the kept pauses
+     * @return the pauses, oldest first
      */
-    public List<GCPauseEvent> getAllEvents() {
-        return new ArrayList<>(pauseEvents);
+    public synchronized List<GCPauseEvent> getEvents() {
+        return new ArrayList<>(events);
     }
 
     /**
-     * Get statistics
+     * Summarises the kept pauses
+     * @return the statistics over every kept pause
      */
     public GCStatistics getStatistics() {
-        if (pauseEvents.isEmpty()) {
-            return new GCStatistics(0, 0, 0, 0, 0, 0, null);
+        List<GCPauseEvent> kept = getEvents();
+        if (kept.isEmpty()) {
+            return new GCStatistics(0, 0, 0, 0, 0, null);
         }
-
-        long avgPause = totalPauses > 0 ? totalPauseTime / totalPauses : 0;
-
-        // Calculate percentiles
-        List<Long> durations = new ArrayList<>();
-        for (GCPauseEvent event : pauseEvents) {
-            durations.add(event.getDuration());
+        long[] durations = new long[kept.size()];
+        long total = 0;
+        GCPauseEvent longest = kept.get(0);
+        for (int index = 0; index < durations.length; index++) {
+            GCPauseEvent event = kept.get(index);
+            durations[index] = event.getDuration();
+            total += event.getDuration();
+            if (event.getDuration() > longest.getDuration()) {
+                longest = event;
+            }
         }
-        Collections.sort(durations);
-
-        long p50 = getPercentile(durations, 0.50);
-        long p95 = getPercentile(durations, 0.95);
-        long p99 = getPercentile(durations, 0.99);
-
-        return new GCStatistics(
-            totalPauses,
-            totalPauseTime,
-            avgPause,
-            longestPause,
-            p95,
-            p99,
-            longestPauseEvent
-        );
+        Arrays.sort(durations);
+        return new GCStatistics(kept.size(), total, total / kept.size(), percentile(durations, 0.95), percentile(durations, 0.99), longest);
     }
 
-    private long getPercentile(List<Long> sorted, double percentile) {
-        if (sorted.isEmpty()) {
-            return 0;
+    private long heapUsed(Map<String, MemoryUsage> pools) {
+        long used = 0;
+        for (Map.Entry<String, MemoryUsage> pool : pools.entrySet()) {
+            if (heapPools.contains(pool.getKey())) {
+                used += pool.getValue().getUsed();
+            }
         }
-        int index = (int) Math.ceil(percentile * sorted.size()) - 1;
-        index = Math.max(0, Math.min(index, sorted.size() - 1));
-        return sorted.get(index);
+        return used;
     }
 
-    /**
-     * Get pause events by type
-     */
-    public Map<GCPauseEvent.GCType, List<GCPauseEvent>> getEventsByType() {
-        Map<GCPauseEvent.GCType, List<GCPauseEvent>> byType = new HashMap<>();
-        for (GCPauseEvent.GCType type : GCPauseEvent.GCType.values()) {
-            byType.put(type, new ArrayList<>());
+    private long heapMax(Map<String, MemoryUsage> pools) {
+        long max = 0;
+        for (Map.Entry<String, MemoryUsage> pool : pools.entrySet()) {
+            if (heapPools.contains(pool.getKey())) {
+                MemoryUsage usage = pool.getValue();
+                max += usage.getMax() > 0 ? usage.getMax() : usage.getCommitted();
+            }
         }
+        return max;
+    }
 
-        for (GCPauseEvent event : pauseEvents) {
-            byType.get(event.getGcType()).add(event);
-        }
-
-        return byType;
+    private static long percentile(long[] sorted, double fraction) {
+        int index = (int) Math.ceil(fraction * sorted.length) - 1;
+        return sorted[Math.max(0, Math.min(index, sorted.length - 1))];
     }
 
     /**
-     * Clear all events and statistics
-     */
-    public void clear() {
-        pauseEvents.clear();
-        totalPauses = 0;
-        totalPauseTime = 0;
-        longestPause = 0;
-        longestPauseEvent = null;
-    }
-
-    public boolean isMonitoring() {
-        return monitoring;
-    }
-
-    /**
-     * GC Statistics summary
+     * Statistics over the kept pauses
      */
     public static class GCStatistics {
-        public final long totalPauses;
+        public final int pauses;
         public final long totalPauseTime;
-        public final long avgPause;
-        public final long longestPause;
+        public final long averagePause;
         public final long p95Pause;
         public final long p99Pause;
-        public final GCPauseEvent longestPauseEvent;
+        public final GCPauseEvent longest;
 
-        public GCStatistics(long totalPauses, long totalPauseTime, long avgPause,
-                           long longestPause, long p95Pause, long p99Pause,
-                           GCPauseEvent longestPauseEvent) {
-            this.totalPauses = totalPauses;
+        /**
+         * Creates the statistics
+         * @param pauses the number of pauses
+         * @param totalPauseTime their total duration in milliseconds
+         * @param averagePause their mean duration in milliseconds
+         * @param p95Pause the 95th percentile duration in milliseconds
+         * @param p99Pause the 99th percentile duration in milliseconds
+         * @param longest the longest pause, or null with none
+         */
+        public GCStatistics(int pauses, long totalPauseTime, long averagePause, long p95Pause, long p99Pause, GCPauseEvent longest) {
+            this.pauses = pauses;
             this.totalPauseTime = totalPauseTime;
-            this.avgPause = avgPause;
-            this.longestPause = longestPause;
+            this.averagePause = averagePause;
             this.p95Pause = p95Pause;
             this.p99Pause = p99Pause;
-            this.longestPauseEvent = longestPauseEvent;
+            this.longest = longest;
         }
     }
 }
