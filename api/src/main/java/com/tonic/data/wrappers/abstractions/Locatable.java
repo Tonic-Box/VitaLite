@@ -69,7 +69,12 @@ public interface Locatable
 
     default int distanceTo(WorldPoint other)
     {
-        var path = SceneAPI.pathTo(getInteractionPoint(), other);
+        WorldPoint from = getInteractionPoint();
+        if (from == null || other == null)
+        {
+            return Integer.MAX_VALUE;
+        }
+        var path = SceneAPI.pathTo(from, other);
         return path != null ? path.size() : Integer.MAX_VALUE;
     }
 
