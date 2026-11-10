@@ -11,9 +11,9 @@ import com.tonic.services.profiler.recording.MethodTimingResults;
 import com.tonic.services.profiler.recording.CallTreeNode;
 import com.tonic.services.profiler.sampling.CPUSampler;
 import com.tonic.services.profiler.sampling.MemorySampler;
-import com.tonic.services.profiler.sampling.StackSample;
-import com.tonic.services.profiler.sampling.HeapHistogramSample;
+import com.tonic.services.profiler.heap.HeapSnapshot;
 import com.tonic.services.profiler.sampling.SampleAnalyzer;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,7 +31,6 @@ import java.util.concurrent.Executors;
 /**
  * HTTP REST API server for profiler data access.
  * Enables LLMs and external tools to query profiler metrics.
- *
  * Endpoints:
  *   GET  /profiler/status              - Server and profiler status
  *   GET  /profiler/exact               - MethodProfiler exact timing data
@@ -49,7 +48,9 @@ public class ProfilerServer {
     private static ProfilerServer instance;
 
     private HttpServer server;
+    @Getter
     private int port = 8787;
+    @Getter
     private volatile boolean running = false;
 
     // JFR state
@@ -57,12 +58,12 @@ public class ProfilerServer {
     private MethodTimingResults lastJFRResults;
 
     // Sampling state
-    private CPUSampler cpuSampler;
-    private MemorySampler memorySampler;
+    private final CPUSampler cpuSampler;
+    private final MemorySampler memorySampler;
     private final SampleAnalyzer sampleAnalyzer = new SampleAnalyzer();
 
     // Resource metrics
-    private ResourceMetricsCollector metricsCollector;
+    private final ResourceMetricsCollector metricsCollector;
 
     private ProfilerServer() {
         jfrRecorder = new JFRMethodRecorder();
@@ -149,120 +150,112 @@ public class ProfilerServer {
         System.out.println("[ProfilerServer] Stopped");
     }
 
-    public boolean isRunning() {
-        return running;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
     // ==================== HANDLERS ====================
 
     private void handleRoot(HttpExchange exchange) throws IOException {
         // Serve help/documentation for any request to root or /profiler without sub-path
         String path = exchange.getRequestURI().getPath();
         if (path.equals("/") || path.equals("/profiler") || path.equals("/profiler/")) {
-            StringBuilder json = new StringBuilder();
-            json.append("{\n");
-            json.append("  \"name\": \"VitaLite Profiler API\",\n");
-            json.append("  \"version\": \"1.0\",\n");
-            json.append("  \"description\": \"REST API for accessing JVM profiler data. Designed for LLM integration.\",\n");
-            json.append("  \"endpoints\": {\n");
 
-            // Status
-            json.append("    \"status\": {\n");
-            json.append("      \"GET /profiler/status\": \"Server and profiler status overview\"\n");
-            json.append("    },\n");
+            String json = "{\n" +
+                    "  \"name\": \"VitaLite Profiler API\",\n" +
+                    "  \"version\": \"1.0\",\n" +
+                    "  \"description\": \"REST API for accessing JVM profiler data. Designed for LLM integration.\",\n" +
+                    "  \"endpoints\": {\n" +
 
-            // Exact timing
-            json.append("    \"exact_timing\": {\n");
-            json.append("      \"description\": \"Manual method timing via MethodProfiler.begin()/end() instrumentation\",\n");
-            json.append("      \"GET /profiler/exact\": \"All exact timing data as JSON\",\n");
-            json.append("      \"GET /profiler/exact/csv\": \"All exact timing data as CSV\",\n");
-            json.append("      \"POST /profiler/exact/enable\": \"Enable MethodProfiler (starts collecting data)\",\n");
-            json.append("      \"POST /profiler/exact/disable\": \"Disable MethodProfiler (zero overhead when disabled)\",\n");
-            json.append("      \"POST /profiler/exact/clear\": \"Clear all collected timing data\"\n");
-            json.append("    },\n");
+                    // Status
+                    "    \"status\": {\n" +
+                    "      \"GET /profiler/status\": \"Server and profiler status overview\"\n" +
+                    "    },\n" +
 
-            // JFR
-            json.append("    \"jfr_sampling\": {\n");
-            json.append("      \"description\": \"JVM Flight Recorder sampling profiler for statistical CPU profiling\",\n");
-            json.append("      \"GET /profiler/jfr\": \"Results from last JFR recording session\",\n");
-            json.append("      \"POST /profiler/jfr/start\": \"Start JFR recording. Optional: ?period=N (sample period in ms, default 10)\",\n");
-            json.append("      \"POST /profiler/jfr/stop\": \"Stop JFR recording and analyze results\"\n");
-            json.append("    },\n");
+                    // Exact timing
+                    "    \"exact_timing\": {\n" +
+                    "      \"description\": \"Manual method timing via MethodProfiler.begin()/end() instrumentation\",\n" +
+                    "      \"GET /profiler/exact\": \"All exact timing data as JSON\",\n" +
+                    "      \"GET /profiler/exact/csv\": \"All exact timing data as CSV\",\n" +
+                    "      \"POST /profiler/exact/enable\": \"Enable MethodProfiler (starts collecting data)\",\n" +
+                    "      \"POST /profiler/exact/disable\": \"Disable MethodProfiler (zero overhead when disabled)\",\n" +
+                    "      \"POST /profiler/exact/clear\": \"Clear all collected timing data\"\n" +
+                    "    },\n" +
 
-            // Analysis
-            json.append("    \"analysis\": {\n");
-            json.append("      \"description\": \"Higher-level analysis endpoints for JFR data\",\n");
-            json.append("      \"GET /profiler/hotspots\": \"Top methods by CPU time. Optional: ?top=N (default 10)\",\n");
-            json.append("      \"GET /profiler/method\": \"Method details with callers/callees. Required: ?name=ClassName.methodName\"\n");
-            json.append("    },\n");
+                    // JFR
+                    "    \"jfr_sampling\": {\n" +
+                    "      \"description\": \"JVM Flight Recorder sampling profiler for statistical CPU profiling\",\n" +
+                    "      \"GET /profiler/jfr\": \"Results from last JFR recording session\",\n" +
+                    "      \"POST /profiler/jfr/start\": \"Start JFR recording. Optional: ?period=N (sample period in ms, default 10)\",\n" +
+                    "      \"POST /profiler/jfr/stop\": \"Stop JFR recording and analyze results\"\n" +
+                    "    },\n" +
 
-            // CPU sampling
-            json.append("    \"cpu_sampling\": {\n");
-            json.append("      \"description\": \"Stack trace sampling for CPU profiling\",\n");
-            json.append("      \"GET /profiler/cpu\": \"CPU sampling results with top methods and packages\",\n");
-            json.append("      \"POST /profiler/cpu/start\": \"Start CPU sampling. Optional: ?interval=N (ms, default 50)\",\n");
-            json.append("      \"POST /profiler/cpu/stop\": \"Stop CPU sampling\",\n");
-            json.append("      \"POST /profiler/cpu/clear\": \"Clear CPU sampling data\"\n");
-            json.append("    },\n");
+                    // Analysis
+                    "    \"analysis\": {\n" +
+                    "      \"description\": \"Higher-level analysis endpoints for JFR data\",\n" +
+                    "      \"GET /profiler/hotspots\": \"Top methods by CPU time. Optional: ?top=N (default 10)\",\n" +
+                    "      \"GET /profiler/method\": \"Method details with callers/callees. Required: ?name=ClassName.methodName\"\n" +
+                    "    },\n" +
 
-            // Memory sampling
-            json.append("    \"memory_sampling\": {\n");
-            json.append("      \"description\": \"Heap and GC tracking\",\n");
-            json.append("      \"GET /profiler/memory\": \"Memory sampling results with allocation rates and GC stats\",\n");
-            json.append("      \"GET /profiler/memory/histogram\": \"Heap histogram (top classes by size). Optional: ?top=N (default 50)\",\n");
-            json.append("      \"POST /profiler/memory/start\": \"Start memory sampling. Optional: ?interval=N (ms, default 1000)\",\n");
-            json.append("      \"POST /profiler/memory/stop\": \"Stop memory sampling\"\n");
-            json.append("    },\n");
+                    // CPU sampling
+                    "    \"cpu_sampling\": {\n" +
+                    "      \"description\": \"Stack trace sampling for CPU profiling\",\n" +
+                    "      \"GET /profiler/cpu\": \"CPU sampling results with top methods and packages\",\n" +
+                    "      \"POST /profiler/cpu/start\": \"Start CPU sampling. Optional: ?interval=N (ms, default 50)\",\n" +
+                    "      \"POST /profiler/cpu/stop\": \"Stop CPU sampling\",\n" +
+                    "      \"POST /profiler/cpu/clear\": \"Clear CPU sampling data\"\n" +
+                    "    },\n" +
 
-            // Resources
-            json.append("    \"resources\": {\n");
-            json.append("      \"description\": \"Live JVM resource metrics\",\n");
-            json.append("      \"GET /profiler/resources\": \"Current CPU, heap, metaspace, code cache, and thread stats\"\n");
-            json.append("    },\n");
+                    // Memory sampling
+                    "    \"memory_sampling\": {\n" +
+                    "      \"description\": \"Heap and GC tracking\",\n" +
+                    "      \"GET /profiler/memory\": \"Memory sampling results with allocation rates and GC stats\",\n" +
+                    "      \"GET /profiler/memory/histogram\": \"Heap histogram (top classes by size). Optional: ?top=N (default 50)\",\n" +
+                    "      \"POST /profiler/memory/start\": \"Start memory sampling. Optional: ?interval=N (ms, default 1000)\",\n" +
+                    "      \"POST /profiler/memory/stop\": \"Stop memory sampling\"\n" +
+                    "    },\n" +
 
-            // Threads
-            json.append("    \"threads\": {\n");
-            json.append("      \"description\": \"Thread information and stack traces\",\n");
-            json.append("      \"GET /profiler/threads\": \"All threads with state info. Optional: ?stacks=true&depth=N\"\n");
-            json.append("    },\n");
+                    // Resources
+                    "    \"resources\": {\n" +
+                    "      \"description\": \"Live JVM resource metrics\",\n" +
+                    "      \"GET /profiler/resources\": \"Current CPU, heap, metaspace, code cache, and thread stats\"\n" +
+                    "    },\n" +
 
-            // GC control
-            json.append("    \"gc\": {\n");
-            json.append("      \"description\": \"Garbage collection control\",\n");
-            json.append("      \"POST /profiler/gc\": \"Trigger full GC and report memory freed\"\n");
-            json.append("    }\n");
-            json.append("  },\n");
+                    // Threads
+                    "    \"threads\": {\n" +
+                    "      \"description\": \"Thread information and stack traces\",\n" +
+                    "      \"GET /profiler/threads\": \"All threads with state info. Optional: ?stacks=true&depth=N\"\n" +
+                    "    },\n" +
 
-            // Quick start
-            json.append("  \"quick_start\": {\n");
-            json.append("    \"1_check_status\": \"GET /profiler/status\",\n");
-            json.append("    \"2a_exact_timing\": [\n");
-            json.append("      \"POST /profiler/exact/enable\",\n");
-            json.append("      \"(run your code with MethodProfiler instrumentation)\",\n");
-            json.append("      \"GET /profiler/exact\"\n");
-            json.append("    ],\n");
-            json.append("    \"2b_jfr_sampling\": [\n");
-            json.append("      \"POST /profiler/jfr/start?period=10\",\n");
-            json.append("      \"(run your code for a few seconds)\",\n");
-            json.append("      \"POST /profiler/jfr/stop\",\n");
-            json.append("      \"GET /profiler/hotspots?top=10\"\n");
-            json.append("    ]\n");
-            json.append("  },\n");
+                    // GC control
+                    "    \"gc\": {\n" +
+                    "      \"description\": \"Garbage collection control\",\n" +
+                    "      \"POST /profiler/gc\": \"Trigger full GC and report memory freed\"\n" +
+                    "    }\n" +
+                    "  },\n" +
 
-            // Tips for LLMs
-            json.append("  \"llm_tips\": {\n");
-            json.append("    \"workflow\": \"Use /profiler/status first to check what data is available\",\n");
-            json.append("    \"exact_vs_jfr\": \"Exact timing is precise but requires code instrumentation. JFR sampling works on any code with statistical accuracy.\",\n");
-            json.append("    \"hotspots\": \"Start with /profiler/hotspots to find slow methods, then use /profiler/method?name=X for caller/callee analysis\",\n");
-            json.append("    \"confidence\": \"JFR results include confidence levels: HIGH (100+ samples), MEDIUM (30+), LOW (10+), VERY_LOW (<10)\"\n");
-            json.append("  }\n");
-            json.append("}\n");
+                    // Quick start
+                    "  \"quick_start\": {\n" +
+                    "    \"1_check_status\": \"GET /profiler/status\",\n" +
+                    "    \"2a_exact_timing\": [\n" +
+                    "      \"POST /profiler/exact/enable\",\n" +
+                    "      \"(run your code with MethodProfiler instrumentation)\",\n" +
+                    "      \"GET /profiler/exact\"\n" +
+                    "    ],\n" +
+                    "    \"2b_jfr_sampling\": [\n" +
+                    "      \"POST /profiler/jfr/start?period=10\",\n" +
+                    "      \"(run your code for a few seconds)\",\n" +
+                    "      \"POST /profiler/jfr/stop\",\n" +
+                    "      \"GET /profiler/hotspots?top=10\"\n" +
+                    "    ]\n" +
+                    "  },\n" +
 
-            sendJson(exchange, 200, json.toString());
+                    // Tips for LLMs
+                    "  \"llm_tips\": {\n" +
+                    "    \"workflow\": \"Use /profiler/status first to check what data is available\",\n" +
+                    "    \"exact_vs_jfr\": \"Exact timing is precise but requires code instrumentation. JFR sampling works on any code with statistical accuracy.\",\n" +
+                    "    \"hotspots\": \"Start with /profiler/hotspots to find slow methods, then use /profiler/method?name=X for caller/callee analysis\",\n" +
+                    "    \"confidence\": \"JFR results include confidence levels: HIGH (100+ samples), MEDIUM (30+), LOW (10+), VERY_LOW (<10)\"\n" +
+                    "  }\n" +
+                    "}\n";
+
+            sendJson(exchange, 200, json);
             return;
         }
         // For other paths under /profiler that don't match, return 404
@@ -272,31 +265,30 @@ public class ProfilerServer {
     private void handleStatus(HttpExchange exchange) throws IOException {
         if (!checkGet(exchange)) return;
 
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"server\":{");
-        json.append("\"running\":true,");
-        json.append("\"port\":").append(port);
-        json.append("},");
-        json.append("\"exact\":{");
-        json.append("\"enabled\":").append(MethodProfiler.isEnabled()).append(",");
-        json.append("\"methodCount\":").append(MethodProfiler.getMethodCount());
-        json.append("},");
-        json.append("\"jfr\":{");
-        json.append("\"available\":").append(JFRMethodRecorder.isAvailable()).append(",");
-        json.append("\"recording\":").append(jfrRecorder != null && isJFRRecording()).append(",");
-        json.append("\"hasResults\":").append(lastJFRResults != null);
-        json.append("},");
-        json.append("\"cpu\":{");
-        json.append("\"running\":").append(cpuSampler.isRunning()).append(",");
-        json.append("\"totalSamples\":").append(cpuSampler.getTotalSamples());
-        json.append("},");
-        json.append("\"memory\":{");
-        json.append("\"running\":").append(memorySampler.isRunning()).append(",");
-        json.append("\"totalSamples\":").append(memorySampler.getTotalSamples());
-        json.append("}}");
+        String json = "{" +
+                "\"server\":{" +
+                "\"running\":true," +
+                "\"port\":" + port +
+                "}," +
+                "\"exact\":{" +
+                "\"enabled\":" + MethodProfiler.isEnabled() + "," +
+                "\"methodCount\":" + MethodProfiler.getMethodCount() +
+                "}," +
+                "\"jfr\":{" +
+                "\"available\":" + JFRMethodRecorder.isAvailable() + "," +
+                "\"recording\":" + (jfrRecorder != null && isJFRRecording()) + "," +
+                "\"hasResults\":" + (lastJFRResults != null) +
+                "}," +
+                "\"cpu\":{" +
+                "\"running\":" + cpuSampler.isRunning() + "," +
+                "\"totalSamples\":" + cpuSampler.getTotalSamples() +
+                "}," +
+                "\"memory\":{" +
+                "\"running\":" + memorySampler.isRunning() + "," +
+                "\"totalSamples\":" + memorySampler.getTotalSamples() +
+                "}}";
 
-        sendJson(exchange, 200, json.toString());
+        sendJson(exchange, 200, json);
     }
 
     private void handleExact(HttpExchange exchange) throws IOException {
@@ -422,14 +414,13 @@ public class ProfilerServer {
             jfrRecorder.stopRecording();
             lastJFRResults = jfrRecorder.analyze();
 
-            StringBuilder json = new StringBuilder();
-            json.append("{\"success\":true,\"recording\":false,");
-            json.append("\"totalSamples\":").append(lastJFRResults.totalSamples).append(",");
-            json.append("\"methodCount\":").append(lastJFRResults.getMethodCount()).append(",");
-            json.append("\"durationMs\":").append(lastJFRResults.recordingEndTime - lastJFRResults.recordingStartTime);
-            json.append("}");
+            String json = "{\"success\":true,\"recording\":false," +
+                    "\"totalSamples\":" + lastJFRResults.totalSamples + "," +
+                    "\"methodCount\":" + lastJFRResults.getMethodCount() + "," +
+                    "\"durationMs\":" + (lastJFRResults.recordingEndTime - lastJFRResults.recordingStartTime) +
+                    "}";
 
-            sendJson(exchange, 200, json.toString());
+            sendJson(exchange, 200, json);
         } catch (Exception e) {
             sendJson(exchange, 500, "{\"success\":false,\"error\":\"" + escapeJson(e.getMessage()) + "\"}");
         }
@@ -630,24 +621,23 @@ public class ProfilerServer {
             memorySampler.getGCSamples()
         );
 
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"running\":").append(stats.running).append(",");
-        json.append("\"totalSamples\":").append(stats.totalSamples).append(",");
-        json.append("\"currentHeapSamples\":").append(stats.currentHeapSamples).append(",");
-        json.append("\"gcEventCount\":").append(stats.gcEventCount).append(",");
-        json.append("\"intervalMs\":").append(stats.intervalMs).append(",");
-        json.append("\"analysis\":{");
-        json.append("\"averageAllocationRateMBps\":").append(String.format("%.2f", analysis.averageAllocationRate)).append(",");
-        json.append("\"peakAllocationRateMBps\":").append(String.format("%.2f", analysis.peakAllocationRate)).append(",");
-        json.append("\"totalEstimatedAllocationMB\":").append(String.format("%.2f", analysis.totalEstimatedAllocation)).append(",");
-        json.append("\"heapGrowthTrend\":\"").append(analysis.heapGrowthTrend).append("\",");
-        json.append("\"totalGCEvents\":").append(analysis.totalGCEvents).append(",");
-        json.append("\"averageGCOverheadPercent\":").append(String.format("%.2f", analysis.averageGCOverhead)).append(",");
-        json.append("\"fullGCCount\":").append(analysis.fullGCCount);
-        json.append("}}");
+        String json = "{" +
+                "\"running\":" + stats.running + "," +
+                "\"totalSamples\":" + stats.totalSamples + "," +
+                "\"currentHeapSamples\":" + stats.currentHeapSamples + "," +
+                "\"gcEventCount\":" + stats.gcEventCount + "," +
+                "\"intervalMs\":" + stats.intervalMs + "," +
+                "\"analysis\":{" +
+                "\"averageAllocationRateMBps\":" + String.format("%.2f", analysis.averageAllocationRate) + "," +
+                "\"peakAllocationRateMBps\":" + String.format("%.2f", analysis.peakAllocationRate) + "," +
+                "\"totalEstimatedAllocationMB\":" + String.format("%.2f", analysis.totalEstimatedAllocation) + "," +
+                "\"heapGrowthTrend\":\"" + analysis.heapGrowthTrend + "\"," +
+                "\"totalGCEvents\":" + analysis.totalGCEvents + "," +
+                "\"averageGCOverheadPercent\":" + String.format("%.2f", analysis.averageGCOverhead) + "," +
+                "\"fullGCCount\":" + analysis.fullGCCount +
+                "}}";
 
-        sendJson(exchange, 200, json.toString());
+        sendJson(exchange, 200, json);
     }
 
     private void handleMemoryStart(HttpExchange exchange) throws IOException {
@@ -687,25 +677,27 @@ public class ProfilerServer {
             // Use default
         }
 
-        List<HeapHistogramSample> histogram = memorySampler.captureHeapHistogram();
+        HeapSnapshot snapshot = HeapSnapshot.capture();
 
         StringBuilder json = new StringBuilder();
         json.append("{");
-        json.append("\"timestamp\":").append(System.currentTimeMillis()).append(",");
-        json.append("\"classCount\":").append(histogram.size()).append(",");
+        json.append("\"timestamp\":").append(snapshot.time).append(",");
+        json.append("\"classCount\":").append(snapshot.classes.size()).append(",");
+        json.append("\"totalInstances\":").append(snapshot.totalInstances).append(",");
+        json.append("\"totalBytes\":").append(snapshot.totalBytes).append(",");
         json.append("\"classes\":[");
 
         boolean first = true;
         int count = 0;
-        for (HeapHistogramSample h : histogram) {
+        for (HeapSnapshot.ClassCount h : snapshot.classes) {
             if (count++ >= top) break;
             if (!first) json.append(",");
             first = false;
             json.append("{");
-            json.append("\"className\":\"").append(escapeJson(h.className)).append("\",");
-            json.append("\"instanceCount\":").append(h.instanceCount).append(",");
-            json.append("\"totalBytes\":").append(h.totalBytes).append(",");
-            json.append("\"totalMB\":").append(String.format("%.2f", h.totalBytes / (1024.0 * 1024.0)));
+            json.append("\"className\":\"").append(escapeJson(h.displayName())).append("\",");
+            json.append("\"instanceCount\":").append(h.instances).append(",");
+            json.append("\"totalBytes\":").append(h.bytes).append(",");
+            json.append("\"totalMB\":").append(String.format(java.util.Locale.ROOT, "%.2f", h.bytes / (1024.0 * 1024.0)));
             json.append("}");
         }
 
@@ -720,54 +712,51 @@ public class ProfilerServer {
 
         MetricSnapshot snapshot = metricsCollector.collect();
 
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"timestamp\":").append(snapshot.timestamp).append(",");
+        String json = "{" +
+                "\"timestamp\":" + snapshot.timestamp + "," +
 
-        // CPU & GC
-        json.append("\"cpu\":{");
-        json.append("\"percent\":").append(String.format("%.2f", snapshot.cpuPercent));
-        json.append("},");
+                // CPU & GC
+                "\"cpu\":{" +
+                "\"percent\":" + String.format("%.2f", snapshot.cpuPercent) +
+                "}," +
+                "\"gc\":{" +
+                "\"percent\":" + String.format("%.2f", snapshot.gcPercent) + "," +
+                "\"count\":" + snapshot.gcCount + "," +
+                "\"totalTimeMs\":" + snapshot.gcTime +
+                "}," +
 
-        json.append("\"gc\":{");
-        json.append("\"percent\":").append(String.format("%.2f", snapshot.gcPercent)).append(",");
-        json.append("\"count\":").append(snapshot.gcCount).append(",");
-        json.append("\"totalTimeMs\":").append(snapshot.gcTime);
-        json.append("},");
+                // Heap
+                "\"heap\":{" +
+                "\"usedBytes\":" + snapshot.heapUsed + "," +
+                "\"usedMB\":" + String.format("%.2f", snapshot.heapUsed / (1024.0 * 1024.0)) + "," +
+                "\"committedBytes\":" + snapshot.heapCommitted + "," +
+                "\"maxBytes\":" + snapshot.heapMax + "," +
+                "\"utilizationPercent\":" + String.format("%.2f", snapshot.getHeapUtilization()) +
+                "}," +
 
-        // Heap
-        json.append("\"heap\":{");
-        json.append("\"usedBytes\":").append(snapshot.heapUsed).append(",");
-        json.append("\"usedMB\":").append(String.format("%.2f", snapshot.heapUsed / (1024.0 * 1024.0))).append(",");
-        json.append("\"committedBytes\":").append(snapshot.heapCommitted).append(",");
-        json.append("\"maxBytes\":").append(snapshot.heapMax).append(",");
-        json.append("\"utilizationPercent\":").append(String.format("%.2f", snapshot.getHeapUtilization()));
-        json.append("},");
+                // Metaspace
+                "\"metaspace\":{" +
+                "\"usedBytes\":" + snapshot.metaspaceUsed + "," +
+                "\"usedMB\":" + String.format("%.2f", snapshot.metaspaceUsed / (1024.0 * 1024.0)) + "," +
+                "\"committedBytes\":" + snapshot.metaspaceCommitted + "," +
+                "\"maxBytes\":" + snapshot.metaspaceMax +
+                "}," +
 
-        // Metaspace
-        json.append("\"metaspace\":{");
-        json.append("\"usedBytes\":").append(snapshot.metaspaceUsed).append(",");
-        json.append("\"usedMB\":").append(String.format("%.2f", snapshot.metaspaceUsed / (1024.0 * 1024.0))).append(",");
-        json.append("\"committedBytes\":").append(snapshot.metaspaceCommitted).append(",");
-        json.append("\"maxBytes\":").append(snapshot.metaspaceMax);
-        json.append("},");
+                // Code Cache
+                "\"codeCache\":{" +
+                "\"usedBytes\":" + snapshot.codeCacheUsed + "," +
+                "\"maxBytes\":" + snapshot.codeCacheMax +
+                "}," +
 
-        // Code Cache
-        json.append("\"codeCache\":{");
-        json.append("\"usedBytes\":").append(snapshot.codeCacheUsed).append(",");
-        json.append("\"maxBytes\":").append(snapshot.codeCacheMax);
-        json.append("},");
-
-        // Threads
-        json.append("\"threads\":{");
-        json.append("\"count\":").append(snapshot.threadCount).append(",");
-        json.append("\"daemonCount\":").append(snapshot.daemonThreadCount).append(",");
-        json.append("\"peakCount\":").append(snapshot.peakThreadCount).append(",");
-        json.append("\"userCount\":").append(snapshot.getUserThreadCount());
-        json.append("}");
-
-        json.append("}");
-        sendJson(exchange, 200, json.toString());
+                // Threads
+                "\"threads\":{" +
+                "\"count\":" + snapshot.threadCount + "," +
+                "\"daemonCount\":" + snapshot.daemonThreadCount + "," +
+                "\"peakCount\":" + snapshot.peakThreadCount + "," +
+                "\"userCount\":" + snapshot.getUserThreadCount() +
+                "}" +
+                "}";
+        sendJson(exchange, 200, json);
     }
 
     // ==================== THREADS HANDLER ====================
@@ -845,17 +834,16 @@ public class ProfilerServer {
         long duration = System.currentTimeMillis() - startTime;
         long freedBytes = beforeHeap - afterHeap;
 
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"success\":true,");
-        json.append("\"durationMs\":").append(duration).append(",");
-        json.append("\"beforeHeapBytes\":").append(beforeHeap).append(",");
-        json.append("\"afterHeapBytes\":").append(afterHeap).append(",");
-        json.append("\"freedBytes\":").append(freedBytes).append(",");
-        json.append("\"freedMB\":").append(String.format("%.2f", freedBytes / (1024.0 * 1024.0)));
-        json.append("}");
+        String json = "{" +
+                "\"success\":true," +
+                "\"durationMs\":" + duration + "," +
+                "\"beforeHeapBytes\":" + beforeHeap + "," +
+                "\"afterHeapBytes\":" + afterHeap + "," +
+                "\"freedBytes\":" + freedBytes + "," +
+                "\"freedMB\":" + String.format("%.2f", freedBytes / (1024.0 * 1024.0)) +
+                "}";
 
-        sendJson(exchange, 200, json.toString());
+        sendJson(exchange, 200, json);
     }
 
     // ==================== HELPERS ====================

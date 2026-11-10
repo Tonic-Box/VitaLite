@@ -1,9 +1,9 @@
 package com.tonic.services.profiler;
 
 import com.tonic.model.ui.components.VitaFrame;
+import com.tonic.services.profiler.heap.HeapTab;
 import com.tonic.services.profiler.jit.JitTab;
 import com.tonic.services.profiler.jvm.JvmTab;
-import com.tonic.services.profiler.leak.LeakDetectorTab;
 import com.tonic.services.profiler.recording.RecordingTab;
 import com.tonic.services.profiler.resource.ResourceMonitorTab;
 import com.tonic.services.profiler.server.ProfilerServer;
@@ -74,11 +74,10 @@ public class ProfilerWindow extends VitaFrame {
 
         SamplingTab sampling = new SamplingTab();
         RecordingTab recording = new RecordingTab();
-        LeakDetectorTab leaks = new LeakDetectorTab();
         add(resourceMonitor);
         add(new PanelTab("Sampling", sampling, sampling::cleanup));
         add(new PanelTab("Recording", recording, recording::cleanup));
-        add(new PanelTab("Leak Detector", leaks, leaks::cleanup));
+        add(new HeapTab());
         add(new ThreadsTab());
         add(new JvmTab());
         add(new JitTab());
