@@ -56,44 +56,6 @@ public class CircularBuffer<T> {
     }
 
     /**
-     * Get the N most recent items in chronological order
-     */
-    @SuppressWarnings("unchecked")
-    public List<T> getRecent(int count) {
-        synchronized (lock) {
-            if (count <= 0 || size == 0) {
-                return new ArrayList<>();
-            }
-
-            int actualCount = Math.min(count, size);
-            List<T> result = new ArrayList<>(actualCount);
-
-            int start = (size < capacity) ? 0 : head;
-            int offset = size - actualCount;
-
-            for (int i = 0; i < actualCount; i++) {
-                int index = (start + offset + i) % capacity;
-                result.add((T) buffer[index]);
-            }
-            return result;
-        }
-    }
-
-    /**
-     * Get the most recent item, or null if empty
-     */
-    @SuppressWarnings("unchecked")
-    public T getLatest() {
-        synchronized (lock) {
-            if (size == 0) {
-                return null;
-            }
-            int lastIndex = (head - 1 + capacity) % capacity;
-            return (T) buffer[lastIndex];
-        }
-    }
-
-    /**
      * Get current number of items in buffer
      */
     public int size() {

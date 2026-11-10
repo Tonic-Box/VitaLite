@@ -1,5 +1,6 @@
 package com.tonic.services.profiler.recording;
 
+import lombok.Getter;
 import lombok.ToString;
 
 /**
@@ -8,12 +9,14 @@ import lombok.ToString;
  */
 @ToString
 public class MethodStats {
-    public final String methodKey;  // ClassName.methodName
+    public final String methodKey;
     public final String className;
     public final String methodName;
 
-    private int selfSamples;   // Times this method was at TOP of stack (executing)
-    private int totalSamples;  // Times this method was anywhere on stack
+    @Getter
+    private int selfSamples;
+    @Getter
+    private int totalSamples;
 
     public MethodStats(String methodKey) {
         this.methodKey = methodKey;
@@ -33,14 +36,6 @@ public class MethodStats {
 
     public void incrementTotalSamples() {
         totalSamples++;
-    }
-
-    public int getSelfSamples() {
-        return selfSamples;
-    }
-
-    public int getTotalSamples() {
-        return totalSamples;
     }
 
     /**

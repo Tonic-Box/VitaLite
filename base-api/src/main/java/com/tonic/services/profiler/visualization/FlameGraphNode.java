@@ -48,14 +48,6 @@ public class FlameGraphNode {
     }
 
     /**
-     * Counts more samples through this frame
-     * @param count the number of samples
-     */
-    public void addSamples(long count) {
-        samples += count;
-    }
-
-    /**
      * Gets the child for a method, creating it the first time
      * @param methodName the method's name
      * @param className the fully qualified class name

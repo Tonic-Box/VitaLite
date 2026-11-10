@@ -108,14 +108,6 @@ public class MethodTimingResults {
     }
 
     /**
-     * Gets every sampled method by the samples it was on the stack in
-     * @return the methods, most total samples first
-     */
-    public List<MethodStats> getAllMethodsByTotalTime() {
-        return sorted(methodStats, Comparator.comparingInt(MethodStats::getTotalSamples));
-    }
-
-    /**
      * Gets the methods that ran the most
      * @param limit the most methods to return
      * @return up to that many methods, most self samples first
