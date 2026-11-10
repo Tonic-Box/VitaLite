@@ -1,7 +1,6 @@
 package com.tonic.services.profiler.sampling;
 
-import com.tonic.services.profiler.JVMTI;
-import com.tonic.services.profiler.VMObjectAccess;
+import com.tonic.services.profiler.AdvancedVMAccess;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
@@ -86,10 +85,10 @@ public class HeapHistogramSampler {
      */
     private Set<Class<?>> getLoadedClasses() {
         // Try using JVMTI if available
-        if (JVMTI.isAvailable()) {
+        if (AdvancedVMAccess.isAvailable()) {
             try {
                 // Use JVMTI to get loaded classes
-                return JVMTI.getLoadedClasses();
+                return AdvancedVMAccess.getAllLoadedClasses();
             } catch (Exception e) {
                 // Fallback to alternative methods
             }
@@ -114,11 +113,7 @@ public class HeapHistogramSampler {
         }
 
         // Skip lambda classes
-        if (className.contains("$$Lambda$")) {
-            return true;
-        }
-
-        return false;
+        return className.contains("$$Lambda$");
     }
 
     /**

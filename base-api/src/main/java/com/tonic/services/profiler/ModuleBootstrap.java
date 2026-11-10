@@ -1,28 +1,61 @@
 package com.tonic.services.profiler;
 
-import lombok.Getter;
-
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+/**
+ * Privileged JVM access without launch flags: the trusted lookup, both Unsafe instances, and every boot module package
+ * opened to unnamed modules. Runs once, on first use.
+ */
 public class ModuleBootstrap
 {
-    @Getter
     private static Object unsafe;
-    @Getter
     private static Object internalUnsafe;
-    @Getter
     private static MethodHandles.Lookup trustedLookup;
+    private static Boolean ready;
 
-    static {
-        try {
-            bootstrapUnsafeAccess();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to bootstrap Unsafe access", e);
+    /**
+     * Runs the bootstrap the first time it is called
+     * @return whether privileged access is available
+     */
+    public static synchronized boolean ensure() {
+        if (ready == null) {
+            try {
+                bootstrapUnsafeAccess();
+                ready = true;
+            } catch (Throwable e) {
+                System.err.println("[Profiler] Privileged JVM access unavailable: " + e);
+                ready = false;
+            }
         }
+        return ready;
+    }
+
+    /**
+     * Gets sun.misc.Unsafe
+     * @return the instance, or null when privileged access is unavailable
+     */
+    public static Object getUnsafe() {
+        return ensure() ? unsafe : null;
+    }
+
+    /**
+     * Gets jdk.internal.misc.Unsafe
+     * @return the instance, or null when privileged access or the internal Unsafe is unavailable
+     */
+    public static Object getInternalUnsafe() {
+        return ensure() ? internalUnsafe : null;
+    }
+
+    /**
+     * Gets the trusted lookup that bypasses access checks
+     * @return the lookup, or null when privileged access is unavailable
+     */
+    public static MethodHandles.Lookup getTrustedLookup() {
+        return ensure() ? trustedLookup : null;
     }
 
     private static void bootstrapUnsafeAccess() throws Exception {
@@ -49,7 +82,7 @@ public class ModuleBootstrap
         openModulePackages();
     }
 
-    private static void bootstrapInternalUnsafe() throws Exception {
+    private static void bootstrapInternalUnsafe() {
         try {
             // Get the internal jdk.internal.misc.Unsafe class
             Class<?> internalUnsafeClass = Class.forName("jdk.internal.misc.Unsafe");
