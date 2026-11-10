@@ -1,6 +1,7 @@
 package com.tonic.data.magic;
 
 import com.tonic.Static;
+import com.tonic.api.game.ClientScriptAPI;
 import net.runelite.api.Client;
 import net.runelite.api.EnumID;
 import net.runelite.api.EquipmentInventorySlot;
@@ -62,7 +63,7 @@ public final class MagicCast
                     && hasRunes(c, spell);
         }
 
-        c.runScript(SCRIPT_SPELL_CASTABLE, spell, component, ICON_SIZE);
+        ClientScriptAPI.runScript(SCRIPT_SPELL_CASTABLE, spell, component, ICON_SIZE);
         return c.getIntStack()[c.getIntStackSize() - 2] == 1;
     }
 
@@ -149,7 +150,7 @@ public final class MagicCast
 
     private static int run(Client c, Object... script)
     {
-        c.runScript(script);
+        ClientScriptAPI.runScript(script);
         return c.getIntStack()[c.getIntStackSize() - 1];
     }
 

@@ -34,7 +34,7 @@ public class ClientScriptAPI
             Widget w2 = client.getWidget(InterfaceID.Chatbox.MES_TEXT2);
             if(w != null || w2 != null)
             {
-                client.runScript(SCRIPT_CLOSE_CHATBOX_INPUT);
+                ClientScriptAPI.runScript(SCRIPT_CLOSE_CHATBOX_INPUT);
             }
         });
     }
@@ -46,8 +46,7 @@ public class ClientScriptAPI
      */
     public static void switchTabs(int tab)
     {
-        Client client = Static.getClient();
-        Static.invoke(() -> client.runScript(SCRIPT_SWITCH_TAB, tab));
+        runScript(SCRIPT_SWITCH_TAB, tab);
     }
 
     /**
@@ -56,8 +55,7 @@ public class ClientScriptAPI
      */
     public static void switchTabs(Tab tab)
     {
-        Client client = Static.getClient();
-        Static.invoke(() -> client.runScript(SCRIPT_SWITCH_TAB, tab.getTabVarbit()));
+        runScript(SCRIPT_SWITCH_TAB, tab.getTabVarbit());
     }
 
     /**
@@ -68,6 +66,6 @@ public class ClientScriptAPI
     public static void runScript(Object... args)
     {
         Client client = Static.getClient();
-        Static.invoke(() -> client.runScript(args));
+        Static.invoke(() -> client.createScriptEventBuilder(args).build().setCanSendPackets(true).run());
     }
 }

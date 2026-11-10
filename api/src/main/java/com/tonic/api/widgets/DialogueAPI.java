@@ -6,7 +6,6 @@ import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.data.VarrockMuseumAnswer;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
-import net.runelite.api.Client;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigManager;
@@ -119,7 +118,7 @@ public class DialogueAPI
                 Widget w = WidgetAPI.get(InterfaceID.Chatbox.MES_TEXT2);
                 if(w != null && w.getText() != null && w.getText().equals("Click here to continue"))
                 {
-                    ((Client) client).runScript(SCRIPT_CLOSE_MESSAGE_LAYER, 1);
+                    ClientScriptAPI.runScript(SCRIPT_CLOSE_MESSAGE_LAYER, 1);
                     return true;
                 }
             }
