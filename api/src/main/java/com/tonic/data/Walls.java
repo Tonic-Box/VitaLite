@@ -43,12 +43,12 @@ public class Walls
 
         if(orientationA != 0)
         {
-            walls.add(Wall.of(orientationA));
+            add(orientationA);
         }
 
         if(orientationB != 0)
         {
-            walls.add(Wall.of(orientationB));
+            add(orientationB);
         }
     }
 
@@ -71,12 +71,12 @@ public class Walls
 
         if(orientationA != 0)
         {
-            walls.add(Wall.of(orientationA));
+            add(orientationA);
         }
 
         if(orientationB != 0)
         {
-            walls.add(Wall.of(orientationB));
+            add(orientationB);
         }
     }
 
@@ -144,6 +144,15 @@ public class Walls
     public boolean hasWestWall()
     {
         return hasWall(Wall.WEST);
+    }
+
+    private void add(int orientation)
+    {
+        Wall wall = Wall.of(orientation);
+        if(wall != null)
+        {
+            walls.add(wall);
+        }
     }
 
     @RequiredArgsConstructor
