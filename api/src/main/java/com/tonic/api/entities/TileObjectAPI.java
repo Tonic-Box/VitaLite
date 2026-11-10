@@ -116,6 +116,7 @@ public class TileObjectAPI
                 ClickManager.click(ClickType.OBJECT);
                 tclient.getPacketWriter().objectActionPacket(actionIndex, object.getId(), object.getWorldLocation().getX(), object.getWorldLocation().getY(), false);
             });
+            return;
         }
     }
 
