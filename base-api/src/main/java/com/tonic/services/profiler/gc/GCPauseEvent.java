@@ -1,8 +1,11 @@
 package com.tonic.services.profiler.gc;
 
+import lombok.Getter;
+
 /**
  * Represents a single GC pause event
  */
+@Getter
 public class GCPauseEvent {
     private final long timestamp;
     private final String gcName;
@@ -41,38 +44,6 @@ public class GCPauseEvent {
         return GCType.UNKNOWN;
     }
 
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public String getGcName() {
-        return gcName;
-    }
-
-    public String getGcAction() {
-        return gcAction;
-    }
-
-    public String getGcCause() {
-        return gcCause;
-    }
-
-    public long getDuration() {
-        return duration;
-    }
-
-    public long getBeforeGC() {
-        return beforeGC;
-    }
-
-    public long getAfterGC() {
-        return afterGC;
-    }
-
-    public long getMaxMemory() {
-        return maxMemory;
-    }
-
     public long getMemoryFreed() {
         return beforeGC - afterGC;
     }
@@ -81,10 +52,7 @@ public class GCPauseEvent {
         return beforeGC > 0 ? ((double) getMemoryFreed() / beforeGC) * 100.0 : 0;
     }
 
-    public GCType getGcType() {
-        return gcType;
-    }
-
+    @Getter
     public enum GCType {
         YOUNG("Young Gen", "Minor collection"),
         OLD("Old Gen", "Major/Full collection"),
@@ -98,12 +66,5 @@ public class GCPauseEvent {
             this.description = description;
         }
 
-        public String getLabel() {
-            return label;
-        }
-
-        public String getDescription() {
-            return description;
-        }
     }
 }

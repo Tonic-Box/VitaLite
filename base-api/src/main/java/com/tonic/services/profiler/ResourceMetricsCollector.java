@@ -16,7 +16,7 @@ public class ResourceMetricsCollector {
     // GC tracking
     private long lastGcTime = 0;
     private long lastGcCount = 0;
-    private long lastTimestamp = 0;
+    private long lastTimestamp;
 
     // Memory pools
     private MemoryPoolMXBean metaspacePool;
