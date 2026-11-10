@@ -235,13 +235,12 @@ public final class ResourceMonitorTab implements ProfilerTab {
         setText(pauseStats, text.toString());
 
         FrameImpact frames = FrameImpact.of(pauses.getEvents(), System.currentTimeMillis(), IMPACT_WINDOW_MS);
-        StringBuilder impactText = new StringBuilder();
-        impactText.append(String.format("Pauses:            %d\n", frames.pauses));
-        impactText.append(String.format("Over %d ms (60 FPS): %d\n", FrameImpact.FRAME_60_FPS, frames.over60Fps));
-        impactText.append(String.format("Over %d ms (30 FPS): %d\n", FrameImpact.FRAME_30_FPS, frames.over30Fps));
-        impactText.append(String.format("Longest:           %d ms\n", frames.longestMs));
-        impactText.append(String.format("GC time:           %.0f ms/min\n", frames.msPerMinute()));
-        setText(impact, impactText.toString());
+        String impactText = String.format("Pauses:            %d\n", frames.pauses) +
+                String.format("Over %d ms (60 FPS): %d\n", FrameImpact.FRAME_60_FPS, frames.over60Fps) +
+                String.format("Over %d ms (30 FPS): %d\n", FrameImpact.FRAME_30_FPS, frames.over30Fps) +
+                String.format("Longest:           %d ms\n", frames.longestMs) +
+                String.format("GC time:           %.0f ms/min\n", frames.msPerMinute());
+        setText(impact, impactText);
     }
 
     private void resize(int seconds) {
