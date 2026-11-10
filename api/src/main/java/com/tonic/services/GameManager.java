@@ -4,12 +4,11 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.api.game.sailing.BoatStatsAPI;
-import com.tonic.data.magic.SpellBook;
-import com.tonic.data.magic.spellbooks.SpellbookEnums;
-import com.tonic.data.magic.spellbooks.Standard;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
 import com.tonic.services.pathfinder.sailing.BoatPathing;
+import com.tonic.services.pathfinder.sailing.Sailing;
 import com.tonic.api.game.sailing.SailingAPI;
+import com.tonic.api.game.sailing.SailingRenderUtil;
 import com.tonic.api.threaded.Delays;
 import com.tonic.api.widgets.MiniMapAPI;
 import com.tonic.api.widgets.WidgetAPI;
@@ -22,7 +21,6 @@ import com.tonic.data.wrappers.TileItemEx;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.headless.HeadlessMode;
 import com.tonic.services.hotswapper.PluginReloader;
-import com.tonic.util.AsyncTask;
 import com.tonic.services.mouse.ClickVisualizationOverlay;
 import com.tonic.services.mouse.MovementVisualizationOverlay;
 import com.tonic.services.pathfinder.abstractions.IPathfinder;
@@ -49,9 +47,6 @@ import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.WorldService;
-import net.runelite.client.plugins.Plugin;
-import net.runelite.client.plugins.PluginInstantiationException;
-import net.runelite.client.plugins.PluginManager;
 import net.runelite.client.ui.overlay.*;
 import net.runelite.http.api.worlds.WorldResult;
 
@@ -485,7 +480,7 @@ public class GameManager extends Overlay {
     public void hop(int worldNumber, Client client)
     {
         WorldResult worldResult = Static.getInjector().getInstance(WorldService.class).getWorlds();
-        if(worldResult == null) return;;
+        if(worldResult == null) return;
         net.runelite.http.api.worlds.World world = worldResult.findWorld(worldNumber);
         if(world == null) return;
         final net.runelite.api.World rsWorld = client.createWorld();
@@ -510,7 +505,6 @@ public class GameManager extends Overlay {
     @Getter
     private volatile List<WorldPoint> testPoints = null;
     @Getter
-    private volatile List<WorldPoint> sailingPoints = null;
     private final BoatOverlay boatOverlay = new BoatOverlay();
     private boolean boatDebugShowing = false;
 
@@ -537,6 +531,7 @@ public class GameManager extends Overlay {
         {
             sailingPath = null;
         }
+        Sailing.onClientCycle(true);
 
         if(Static.getVitaConfig().getDrawBoatDebug() && !boatDebugShowing && SailingAPI.isOnBoat())
         {
@@ -601,6 +596,8 @@ public class GameManager extends Overlay {
         if(client.getGameState() != GameState.LOGGED_IN)
             return;
 
+        Sailing.onClientCycle(false);
+
         if(Static.getVitaConfig().getDrawBoatDebug() && !boatOverlay.isHidden() && SailingAPI.isOnBoat())
         {
             boatOverlay.update();
@@ -663,11 +660,9 @@ public class GameManager extends Overlay {
                         .setParam1(event.getActionParam1())
                         .setIdentifier(event.getIdentifier())
                         .setType(MenuAction.RUNELITE)
-                        .onClick(e -> {
-                            ThreadPool.submit(() -> {
-                                sailingPath = BoatPathing.travelTo(wp);
-                            });
-                        });
+                        .onClick(e -> ThreadPool.submit(() -> {
+                            sailingPath = BoatPathing.travelTo(wp);
+                        }));
             }
             else
             {
@@ -680,8 +675,7 @@ public class GameManager extends Overlay {
                         .setType(MenuAction.RUNELITE)
                         .onClick(e -> {
                             sailingPath = null;
-                            SailingAPI.unSetSails();
-                            clearPathPoints();
+                            BoatPathing.cancel();
                         });
             }
 
@@ -781,13 +775,22 @@ public class GameManager extends Overlay {
             WorldMapAPI.drawRedMapMarker(graphics, last);
         }
 
+        boolean onBoat = SailingAPI.isOnBoat();
+        if(onBoat && Static.getVitaConfig().getDrawBoatRoute())
+        {
+            SailingRenderUtil.renderRouteOnMinimap(graphics);
+        }
+
         if(!Static.getVitaConfig().shouldDrawWalkerPath())
             return null;
 
         if(pathPoints != null && !pathPoints.isEmpty())
         {
             WorldMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
-            MiniMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
+            if(!onBoat)
+            {
+                MiniMapAPI.drawPath(graphics, pathPoints, Color.CYAN);
+            }
             WorldPoint last = pathPoints.get(pathPoints.size() - 1);
             WorldMapAPI.drawGreenMapMarker(graphics, last);
         }

@@ -51,7 +51,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ToggleSlider sendMouseMovement;
     private final ToggleSlider recordTrajectory;
     private Timer trajectoryCheckTimer;
-    private boolean shouldRestoreGpu = false;
+    private final boolean shouldRestoreGpu = false;
 
     private VitaLiteOptionsPanel() {
         super(false);
@@ -261,9 +261,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         PathfinderAlgo algo = Static.getVitaConfig().getPathfinderImpl();
         pathfinderAlgo.setSelectedItem(algo);
 
-        pathfinderAlgo.addSelectionListener(event -> {
-            Static.getVitaConfig().setPathfinderImpl(pathfinderAlgo.getSelectedItem());
-        });
+        pathfinderAlgo.addSelectionListener(event -> Static.getVitaConfig().setPathfinderImpl(pathfinderAlgo.getSelectedItem()));
 
         walkerPanel.addContent(pathfinderAlgo);
         walkerPanel.addVerticalStrut(12);
@@ -295,7 +293,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         drawHull.setSelected(Static.getVitaConfig().getDrawBoatHull());
         boatPanel.addContent(createToggleOption(
                 "Draw Boat Hull",
-                "Draw the Boat hull collision when on a boat",
+                "Draw the boat's hull at its real angle, with any land it touches in red",
                 drawHull,
                 () -> Static.getVitaConfig().setDrawBoatHull(drawHull.isSelected())
         ));
@@ -306,7 +304,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         drawDeck.setSelected(Static.getVitaConfig().getDrawBoatDeck());
         boatPanel.addContent(createToggleOption(
                 "Draw Boat Deck",
-                "Draw the Boat Deck collision when on a boat",
+                "Draw the deck tiles you can walk on",
                 drawDeck,
                 () -> Static.getVitaConfig().setDrawBoatDeck(drawDeck.isSelected())
         ));
@@ -316,10 +314,54 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         ToggleSlider drawDebug = new ToggleSlider();
         drawDebug.setSelected(Static.getVitaConfig().getDrawBoatDebug());
         boatPanel.addContent(createToggleOption(
-                "Boat Debug Overlay",
-                "Draw boat stats overlay when on a boat",
+                "Boat Info Panel",
+                "Show the boat's position, speed, throttle, voyage state, last plan and resistances",
                 drawDebug,
                 () -> Static.getVitaConfig().setDrawBoatDebug(drawDebug.isSelected())
+        ));
+
+        boatPanel.addVerticalStrut(12);
+
+        ToggleSlider drawRoute = new ToggleSlider();
+        drawRoute.setSelected(Static.getVitaConfig().getDrawBoatRoute());
+        boatPanel.addContent(createToggleOption(
+                "Draw Boat Route",
+                "Draw the route being sailed, tick by tick, and its goal",
+                drawRoute,
+                () -> Static.getVitaConfig().setDrawBoatRoute(drawRoute.isSelected())
+        ));
+
+        boatPanel.addVerticalStrut(12);
+
+        ToggleSlider drawTrack = new ToggleSlider();
+        drawTrack.setSelected(Static.getVitaConfig().getDrawBoatTrack());
+        boatPanel.addContent(createToggleOption(
+                "Draw Predicted Track",
+                "Draw where the hull will be over the next ticks if the helm is left as set",
+                drawTrack,
+                () -> Static.getVitaConfig().setDrawBoatTrack(drawTrack.isSelected())
+        ));
+
+        boatPanel.addVerticalStrut(12);
+
+        ToggleSlider drawSeaCells = new ToggleSlider();
+        drawSeaCells.setSelected(Static.getVitaConfig().getDrawSeaCells());
+        boatPanel.addContent(createToggleOption(
+                "Draw Sea Cells",
+                "Draw the sea map round the boat: land in coast tiles, walk-blocked water, water close to land",
+                drawSeaCells,
+                () -> Static.getVitaConfig().setDrawSeaCells(drawSeaCells.isSelected())
+        ));
+
+        boatPanel.addVerticalStrut(12);
+
+        ToggleSlider drawSeaGraph = new ToggleSlider();
+        drawSeaGraph.setSelected(Static.getVitaConfig().getDrawSeaGraph());
+        boatPanel.addContent(createToggleOption(
+                "Draw Sea Graph",
+                "Draw the sailing nav graph's nodes and edges round the boat",
+                drawSeaGraph,
+                () -> Static.getVitaConfig().setDrawSeaGraph(drawSeaGraph.isSelected())
         ));
 
         contentPanel.add(boatPanel);

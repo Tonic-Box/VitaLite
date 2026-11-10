@@ -1,13 +1,11 @@
 package com.tonic.util;
 
 import com.tonic.services.ClickStrategy;
-import com.tonic.services.ConfigManager;
 import com.tonic.services.pathfinder.PathfinderAlgo;
 import com.tonic.util.config.ConfigGroup;
 import com.tonic.util.config.ConfigKey;
 import com.tonic.util.config.VitaConfig;
 
-import java.nio.file.Path;
 
 @ConfigGroup("VitaLiteOptions")
 public interface ClientConfig extends VitaConfig {
@@ -116,6 +114,26 @@ public interface ClientConfig extends VitaConfig {
     boolean getDrawBoatDebug();
     @ConfigKey(value = "boatDebug")
     void setDrawBoatDebug(boolean draw);
+
+    @ConfigKey(value = "boatRoute", defaultValue = "false")
+    boolean getDrawBoatRoute();
+    @ConfigKey(value = "boatRoute")
+    void setDrawBoatRoute(boolean draw);
+
+    @ConfigKey(value = "boatTrack", defaultValue = "false")
+    boolean getDrawBoatTrack();
+    @ConfigKey(value = "boatTrack")
+    void setDrawBoatTrack(boolean draw);
+
+    @ConfigKey(value = "seaCells", defaultValue = "false")
+    boolean getDrawSeaCells();
+    @ConfigKey(value = "seaCells")
+    void setDrawSeaCells(boolean draw);
+
+    @ConfigKey(value = "seaGraph", defaultValue = "false")
+    boolean getDrawSeaGraph();
+    @ConfigKey(value = "seaGraph")
+    void setDrawSeaGraph(boolean draw);
 
     // Headless map view
     @ConfigKey(value = "headlessMapView", defaultValue = "true")

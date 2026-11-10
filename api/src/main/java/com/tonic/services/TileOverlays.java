@@ -29,6 +29,8 @@ import java.util.List;
 
 public class TileOverlays extends Overlay
 {
+    private static final int SEA_RADIUS = 16;
+    private static final int TRACK_TICKS = 8;
     private final GameManager manager;
     public TileOverlays(GameManager manager)
     {
@@ -51,6 +53,26 @@ public class TileOverlays extends Overlay
             {
                 SailingRenderUtil.renderPlayerBoatDeck(graphics);
             }
+
+            if(Static.getVitaConfig().getDrawSeaCells())
+            {
+                SailingRenderUtil.renderSeaCells(graphics, SEA_RADIUS);
+            }
+
+            if(Static.getVitaConfig().getDrawSeaGraph())
+            {
+                SailingRenderUtil.renderSeaGraph(graphics);
+            }
+
+            if(Static.getVitaConfig().getDrawBoatRoute())
+            {
+                SailingRenderUtil.renderRoute(graphics);
+            }
+
+            if(Static.getVitaConfig().getDrawBoatTrack())
+            {
+                SailingRenderUtil.renderPredictedTrack(graphics, TRACK_TICKS);
+            }
         }
         if(Static.getVitaConfig().shouldDrawInteractable())
         {
@@ -63,21 +85,52 @@ public class TileOverlays extends Overlay
         }
 
         var testPoints = manager.getTestPoints();
+        boolean onBoat = SailingAPI.isOnBoat();
         if(testPoints != null && !testPoints.isEmpty())
         {
-            drawWorldTiles(graphics, testPoints, Color.MAGENTA);
+            drawPath(graphics, testPoints, Color.MAGENTA, onBoat);
         }
 
-        if(!Static.getVitaConfig().shouldDrawWalkerPath())
+        if(onBoat || !Static.getVitaConfig().shouldDrawWalkerPath())
             return null;
 
         var pathPoints = manager.getPathPoints();
 
         if(pathPoints != null && !pathPoints.isEmpty())
         {
-            drawWorldTiles(graphics, pathPoints, Color.CYAN);
+            drawPath(graphics, pathPoints, Color.CYAN, onBoat);
         }
         return null;
+    }
+
+    private void drawPath(Graphics2D graphics, List<WorldPoint> points, Color color, boolean asLine)
+    {
+        if(asLine)
+        {
+            drawWorldLine(graphics, points, color);
+        }
+        else
+        {
+            drawWorldTiles(graphics, points, color);
+        }
+    }
+
+    private void drawWorldLine(Graphics2D graphics, List<WorldPoint> points, Color color)
+    {
+        final Client client = Static.getClient();
+        graphics.setColor(color);
+        graphics.setStroke(new BasicStroke(2.0f));
+        net.runelite.api.Point last = null;
+        for(WorldPoint point : points)
+        {
+            LocalPoint localPoint = LocalPoint.fromWorld(client, point);
+            net.runelite.api.Point canvas = localPoint == null ? null : Perspective.localToCanvas(client, localPoint, point.getPlane());
+            if(canvas != null && last != null)
+            {
+                graphics.drawLine(last.getX(), last.getY(), canvas.getX(), canvas.getY());
+            }
+            last = canvas;
+        }
     }
 
     private void drawWorldTiles(Graphics2D graphics, List<WorldPoint> points, Color color)
@@ -269,7 +322,7 @@ public class TileOverlays extends Overlay
                 point = WorldPoint.fromScene(wv, x, y, wv.getPlane());
                 localPoint = LocalPoint.fromScene(x, y, wv);
                 byte flags = map.all((short)point.getX(), (short)point.getY(), (byte)point.getPlane());
-                tile = new Tile(flags, point);
+                tile = new Tile(flags);
                 tile.render(graphics, localPoint, Perspective.getCanvasTilePoly(client, localPoint), wall, fill, stroke);
             }
         }
@@ -279,7 +332,6 @@ public class TileOverlays extends Overlay
     private static class Tile
     {
         private final byte flag;
-        private final WorldPoint point;
         /**
          * no blocking
          * @return true if there are no walls

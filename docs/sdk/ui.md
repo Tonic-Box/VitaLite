@@ -25,6 +25,6 @@
 | `VitaOverlay` | `com.tonic.ui`. A movable info box overlay. Fill it with lines of text using `clear()` and `newLine(...)`. |
 | `TileDrawingUtil` | `com.tonic.util`. Draw tile outlines and wall lines in overlays. |
 | `MiniMapAPI` / `WorldMapAPI` | `com.tonic.api.widgets`. Draw paths and markers on the minimap and world map. |
-| `SailingRenderUtil` | `com.tonic.api.game.sailing`. Draw a boat's hull and deck. |
+| `SailingRenderUtil` | `com.tonic.api.game.sailing`. Draw the boat's exact hull, deck, route, predicted track, the sea map and the nav graph. |
 
 [SDK index](../SDK-DOCS.md) · [← Services](services.md) · [Utilities →](utilities.md)
