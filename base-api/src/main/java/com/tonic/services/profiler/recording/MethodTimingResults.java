@@ -109,11 +109,11 @@ public class MethodTimingResults {
 
     /**
      * Gets the methods that ran the most
-     * @param limit the most methods to return
+     * @param limit the most methods to return; zero or less returns none
      * @return up to that many methods, most self samples first
      */
     public List<MethodStats> getTopMethodsBySelfTime(int limit) {
-        return getAllMethodsBySelfTime().stream().limit(limit).collect(Collectors.toList());
+        return getAllMethodsBySelfTime().stream().limit(Math.max(0, limit)).collect(Collectors.toList());
     }
 
     /**
