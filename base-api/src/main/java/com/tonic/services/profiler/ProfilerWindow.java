@@ -6,7 +6,6 @@ import com.tonic.services.profiler.recording.RecordingTab;
 import com.tonic.services.profiler.resource.ResourceMonitorTab;
 import com.tonic.services.profiler.server.ProfilerServer;
 import com.tonic.services.profiler.threads.ThreadsTab;
-import com.tonic.services.profiler.timeline.TimelinePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -74,12 +73,10 @@ public class ProfilerWindow extends VitaFrame {
         SamplingTab sampling = new SamplingTab();
         RecordingTab recording = new RecordingTab();
         LeakDetectorTab leaks = new LeakDetectorTab();
-        TimelinePanel timeline = new TimelinePanel(resourceMonitor.pauses());
         add(resourceMonitor);
         add(new PanelTab("Sampling", sampling, sampling::cleanup));
         add(new PanelTab("Recording", recording, recording::cleanup));
         add(new PanelTab("Leak Detector", leaks, leaks::cleanup));
-        add(new PanelTab("Event Timeline", timeline, timeline::cleanup));
         add(new ThreadsTab());
 
         tabbedPane.setBackground(PANEL);

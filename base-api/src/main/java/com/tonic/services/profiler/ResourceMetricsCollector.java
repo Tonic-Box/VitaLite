@@ -1,6 +1,8 @@
 package com.tonic.services.profiler;
 
 import java.lang.management.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Collects system resource metrics from JVM management beans
@@ -18,7 +20,7 @@ public class ResourceMetricsCollector {
 
     // Memory pools
     private MemoryPoolMXBean metaspacePool;
-    private MemoryPoolMXBean codeCachePool;
+    private final List<MemoryPoolMXBean> codeCachePools = new ArrayList<>();
 
     public ResourceMetricsCollector() {
         this.memoryBean = ManagementFactory.getMemoryMXBean();
@@ -37,8 +39,8 @@ public class ResourceMetricsCollector {
             String name = pool.getName();
             if (name.contains("Metaspace")) {
                 this.metaspacePool = pool;
-            } else if (name.contains("Code Cache")) {
-                this.codeCachePool = pool;
+            } else if (name.contains("CodeHeap") || name.contains("Code Cache")) {
+                this.codeCachePools.add(pool);
             }
         }
 
@@ -97,10 +99,13 @@ public class ResourceMetricsCollector {
         long codeCacheUsed = 0;
         long codeCacheMax = -1;
 
-        if (codeCachePool != null) {
-            MemoryUsage codeCacheUsage = codeCachePool.getUsage();
-            codeCacheUsed = codeCacheUsage.getUsed();
-            codeCacheMax = codeCacheUsage.getMax();
+        if (!codeCachePools.isEmpty()) {
+            codeCacheMax = 0;
+            for (MemoryPoolMXBean pool : codeCachePools) {
+                MemoryUsage usage = pool.getUsage();
+                codeCacheUsed += usage.getUsed();
+                codeCacheMax += usage.getMax();
+            }
         }
 
         // Thread counts
@@ -194,7 +199,7 @@ public class ResourceMetricsCollector {
      * Check if code cache pool is available
      */
     public boolean isCodeCacheAvailable() {
-        return codeCachePool != null;
+        return !codeCachePools.isEmpty();
     }
 
     /**

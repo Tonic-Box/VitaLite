@@ -4,8 +4,10 @@ import com.tonic.services.profiler.CircularBuffer;
 import com.tonic.services.profiler.MetricSnapshot;
 import com.tonic.services.profiler.ProfilerTab;
 import com.tonic.services.profiler.ResourceMetricsCollector;
+import com.tonic.services.profiler.gc.FrameImpact;
 import com.tonic.services.profiler.gc.GCPauseAnalyzer;
-import com.tonic.services.profiler.gc.GCTuningAdvisor;
+import com.tonic.services.profiler.gc.GCPauseEvent;
+import com.tonic.util.ThreadPool;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.data.time.Millisecond;
@@ -24,10 +26,11 @@ import java.util.Locale;
 import static com.tonic.services.profiler.ProfilerTheme.*;
 
 /**
- * Live CPU, GC, heap, metaspace and thread charts with GC pause statistics
+ * Live CPU, GC, heap, metaspace and thread charts with GC pause statistics and their frame impact
  */
 public final class ResourceMonitorTab implements ProfilerTab {
     private static final double MEGABYTE = 1024.0 * 1024.0;
+    private static final long IMPACT_WINDOW_MS = 60_000;
     private static final int[] WINDOW_SECONDS = {60, 120, 300, 600};
     private static final Color YELLOW = new Color(255, 193, 7);
     private static final Color PURPLE = new Color(156, 39, 176);
@@ -37,7 +40,6 @@ public final class ResourceMonitorTab implements ProfilerTab {
 
     private final ResourceMetricsCollector collector = new ResourceMetricsCollector();
     private final GCPauseAnalyzer pauses = new GCPauseAnalyzer(500);
-    private final GCTuningAdvisor advisor = new GCTuningAdvisor(pauses);
     private final TimeSeries cpu = new TimeSeries("CPU %");
     private final TimeSeries gc = new TimeSeries("GC %");
     private final TimeSeries heapUsed = new TimeSeries("Used");
@@ -54,7 +56,7 @@ public final class ResourceMonitorTab implements ProfilerTab {
     private final JLabel metaspaceLabel = summaryLabel("-- MB");
     private final JLabel threadLabel = summaryLabel("--");
     private final JTextArea pauseStats = textArea(MONO);
-    private final JTextArea advice = textArea(UI_SMALL);
+    private final JTextArea impact = textArea(MONO);
     private final JPanel panel;
 
     private CircularBuffer<MetricSnapshot> history;
@@ -89,14 +91,6 @@ public final class ResourceMonitorTab implements ProfilerTab {
         center.add(pausePanel(), BorderLayout.SOUTH);
         panel.add(center, BorderLayout.CENTER);
         panel.add(summary(), BorderLayout.SOUTH);
-    }
-
-    /**
-     * Gets the GC pause analyzer the tab listens with
-     * @return the analyzer
-     */
-    public GCPauseAnalyzer pauses() {
-        return pauses;
     }
 
     @Override
@@ -169,11 +163,7 @@ public final class ResourceMonitorTab implements ProfilerTab {
         controls.add(export);
 
         JButton forceGc = button("Force GC", ERROR);
-        forceGc.addActionListener(e -> {
-            System.gc();
-            System.runFinalization();
-            System.gc();
-        });
+        forceGc.addActionListener(e -> ThreadPool.submit(System::gc));
         controls.add(forceGc);
 
         JButton clear = button("Clear", NEUTRAL);
@@ -197,15 +187,12 @@ public final class ResourceMonitorTab implements ProfilerTab {
         pauseStats.setText("Collecting GC data...");
         stats.add(scroll(pauseStats), BorderLayout.CENTER);
 
-        JPanel recommendations = section("Tuning Recommendations");
-        recommendations.setLayout(new BorderLayout());
-        advice.setLineWrap(true);
-        advice.setWrapStyleWord(true);
-        advice.setText("Analyzing GC patterns...");
-        recommendations.add(scroll(advice), BorderLayout.CENTER);
+        JPanel frames = section("Frame Impact (last 60 s)");
+        frames.setLayout(new BorderLayout());
+        frames.add(scroll(impact), BorderLayout.CENTER);
 
         pausePanel.add(stats);
-        pausePanel.add(recommendations);
+        pausePanel.add(frames);
         return pausePanel;
     }
 
@@ -231,36 +218,30 @@ public final class ResourceMonitorTab implements ProfilerTab {
 
     private void updatePauses() {
         GCPauseAnalyzer.GCStatistics stats = pauses.getStatistics();
-        StringBuilder text = new StringBuilder("GC Pause Statistics\n===================\n\n");
-        if (stats.totalPauses == 0) {
-            text.append("No GC events captured yet.\nWaiting for garbage collection...");
+        StringBuilder text = new StringBuilder();
+        if (stats.pauses == 0) {
+            text.append("No GC pauses yet.");
         } else {
-            text.append(String.format("Total Pauses:    %d\n", stats.totalPauses));
+            text.append(stats.pauses == 1 ? "Last pause\n\n" : String.format("Last %d pauses\n\n", stats.pauses));
             text.append(String.format("Total Time:      %d ms\n", stats.totalPauseTime));
-            text.append(String.format("Average Pause:   %d ms\n", stats.avgPause));
-            text.append(String.format("Longest Pause:   %d ms\n", stats.longestPause));
+            text.append(String.format("Average Pause:   %d ms\n", stats.averagePause));
             text.append(String.format("95th Percentile: %d ms\n", stats.p95Pause));
-            text.append(String.format("99th Percentile: %d ms\n\n", stats.p99Pause));
-            if (stats.longestPauseEvent != null) {
-                text.append("Longest Pause Details:\n");
-                text.append(String.format("  Type:   %s\n", stats.longestPauseEvent.getGcType().getLabel()));
-                text.append(String.format("  Action: %s\n", stats.longestPauseEvent.getGcAction()));
-                text.append(String.format("  Cause:  %s\n", stats.longestPauseEvent.getGcCause()));
-                text.append(String.format("  Freed:  %.1f MB (%.1f%%)\n", stats.longestPauseEvent.getMemoryFreed() / MEGABYTE, stats.longestPauseEvent.getMemoryFreedPercent()));
-            }
+            text.append(String.format("99th Percentile: %d ms\n", stats.p99Pause));
+            GCPauseEvent longest = stats.longest;
+            text.append(String.format("Longest Pause:   %d ms\n", longest.getDuration()));
+            text.append(String.format("  %s, %s, %s\n", longest.getGcName(), longest.getGcAction(), longest.getGcCause()));
+            text.append(String.format("  Freed %.1f MB (%.1f%% of the heap in use)\n", longest.getMemoryFreed() / MEGABYTE, longest.getMemoryFreedPercent()));
         }
         setText(pauseStats, text.toString());
 
-        StringBuilder recommendations = new StringBuilder();
-        for (GCTuningAdvisor.Recommendation recommendation : advisor.getRecommendations()) {
-            recommendations.append('[').append(recommendation.severity.getLabel().toUpperCase()).append("] ").append(recommendation.title).append('\n');
-            recommendations.append(recommendation.description).append('\n');
-            if (recommendation.suggestion != null) {
-                recommendations.append("\nSuggestion: ").append(recommendation.suggestion).append('\n');
-            }
-            recommendations.append('\n');
-        }
-        setText(advice, recommendations.toString());
+        FrameImpact frames = FrameImpact.of(pauses.getEvents(), System.currentTimeMillis(), IMPACT_WINDOW_MS);
+        StringBuilder impactText = new StringBuilder();
+        impactText.append(String.format("Pauses:            %d\n", frames.pauses));
+        impactText.append(String.format("Over %d ms (60 FPS): %d\n", FrameImpact.FRAME_60_FPS, frames.over60Fps));
+        impactText.append(String.format("Over %d ms (30 FPS): %d\n", FrameImpact.FRAME_30_FPS, frames.over30Fps));
+        impactText.append(String.format("Longest:           %d ms\n", frames.longestMs));
+        impactText.append(String.format("GC time:           %.0f ms/min\n", frames.msPerMinute()));
+        setText(impact, impactText.toString());
     }
 
     private void resize(int seconds) {
