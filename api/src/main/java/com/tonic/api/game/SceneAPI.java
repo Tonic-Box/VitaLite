@@ -1,16 +1,16 @@
 package com.tonic.api.game;
 
 import com.tonic.Static;
+import com.tonic.api.game.reach.Reachability;
+import com.tonic.api.game.reach.SceneCollision;
+import com.tonic.api.game.reach.SceneFlood;
 import com.tonic.data.wrappers.PlayerEx;
-import com.tonic.util.Location;
 import com.tonic.util.WorldPointUtil;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import it.unimi.dsi.fastutil.ints.IntArrayFIFOQueue;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -32,117 +32,59 @@ public class SceneAPI {
     }
 
     /**
-     * Returns a list of all reachable tiles from the origins position using a breadth-first search algorithm.
-     * This method considers the collision data to determine which tiles can be reached.
+     * Returns all tiles that can be walked to from a tile of the local player's world view, the tile itself included
      *
-     * @param origin The point to query from
-     * @return A list of WorldPoint objects representing all reachable tiles from the origin.
+     * @param origin The point to query from, in the coordinates of the player's world view
+     * @return The walkable tiles, empty when the origin lies outside the scene
      */
     public static List<WorldPoint> reachableTiles(WorldPoint origin) {
-        return Static.invoke(() -> {
-            Client client = Static.getClient();
-            boolean[][] visited = new boolean[104][104];
-            CollisionData[] collisionData = client.getTopLevelWorldView().getCollisionMaps();
-            if (collisionData == null) {
-                return new ArrayList<>();
-            }
-            WorldView worldView = client.getTopLevelWorldView();
-            int[][] flags = collisionData[worldView.getPlane()].getFlags();
-            int firstPoint = (origin.getX()-worldView.getBaseX() << 16) | origin.getY()-worldView.getBaseY();
-            ArrayDeque<Integer> queue = new ArrayDeque<>();
-            queue.add(firstPoint);
-            while (!queue.isEmpty()) {
-                int point = queue.poll();
-                short x =(short)(point >> 16);
-                short y = (short)point;
-                if (y < 0 || x < 0 || y > 104 || x > 104) {
-                    continue;
-                }
-                if ((flags[x][y] & CollisionDataFlag.BLOCK_MOVEMENT_SOUTH) == 0 && (flags[x][y - 1] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0 && !visited[x][y - 1]) {
-                    queue.add((x << 16) | (y - 1));
-                    visited[x][y - 1] = true;
-                }
-                if ((flags[x][y] & CollisionDataFlag.BLOCK_MOVEMENT_NORTH) == 0 && (flags[x][y + 1] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0 && !visited[x][y + 1]) {
-                    queue.add((x << 16) | (y + 1));
-                    visited[x][y + 1] = true;
-                }
-                if ((flags[x][y] & CollisionDataFlag.BLOCK_MOVEMENT_WEST) == 0 && (flags[x - 1][y] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0 && !visited[x - 1][y]) {
-                    queue.add(((x - 1) << 16) | y);
-                    visited[x - 1][y] = true;
-                }
-                if ((flags[x][y] & CollisionDataFlag.BLOCK_MOVEMENT_EAST) == 0 && (flags[x + 1][y] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0 && !visited[x + 1][y]) {
-                    queue.add(((x + 1) << 16) | y);
-                    visited[x + 1][y] = true;
+        List<WorldPoint> points = new ArrayList<>();
+        SceneCollision map = Static.invoke(() -> playerCollision(origin));
+        if (map == null) {
+            return points;
+        }
+        boolean[][] walkable = SceneFlood.flood(map, map.sceneX(origin), map.sceneY(origin));
+        for (int x = 0; x < map.getSizeX(); x++) {
+            for (int y = 0; y < map.getSizeY(); y++) {
+                if (walkable[x][y]) {
+                    points.add(map.toWorld(x, y));
                 }
             }
-            int baseX = worldView.getBaseX();
-            int baseY = worldView.getBaseY();
-            int plane = worldView.getPlane();
-            List<WorldPoint> finalPoints = new ArrayList<>();
-            for (int x = 0; x < 104; ++x) {
-                for (int y = 0; y < 104; ++y) {
-                    if (visited[x][y]) {
-                        finalPoints.add(new WorldPoint(baseX + x, baseY + y, plane));
-                    }
-                }
-            }
-            return finalPoints;
-        });
+        }
+        return points;
     }
 
+    /**
+     * Returns all tiles that can be walked to from a tile of the local player's world view, compressed
+     *
+     * @param origin The point to query from, in the coordinates of the player's world view
+     * @return The walkable tiles, empty when the origin lies outside the scene
+     */
     public static TIntSet reachableTilesCompressed(WorldPoint origin) {
-        return Static.invoke(() -> {
-            Client client = Static.getClient();
-            boolean[][] visited = new boolean[104][104];
-            CollisionData[] collisionData = client.getTopLevelWorldView().getCollisionMaps();
-            if (collisionData == null) {
-                return new TIntHashSet();
+        TIntSet points = new TIntHashSet();
+        SceneCollision map = Static.invoke(() -> playerCollision(origin));
+        if (map == null) {
+            return points;
+        }
+        boolean[][] walkable = SceneFlood.flood(map, map.sceneX(origin), map.sceneY(origin));
+        for (int x = 0; x < map.getSizeX(); x++) {
+            for (int y = 0; y < map.getSizeY(); y++) {
+                if (walkable[x][y]) {
+                    points.add(WorldPointUtil.compress(map.getBaseX() + x, map.getBaseY() + y, map.getPlane()));
+                }
             }
-            WorldView worldView = client.getTopLevelWorldView();
-            int[][] flags = collisionData[worldView.getPlane()].getFlags();
-            int firstPoint = (origin.getX()-worldView.getBaseX() << 16) | origin.getY()-worldView.getBaseY();
+        }
+        return points;
+    }
 
-            // Use IntArrayFIFOQueue instead of ArrayDeque<Integer>
-            IntArrayFIFOQueue queue = new IntArrayFIFOQueue();
-            queue.enqueue(firstPoint);
-
-            while (!queue.isEmpty()) {
-                int point = queue.dequeueInt();  // dequeueInt() instead of poll()
-                short x = (short)(point >> 16);
-                short y = (short)point;
-                if (y < 0 || x < 0 || y > 104 || x > 104) {
-                    continue;
-                }
-                if ((flags[x][y] & CollisionDataFlag.BLOCK_MOVEMENT_SOUTH) == 0 && (flags[x][y - 1] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0 && !visited[x][y - 1]) {
-                    queue.enqueue((x << 16) | (y - 1));  // enqueue() instead of add()
-                    visited[x][y - 1] = true;
-                }
-                if ((flags[x][y] & CollisionDataFlag.BLOCK_MOVEMENT_NORTH) == 0 && (flags[x][y + 1] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0 && !visited[x][y + 1]) {
-                    queue.enqueue((x << 16) | (y + 1));
-                    visited[x][y + 1] = true;
-                }
-                if ((flags[x][y] & CollisionDataFlag.BLOCK_MOVEMENT_WEST) == 0 && (flags[x - 1][y] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0 && !visited[x - 1][y]) {
-                    queue.enqueue(((x - 1) << 16) | y);
-                    visited[x - 1][y] = true;
-                }
-                if ((flags[x][y] & CollisionDataFlag.BLOCK_MOVEMENT_EAST) == 0 && (flags[x + 1][y] & CollisionDataFlag.BLOCK_MOVEMENT_FULL) == 0 && !visited[x + 1][y]) {
-                    queue.enqueue(((x + 1) << 16) | y);
-                    visited[x + 1][y] = true;
-                }
-            }
-            int baseX = worldView.getBaseX();
-            int baseY = worldView.getBaseY();
-            int plane = worldView.getPlane();
-            TIntSet finalPoints = new TIntHashSet();
-            for (int x = 0; x < 104; ++x) {
-                for (int y = 0; y < 104; ++y) {
-                    if (visited[x][y]) {
-                        finalPoints.add(WorldPointUtil.compress(baseX + x, baseY + y, plane));
-                    }
-                }
-            }
-            return finalPoints;
-        });
+    private static SceneCollision playerCollision(WorldPoint origin) {
+        Client client = Static.getClient();
+        Player player = client.getLocalPlayer();
+        WorldView view = player == null ? null : player.getWorldView();
+        if (view == null || origin == null) {
+            return null;
+        }
+        return SceneCollision.of(view, origin.getPlane());
     }
 
     /**
@@ -704,11 +646,10 @@ public class SceneAPI {
 
     public static List<WorldPoint> filterReachable(WorldPoint... to)
     {
-        List<WorldPoint> reachable = reachableTiles();
         List<WorldPoint> finalList = new ArrayList<>();
         for (WorldPoint wp : to)
         {
-            if (reachable.contains(wp))
+            if (Reachability.isReachable(wp))
             {
                 finalList.add(wp);
             }
@@ -718,11 +659,10 @@ public class SceneAPI {
 
     public static List<WorldPoint> filterReachable(List<WorldPoint> to)
     {
-        List<WorldPoint> reachable = reachableTiles();
         List<WorldPoint> finalList = new ArrayList<>();
         for (WorldPoint wp : to)
         {
-            if (reachable.contains(wp))
+            if (Reachability.isReachable(wp))
             {
                 finalList.add(wp);
             }

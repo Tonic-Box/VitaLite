@@ -2,7 +2,7 @@ package com.tonic.services;
 
 import com.tonic.Logger;
 import com.tonic.Static;
-import com.tonic.api.game.SceneAPI;
+import com.tonic.api.game.reach.Reachability;
 import com.tonic.api.game.sailing.BoatStatsAPI;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
 import com.tonic.services.pathfinder.sailing.BoatPathing;
@@ -34,8 +34,6 @@ import com.tonic.util.RuneliteConfigUtil;
 import com.tonic.util.ThreadPool;
 import com.tonic.util.WorldPointUtil;
 import com.tonic.util.handler.StepHandler;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
 import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.*;
@@ -76,7 +74,6 @@ public class GameManager extends Overlay {
     private static int lastUpdateTileObjects = 0;
     private static int lastUpdatePlayers = 0;
     private static int lastUpdateNpcs = 0;
-    private static int lastUpdateReachableTiles = 0;
     private static int lastUpdateTileItems = 0;
     private static final List<TileObjectEx> tileObjects = new ArrayList<>();
     private static final List<NpcEx> npcs = new ArrayList<>();
@@ -86,7 +83,6 @@ public class GameManager extends Overlay {
     @Getter
     private static WalkerPath walkerPath;
     private static volatile StepHandler sailingPath;
-    private static final TIntSet reachableTiles = new TIntHashSet();
     private static final Set<Integer> worldViews = ConcurrentHashMap.newKeySet();
 
     public static Stream<PlayerEx> playerStream()
@@ -147,26 +143,36 @@ public class GameManager extends Overlay {
         return npcs;
     }
 
+    /**
+     * Whether the local player can walk to a tile of its own world view now
+     * @param worldPoint the tile, in the coordinates of the player's world view
+     * @return whether it can be walked to
+     */
     public static boolean isReachable(WorldPoint worldPoint)
     {
-        return isReachable(WorldPointUtil.compress(worldPoint));
+        return Reachability.isReachable(worldPoint);
     }
 
+    /**
+     * Whether the local player can walk to a tile of its own world view now
+     * @param x the world x
+     * @param y the world y
+     * @param plane the plane
+     * @return whether it can be walked to
+     */
     public static boolean isReachable(int x, int y, int plane)
     {
-        return isReachable(WorldPointUtil.compress(x, y, plane));
+        return Reachability.isReachable(new WorldPoint(x, y, plane));
     }
 
+    /**
+     * Whether the local player can walk to a tile of its own world view now
+     * @param compressed the tile, compressed
+     * @return whether it can be walked to
+     */
     public static boolean isReachable(int compressed)
     {
-        Client client = Static.getClient();
-        if(lastUpdateReachableTiles < client.getTickCount())
-        {
-            reachableTiles.clear();
-            reachableTiles.addAll(SceneAPI.reachableTilesCompressed(PlayerEx.getLocal().getWorldPoint()));
-            lastUpdateReachableTiles = client.getTickCount();
-        }
-        return reachableTiles.contains(compressed);
+        return Reachability.isReachable(WorldPointUtil.fromCompressed(compressed));
     }
 
     public static List<Tile> getTiles()
