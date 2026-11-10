@@ -4,11 +4,11 @@ import com.tonic.Static;
 import com.tonic.api.TObjectComposition;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.SceneAPI;
-import com.tonic.data.ObjectBlockAccessFlags;
-import com.tonic.data.Walls;
+import com.tonic.api.game.reach.Reachability;
+import com.tonic.api.game.reach.ReachRule;
+import com.tonic.api.game.reach.SceneCollision;
 import com.tonic.data.wrappers.abstractions.Entity;
 import com.tonic.services.GameManager;
-import com.tonic.services.pathfinder.local.LocalCollisionMap;
 import com.tonic.util.Distance;
 import com.tonic.util.TextUtil;
 import lombok.Getter;
@@ -18,7 +18,7 @@ import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import java.awt.*;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class TileObjectEx implements Entity
@@ -186,9 +186,9 @@ public class TileObjectEx implements Entity
             GameObject go = (GameObject) tileObject;
             Point p = go.getSceneMinLocation();
             if (wv == null || p == null) {
-                return wp;  // Fallback to base location if scene data unavailable
+                return wp;
             }
-            wp = WorldPoint.fromScene(wv, p.getX(), p.getY(), wv.getPlane());
+            wp = WorldPoint.fromScene(wv, p.getX(), p.getY(), tileObject.getPlane());
         }
         return wp;
     }
@@ -202,8 +202,10 @@ public class TileObjectEx implements Entity
             GameObject go = (GameObject) tileObject;
             Point min = go.getSceneMinLocation();
             Point max = go.getSceneMaxLocation();
-            width = max.getX() - min.getX() + 1;
-            height = max.getY() - min.getY() + 1;
+            if(min != null && max != null) {
+                width = max.getX() - min.getX() + 1;
+                height = max.getY() - min.getY() + 1;
+            }
         }
         return new WorldArea(getWorldPoint(), width, height);
     }
@@ -253,8 +255,15 @@ public class TileObjectEx implements Entity
         });
     }
 
+    /**
+     * Whether the local player can walk now to a tile this object can be interacted with from
+     * @return false when the object lies in another world view than the player
+     */
     public boolean isReachable()
     {
+        if(getWorldViewId() != Reachability.viewId())
+            return false;
+
         for(WorldPoint wp : interactableFrom())
         {
             if(GameManager.isReachable(wp))
@@ -264,8 +273,8 @@ public class TileObjectEx implements Entity
     }
 
     /**
-     * Gets the closest WorldPoint from which this object can be interacted with.
-     * @return The closest WorldPoint from which the object can be interacted with.
+     * Gets the nearest tile to the local player this object can be interacted with from, reachable or not
+     * @return the tile, or null when there is none
      */
     public WorldPoint getInteractionPoint()
     {
@@ -287,6 +296,11 @@ public class TileObjectEx implements Entity
         return worldView.getId();
     }
 
+    /**
+     * Gets the nearest tile to a point this object can be interacted with from, reachable or not
+     * @param to the point measured from
+     * @return the tile, or null when there is none
+     */
     public WorldPoint getInteractionPoint(WorldPoint to)
     {
         WorldPoint closest = null;
@@ -304,129 +318,70 @@ public class TileObjectEx implements Entity
     }
 
     /**
-     * Gets all WorldPoints from which this object can be interacted with.
-     * Takes into account walls that may block access. Does not account for reachability.
-     *
-     * @return A set of WorldPoints from which the object can be interacted with.
+     * Gets the tiles this object can be interacted with from that can be stood on, reachable or not
+     * @return the tiles in the object's world view, west to east then south to north, empty when its scene is unloaded
      */
-    public Set<WorldPoint> interactableFrom() {
-        Client client = Static.getClient();
+    public Set<WorldPoint> interactableFrom()
+    {
         return Static.invoke(() -> {
-            ObjectComposition composition = client.getObjectDefinition(getId());
-            TObjectComposition tComp = (TObjectComposition) composition;
-
-            int modelRotation = getOrientation();
-            int type = getConfig() & 0x1F;
-
-            int rotation = modelRotation;
-            if (type == 2 || type == 6 || type == 8) {
-                rotation -= 4;
-            } else if (type == 7) {
-                rotation = (rotation - 2) & 0x3;
-            }
-            rotation = rotation & 0x3;
-
-            // Get object dimensions
-            WorldArea area = getWorldArea();
-            int width = area.getWidth();
-            int height = area.getHeight();
-
-            WorldPoint objPos = getWorldPoint();
-            int rotatedFlags = tComp.rotateBlockAccessFlags(rotation);
-            Set<WorldPoint> accessibleFrom = new HashSet<>();
-
-            if(tileObject instanceof DecorativeObject)
-            {
-                accessibleFrom.add(objPos);
-                return accessibleFrom;
-            }
-
-            if(tileObject instanceof WallObject)
-            {
-                return wallAccess((WallObject) tileObject, objPos);
-            }
-
-            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_NORTH) == 0) {
-                int y = objPos.getY() + height;
-                int plane = objPos.getPlane();
-                for (int x = objPos.getX(); x < objPos.getX() + width; x++) {
-                    if(Walls.of(x, y, objPos.getPlane()).hasSouthWall())
-                        continue;
-                    if(!LocalCollisionMap.canStep(x, y, plane))
-                        continue;
-                    accessibleFrom.add(new WorldPoint(x, y, plane));
-                }
-            }
-
-            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_EAST) == 0) {
-                int x = objPos.getX() + width;
-                int plane = objPos.getPlane();
-                for (int y = objPos.getY(); y < objPos.getY() + height; y++) {
-                    if(Walls.of(x, y, objPos.getPlane()).hasWestWall())
-                        continue;
-                    if(!LocalCollisionMap.canStep(x, y, plane))
-                        continue;
-                    accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
-                }
-            }
-
-            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_SOUTH) == 0) {
-                int y = objPos.getY() - 1;
-                int plane = objPos.getPlane();
-                for (int x = objPos.getX(); x < objPos.getX() + width; x++) {
-                    if(Walls.of(x, y, objPos.getPlane()).hasNorthWall())
-                        continue;
-                    if(!LocalCollisionMap.canStep(x, y, plane))
-                        continue;
-                    accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
-                }
-            }
-
-            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_WEST) == 0) {
-                int x = objPos.getX() - 1;
-                int plane = objPos.getPlane();
-                for (int y = objPos.getY(); y < objPos.getY() + height; y++) {
-                    if(Walls.of(x, y, objPos.getPlane()).hasEastWall())
-                        continue;
-                    if(!LocalCollisionMap.canStep(x, y, plane))
-                        continue;
-                    accessibleFrom.add(new WorldPoint(x, y, objPos.getPlane()));
-                }
-            }
-
-            return accessibleFrom;
+            WorldView view = tileObject.getWorldView();
+            SceneCollision map = SceneCollision.of(view, tileObject.getPlane());
+            ReachRule.Target target = target();
+            if(map == null || target == null)
+                return new LinkedHashSet<WorldPoint>();
+            return new LinkedHashSet<>(ReachRule.tiles(map, target));
         });
     }
 
-    private static Set<WorldPoint> wallAccess(WallObject wall, WorldPoint position)
+    /**
+     * Whether this object can be interacted with from a tile
+     * @param point the tile stood on, in the object's world view
+     * @return whether the server accepts the interaction from there
+     */
+    public boolean reachedFrom(WorldPoint point)
     {
-        Walls faces = Walls.of(wall);
-        Set<WorldPoint> accessibleFrom = new HashSet<>();
-        accessibleFrom.add(position);
-        for(Walls.Wall side : Walls.Wall.values())
-        {
-            WorldPoint next = neighbour(position, side);
-            if(!LocalCollisionMap.canStep(next.getX(), next.getY(), next.getPlane()))
-                continue;
-            if(faces.hasWall(side) || !Walls.of(next).hasWall(side.negate()))
-                accessibleFrom.add(next);
-        }
-        return accessibleFrom;
+        if(point == null)
+            return false;
+
+        return Static.invoke(() -> {
+            WorldView view = tileObject.getWorldView();
+            SceneCollision map = SceneCollision.of(view, tileObject.getPlane());
+            ReachRule.Target target = target();
+            if(map == null || target == null || point.getPlane() != tileObject.getPlane())
+                return false;
+            return ReachRule.reached(map, map.sceneX(point), map.sceneY(point), target);
+        });
     }
 
-    private static WorldPoint neighbour(WorldPoint position, Walls.Wall side)
+    private ReachRule.Target target()
     {
-        switch(side)
+        int x;
+        int y;
+        int sizeX = 1;
+        int sizeY = 1;
+        if(tileObject instanceof GameObject)
         {
-            case WEST:
-                return position.dx(-1);
-            case EAST:
-                return position.dx(1);
-            case NORTH:
-                return position.dy(1);
-            default:
-                return position.dy(-1);
+            GameObject go = (GameObject) tileObject;
+            Point min = go.getSceneMinLocation();
+            Point max = go.getSceneMaxLocation();
+            if(min == null || max == null)
+                return null;
+            x = min.getX();
+            y = min.getY();
+            sizeX = max.getX() - min.getX() + 1;
+            sizeY = max.getY() - min.getY() + 1;
         }
+        else
+        {
+            LocalPoint local = tileObject.getLocalLocation();
+            x = local.getSceneX();
+            y = local.getSceneY();
+        }
+
+        Client client = Static.getClient();
+        ObjectComposition composition = client.getObjectDefinition(getId());
+        int access = composition == null ? 0 : ((TObjectComposition) composition).getBlockAccessFlags();
+        return new ReachRule.Target(x, y, getShapeFlag(), getOrientation(), sizeX, sizeY, access);
     }
 
     public int getConfig()

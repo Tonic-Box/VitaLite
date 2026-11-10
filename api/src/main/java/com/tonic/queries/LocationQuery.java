@@ -6,7 +6,6 @@ import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.queries.abstractions.AbstractQuery;
 import com.tonic.services.GameManager;
 import com.tonic.util.Distance;
-import com.tonic.util.Location;
 import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
@@ -28,13 +27,12 @@ public class LocationQuery extends AbstractQuery<Tile, LocationQuery>
     }
 
     /**
-     * Filters the query to only include tiles that are reachable from the player's current position.
+     * Filters the query to only include tiles the player can walk to now, over its own world view's live collision
      *
      * @return LocationQuery
      */
     public LocationQuery isReachable() {
-        Tile player = SceneAPI.getTile(PlayerEx.getLocal().getWorldPoint());
-        keepIf(tile -> SceneAPI.isReachable(player, tile));
+        keepIf(tile -> GameManager.isReachable(tile.getWorldLocation()));
         return this;
     }
 
