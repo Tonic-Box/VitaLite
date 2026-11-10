@@ -1,5 +1,7 @@
 package com.tonic.services.profiler.recording;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -11,20 +13,26 @@ import java.util.Map;
  * Used for hierarchical method breakdown and flame graph generation.
  */
 public class CallTreeNode {
-    private final String methodKey;      // ClassName.methodName
+    @Getter
+    private final String methodKey;
+    @Getter
     private final String className;
+    @Getter
     private final String methodName;
+    @Getter
     private final String packageName;
 
-    private int selfSamples;             // Times at top of stack (executing)
-    private int totalSamples;            // Times anywhere on stack
+    @Getter
+    private int selfSamples;
+    @Getter
+    private int totalSamples;
 
+    @Getter
     private CallTreeNode parent;
-    private final Map<String, CallTreeNode> children;  // methodKey -> child node
+    private final Map<String, CallTreeNode> children;
 
-    // For caller/callee analysis
-    private final Map<String, Integer> callers;   // methodKey -> count
-    private final Map<String, Integer> callees;   // methodKey -> count
+    private final Map<String, Integer> callers;
+    private final Map<String, Integer> callees;
 
     public CallTreeNode(String methodKey, String className, String methodName, String packageName) {
         this.methodKey = methodKey;
@@ -82,36 +90,6 @@ public class CallTreeNode {
         callees.merge(calleeKey, 1, Integer::sum);
     }
 
-    // ==================== Getters ====================
-
-    public String getMethodKey() {
-        return methodKey;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public String getMethodName() {
-        return methodName;
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public int getSelfSamples() {
-        return selfSamples;
-    }
-
-    public int getTotalSamples() {
-        return totalSamples;
-    }
-
-    public CallTreeNode getParent() {
-        return parent;
-    }
-
     public List<CallTreeNode> getChildren() {
         return new ArrayList<>(children.values());
     }
@@ -123,14 +101,6 @@ public class CallTreeNode {
         List<CallTreeNode> sorted = new ArrayList<>(children.values());
         sorted.sort(Comparator.comparingInt(CallTreeNode::getTotalSamples).reversed());
         return sorted;
-    }
-
-    public Map<String, Integer> getCallers() {
-        return callers;
-    }
-
-    public Map<String, Integer> getCallees() {
-        return callees;
     }
 
     /**
@@ -188,19 +158,6 @@ public class CallTreeNode {
      */
     public boolean hasChildren() {
         return !children.isEmpty();
-    }
-
-    /**
-     * Get depth of this node in the tree
-     */
-    public int getDepth() {
-        int depth = 0;
-        CallTreeNode node = this;
-        while (node.parent != null) {
-            depth++;
-            node = node.parent;
-        }
-        return depth;
     }
 
     @Override

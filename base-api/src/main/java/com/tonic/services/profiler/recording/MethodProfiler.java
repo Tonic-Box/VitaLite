@@ -1,31 +1,28 @@
 package com.tonic.services.profiler.recording;
 
+import lombok.Getter;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
 /**
  * Manual method timing profiler for exact per-invocation timing.
- *
  * Usage:
  *   MethodProfiler.begin("MyClass.myMethod");
  *   // ... your code ...
  *   MethodProfiler.end("MyClass.myMethod");
- *
  * Or with try-with-resources:
  *   try (var ignored = MethodProfiler.time("MyClass.myMethod")) {
  *       // ... your code ...
  *   }
- *
  * Or with lambda:
  *   MethodProfiler.time("MyClass.myMethod", () -> {
  *       // ... your code ...
  *   });
- *
  *   result = MethodProfiler.timeResult("MyClass.myMethod", () -> {
  *       return computeValue();
  *   });
@@ -34,7 +31,8 @@ public class MethodProfiler {
 
     private static final Map<String, MethodTiming> timings = new ConcurrentHashMap<>();
     private static final ThreadLocal<Map<String, Long>> activeTimings = ThreadLocal.withInitial(ConcurrentHashMap::new);
-    private static volatile boolean enabled = false;  // Disabled by default for zero overhead
+    @Getter
+    private static volatile boolean enabled = false;
 
     /**
      * Start timing a method/section. Must be paired with end().
@@ -52,7 +50,7 @@ public class MethodProfiler {
 
         Long startTime = activeTimings.get().remove(label);
         if (startTime == null) {
-            return; // No matching begin()
+            return;
         }
 
         long elapsedNanos = System.nanoTime() - startTime;
@@ -133,13 +131,6 @@ public class MethodProfiler {
     }
 
     /**
-     * Check if profiling is enabled.
-     */
-    public static boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
      * Get count of tracked methods.
      */
     public static int getMethodCount() {
@@ -168,19 +159,16 @@ public class MethodProfiler {
             return sb.toString();
         }
 
-        // Calculate totals
         long totalCalls = sorted.stream().mapToLong(MethodTiming::getCallCount).sum();
         double totalMs = sorted.stream().mapToDouble(MethodTiming::getTotalMs).sum();
 
         sb.append(String.format("Total calls: %,d\n", totalCalls));
         sb.append(String.format("Total time: %.2fms\n\n", totalMs));
 
-        // Header
         sb.append(String.format("%-50s %12s %12s %12s %12s %12s\n",
                 "Method", "Calls", "Total", "Average", "Min", "Max"));
         sb.append("-".repeat(110)).append("\n");
 
-        // Data rows
         for (MethodTiming timing : sorted) {
             sb.append(String.format("%-50s %,12d %12s %12s %12s %12s\n",
                     truncate(timing.getLabel(), 50),
@@ -224,14 +212,18 @@ public class MethodProfiler {
      */
     @FunctionalInterface
     public interface TimingScope extends AutoCloseable {
+        /**
+         * Ends the timing; never throws
+         */
         @Override
-        void close(); // No exception
+        void close();
     }
 
     /**
      * Timing statistics for a single method/label.
      */
     public static class MethodTiming {
+        @Getter
         private final String label;
         private final AtomicLong callCount = new AtomicLong(0);
         private final AtomicLong totalNanos = new AtomicLong(0);
@@ -251,10 +243,6 @@ public class MethodProfiler {
                 if (elapsedNanos < minNanos) minNanos = elapsedNanos;
                 if (elapsedNanos > maxNanos) maxNanos = elapsedNanos;
             }
-        }
-
-        public String getLabel() {
-            return label;
         }
 
         public long getCallCount() {
@@ -292,7 +280,6 @@ public class MethodProfiler {
         public String getDisplayName() {
             int lastDot = label.lastIndexOf('.');
             if (lastDot > 0 && lastDot < label.length() - 1) {
-                // Return ClassName.methodName format
                 String beforeDot = label.substring(0, lastDot);
                 int secondLastDot = beforeDot.lastIndexOf('.');
                 if (secondLastDot > 0) {

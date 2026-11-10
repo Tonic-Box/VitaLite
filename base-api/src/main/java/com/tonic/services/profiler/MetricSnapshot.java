@@ -9,28 +9,26 @@ import lombok.ToString;
 public class MetricSnapshot {
     public final long timestamp;
 
-    // CPU & GC metrics
     public final double cpuPercent;
     public final double gcPercent;
     public final long gcCount;
     public final long gcTime;
 
-    // Heap memory metrics (bytes)
     public final long heapUsed;
     public final long heapCommitted;
     public final long heapMax;
 
-    // Metaspace metrics (bytes)
     public final long metaspaceUsed;
     public final long metaspaceCommitted;
-    public final long metaspaceMax; // -1 if unlimited
+    /**
+     * The metaspace limit in bytes, -1 when unlimited
+     */
+    public final long metaspaceMax;
 
-    // Thread metrics
     public final int threadCount;
     public final int daemonThreadCount;
     public final int peakThreadCount;
 
-    // Additional memory pools
     public final long codeCacheUsed;
     public final long codeCacheMax;
 
@@ -76,14 +74,6 @@ public class MetricSnapshot {
     public double getHeapUtilization() {
         if (heapMax <= 0) return 0;
         return (heapUsed * 100.0) / heapMax;
-    }
-
-    /**
-     * Get metaspace utilization percentage (0-100, or -1 if unlimited)
-     */
-    public double getMetaspaceUtilization() {
-        if (metaspaceMax <= 0) return -1; // Unlimited
-        return (metaspaceUsed * 100.0) / metaspaceMax;
     }
 
     /**

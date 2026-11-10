@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,14 +34,12 @@ public class FlameGraphPanel extends JPanel {
     private final Map<String, Color> packageColors;
     private int colorIndex = 0;
 
-    // Zoom state
     private double zoomScale = 1.0;
     private double zoomOffsetX = 0;
     private static final double ZOOM_FACTOR = 1.2;
     private static final double MIN_ZOOM = 1.0;
     private static final double MAX_ZOOM = 20.0;
 
-    // Panning state (for drag-to-pan when zoomed)
     private boolean isPanning = false;
     private int panStartX;
     private double panStartOffsetX;
@@ -72,7 +69,6 @@ public class FlameGraphPanel extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                // Middle mouse button starts panning when zoomed
                 if (e.getButton() == MouseEvent.BUTTON2 && zoomScale > 1.01) {
                     isPanning = true;
                     panStartX = e.getX();
@@ -104,7 +100,6 @@ public class FlameGraphPanel extends JPanel {
             }
         });
 
-        // Mouse wheel zoom - zoom centered on mouse position
         addMouseWheelListener(this::handleMouseWheelZoom);
     }
 
@@ -136,7 +131,6 @@ public class FlameGraphPanel extends JPanel {
         layoutIfChanged();
         drawFlameGraph(g2d, focusedNode, 0);
 
-        // Draw tooltip
         if (hoveredNode != null) {
             drawTooltip(g2d, hoveredNode);
         }
@@ -190,7 +184,6 @@ public class FlameGraphPanel extends JPanel {
                        " (" + focusedNode.getSamples() + " samples) - Click background to reset";
         }
 
-        // Show zoom level if zoomed
         String zoomInfo = "";
         if (zoomScale > 1.01) {
             zoomInfo = String.format(" [%.0f%% zoom]", zoomScale * 100);
@@ -252,21 +245,17 @@ public class FlameGraphPanel extends JPanel {
             return;
         }
 
-        // Get color
         Color color = getColorForPackage(node.getPackageName());
         if (node == hoveredNode) {
             color = brighten(color, 0.3f);
         }
 
-        // Fill
         g2d.setColor(color);
         g2d.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
-        // Border
         g2d.setColor(BORDER_COLOR);
         g2d.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
 
-        // Label
         if (bounds.width >= MIN_WIDTH_FOR_LABEL) {
             drawLabel(g2d, node, bounds);
         }
@@ -279,7 +268,6 @@ public class FlameGraphPanel extends JPanel {
         String label = node.getDisplayName();
         FontMetrics fm = g2d.getFontMetrics();
 
-        // Truncate if needed
         if (fm.stringWidth(label) > bounds.width - 10) {
             label = truncateLabel(label, fm, bounds.width - 10);
         }
@@ -328,7 +316,6 @@ public class FlameGraphPanel extends JPanel {
         int x = mouse.x + 15;
         int y = mouse.y - height - 5;
 
-        // Keep tooltip on screen
         if (x + width > getWidth()) {
             x = mouse.x - width - 5;
         }
@@ -352,7 +339,6 @@ public class FlameGraphPanel extends JPanel {
             focusedNode = clicked;
             repaint();
         } else if (point.y < 30 && focusedNode != root) {
-            // Click on header to reset
             focusedNode = root;
             repaint();
         }
@@ -368,7 +354,6 @@ public class FlameGraphPanel extends JPanel {
 
     private FlameGraphNode findNodeAt(FlameGraphNode node, Point point) {
         if (node.getBounds().contains(point)) {
-            // Check children first (they're on top)
             for (FlameGraphNode child : node.getChildren()) {
                 FlameGraphNode found = findNodeAt(child, point);
                 if (found != null) {
@@ -406,7 +391,6 @@ public class FlameGraphPanel extends JPanel {
         int deltaX = panStartX - currentX;
         double newOffset = panStartOffsetX + deltaX;
 
-        // Clamp offset
         int baseWidth = getWidth() - 10;
         double maxOffset = baseWidth * zoomScale - baseWidth;
         zoomOffsetX = Math.max(0, Math.min(maxOffset, newOffset));
@@ -422,40 +406,28 @@ public class FlameGraphPanel extends JPanel {
             return;
         }
 
-        // Get mouse position relative to content area
         int mouseX = e.getX();
 
-        // Determine zoom direction
         int rotation = e.getWheelRotation();
         double oldZoom = zoomScale;
         double newZoom;
 
         if (rotation < 0) {
-            // Scroll up = zoom in
             newZoom = oldZoom * ZOOM_FACTOR;
         } else {
-            // Scroll down = zoom out
             newZoom = oldZoom / ZOOM_FACTOR;
         }
 
-        // Clamp zoom
         newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoom));
 
         if (Math.abs(newZoom - oldZoom) < 0.001) {
-            return; // No change
+            return;
         }
-
-        // Calculate new offset to keep mouse position fixed
-        // Formula: mouseX = zoomedX + (contentX * zoomScale)
-        // We want: mouseX_old_content == mouseX_new_content
-        // So: (mouseX + oldOffset) / oldZoom == (mouseX + newOffset) / newZoom
-        // newOffset = (mouseX + oldOffset) * newZoom / oldZoom - mouseX
 
         double contentX = (mouseX + zoomOffsetX - 5) / oldZoom;
         zoomOffsetX = contentX * newZoom - (mouseX - 5);
         zoomScale = newZoom;
 
-        // Clamp offset to prevent panning past content
         int baseWidth = getWidth() - 10;
         double maxOffset = baseWidth * zoomScale - baseWidth;
         zoomOffsetX = Math.max(0, Math.min(maxOffset, zoomOffsetX));
