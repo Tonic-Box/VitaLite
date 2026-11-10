@@ -144,7 +144,7 @@ Scripts and LLM agents can drive the profiler over HTTP. Start the server with *
 | Endpoint | What it does |
 |---|---|
 | `GET /profiler/status` | Server, exact timing and recording status. |
-| `POST /profiler/jfr/start` | Start a recording. `?period=N` sets the period in ms (default 10); `?allocations=true` records allocations too. Returns 409 when one is already running. |
+| `POST /profiler/jfr/start` | Start a recording. `?period=N` sets the period in ms (default 10); `?allocations=true` records allocations too; `?package=com.example` or `?class=com.example.Foo` shows only those methods and credits allocations to the first matching frame. Returns 409 when one is already running. |
 | `POST /profiler/jfr/stop` | Stop and analyze it. |
 | `GET /profiler/jfr` | Every method of the last recording. |
 | `GET /profiler/hotspots` | The methods that ran the most. `?top=N` (default 10). |

@@ -133,7 +133,7 @@ public class ProfilerServer {
         }
         Map<String, Object> endpoints = new LinkedHashMap<>();
         endpoints.put("GET /profiler/status", "Server, exact timing and recording status");
-        endpoints.put("POST /profiler/jfr/start", "Start a JFR recording. Optional: ?period=N (ms, default 10), ?allocations=true to record allocations too");
+        endpoints.put("POST /profiler/jfr/start", "Start a JFR recording. Optional: ?period=N (ms, default 10), ?allocations=true to record allocations too, ?package=com.example or ?class=com.example.Foo to show only those methods; allocations are then credited to the first matching frame");
         endpoints.put("POST /profiler/jfr/stop", "Stop the recording and analyze it");
         endpoints.put("GET /profiler/jfr", "Every method of the last recording, Java execution samples only");
         endpoints.put("GET /profiler/hotspots", "Methods that ran the most. Optional: ?top=N (default 10)");
@@ -222,6 +222,9 @@ public class ProfilerServer {
         Map<String, String> query = query(exchange);
         int period = intParam(query, "period", 10);
         boolean allocations = "true".equalsIgnoreCase(query.get("allocations"));
+        String packageFilter = query.getOrDefault("package", "").trim();
+        String classFilter = query.getOrDefault("class", "").trim();
+        JFRMethodRecorder.FilterMode filter = !classFilter.isEmpty() ? JFRMethodRecorder.FilterMode.CLASS : !packageFilter.isEmpty() ? JFRMethodRecorder.FilterMode.PACKAGE : JFRMethodRecorder.FilterMode.ALL;
         synchronized (jfrRecorder) {
             if (jfrRecorder.isRecording()) {
                 send(exchange, 409, map("success", false, "error", "A recording is already running. POST /profiler/jfr/stop first."));
@@ -230,13 +233,16 @@ public class ProfilerServer {
             try {
                 jfrRecorder.setSamplePeriodMs(period);
                 jfrRecorder.setRecordAllocations(allocations);
+                jfrRecorder.setFilterMode(filter);
+                jfrRecorder.setPackageFilter(packageFilter);
+                jfrRecorder.setClassFilter(classFilter);
                 jfrRecorder.startRecording();
             } catch (Exception e) {
                 send(exchange, 500, map("success", false, "error", String.valueOf(e.getMessage())));
                 return;
             }
         }
-        send(exchange, 200, map("success", true, "recording", true, "periodMs", jfrRecorder.getSamplePeriodMs(), "allocations", allocations));
+        send(exchange, 200, map("success", true, "recording", true, "periodMs", jfrRecorder.getSamplePeriodMs(), "allocations", allocations, "filter", filter == JFRMethodRecorder.FilterMode.CLASS ? "class " + classFilter : filter == JFRMethodRecorder.FilterMode.PACKAGE ? "package " + packageFilter : "all"));
     }
 
     private void handleJfrStop(HttpExchange exchange) throws IOException {
