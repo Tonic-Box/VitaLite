@@ -21,7 +21,7 @@
 | `StrongholdSecurityQuestion` | Stronghold of Security door questions and answers. |
 | `Tab` | Side tabs, used by `TabsAPI`. |
 | `VarrockMuseumAnswer` | Varrock Museum quiz answers. |
-| `Walls` | Wall flags on a tile. |
+| `Walls` | The wall objects on and around a tile. Reach doesn't use it; see [interaction tiles](queries-and-wrappers.md#interaction-tiles-and-reachability). |
 | `WorldLocation` | Named areas of the world. |
 
 ## Magic

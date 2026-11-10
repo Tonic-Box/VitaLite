@@ -15,6 +15,20 @@ import static net.runelite.api.Perspective.LOCAL_HALF_TILE_SIZE;
 
 public class TileDrawingUtil
 {
+    private static final Stroke[] STROKES = {new BasicStroke(0), new BasicStroke(1), new BasicStroke(2), new BasicStroke(3), new BasicStroke(4)};
+
+    /**
+     * Gets a shared stroke of a width
+     * @param width the width in pixels
+     * @return the stroke, shared for widths 0 to 4
+     */
+    public static Stroke stroke(int width)
+    {
+        if(width >= 0 && width < STROKES.length)
+            return STROKES[width];
+        return new BasicStroke(width);
+    }
+
     public static void renderPolygon(Graphics2D graphics, Shape poly, Color color, Color fillColor, Stroke borderStroke)
     {
         if(poly == null)
@@ -29,7 +43,7 @@ public class TileDrawingUtil
     }
 
     public static void drawNorthLine(Client client, Graphics2D graphics, LocalPoint localLocation, Color color, int strokeWidth) {
-        var wv = client.getTopLevelWorldView();
+        var wv = client.getWorldView(localLocation.getWorldView());
         if (wv == null) return;
 
         int plane = wv.getPlane();
@@ -52,7 +66,7 @@ public class TileDrawingUtil
 
         if (nwPoint != null && nePoint != null) {
             graphics.setColor(color);
-            graphics.setStroke(new BasicStroke(strokeWidth));
+            graphics.setStroke(stroke(strokeWidth));
             graphics.drawLine(nwPoint.getX(), nwPoint.getY(), nePoint.getX(), nePoint.getY());
         }
     }
@@ -80,7 +94,7 @@ public class TileDrawingUtil
 
         if (nePoint != null && sePoint != null) {
             graphics.setColor(color);
-            graphics.setStroke(new BasicStroke(strokeWidth));
+            graphics.setStroke(stroke(strokeWidth));
             graphics.drawLine(nePoint.getX(), nePoint.getY(), sePoint.getX(), sePoint.getY());
         }
     }
@@ -108,7 +122,7 @@ public class TileDrawingUtil
 
         if (swPoint != null && sePoint != null) {
             graphics.setColor(color);
-            graphics.setStroke(new BasicStroke(strokeWidth));
+            graphics.setStroke(stroke(strokeWidth));
             graphics.drawLine(swPoint.getX(), swPoint.getY(), sePoint.getX(), sePoint.getY());
         }
     }
@@ -136,7 +150,7 @@ public class TileDrawingUtil
 
         if (swPoint != null && nwPoint != null) {
             graphics.setColor(color);
-            graphics.setStroke(new BasicStroke(strokeWidth));
+            graphics.setStroke(stroke(strokeWidth));
             graphics.drawLine(swPoint.getX(), swPoint.getY(), nwPoint.getX(), nwPoint.getY());
         }
     }
