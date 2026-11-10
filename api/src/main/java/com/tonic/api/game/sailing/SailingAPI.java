@@ -14,8 +14,6 @@ import lombok.Getter;
 import lombok.Setter;
 import net.runelite.api.MenuAction;
 import net.runelite.api.WorldEntity;
-import net.runelite.api.WorldView;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
@@ -25,6 +23,8 @@ import net.runelite.api.gameval.VarbitID;
  */
 public class SailingAPI
 {
+    private static final int AT_HELM = 3;
+
     @Getter
     @Setter
     private static volatile int speed = 0;
@@ -39,7 +39,7 @@ public class SailingAPI
             return false;
 
         SailingTab.FACILITIES.open();
-        if(MoveMode.getCurrent() != MoveMode.STILL && MoveMode.getCurrent() != MoveMode.STILL_WITH_WIND_CATCHER)
+        if(MoveMode.getCurrent() != MoveMode.STOPPED && MoveMode.getCurrent() != MoveMode.MOORED)
             return false;
 
         WidgetAPI.interact(1, InterfaceID.SailingSidepanel.FACILITIES_CONTENT_CLICKLAYER, 0);
@@ -56,7 +56,7 @@ public class SailingAPI
             return false;
 
         SailingTab.FACILITIES.open();
-        if(MoveMode.getCurrent() == MoveMode.STILL)
+        if(MoveMode.getCurrent() == MoveMode.STOPPED)
             return false;
 
         WidgetAPI.interact(1, InterfaceID.SailingSidepanel.FACILITIES_CONTENT_CLICKLAYER, 0);
@@ -69,7 +69,7 @@ public class SailingAPI
      */
     public static boolean isNavigating()
     {
-        return isOnBoat() && VarAPI.getVar(VarbitID.SAILING_SIDEPANEL_PLAYER_AT_HELM) == 1;
+        return isOnBoat() && VarAPI.getVar(VarbitID.SAILING_BOAT_FACILITY_LOCKEDIN) == AT_HELM;
     }
 
     /**
@@ -128,7 +128,8 @@ public class SailingAPI
      * @return true if moving forward, false otherwise
      */
     public static boolean isMovingForward() {
-        return MoveMode.getCurrent() == MoveMode.FORWARD;
+        MoveMode mode = MoveMode.getCurrent();
+        return mode == MoveMode.SLOW || mode == MoveMode.FULL;
     }
 
     /**
@@ -144,7 +145,8 @@ public class SailingAPI
      * @return true if standing still, false otherwise
      */
     public static boolean isStandingStill() {
-        return MoveMode.getCurrent() == MoveMode.STILL;
+        MoveMode mode = MoveMode.getCurrent();
+        return mode == MoveMode.STOPPED || mode == MoveMode.MOORED;
     }
 
     /**
@@ -230,7 +232,6 @@ public class SailingAPI
         return heading != null ? heading.getValue() : -1;
     }
 
-
     public static Heading getResolvedHeading()
     {
         int headingValue = getResolvedHeadingValue();
@@ -295,53 +296,15 @@ public class SailingAPI
         return false;
     }
 
-    /**
-     * Opens the cargo hold on the boat
-     * @return true if cargo hold was opened, false otherwise
-     */
-    public static boolean openCargo() {
-        if (!isOnBoat()) {
-            return false;
-        }
-
-        TileObjectEx cargo = TileObjectAPI.search()
-                .withId(SailingConstants.CARGO_HOLDS)
-                .nearest();
-
-        if(cargo != null) {
-            TileObjectAPI.interact(cargo, "open");
-            return true;
-        }
-        return false;
-    }
-
     // interactions
-    public static boolean navigate()
-    {
-        if(!isOnBoat())
-            return false;
-
-        if(isNavigating())
-            return true;
-
-        TileObjectEx helm = TileObjectAPI.search()
-                .withNameContains("Helm")
-                .nearest();
-        if(helm != null)
-        {
-            helm.interact("Navigate");
-            return true;
-        }
-        return false;
-    }
 
     public static boolean stopNavigate()
     {
         if(!isOnBoat())
             return false;
 
-        if(isNavigating())
-            return true;
+        if(!isNavigating())
+            return false;
 
         TileObjectEx helm = TileObjectAPI.search()
                 .withNameContains("Helm")

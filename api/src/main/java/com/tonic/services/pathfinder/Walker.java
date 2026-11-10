@@ -1,25 +1,21 @@
 package com.tonic.services.pathfinder;
 
 import com.tonic.Logger;
-import com.tonic.Static;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.services.pathfinder.sailing.BoatPathing;
-import com.tonic.api.game.sailing.SailingAPI;
+import com.tonic.services.pathfinder.sailing.Sailing;
 import com.tonic.api.threaded.Delays;
+import com.tonic.data.locatables.sailing.PortLocation;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.services.GameManager;
 import com.tonic.services.pathfinder.collision.CollisionMap;
 import com.tonic.services.pathfinder.collision.GlobalCollisionMap;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.services.pathfinder.objects.ObjectMap;
-import com.tonic.services.pathfinder.sailing.graph.NavGraph;
-import com.tonic.services.pathfinder.tiletype.TileTypeMap;
 import com.tonic.util.IntPair;
-import com.tonic.util.ThreadPool;
 import com.tonic.util.handler.StepHandler;
 import lombok.Getter;
-import net.runelite.api.Client;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 import java.util.List;
@@ -34,8 +30,6 @@ public class Walker
         try {
             collisionMap = GlobalCollisionMap.load();
             objectMap = ObjectMap.load();
-            tileTypeMap = TileTypeMap.load();
-            navGraph = NavGraph.load();
         } catch (Exception e) {
             Logger.error("[Pathfinder] Failed to load collision map: " + e.getMessage());
             e.printStackTrace();
@@ -46,10 +40,6 @@ public class Walker
     private static CollisionMap collisionMap;
     @Getter
     private static ObjectMap objectMap;
-    @Getter
-    private static TileTypeMap tileTypeMap;
-    @Getter
-    private static NavGraph navGraph;
     private static boolean running = false;
     private static WalkerPath currentPath = null;
 
@@ -67,20 +57,58 @@ public class Walker
         public static int consumeStaminaThreshold = consumeStaminaRange.randomEnclosed();
     }
 
+    /**
+     * Sails to a tile and stops there, blocking until the voyage ends
+     * @param target the tile to sail to
+     */
     public static void sailTo(WorldPoint target)
     {
-        StepHandler handler = BoatPathing.travelTo(target);
+        voyage(BoatPathing.travelTo(target));
+    }
+
+    /**
+     * Sails to a port and docks there, blocking until the voyage ends
+     * @param port the port to dock at
+     * @return true if the boat arrived, false otherwise
+     */
+    public static boolean sailTo(PortLocation port)
+    {
+        return voyage(BoatPathing.travelTo(port));
+    }
+
+    /**
+     * Walks to a port's gangplank and boards the player's boat, blocking until boarded or failed
+     * @param port the port to board at
+     * @return true if boarded, false otherwise
+     */
+    public static boolean boardBoat(PortLocation port)
+    {
+        return voyage(BoatPathing.board(port));
+    }
+
+    /**
+     * Docks at a port from within reach of its gangplank, blocking until docked or failed
+     * @param port the port to dock at
+     * @return true if docked, false otherwise
+     */
+    public static boolean dockAt(PortLocation port)
+    {
+        return voyage(BoatPathing.dock(port));
+    }
+
+    private static boolean voyage(StepHandler handler)
+    {
         running = true;
         while(handler.step())
         {
             if(!running)
             {
-                GameManager.clearPathPoints();
-                SailingAPI.unSetSails();
-                return;
+                BoatPathing.cancel();
+                return false;
             }
             Delays.tick();
         }
+        return BoatPathing.getState() == Sailing.State.ARRIVED;
     }
 
     /**
@@ -128,11 +156,6 @@ public class Walker
     private static boolean walk(List<WorldArea> targets, BooleanSupplier stopCondition) {
         WalkerPath walkerPath = WalkerPath.get(targets);
         return walk(walkerPath, stopCondition);
-    } //Walker.walkTo(new WorldPoint(2570, 3245, 0));
-
-    private static void walk(WalkerPath walkerPath)
-    {
-        walk(walkerPath, () -> false);
     }
 
     private static boolean walk(WalkerPath walkerPath, BooleanSupplier stopCondition)

@@ -1,11 +1,10 @@
 package com.tonic.util.handler;
 
-import com.tonic.data.WorldLocation;
+import com.tonic.data.locatables.sailing.PortLocation;
+import com.tonic.services.pathfinder.sailing.BoatPathing;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.*;
 
 public abstract class AbstractHandlerBuilder<Q> extends HandlerBuilder
@@ -405,5 +404,89 @@ public abstract class AbstractHandlerBuilder<Q> extends HandlerBuilder
     {
         LABELS.put(label, currentStep);
         return walkToWorldPointSupplier(location);
+    }
+
+    /**
+     * Adds a step that sails to a tile and stops there
+     * @param location the tile to sail to
+     * @return the HandlerBuilder
+     */
+    public Q sailTo(WorldPoint location)
+    {
+        return append(BoatPathing.travelTo(location));
+    }
+
+    /**
+     * Adds a step that sails to a tile and stops there
+     * @param label the label for the step
+     * @param location the tile to sail to
+     * @return the HandlerBuilder
+     */
+    public Q sailTo(String label, WorldPoint location)
+    {
+        return append(label, BoatPathing.travelTo(location));
+    }
+
+    /**
+     * Adds a step that sails to a port and docks there
+     * @param port the port to dock at
+     * @return the HandlerBuilder
+     */
+    public Q sailTo(PortLocation port)
+    {
+        return append(BoatPathing.travelTo(port));
+    }
+
+    /**
+     * Adds a step that sails to a port and docks there
+     * @param label the label for the step
+     * @param port the port to dock at
+     * @return the HandlerBuilder
+     */
+    public Q sailTo(String label, PortLocation port)
+    {
+        return append(label, BoatPathing.travelTo(port));
+    }
+
+    /**
+     * Adds a step that walks to a port's gangplank and boards the player's boat
+     * @param port the port to board at
+     * @return the HandlerBuilder
+     */
+    public Q boardBoat(PortLocation port)
+    {
+        return append(BoatPathing.board(port));
+    }
+
+    /**
+     * Adds a step that walks to a port's gangplank and boards the player's boat
+     * @param label the label for the step
+     * @param port the port to board at
+     * @return the HandlerBuilder
+     */
+    public Q boardBoat(String label, PortLocation port)
+    {
+        return append(label, BoatPathing.board(port));
+    }
+
+    /**
+     * Adds a step that docks at a port from within reach of its gangplank
+     * @param port the port to dock at
+     * @return the HandlerBuilder
+     */
+    public Q dockAt(PortLocation port)
+    {
+        return append(BoatPathing.dock(port));
+    }
+
+    /**
+     * Adds a step that docks at a port from within reach of its gangplank
+     * @param label the label for the step
+     * @param port the port to dock at
+     * @return the HandlerBuilder
+     */
+    public Q dockAt(String label, PortLocation port)
+    {
+        return append(label, BoatPathing.dock(port));
     }
 }

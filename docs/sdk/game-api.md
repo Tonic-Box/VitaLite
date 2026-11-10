@@ -45,9 +45,9 @@ Static classes for reading the game and acting in it. Calls are instant unless m
 | `BoatStatsAPI` | Your boat's resistances and health, while on board. |
 | `NoticeBoardAPI` | Sailing notice-board tasks: best, available and accepted ones; open and close the board. |
 | `Heading` | Boat headings, including the best heading towards a point. |
-| `MoveMode` | The boat's move modes and which one is active. |
+| `MoveMode` | How the sails are set: stopped, slow, full, reverse or moored. |
 | `SailingTab` | The sailing side-panel tabs. |
-| `SailingRenderUtil` | Drawing the boat hull, deck and debug tiles in overlays. |
+| `SailingRenderUtil` | Drawing the boat's exact hull, deck, route, predicted track, the sea map and the nav graph in overlays. |
 
 ## Widgets
 

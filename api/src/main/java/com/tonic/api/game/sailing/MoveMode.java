@@ -5,16 +5,16 @@ import lombok.RequiredArgsConstructor;
 import net.runelite.api.gameval.VarbitID;
 
 /**
- * Boat Move Mode Enum
+ * How the boat's sails are set, as the sidepanel's move mode reads it
  */
 @RequiredArgsConstructor
 public enum MoveMode
 {
-    STILL(0),
-    ON_BOAT(1),
-    FORWARD(2),
+    STOPPED(0),
+    SLOW(1),
+    FULL(2),
     REVERSE(3),
-    STILL_WITH_WIND_CATCHER(4)
+    MOORED(4)
 
     ;
 

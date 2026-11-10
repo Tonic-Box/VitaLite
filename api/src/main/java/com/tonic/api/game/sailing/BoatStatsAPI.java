@@ -1,9 +1,7 @@
 package com.tonic.api.game.sailing;
 
 import com.tonic.Static;
-import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.queries.WidgetQuery;
-import com.tonic.util.TextUtil;
 import lombok.Getter;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.gameval.InterfaceID;
@@ -34,13 +32,11 @@ public class BoatStatsAPI
     // === Boat Resistances ===
     public static boolean isRapidResistant()
     {
-        //TileType.F_TEMPOR_STORM_WATER
         return rapidResistance > 0;
     }
 
     public static boolean isStormResistant()
     {
-        //TileType.F_TEMPOR_STORM_WATER
         return stormResistance > 0;
     }
 
