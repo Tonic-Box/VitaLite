@@ -31,6 +31,7 @@ Static classes for reading the game and acting in it. Calls are instant unless m
 | `MovementAPI` | Run energy, run toggle, stamina, whether you're moving, and walk clicks. Each walk call sends one click; it doesn't wait to arrive. For long walks use the [Walker](navigation.md). |
 | `QuestAPI` | Quest state: not started, in progress, completed. |
 | `SceneAPI` | The loaded scene: tiles, reachable tiles, local paths, line of sight. |
+| `reach.ReachRule` | The server's rule for which tiles an object or actor can be interacted with from. `reach.SceneCollision` reads a world view's collision by scene tile; `reach.Reachability` holds the per-tick reachable tiles. See [interaction tiles](queries-and-wrappers.md#interaction-tiles-and-reachability). |
 | `SkillAPI` | Real and boosted levels, experience, level and XP maths. |
 | `VarAPI` | Read and set varbits, varps and client vars. |
 | `WorldsAPI` | Current world, members check, world queries. Its `hop` methods return a `StepHandler` to run rather than hopping directly. |

@@ -1,11 +1,8 @@
 package com.tonic.services;
 
 import com.tonic.Static;
-import com.tonic.api.TObjectComposition;
 import com.tonic.api.game.sailing.SailingAPI;
 import com.tonic.api.game.sailing.SailingRenderUtil;
-import com.tonic.data.ObjectBlockAccessFlags;
-import com.tonic.data.Walls;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.pathfinder.collision.Flags;
@@ -31,6 +28,9 @@ public class TileOverlays extends Overlay
 {
     private static final int SEA_RADIUS = 16;
     private static final int TRACK_TICKS = 8;
+    private static final int[][] SIDES = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+    private int interactableTick = -1;
+    private List<Edge> interactableEdges = new ArrayList<>();
     private final GameManager manager;
     public TileOverlays(GameManager manager)
     {
@@ -162,142 +162,91 @@ public class TileOverlays extends Overlay
         }
     }
 
-    public void drawInteractableFrom(Graphics2D graphics2D)
+    /**
+     * Draws, for every object with actions, the edge of each tile it can be interacted with from on the side facing it,
+     * and the outline of tiles inside its footprint it can be used from
+     * @param graphics the overlay graphics
+     */
+    public void drawInteractableFrom(Graphics2D graphics)
     {
         Client client = Static.getClient();
+        if(interactableTick != client.getTickCount())
+        {
+            interactableEdges = interactableEdges();
+            interactableTick = client.getTickCount();
+        }
 
+        graphics.setColor(Color.RED);
+        graphics.setStroke(TileDrawingUtil.stroke(2));
+        for(Edge edge : interactableEdges)
+        {
+            net.runelite.api.Point from = Perspective.localToCanvas(client, edge.from, edge.plane);
+            net.runelite.api.Point to = Perspective.localToCanvas(client, edge.to, edge.plane);
+            if(from != null && to != null)
+            {
+                graphics.drawLine(from.getX(), from.getY(), to.getX(), to.getY());
+            }
+        }
+    }
+
+    private static List<Edge> interactableEdges()
+    {
+        List<Edge> edges = new ArrayList<>();
         for(TileObjectEx obj : GameManager.objectList())
         {
-            if(obj.getType() != 2 || !obj.isInteractable())
+            if(!obj.isInteractable())
                 continue;
 
-            ObjectComposition composition = client.getObjectDefinition(obj.getId());
-            TObjectComposition tComp = (TObjectComposition) composition;
+            WorldView view = obj.getWorldView();
+            if(view == null)
+                continue;
 
-            int modelRotation = obj.getOrientation();
-            int type = obj.getConfig() & 0x1F;
-
-            int rotation = modelRotation;
-            if (type == 2 || type == 6 || type == 8) {
-                rotation -= 4;
-            } else if (type == 7) {
-                rotation = (rotation - 2) & 0x3;
-            }
-            rotation = rotation & 0x3;
-
-            WorldArea area = obj.getWorldArea();
-            int width = area.getWidth();
-            int height = area.getHeight();
-
-            WorldPoint objPos = obj.getWorldPoint();
-            int rotatedFlags = tComp.rotateBlockAccessFlags(rotation);
-
-            int newX;
-            int newY;
-            int plane;
-
-            if(obj.getTileObject() instanceof WallObject)
+            WorldArea footprint = obj.getWorldArea();
+            for(WorldPoint tile : obj.interactableFrom())
             {
-                WallObject wall = (WallObject) obj.getTileObject();
-                Walls walls = Walls.of(wall);
-                if(walls.hasNorthWall())
-                {
-                    TileDrawingUtil.renderWall(graphics2D, LocalPoint.fromWorld(client, wall.getWorldLocation()), Color.RED, Wall.Direction.NORTH);
-                }
-                if(walls.hasEastWall())
-                {
-                    TileDrawingUtil.renderWall(graphics2D, LocalPoint.fromWorld(client, wall.getWorldLocation()), Color.RED, Wall.Direction.EAST);
-                }
-                if(walls.hasSouthWall())
-                {
-                    TileDrawingUtil.renderWall(graphics2D, LocalPoint.fromWorld(client, wall.getWorldLocation()), Color.RED, Wall.Direction.SOUTH);
-                }
-                if(walls.hasWestWall())
-                {
-                    TileDrawingUtil.renderWall(graphics2D, LocalPoint.fromWorld(client, wall.getWorldLocation()), Color.RED, Wall.Direction.WEST);
-                }
-                continue;
+                addEdges(edges, view, footprint, tile);
             }
+        }
+        return edges;
+    }
 
-            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_NORTH) == 0) {
-                for(int x = 0; x < width; x++) {
-                    newX = objPos.getX() + x;
-                    newY = objPos.getY() + height - 1;
-                    plane = objPos.getPlane();
-                    if(!LocalCollisionMap.canStep(newX, newY + 1, plane))
-                        continue;
-                    if(Walls.of(newX, newY, plane).hasNorthWall())
-                        continue;
-                    WorldPoint wallPoint = new WorldPoint(newX, newY, plane);
-                    LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
-                    if(localPoint == null)
-                        continue;
-                    Shape poly = Perspective.getCanvasTilePoly(client, localPoint);
-                    if(poly != null) {
-                        TileDrawingUtil.renderWall(graphics2D, localPoint, Color.RED, Wall.Direction.NORTH);
-                    }
-                }
+    private static void addEdges(List<Edge> edges, WorldView view, WorldArea footprint, WorldPoint tile)
+    {
+        boolean inside = footprint.contains2D(tile);
+        int sceneX = tile.getX() - view.getBaseX();
+        int sceneY = tile.getY() - view.getBaseY();
+        for(int[] side : SIDES)
+        {
+            if(inside || footprint.contains2D(tile.dx(side[0]).dy(side[1])))
+            {
+                edges.add(Edge.of(view, sceneX, sceneY, side, tile.getPlane()));
             }
+        }
+    }
 
-            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_EAST) == 0) {
-                for(int y = 0; y < height; y++) {
-                    newX = objPos.getX() + width - 1;
-                    newY = objPos.getY() + y;
-                    plane = objPos.getPlane();
-                    if(!LocalCollisionMap.canStep(newX + 1, newY, plane))
-                        continue;
-                    if(Walls.of(newX, newY, plane).hasEastWall())
-                        continue;
-                    WorldPoint wallPoint = new WorldPoint(newX, newY, plane);
-                    LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
-                    if(localPoint == null)
-                        continue;
-                    Shape poly = Perspective.getCanvasTilePoly(client, localPoint);
-                    if(poly != null) {
-                        TileDrawingUtil.renderWall(graphics2D, localPoint, Color.RED, Wall.Direction.EAST);
-                    }
-                }
-            }
+    private static final class Edge
+    {
+        private final LocalPoint from;
+        private final LocalPoint to;
+        private final int plane;
 
-            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_SOUTH) == 0) {
-                for(int x = 0; x < width; x++) {
-                    newX = objPos.getX() + x;
-                    newY = objPos.getY();
-                    plane = objPos.getPlane();
-                    if(!LocalCollisionMap.canStep(newX, newY - 1, plane))
-                        continue;
-                    if(Walls.of(newX, newY, plane).hasSouthWall())
-                        continue;
-                    WorldPoint wallPoint = new WorldPoint(newX, newY, plane);
-                    LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
-                    if(localPoint == null)
-                        continue;
-                    Shape poly = Perspective.getCanvasTilePoly(client, localPoint);
-                    if(poly != null) {
-                        TileDrawingUtil.renderWall(graphics2D, localPoint, Color.RED, Wall.Direction.SOUTH);
-                    }
-                }
-            }
+        private Edge(LocalPoint from, LocalPoint to, int plane)
+        {
+            this.from = from;
+            this.to = to;
+            this.plane = plane;
+        }
 
-            if ((rotatedFlags & ObjectBlockAccessFlags.BLOCK_WEST) == 0) {
-                for(int y = 0; y < height; y++) {
-                    newX = objPos.getX();
-                    newY = objPos.getY() + y;
-                    plane = objPos.getPlane();
-                    if(!LocalCollisionMap.canStep(newX - 1, newY, plane))
-                        continue;
-                    if(Walls.of(newX, newY, plane).hasWestWall())
-                        continue;
-                    WorldPoint wallPoint = new WorldPoint(newX, newY, plane);
-                    LocalPoint localPoint = LocalPoint.fromWorld(client, wallPoint);
-                    if(localPoint == null)
-                        continue;
-                    Shape poly = Perspective.getCanvasTilePoly(client, localPoint);
-                    if(poly != null) {
-                        TileDrawingUtil.renderWall(graphics2D, localPoint, Color.RED, Wall.Direction.WEST);
-                    }
-                }
-            }
+        private static Edge of(WorldView view, int sceneX, int sceneY, int[] side, int plane)
+        {
+            int half = Perspective.LOCAL_HALF_TILE_SIZE;
+            int centreX = (sceneX << Perspective.LOCAL_COORD_BITS) + half;
+            int centreY = (sceneY << Perspective.LOCAL_COORD_BITS) + half;
+            int fromX = side[0] == 0 ? centreX - half : centreX + side[0] * half;
+            int fromY = side[1] == 0 ? centreY - half : centreY + side[1] * half;
+            int toX = side[0] == 0 ? centreX + half : fromX;
+            int toY = side[1] == 0 ? centreY + half : fromY;
+            return new Edge(new LocalPoint(fromX, fromY, view), new LocalPoint(toX, toY, view), plane);
         }
     }
 
