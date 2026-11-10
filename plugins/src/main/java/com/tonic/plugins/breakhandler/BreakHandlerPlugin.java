@@ -1,6 +1,7 @@
 package com.tonic.plugins.breakhandler;
 
 import com.google.inject.Inject;
+import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.api.widgets.WidgetAPI;
 import com.tonic.services.breakhandler.Break;
 import com.tonic.services.breakhandler.BreakHandler;
@@ -86,7 +87,7 @@ public class BreakHandlerPlugin extends Plugin
     private boolean autoLogin;
 
     @Override
-    protected void startUp() throws Exception
+    protected void startUp()
     {
         panel = new BreakHandlerPanel();
         navigationButton = NavigationButton.builder()
@@ -116,7 +117,7 @@ public class BreakHandlerPlugin extends Plugin
     }
 
     @Override
-    protected void shutDown() throws Exception
+    protected void shutDown()
     {
         breakHandler.cancel();
         clientToolbar.removeNavigation(navigationButton);
@@ -208,7 +209,7 @@ public class BreakHandlerPlugin extends Plugin
 
         if (client.getVarcIntValue(VarClientID.TOPLEVEL_PANEL) != 10)
         {
-            client.runScript(SWITCH_TAB_SCRIPT_ID, 10);
+            ClientScriptAPI.runScript(SWITCH_TAB_SCRIPT_ID, 10);
             breakHandler.log("[%s] Switching to logout interface tab", "Break Handler");
         }
 
