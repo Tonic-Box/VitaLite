@@ -1,6 +1,7 @@
 package com.tonic.services.profiler;
 
 import com.tonic.model.ui.components.VitaFrame;
+import com.tonic.services.profiler.jit.JitTab;
 import com.tonic.services.profiler.jvm.JvmTab;
 import com.tonic.services.profiler.leak.LeakDetectorTab;
 import com.tonic.services.profiler.recording.RecordingTab;
@@ -80,6 +81,7 @@ public class ProfilerWindow extends VitaFrame {
         add(new PanelTab("Leak Detector", leaks, leaks::cleanup));
         add(new ThreadsTab());
         add(new JvmTab());
+        add(new JitTab());
 
         tabbedPane.setBackground(PANEL);
         tabbedPane.setForeground(TEXT);
