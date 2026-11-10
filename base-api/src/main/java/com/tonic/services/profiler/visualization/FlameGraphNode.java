@@ -1,104 +1,102 @@
 package com.tonic.services.profiler.visualization;
 
+import lombok.Getter;
+
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Node in a flame graph representing a method call
+ * One frame of a flame graph: a method and the samples whose stacks passed through it at this point
  */
 public class FlameGraphNode {
+    @Getter
     private final String methodName;
+    @Getter
     private final String className;
+    @Getter
     private final String packageName;
+    @Getter
     private long samples;
-    private final List<FlameGraphNode> children;
+    @Getter
+    private final List<FlameGraphNode> children = new ArrayList<>();
+    private final Map<String, FlameGraphNode> childrenByMethod = new HashMap<>();
+    @Getter
     private FlameGraphNode parent;
-    private Rectangle bounds;
+    @Getter
+    private Rectangle bounds = new Rectangle();
 
+    /**
+     * Creates the node
+     * @param methodName the method's name
+     * @param className the fully qualified class name
+     * @param packageName the class's package, used to colour the frame
+     */
     public FlameGraphNode(String methodName, String className, String packageName) {
         this.methodName = methodName;
         this.className = className;
         this.packageName = packageName;
-        this.samples = 0;
-        this.children = new ArrayList<>();
-        this.bounds = new Rectangle();
     }
 
+    /**
+     * Counts one more sample through this frame
+     */
     public void addSample() {
-        this.samples++;
+        samples++;
     }
 
+    /**
+     * Counts more samples through this frame
+     * @param count the number of samples
+     */
     public void addSamples(long count) {
-        this.samples += count;
+        samples += count;
     }
 
+    /**
+     * Gets the child for a method, creating it the first time
+     * @param methodName the method's name
+     * @param className the fully qualified class name
+     * @param packageName the class's package
+     * @return the child node
+     */
     public FlameGraphNode getOrCreateChild(String methodName, String className, String packageName) {
-        for (FlameGraphNode child : children) {
-            if (child.methodName.equals(methodName) &&
-                child.className.equals(className) &&
-                child.packageName.equals(packageName)) {
-                return child;
-            }
-        }
-
-        FlameGraphNode child = new FlameGraphNode(methodName, className, packageName);
-        child.parent = this;
-        children.add(child);
-        return child;
+        return childrenByMethod.computeIfAbsent(className + '.' + methodName, key -> {
+            FlameGraphNode child = new FlameGraphNode(methodName, className, packageName);
+            child.parent = this;
+            children.add(child);
+            return child;
+        });
     }
 
-    public String getMethodName() {
-        return methodName;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public long getSamples() {
-        return samples;
-    }
-
-    public List<FlameGraphNode> getChildren() {
-        return children;
-    }
-
-    public FlameGraphNode getParent() {
-        return parent;
-    }
-
-    public Rectangle getBounds() {
-        return bounds;
-    }
-
+    /**
+     * Sets where the frame is drawn
+     * @param bounds the frame's rectangle
+     */
     public void setBounds(Rectangle bounds) {
         this.bounds = bounds;
     }
 
-    public long getTotalSamples() {
-        long total = samples;
-        for (FlameGraphNode child : children) {
-            total += child.getTotalSamples();
-        }
-        return total;
+    /**
+     * Gets the class and method name
+     * @return the fully qualified method name
+     */
+    public String getFullName() {
+        return className == null || className.isEmpty() ? methodName : className + '.' + methodName;
     }
 
-    public String getFullName() {
-        if (packageName != null && !packageName.isEmpty()) {
-            return packageName + "." + className + "." + methodName;
-        } else if (className != null && !className.isEmpty()) {
-            return className + "." + methodName;
-        } else {
+    /**
+     * Gets the short class name and method name
+     * @return the name shown on the frame
+     */
+    public String getDisplayName() {
+        if (className == null || className.isEmpty()) {
             return methodName;
         }
-    }
-
-    public String getDisplayName() {
-        return className + "." + methodName;
+        int lambda = className.indexOf("$$Lambda$");
+        String type = lambda >= 0 ? className.substring(0, lambda + "$$Lambda".length()) : className;
+        return type.substring(type.lastIndexOf('.') + 1) + '.' + methodName;
     }
 }

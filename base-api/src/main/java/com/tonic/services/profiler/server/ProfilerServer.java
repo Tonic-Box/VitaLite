@@ -9,10 +9,7 @@ import com.tonic.services.profiler.recording.MethodProfiler;
 import com.tonic.services.profiler.recording.MethodStats;
 import com.tonic.services.profiler.recording.MethodTimingResults;
 import com.tonic.services.profiler.recording.CallTreeNode;
-import com.tonic.services.profiler.sampling.CPUSampler;
-import com.tonic.services.profiler.sampling.MemorySampler;
 import com.tonic.services.profiler.heap.HeapSnapshot;
-import com.tonic.services.profiler.sampling.SampleAnalyzer;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -58,17 +55,12 @@ public class ProfilerServer {
     private MethodTimingResults lastJFRResults;
 
     // Sampling state
-    private final CPUSampler cpuSampler;
-    private final MemorySampler memorySampler;
-    private final SampleAnalyzer sampleAnalyzer = new SampleAnalyzer();
 
     // Resource metrics
     private final ResourceMetricsCollector metricsCollector;
 
     private ProfilerServer() {
         jfrRecorder = new JFRMethodRecorder();
-        cpuSampler = new CPUSampler(10000);
-        memorySampler = new MemorySampler(1000);
         metricsCollector = new ResourceMetricsCollector();
     }
 
@@ -116,16 +108,9 @@ public class ProfilerServer {
         server.createContext("/profiler/method", this::handleMethod);
 
         // CPU sampling endpoints
-        server.createContext("/profiler/cpu/start", this::handleCPUStart);
-        server.createContext("/profiler/cpu/stop", this::handleCPUStop);
-        server.createContext("/profiler/cpu/clear", this::handleCPUClear);
-        server.createContext("/profiler/cpu", this::handleCPU);
 
         // Memory sampling endpoints
-        server.createContext("/profiler/memory/start", this::handleMemoryStart);
-        server.createContext("/profiler/memory/stop", this::handleMemoryStop);
         server.createContext("/profiler/memory/histogram", this::handleHeapHistogram);
-        server.createContext("/profiler/memory", this::handleMemory);
 
         // Resource monitor endpoint
         server.createContext("/profiler/resources", this::handleResources);
@@ -193,22 +178,8 @@ public class ProfilerServer {
                     "      \"GET /profiler/method\": \"Method details with callers/callees. Required: ?name=ClassName.methodName\"\n" +
                     "    },\n" +
 
-                    // CPU sampling
-                    "    \"cpu_sampling\": {\n" +
-                    "      \"description\": \"Stack trace sampling for CPU profiling\",\n" +
-                    "      \"GET /profiler/cpu\": \"CPU sampling results with top methods and packages\",\n" +
-                    "      \"POST /profiler/cpu/start\": \"Start CPU sampling. Optional: ?interval=N (ms, default 50)\",\n" +
-                    "      \"POST /profiler/cpu/stop\": \"Stop CPU sampling\",\n" +
-                    "      \"POST /profiler/cpu/clear\": \"Clear CPU sampling data\"\n" +
-                    "    },\n" +
-
-                    // Memory sampling
-                    "    \"memory_sampling\": {\n" +
-                    "      \"description\": \"Heap and GC tracking\",\n" +
-                    "      \"GET /profiler/memory\": \"Memory sampling results with allocation rates and GC stats\",\n" +
-                    "      \"GET /profiler/memory/histogram\": \"Heap histogram (top classes by size). Optional: ?top=N (default 50)\",\n" +
-                    "      \"POST /profiler/memory/start\": \"Start memory sampling. Optional: ?interval=N (ms, default 1000)\",\n" +
-                    "      \"POST /profiler/memory/stop\": \"Stop memory sampling\"\n" +
+                    "    \"heap\": {\n" +
+                    "      \"GET /profiler/memory/histogram\": \"Live heap histogram, top classes by size; runs a full GC. Optional: ?top=N (default 50)\"\n" +
                     "    },\n" +
 
                     // Resources
@@ -278,14 +249,6 @@ public class ProfilerServer {
                 "\"available\":" + JFRMethodRecorder.isAvailable() + "," +
                 "\"recording\":" + (jfrRecorder != null && isJFRRecording()) + "," +
                 "\"hasResults\":" + (lastJFRResults != null) +
-                "}," +
-                "\"cpu\":{" +
-                "\"running\":" + cpuSampler.isRunning() + "," +
-                "\"totalSamples\":" + cpuSampler.getTotalSamples() +
-                "}," +
-                "\"memory\":{" +
-                "\"running\":" + memorySampler.isRunning() + "," +
-                "\"totalSamples\":" + memorySampler.getTotalSamples() +
                 "}}";
 
         sendJson(exchange, 200, json);
@@ -524,144 +487,6 @@ public class ProfilerServer {
 
         json.append("}");
         sendJson(exchange, 200, json.toString());
-    }
-
-    // ==================== CPU SAMPLING HANDLERS ====================
-
-    private void handleCPU(HttpExchange exchange) throws IOException {
-        if (!checkGet(exchange)) return;
-
-        CPUSampler.SamplingStats stats = cpuSampler.getStats();
-        SampleAnalyzer.CPUAnalysisResults analysis = sampleAnalyzer.analyzeCPU(cpuSampler.getStackSamples());
-
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"running\":").append(stats.running).append(",");
-        json.append("\"totalSamples\":").append(stats.totalSamples).append(",");
-        json.append("\"currentSamples\":").append(stats.currentSamples).append(",");
-        json.append("\"maxSamples\":").append(stats.maxSamples).append(",");
-        json.append("\"droppedSamples\":").append(stats.droppedSamples).append(",");
-        json.append("\"intervalMs\":").append(stats.intervalMs).append(",");
-
-        // Top methods
-        json.append("\"topMethods\":[");
-        List<SampleAnalyzer.MethodStats> topMethods = analysis.getTopMethods(20);
-        boolean first = true;
-        for (SampleAnalyzer.MethodStats m : topMethods) {
-            if (!first) json.append(",");
-            first = false;
-            json.append("{");
-            json.append("\"method\":\"").append(escapeJson(m.method.getFullSignature())).append("\",");
-            json.append("\"selfPercent\":").append(String.format("%.2f", m.selfTimePercent)).append(",");
-            json.append("\"totalPercent\":").append(String.format("%.2f", m.totalTimePercent)).append(",");
-            json.append("\"selfSamples\":").append(m.selfSamples).append(",");
-            json.append("\"totalSamples\":").append(m.totalSamples);
-            json.append("}");
-        }
-        json.append("],");
-
-        // Top packages
-        json.append("\"topPackages\":[");
-        List<SampleAnalyzer.PackageStats> topPkgs = analysis.getTopPackages(10);
-        first = true;
-        for (SampleAnalyzer.PackageStats p : topPkgs) {
-            if (!first) json.append(",");
-            first = false;
-            json.append("{");
-            json.append("\"package\":\"").append(escapeJson(p.packageName)).append("\",");
-            json.append("\"totalSamples\":").append(p.totalSamples).append(",");
-            json.append("\"selfSamples\":").append(p.selfSamples).append(",");
-            json.append("\"methodCount\":").append(p.methodCount);
-            json.append("}");
-        }
-        json.append("]");
-
-        json.append("}");
-        sendJson(exchange, 200, json.toString());
-    }
-
-    private void handleCPUStart(HttpExchange exchange) throws IOException {
-        if (!checkPost(exchange)) return;
-
-        Map<String, String> params = parseQuery(exchange.getRequestURI().getQuery());
-        int interval = 50;
-        try {
-            if (params.containsKey("interval")) {
-                interval = Integer.parseInt(params.get("interval"));
-            }
-        } catch (NumberFormatException e) {
-            // Use default
-        }
-
-        cpuSampler.setSamplingInterval(interval);
-        cpuSampler.start();
-        sendJson(exchange, 200, "{\"success\":true,\"running\":true,\"intervalMs\":" + interval + "}");
-    }
-
-    private void handleCPUStop(HttpExchange exchange) throws IOException {
-        if (!checkPost(exchange)) return;
-        cpuSampler.stop();
-        sendJson(exchange, 200, "{\"success\":true,\"running\":false,\"totalSamples\":" + cpuSampler.getTotalSamples() + "}");
-    }
-
-    private void handleCPUClear(HttpExchange exchange) throws IOException {
-        if (!checkPost(exchange)) return;
-        cpuSampler.clear();
-        sendJson(exchange, 200, "{\"success\":true,\"cleared\":true}");
-    }
-
-    // ==================== MEMORY SAMPLING HANDLERS ====================
-
-    private void handleMemory(HttpExchange exchange) throws IOException {
-        if (!checkGet(exchange)) return;
-
-        MemorySampler.SamplingStats stats = memorySampler.getStats();
-        SampleAnalyzer.MemoryAnalysisResults analysis = sampleAnalyzer.analyzeMemory(
-            memorySampler.getHeapSamples(),
-            memorySampler.getGCSamples()
-        );
-
-        String json = "{" +
-                "\"running\":" + stats.running + "," +
-                "\"totalSamples\":" + stats.totalSamples + "," +
-                "\"currentHeapSamples\":" + stats.currentHeapSamples + "," +
-                "\"gcEventCount\":" + stats.gcEventCount + "," +
-                "\"intervalMs\":" + stats.intervalMs + "," +
-                "\"analysis\":{" +
-                "\"averageAllocationRateMBps\":" + String.format("%.2f", analysis.averageAllocationRate) + "," +
-                "\"peakAllocationRateMBps\":" + String.format("%.2f", analysis.peakAllocationRate) + "," +
-                "\"totalEstimatedAllocationMB\":" + String.format("%.2f", analysis.totalEstimatedAllocation) + "," +
-                "\"heapGrowthTrend\":\"" + analysis.heapGrowthTrend + "\"," +
-                "\"totalGCEvents\":" + analysis.totalGCEvents + "," +
-                "\"averageGCOverheadPercent\":" + String.format("%.2f", analysis.averageGCOverhead) + "," +
-                "\"fullGCCount\":" + analysis.fullGCCount +
-                "}}";
-
-        sendJson(exchange, 200, json);
-    }
-
-    private void handleMemoryStart(HttpExchange exchange) throws IOException {
-        if (!checkPost(exchange)) return;
-
-        Map<String, String> params = parseQuery(exchange.getRequestURI().getQuery());
-        int interval = 1000;
-        try {
-            if (params.containsKey("interval")) {
-                interval = Integer.parseInt(params.get("interval"));
-            }
-        } catch (NumberFormatException e) {
-            // Use default
-        }
-
-        memorySampler.setSamplingInterval(interval);
-        memorySampler.start();
-        sendJson(exchange, 200, "{\"success\":true,\"running\":true,\"intervalMs\":" + interval + "}");
-    }
-
-    private void handleMemoryStop(HttpExchange exchange) throws IOException {
-        if (!checkPost(exchange)) return;
-        memorySampler.stop();
-        sendJson(exchange, 200, "{\"success\":true,\"running\":false,\"totalSamples\":" + memorySampler.getTotalSamples() + "}");
     }
 
     private void handleHeapHistogram(HttpExchange exchange) throws IOException {

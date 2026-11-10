@@ -18,11 +18,21 @@ public class FlameGraphPanel extends JPanel {
     private static final Color BORDER_COLOR = new Color(60, 62, 66);
     private static final int FRAME_HEIGHT = 18;
     private static final int MIN_WIDTH_FOR_LABEL = 60;
+    private static final Font LABEL_FONT = new Font("Segoe UI", Font.BOLD, 10);
+    private static final Font INFO_FONT = new Font("Segoe UI", Font.PLAIN, 11);
+    private static final Font EMPTY_FONT = new Font("Segoe UI", Font.PLAIN, 14);
+    private static final Color INFO_BACKGROUND = new Color(50, 52, 56);
+    private static final Color TOOLTIP_BACKGROUND = new Color(50, 52, 56, 230);
 
     private FlameGraphNode root;
     private FlameGraphNode hoveredNode;
     private FlameGraphNode focusedNode;
-    private Map<String, Color> packageColors;
+    private FlameGraphNode laidOutNode;
+    private int laidOutWidth = -1;
+    private double laidOutZoom;
+    private double laidOutOffset;
+    private int laidOutDepth;
+    private final Map<String, Color> packageColors;
     private int colorIndex = 0;
 
     // Zoom state
@@ -95,12 +105,7 @@ public class FlameGraphPanel extends JPanel {
         });
 
         // Mouse wheel zoom - zoom centered on mouse position
-        addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                handleMouseWheelZoom(e);
-            }
-        });
+        addMouseWheelListener(this::handleMouseWheelZoom);
     }
 
     public void setRoot(FlameGraphNode root) {
@@ -110,6 +115,7 @@ public class FlameGraphPanel extends JPanel {
         this.colorIndex = 0;
         this.zoomScale = 1.0;
         this.zoomOffsetX = 0;
+        this.laidOutNode = null;
         repaint();
     }
 
@@ -126,21 +132,8 @@ public class FlameGraphPanel extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        // Calculate layout
-        int depth = calculateDepth(focusedNode);
-        int totalHeight = depth * FRAME_HEIGHT;
-
-        // Draw focus info at top (includes zoom level)
         drawFocusInfo(g2d);
-
-        // Apply zoom transform for layout
-        int baseWidth = getWidth() - 10;
-        int zoomedWidth = (int) (baseWidth * zoomScale);
-        int zoomedX = (int) (5 - zoomOffsetX);
-
-        // Layout and draw flame graph with zoom
-        Rectangle bounds = new Rectangle(zoomedX, 35, zoomedWidth, totalHeight);
-        layoutNode(focusedNode, bounds, 0);
+        layoutIfChanged();
         drawFlameGraph(g2d, focusedNode, 0);
 
         // Draw tooltip
@@ -149,9 +142,32 @@ public class FlameGraphPanel extends JPanel {
         }
     }
 
+    private void layoutIfChanged() {
+        if (laidOutNode == focusedNode && laidOutWidth == getWidth() && laidOutZoom == zoomScale && laidOutOffset == zoomOffsetX) {
+            return;
+        }
+        if (laidOutNode != focusedNode) {
+            laidOutDepth = calculateDepth(focusedNode);
+        }
+        clearBounds(root);
+        int baseWidth = getWidth() - 10;
+        layoutNode(focusedNode, new Rectangle((int) (5 - zoomOffsetX), 35, (int) (baseWidth * zoomScale), laidOutDepth * FRAME_HEIGHT), 0);
+        laidOutNode = focusedNode;
+        laidOutWidth = getWidth();
+        laidOutZoom = zoomScale;
+        laidOutOffset = zoomOffsetX;
+    }
+
+    private static void clearBounds(FlameGraphNode node) {
+        node.setBounds(new Rectangle());
+        for (FlameGraphNode child : node.getChildren()) {
+            clearBounds(child);
+        }
+    }
+
     private void drawEmptyState(Graphics g) {
         g.setColor(TEXT_COLOR);
-        g.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        g.setFont(EMPTY_FONT);
         String msg = "No profiling data available";
         FontMetrics fm = g.getFontMetrics();
         int x = (getWidth() - fm.stringWidth(msg)) / 2;
@@ -160,11 +176,11 @@ public class FlameGraphPanel extends JPanel {
     }
 
     private void drawFocusInfo(Graphics2D g2d) {
-        g2d.setColor(new Color(50, 52, 56));
+        g2d.setColor(INFO_BACKGROUND);
         g2d.fillRect(0, 0, getWidth(), 30);
 
         g2d.setColor(TEXT_COLOR);
-        g2d.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        g2d.setFont(INFO_FONT);
 
         String focusInfo;
         if (focusedNode == root) {
@@ -219,6 +235,9 @@ public class FlameGraphPanel extends JPanel {
     }
 
     private void drawFlameGraph(Graphics2D g2d, FlameGraphNode node, int depth) {
+        if (node.getBounds().width < 2) {
+            return;
+        }
         drawFrame(g2d, node);
 
         for (FlameGraphNode child : node.getChildren()) {
@@ -255,7 +274,7 @@ public class FlameGraphPanel extends JPanel {
 
     private void drawLabel(Graphics2D g2d, FlameGraphNode node, Rectangle bounds) {
         g2d.setColor(Color.BLACK);
-        g2d.setFont(new Font("Segoe UI", Font.BOLD, 10));
+        g2d.setFont(LABEL_FONT);
 
         String label = node.getDisplayName();
         FontMetrics fm = g2d.getFontMetrics();
@@ -277,8 +296,6 @@ public class FlameGraphPanel extends JPanel {
         }
 
         String ellipsis = "...";
-        int ellipsisWidth = fm.stringWidth(ellipsis);
-
         for (int i = label.length() - 1; i > 0; i--) {
             String truncated = label.substring(0, i) + ellipsis;
             if (fm.stringWidth(truncated) <= maxWidth) {
@@ -296,7 +313,7 @@ public class FlameGraphPanel extends JPanel {
         String text = String.format("%s: %d samples (%.2f%%)",
             node.getFullName(), node.getSamples(), percentage);
 
-        g2d.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        g2d.setFont(INFO_FONT);
         FontMetrics fm = g2d.getFontMetrics();
 
         int padding = 8;
@@ -319,7 +336,7 @@ public class FlameGraphPanel extends JPanel {
             y = mouse.y + 15;
         }
 
-        g2d.setColor(new Color(50, 52, 56, 230));
+        g2d.setColor(TOOLTIP_BACKGROUND);
         g2d.fillRoundRect(x, y, width, height, 5, 5);
 
         g2d.setColor(BORDER_COLOR);
