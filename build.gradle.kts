@@ -358,7 +358,7 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-feature"
+    val title = "${tag}-bugfix"
     val body = "# ${tag}\n" +
             "- Reworked built-in Profiler\n" +
             "- Interactable sides object API fixes\n" +
