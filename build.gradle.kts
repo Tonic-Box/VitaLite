@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("4")
+val vitaVersion by extra("5")
 val runeliteVersion by extra("1.13.6")
 
 group = "com.tonic"
@@ -360,12 +360,9 @@ tasks.register<Exec>("publishRelease") {
     val tag = "${runeliteVersion}_${vitaVersion}"
     val title = "${tag}-feature"
     val body = "# ${tag}\n" +
-            "- Implemented pluginhub feature for vita along with an official plugin repository baked in\n" +
-            "- Ground item interactions by name do nothing when the item has no such option\n" +
-            "- interactableFrom handles wall objects\n" +
-            "- BankLocations.getNearest picks the bank the pathfinder reaches first\n" +
-            "- Inventory ops resolve against the item's shown options\n" +
-            "- Quetzal transport from the game's quetzal table";
+            "- Sailing rework\n" +
+            "- Fixed some threading issues with walker\n" +
+            "- Implemented VitaLite PluginHub"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
