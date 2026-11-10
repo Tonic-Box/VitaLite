@@ -3,10 +3,6 @@ package com.tonic.services.profiler;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Vector;
 
 /**
  * Field offsets and array geometry from jdk.internal.misc.Unsafe, reached through the module bootstrap
@@ -63,27 +59,6 @@ public final class AdvancedVMAccess {
     public static int arrayIndexScale(Class<?> arrayClass) {
         requireAvailable();
         return (int) invoke(arrayIndexScale, arrayClass);
-    }
-
-    /**
-     * Gets the classes the system class loader has loaded
-     * @return the classes, empty when they cannot be read
-     */
-    public static Set<Class<?>> getAllLoadedClasses() {
-        Set<Class<?>> classes = new HashSet<>();
-        if (!isAvailable()) {
-            return classes;
-        }
-        try {
-            Field field = ClassLoader.class.getDeclaredField("classes");
-            field.setAccessible(true);
-            for (Object each : ((Vector<?>) field.get(ClassLoader.getSystemClassLoader())).toArray()) {
-                classes.add((Class<?>) each);
-            }
-        } catch (Exception ignored) {
-        }
-        Collections.addAll(classes, Object.class, String.class, Class.class, Thread.class);
-        return classes;
     }
 
     private static boolean initialize() {

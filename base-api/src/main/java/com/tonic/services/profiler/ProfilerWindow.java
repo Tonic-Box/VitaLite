@@ -72,11 +72,8 @@ public class ProfilerWindow extends VitaFrame {
             }
         });
 
-        SamplingTab sampling = new SamplingTab();
-        RecordingTab recording = new RecordingTab();
         add(resourceMonitor);
-        add(new PanelTab("Sampling", sampling, sampling::cleanup));
-        add(new PanelTab("Recording", recording, recording::cleanup));
+        add(new RecordingTab());
         add(new HeapTab());
         add(new ThreadsTab());
         add(new JvmTab());

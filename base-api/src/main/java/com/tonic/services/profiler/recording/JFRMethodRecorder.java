@@ -2,49 +2,37 @@ package com.tonic.services.profiler.recording;
 
 import jdk.jfr.FlightRecorder;
 import jdk.jfr.Recording;
+import jdk.jfr.consumer.RecordedClass;
 import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedFrame;
 import jdk.jfr.consumer.RecordedMethod;
 import jdk.jfr.consumer.RecordedStackTrace;
 import jdk.jfr.consumer.RecordingFile;
-
-import com.tonic.services.profiler.visualization.FlameGraphNode;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
- * JFR-based method timing recorder.
- * Uses Java Flight Recorder's ExecutionSample events for low-overhead profiling.
- *
- * Usage:
- *   recorder.setSamplePeriodMs(10);
- *   recorder.setFilterMode(FilterMode.PACKAGE);
- *   recorder.setPackageFilter("com.tonic");
- *   recorder.startRecording();
- *   // ... do work ...
- *   recorder.stopRecording();
- *   MethodTimingResults results = recorder.analyze();
+ * Records Java Flight Recorder samples: Java execution, threads blocked in native code, and optionally allocations,
+ * then turns them into results
  */
 public class JFRMethodRecorder {
+    private static final String EXECUTION = "jdk.ExecutionSample";
+    private static final String NATIVE = "jdk.NativeMethodSample";
+    private static final String ALLOCATION_IN_TLAB = "jdk.ObjectAllocationInNewTLAB";
+    private static final String ALLOCATION_OUTSIDE_TLAB = "jdk.ObjectAllocationOutsideTLAB";
 
     /**
-     * Filter mode for which methods to include in results
+     * Which methods the results show
      */
     public enum FilterMode {
-        /** Include all Java methods */
         ALL,
-        /** Include only methods from classes starting with packageFilter */
         PACKAGE,
-        /** Include only methods from the exact classFilter class */
         CLASS
     }
 
@@ -53,355 +41,224 @@ public class JFRMethodRecorder {
     private volatile boolean isRecording;
     private long recordingStartTime;
     private long recordingEndTime;
-
-    // Configuration
+    @Getter
     private int samplePeriodMs = 10;
     private FilterMode filterMode = FilterMode.ALL;
     private String packageFilter = "";
     private String classFilter = "";
+    private boolean recordAllocations;
+    private boolean allocationsRecorded;
 
     /**
-     * Check if JFR is available on this JVM
+     * Checks whether this JVM has Flight Recorder
+     * @return true when recordings can be made
      */
     public static boolean isAvailable() {
         try {
             return FlightRecorder.isAvailable();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return false;
         }
     }
 
     /**
-     * Start a new recording session
+     * Starts recording, discarding any recording not yet analyzed
+     * @throws IOException if the recording file cannot be created
+     * @throws IllegalStateException if a recording is already running or Flight Recorder is unavailable
      */
-    public void startRecording() throws IOException {
+    public synchronized void startRecording() throws IOException {
         if (isRecording) {
             throw new IllegalStateException("Recording already in progress");
         }
-
-        // Create temp file for JFR data
-        tempFile = Files.createTempFile("jfr_method_recording_", ".jfr");
-
-        // Create and configure recording
+        if (!isAvailable()) {
+            throw new IllegalStateException("Flight Recorder is not available in this JVM");
+        }
+        discard();
+        tempFile = Files.createTempFile("vitalite-recording-", ".jfr");
         recording = new Recording();
-
-        // Enable ExecutionSample for method profiling
-        recording.enable("jdk.ExecutionSample")
-                .withPeriod(Duration.ofMillis(samplePeriodMs))
-                .withStackTrace();
-
-        // Also enable NativeMethodSample for native code (optional)
-        recording.enable("jdk.NativeMethodSample")
-                .withPeriod(Duration.ofMillis(samplePeriodMs));
-
-        // Configure recording destination
+        recording.enable(EXECUTION).withPeriod(Duration.ofMillis(samplePeriodMs)).withStackTrace();
+        recording.enable(NATIVE).withPeriod(Duration.ofMillis(samplePeriodMs)).withStackTrace();
+        if (recordAllocations) {
+            recording.enable(ALLOCATION_IN_TLAB).withStackTrace();
+            recording.enable(ALLOCATION_OUTSIDE_TLAB).withStackTrace();
+        }
+        allocationsRecorded = recordAllocations;
         recording.setToDisk(true);
         recording.setDestination(tempFile);
-
-        // Start recording
         recording.start();
         recordingStartTime = System.currentTimeMillis();
         isRecording = true;
     }
 
     /**
-     * Stop the current recording session
+     * Stops recording and writes the recording file, which can take a moment; safe to call more than once
      */
-    public void stopRecording() {
-        if (!isRecording || recording == null) {
+    public synchronized void stopRecording() {
+        if (!isRecording) {
             return;
         }
-
         recordingEndTime = System.currentTimeMillis();
         isRecording = false;
-
         try {
             recording.stop();
+        } finally {
             recording.close();
-        } catch (Exception e) {
-            System.err.println("Error stopping JFR recording: " + e.getMessage());
+            recording = null;
         }
     }
 
     /**
-     * Analyze the recorded data and return method timing results.
-     * Should be called after stopRecording().
+     * Reads the stopped recording into results and deletes its file
+     * @return the results, empty when nothing was recorded
+     * @throws IOException if the recording file cannot be read
      */
-    public MethodTimingResults analyze() throws IOException {
+    public synchronized MethodTimingResults analyze() throws IOException {
+        StackAnalyzer analyzer = new StackAnalyzer(this::matchesFilter);
         if (tempFile == null || !Files.exists(tempFile)) {
-            return new MethodTimingResults(new HashMap<>(), 0, samplePeriodMs,
-                    recordingStartTime, recordingEndTime, null, null, new HashMap<>());
+            return analyzer.results(samplePeriodMs, recordingStartTime, recordingEndTime, false);
         }
-
-        Map<String, MethodStats> stats = new HashMap<>();
-        FlameGraphNode flameRoot = new FlameGraphNode("(all)", "", "");
-        CallTreeNode callTreeRoot = CallTreeNode.createRoot();
-        Map<String, CallTreeNode> methodNodes = new HashMap<>();  // For caller/callee tracking
-        int totalSamples = 0;
-
-        try (RecordingFile rf = new RecordingFile(tempFile)) {
-            while (rf.hasMoreEvents()) {
-                RecordedEvent event = rf.readEvent();
-                String eventName = event.getEventType().getName();
-
-                // Process execution samples
-                if ("jdk.ExecutionSample".equals(eventName) ||
-                    "jdk.NativeMethodSample".equals(eventName)) {
-
-                    RecordedStackTrace stackTrace = event.getStackTrace();
-                    if (stackTrace != null) {
-                        processStackTrace(stackTrace, stats, flameRoot, callTreeRoot, methodNodes);
-                        totalSamples++;
-                    }
+        try (RecordingFile file = new RecordingFile(tempFile)) {
+            while (file.hasMoreEvents()) {
+                RecordedEvent event = file.readEvent();
+                String name = event.getEventType().getName();
+                RecordedStackTrace stack = event.getStackTrace();
+                if (stack == null) {
+                    continue;
+                }
+                switch (name) {
+                    case EXECUTION:
+                        analyzer.addCpuSample(frames(stack), stack.isTruncated());
+                        break;
+                    case NATIVE:
+                        analyzer.addNativeSample(frames(stack));
+                        break;
+                    case ALLOCATION_IN_TLAB:
+                        analyzer.addAllocation(className(event.getClass("objectClass")), event.getLong("tlabSize"), frames(stack));
+                        break;
+                    case ALLOCATION_OUTSIDE_TLAB:
+                        analyzer.addAllocation(className(event.getClass("objectClass")), event.getLong("allocationSize"), frames(stack));
+                        break;
+                    default:
+                        break;
                 }
             }
         } finally {
-            // Cleanup temp file
+            discard();
+        }
+        return analyzer.results(samplePeriodMs, recordingStartTime, recordingEndTime, allocationsRecorded);
+    }
+
+    /**
+     * Stops any recording and deletes its file without analyzing it; safe to call more than once
+     */
+    public synchronized void discard() {
+        if (isRecording) {
+            stopRecording();
+        }
+        if (tempFile != null) {
             try {
                 Files.deleteIfExists(tempFile);
-            } catch (IOException e) {
-                // Ignore cleanup errors
+            } catch (IOException ignored) {
             }
             tempFile = null;
         }
-
-        // Update flame root sample count
-        flameRoot.addSamples(totalSamples);
-
-        return new MethodTimingResults(stats, totalSamples, samplePeriodMs,
-                recordingStartTime, recordingEndTime, flameRoot, callTreeRoot, methodNodes);
     }
 
-    /**
-     * Process a single stack trace sample
-     */
-    private void processStackTrace(RecordedStackTrace stackTrace, Map<String, MethodStats> stats,
-                                   FlameGraphNode flameRoot, CallTreeNode callTreeRoot,
-                                   Map<String, CallTreeNode> methodNodes) {
-        List<RecordedFrame> frames = stackTrace.getFrames();
-        Set<String> seenMethods = new HashSet<>();  // For total time deduplication
-
-        // Build list of filtered frames for flame graph (reversed - bottom to top)
-        List<FrameInfo> filteredFrames = new ArrayList<>();
-
-        for (int i = 0; i < frames.size(); i++) {
-            RecordedFrame frame = frames.get(i);
-
-            // Skip non-Java frames
-            if (!frame.isJavaFrame()) {
-                continue;
-            }
-
+    private static List<StackAnalyzer.Frame> frames(RecordedStackTrace stack) {
+        List<StackAnalyzer.Frame> frames = new ArrayList<>();
+        for (RecordedFrame frame : stack.getFrames()) {
             RecordedMethod method = frame.getMethod();
-            if (method == null || method.getType() == null) {
-                continue;
-            }
-
-            String className = method.getType().getName();
-            String methodName = method.getName();
-
-            // Skip internal/synthetic methods
-            if (methodName.startsWith("lambda$") && !shouldIncludeLambdas()) {
-                continue;
-            }
-
-            // Apply filter
-            if (!matchesFilter(className)) {
-                continue;
-            }
-
-            String methodKey = className + "." + methodName;
-            String packageName = extractPackage(className);
-
-            // Add to filtered frames for flame graph
-            filteredFrames.add(new FrameInfo(methodKey, className, methodName, packageName, i == 0));
-
-            MethodStats methodStats = stats.computeIfAbsent(methodKey, MethodStats::new);
-
-            // Top frame = self time (this method was actually executing)
-            if (i == 0) {
-                methodStats.incrementSelfSamples();
-            }
-
-            // All frames = total time (method was on the call stack)
-            // Only count once per sample to avoid double-counting recursive calls
-            if (seenMethods.add(methodKey)) {
-                methodStats.incrementTotalSamples();
-            }
-
-            // Track in methodNodes for caller/callee analysis
-            CallTreeNode methodNode = methodNodes.computeIfAbsent(methodKey,
-                k -> new CallTreeNode(methodKey, className, methodName, packageName));
-            if (i == 0) {
-                methodNode.addSelfSample();
-            }
-            methodNode.addTotalSample();
-        }
-
-        // Build flame graph (bottom-up: root -> callers -> ... -> executing method)
-        if (!filteredFrames.isEmpty()) {
-            FlameGraphNode currentFlame = flameRoot;
-            // Reverse iterate (from bottom of stack to top)
-            for (int i = filteredFrames.size() - 1; i >= 0; i--) {
-                FrameInfo fi = filteredFrames.get(i);
-                currentFlame = currentFlame.getOrCreateChild(fi.methodName, fi.className, fi.packageName);
-                currentFlame.addSample();
+            if (frame.isJavaFrame() && method != null && method.getType() != null) {
+                frames.add(new StackAnalyzer.Frame(method.getType().getName(), method.getName()));
             }
         }
-
-        // Build call tree (top-down: root -> called methods -> ... -> leaf)
-        if (!filteredFrames.isEmpty()) {
-            CallTreeNode currentCall = callTreeRoot;
-            // Forward iterate (from top of stack - executing - down to callers)
-            for (FrameInfo fi : filteredFrames) {
-                currentCall = currentCall.getOrCreateChild(fi.methodKey, fi.className, fi.methodName, fi.packageName);
-                if (fi.isTop) {
-                    currentCall.addSelfSample();
-                }
-                currentCall.addTotalSample();
-            }
-        }
-
-        // Track caller/callee relationships
-        for (int i = 0; i < filteredFrames.size(); i++) {
-            FrameInfo current = filteredFrames.get(i);
-            CallTreeNode currentNode = methodNodes.get(current.methodKey);
-
-            if (currentNode != null) {
-                // The frame below in the list is the caller (called current)
-                if (i + 1 < filteredFrames.size()) {
-                    FrameInfo caller = filteredFrames.get(i + 1);
-                    currentNode.addCaller(caller.methodKey);
-
-                    // Also track callee from caller's perspective
-                    CallTreeNode callerNode = methodNodes.get(caller.methodKey);
-                    if (callerNode != null) {
-                        callerNode.addCallee(current.methodKey);
-                    }
-                }
-            }
-        }
+        return frames;
     }
 
-    /**
-     * Extract package name from fully qualified class name
-     */
-    private String extractPackage(String className) {
-        if (className == null) return "";
-        int lastDot = className.lastIndexOf('.');
-        return lastDot > 0 ? className.substring(0, lastDot) : "";
+    private static String className(RecordedClass type) {
+        return type == null ? "(unknown)" : type.getName();
     }
 
-    /**
-     * Helper class to hold frame information
-     */
-    private static class FrameInfo {
-        final String methodKey;
-        final String className;
-        final String methodName;
-        final String packageName;
-        final boolean isTop;
-
-        FrameInfo(String methodKey, String className, String methodName, String packageName, boolean isTop) {
-            this.methodKey = methodKey;
-            this.className = className;
-            this.methodName = methodName;
-            this.packageName = packageName;
-            this.isTop = isTop;
-        }
-    }
-
-    /**
-     * Check if a class matches the current filter
-     */
     private boolean matchesFilter(String className) {
-        if (className == null) return false;
-
         switch (filterMode) {
-            case ALL:
-                return true;
-
             case PACKAGE:
-                if (packageFilter == null || packageFilter.isEmpty()) {
-                    return true;
-                }
-                return className.startsWith(packageFilter);
-
+                return packageFilter.isEmpty() || className.startsWith(packageFilter);
             case CLASS:
-                if (classFilter == null || classFilter.isEmpty()) {
-                    return true;
-                }
-                return className.equals(classFilter);
-
+                return classFilter.isEmpty() || className.equals(classFilter);
             default:
                 return true;
         }
     }
 
     /**
-     * Whether to include lambda methods in results
+     * Sets the sampling period
+     * @param samplePeriodMs milliseconds between samples, clamped to 1 to 1000
+     * @throws IllegalStateException if recording
      */
-    private boolean shouldIncludeLambdas() {
-        // For now, exclude lambdas by default (they clutter results)
-        return false;
-    }
-
-    // ==================== Configuration Setters ====================
-
     public void setSamplePeriodMs(int samplePeriodMs) {
-        if (isRecording) {
-            throw new IllegalStateException("Cannot change settings while recording");
-        }
+        requireStopped();
         this.samplePeriodMs = Math.max(1, Math.min(1000, samplePeriodMs));
     }
 
+    /**
+     * Sets which methods the results show
+     * @param filterMode all methods, one package or one class
+     * @throws IllegalStateException if recording
+     */
     public void setFilterMode(FilterMode filterMode) {
-        if (isRecording) {
-            throw new IllegalStateException("Cannot change settings while recording");
-        }
+        requireStopped();
         this.filterMode = filterMode != null ? filterMode : FilterMode.ALL;
     }
 
+    /**
+     * Sets the package the PACKAGE filter keeps
+     * @param packageFilter a package prefix such as com.tonic
+     * @throws IllegalStateException if recording
+     */
     public void setPackageFilter(String packageFilter) {
-        if (isRecording) {
-            throw new IllegalStateException("Cannot change settings while recording");
-        }
+        requireStopped();
         this.packageFilter = packageFilter != null ? packageFilter.trim() : "";
     }
 
+    /**
+     * Sets the class the CLASS filter keeps
+     * @param classFilter a fully qualified class name
+     * @throws IllegalStateException if recording
+     */
     public void setClassFilter(String classFilter) {
-        if (isRecording) {
-            throw new IllegalStateException("Cannot change settings while recording");
-        }
+        requireStopped();
         this.classFilter = classFilter != null ? classFilter.trim() : "";
     }
 
-    // ==================== Getters ====================
+    /**
+     * Sets whether allocations are recorded, which costs noticeably more than sampling alone
+     * @param recordAllocations true to record allocation events with their stacks
+     * @throws IllegalStateException if recording
+     */
+    public void setRecordAllocations(boolean recordAllocations) {
+        requireStopped();
+        this.recordAllocations = recordAllocations;
+    }
 
+    /**
+     * Checks whether a recording is running
+     * @return true while recording
+     */
     public boolean isRecording() {
         return isRecording;
     }
 
-    public int getSamplePeriodMs() {
-        return samplePeriodMs;
-    }
-
-    public FilterMode getFilterMode() {
-        return filterMode;
-    }
-
-    public String getPackageFilter() {
-        return packageFilter;
-    }
-
-    public String getClassFilter() {
-        return classFilter;
-    }
-
+    /**
+     * Gets how long the current or last recording ran
+     * @return the duration in milliseconds
+     */
     public long getRecordingDurationMs() {
+        return (isRecording ? System.currentTimeMillis() : recordingEndTime) - recordingStartTime;
+    }
+
+    private void requireStopped() {
         if (isRecording) {
-            return System.currentTimeMillis() - recordingStartTime;
+            throw new IllegalStateException("Cannot change settings while recording");
         }
-        return recordingEndTime - recordingStartTime;
     }
 }
