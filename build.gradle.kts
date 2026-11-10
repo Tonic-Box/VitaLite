@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("5")
+val vitaVersion by extra("6")
 val runeliteVersion by extra("1.13.6")
 
 group = "com.tonic"
@@ -360,9 +360,9 @@ tasks.register<Exec>("publishRelease") {
     val tag = "${runeliteVersion}_${vitaVersion}"
     val title = "${tag}-feature"
     val body = "# ${tag}\n" +
-            "- Sailing rework\n" +
-            "- Fixed some threading issues with walker\n" +
-            "- Implemented VitaLite PluginHub"
+            "- Reworked built-in Profiler\n" +
+            "- Interactable sides object API fixes\n" +
+            "- Hub plugins start/stop now happens on the EDT"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
