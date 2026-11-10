@@ -22,7 +22,7 @@ import java.awt.image.BufferedImage;
 /**
  * The Vita Hub tab's look: RuneLite's fonts and colours with the Vita accent, its icons, and the buttons it is built from.
  */
-final class HubTheme {
+public final class HubTheme {
     static final Color BACKGROUND = ColorScheme.DARK_GRAY_COLOR;
     static final Color CARD = ColorScheme.DARKER_GRAY_COLOR;
     static final Color CARD_HOVER = ColorScheme.DARKER_GRAY_HOVER_COLOR;
@@ -134,6 +134,11 @@ final class HubTheme {
             switchOff = new ImageIcon(ImageUtil.flipImage(ImageUtil.luminanceScale(ImageUtil.grayscaleImage(on), 0.61f), true, false));
         }
         return switchOff;
+    }
+
+    public static void styleSwitch(JCheckBox checkbox) {
+        checkbox.setIcon(switchOff());
+        checkbox.setSelectedIcon(switchOn());
     }
 
     /**
