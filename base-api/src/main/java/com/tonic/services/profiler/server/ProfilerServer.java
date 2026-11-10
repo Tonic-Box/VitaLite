@@ -1,15 +1,17 @@
 package com.tonic.services.profiler.server;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import com.tonic.services.profiler.MetricSnapshot;
 import com.tonic.services.profiler.ResourceMetricsCollector;
+import com.tonic.services.profiler.heap.HeapSnapshot;
+import com.tonic.services.profiler.recording.CallTreeNode;
 import com.tonic.services.profiler.recording.JFRMethodRecorder;
 import com.tonic.services.profiler.recording.MethodProfiler;
 import com.tonic.services.profiler.recording.MethodStats;
 import com.tonic.services.profiler.recording.MethodTimingResults;
-import com.tonic.services.profiler.recording.CallTreeNode;
-import com.tonic.services.profiler.heap.HeapSnapshot;
 import lombok.Getter;
 
 import java.io.IOException;
@@ -20,743 +22,485 @@ import java.lang.management.ThreadMXBean;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * HTTP REST API server for profiler data access.
- * Enables LLMs and external tools to query profiler metrics.
- * Endpoints:
- *   GET  /profiler/status              - Server and profiler status
- *   GET  /profiler/exact               - MethodProfiler exact timing data
- *   GET  /profiler/exact/csv           - MethodProfiler data as CSV
- *   GET  /profiler/jfr                 - Last JFR recording results
- *   GET  /profiler/hotspots?top=N      - Top N methods by self time
- *   GET  /profiler/method?name=X       - Method details with callers/callees
- *   POST /profiler/exact/enable        - Enable MethodProfiler
- *   POST /profiler/exact/disable       - Disable MethodProfiler
- *   POST /profiler/exact/clear         - Clear MethodProfiler data
- *   POST /profiler/jfr/start?period=N  - Start JFR recording
- *   POST /profiler/jfr/stop            - Stop JFR recording
+ * A local HTTP API over the profiler for scripts and LLM agents: status, JFR recordings and their hotspots, native
+ * waits and allocations, exact timings, heap histograms, resources, threads and GC. GET / lists every endpoint.
  */
 public class ProfilerServer {
+    private static final Gson GSON = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
+    private static final Gson PRETTY = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
     private static ProfilerServer instance;
 
+    private final ResourceMetricsCollector metricsCollector = new ResourceMetricsCollector();
+    private final JFRMethodRecorder jfrRecorder = new JFRMethodRecorder();
     private HttpServer server;
+    private ExecutorService executor;
     @Getter
     private int port = 8787;
     @Getter
-    private volatile boolean running = false;
-
-    // JFR state
-    private JFRMethodRecorder jfrRecorder;
-    private MethodTimingResults lastJFRResults;
-
-    // Sampling state
-
-    // Resource metrics
-    private final ResourceMetricsCollector metricsCollector;
+    private volatile boolean running;
+    private volatile MethodTimingResults lastJFRResults;
 
     private ProfilerServer() {
-        jfrRecorder = new JFRMethodRecorder();
-        metricsCollector = new ResourceMetricsCollector();
     }
 
-    public static ProfilerServer getInstance() {
+    /**
+     * Gets the server
+     * @return the one server instance
+     */
+    public static synchronized ProfilerServer getInstance() {
         if (instance == null) {
             instance = new ProfilerServer();
         }
         return instance;
     }
 
+    /**
+     * Starts the server on its current port, doing nothing when it already runs
+     * @throws IOException if the port cannot be bound
+     */
     public void start() throws IOException {
         start(port);
     }
 
-    public void start(int port) throws IOException {
+    /**
+     * Starts the server on 127.0.0.1, doing nothing when it already runs
+     * @param port the port to listen on
+     * @throws IOException if the port cannot be bound
+     */
+    public synchronized void start(int port) throws IOException {
         if (running) {
             return;
         }
         this.port = port;
-
         server = HttpServer.create(new InetSocketAddress("127.0.0.1", port), 0);
-        server.setExecutor(Executors.newFixedThreadPool(2));
-
-        // Root/help endpoint
-        server.createContext("/profiler", this::handleRoot);
-        server.createContext("/", this::handleRoot);
-
-        // Status endpoint
-        server.createContext("/profiler/status", this::handleStatus);
-
-        // Exact timing endpoints
-        server.createContext("/profiler/exact/enable", this::handleExactEnable);
-        server.createContext("/profiler/exact/disable", this::handleExactDisable);
-        server.createContext("/profiler/exact/clear", this::handleExactClear);
-        server.createContext("/profiler/exact/csv", this::handleExactCSV);
-        server.createContext("/profiler/exact", this::handleExact);
-
-        // JFR endpoints
-        server.createContext("/profiler/jfr/start", this::handleJFRStart);
-        server.createContext("/profiler/jfr/stop", this::handleJFRStop);
-        server.createContext("/profiler/jfr", this::handleJFR);
-
-        // Analysis endpoints
-        server.createContext("/profiler/hotspots", this::handleHotspots);
-        server.createContext("/profiler/method", this::handleMethod);
-
-        // CPU sampling endpoints
-
-        // Memory sampling endpoints
-        server.createContext("/profiler/memory/histogram", this::handleHeapHistogram);
-
-        // Resource monitor endpoint
-        server.createContext("/profiler/resources", this::handleResources);
-
-        // Thread endpoints
-        server.createContext("/profiler/threads", this::handleThreads);
-
-        // GC control
-        server.createContext("/profiler/gc", this::handleGC);
-
+        executor = Executors.newFixedThreadPool(2, task -> {
+            Thread thread = new Thread(task, "Profiler API");
+            thread.setDaemon(true);
+            return thread;
+        });
+        server.setExecutor(executor);
+        route("/", this::handleRoot);
+        route("/profiler", this::handleRoot);
+        route("/profiler/status", this::handleStatus);
+        route("/profiler/exact", this::handleExact);
+        route("/profiler/exact/csv", this::handleExactCsv);
+        route("/profiler/exact/enable", exchange -> setExact(exchange, true));
+        route("/profiler/exact/disable", exchange -> setExact(exchange, false));
+        route("/profiler/exact/clear", this::handleExactClear);
+        route("/profiler/jfr", this::handleJfr);
+        route("/profiler/jfr/start", this::handleJfrStart);
+        route("/profiler/jfr/stop", this::handleJfrStop);
+        route("/profiler/hotspots", this::handleHotspots);
+        route("/profiler/method", this::handleMethod);
+        route("/profiler/native", this::handleNative);
+        route("/profiler/allocations", this::handleAllocations);
+        route("/profiler/histogram", this::handleHistogram);
+        route("/profiler/resources", this::handleResources);
+        route("/profiler/threads", this::handleThreads);
+        route("/profiler/gc", this::handleGc);
         server.start();
         running = true;
         System.out.println("[ProfilerServer] Started on http://127.0.0.1:" + port);
     }
 
-    public void stop() {
-        if (!running || server == null) {
+    /**
+     * Stops the server and its request threads; safe to call more than once
+     */
+    public synchronized void stop() {
+        if (!running) {
             return;
         }
         server.stop(0);
+        executor.shutdownNow();
         running = false;
         System.out.println("[ProfilerServer] Stopped");
     }
 
-    // ==================== HANDLERS ====================
-
     private void handleRoot(HttpExchange exchange) throws IOException {
-        // Serve help/documentation for any request to root or /profiler without sub-path
         String path = exchange.getRequestURI().getPath();
-        if (path.equals("/") || path.equals("/profiler") || path.equals("/profiler/")) {
-
-            String json = "{\n" +
-                    "  \"name\": \"VitaLite Profiler API\",\n" +
-                    "  \"version\": \"1.0\",\n" +
-                    "  \"description\": \"REST API for accessing JVM profiler data. Designed for LLM integration.\",\n" +
-                    "  \"endpoints\": {\n" +
-
-                    // Status
-                    "    \"status\": {\n" +
-                    "      \"GET /profiler/status\": \"Server and profiler status overview\"\n" +
-                    "    },\n" +
-
-                    // Exact timing
-                    "    \"exact_timing\": {\n" +
-                    "      \"description\": \"Manual method timing via MethodProfiler.begin()/end() instrumentation\",\n" +
-                    "      \"GET /profiler/exact\": \"All exact timing data as JSON\",\n" +
-                    "      \"GET /profiler/exact/csv\": \"All exact timing data as CSV\",\n" +
-                    "      \"POST /profiler/exact/enable\": \"Enable MethodProfiler (starts collecting data)\",\n" +
-                    "      \"POST /profiler/exact/disable\": \"Disable MethodProfiler (zero overhead when disabled)\",\n" +
-                    "      \"POST /profiler/exact/clear\": \"Clear all collected timing data\"\n" +
-                    "    },\n" +
-
-                    // JFR
-                    "    \"jfr_sampling\": {\n" +
-                    "      \"description\": \"JVM Flight Recorder sampling profiler for statistical CPU profiling\",\n" +
-                    "      \"GET /profiler/jfr\": \"Results from last JFR recording session\",\n" +
-                    "      \"POST /profiler/jfr/start\": \"Start JFR recording. Optional: ?period=N (sample period in ms, default 10)\",\n" +
-                    "      \"POST /profiler/jfr/stop\": \"Stop JFR recording and analyze results\"\n" +
-                    "    },\n" +
-
-                    // Analysis
-                    "    \"analysis\": {\n" +
-                    "      \"description\": \"Higher-level analysis endpoints for JFR data\",\n" +
-                    "      \"GET /profiler/hotspots\": \"Top methods by CPU time. Optional: ?top=N (default 10)\",\n" +
-                    "      \"GET /profiler/method\": \"Method details with callers/callees. Required: ?name=ClassName.methodName\"\n" +
-                    "    },\n" +
-
-                    "    \"heap\": {\n" +
-                    "      \"GET /profiler/memory/histogram\": \"Live heap histogram, top classes by size; runs a full GC. Optional: ?top=N (default 50)\"\n" +
-                    "    },\n" +
-
-                    // Resources
-                    "    \"resources\": {\n" +
-                    "      \"description\": \"Live JVM resource metrics\",\n" +
-                    "      \"GET /profiler/resources\": \"Current CPU, heap, metaspace, code cache, and thread stats\"\n" +
-                    "    },\n" +
-
-                    // Threads
-                    "    \"threads\": {\n" +
-                    "      \"description\": \"Thread information and stack traces\",\n" +
-                    "      \"GET /profiler/threads\": \"All threads with state info. Optional: ?stacks=true&depth=N\"\n" +
-                    "    },\n" +
-
-                    // GC control
-                    "    \"gc\": {\n" +
-                    "      \"description\": \"Garbage collection control\",\n" +
-                    "      \"POST /profiler/gc\": \"Trigger full GC and report memory freed\"\n" +
-                    "    }\n" +
-                    "  },\n" +
-
-                    // Quick start
-                    "  \"quick_start\": {\n" +
-                    "    \"1_check_status\": \"GET /profiler/status\",\n" +
-                    "    \"2a_exact_timing\": [\n" +
-                    "      \"POST /profiler/exact/enable\",\n" +
-                    "      \"(run your code with MethodProfiler instrumentation)\",\n" +
-                    "      \"GET /profiler/exact\"\n" +
-                    "    ],\n" +
-                    "    \"2b_jfr_sampling\": [\n" +
-                    "      \"POST /profiler/jfr/start?period=10\",\n" +
-                    "      \"(run your code for a few seconds)\",\n" +
-                    "      \"POST /profiler/jfr/stop\",\n" +
-                    "      \"GET /profiler/hotspots?top=10\"\n" +
-                    "    ]\n" +
-                    "  },\n" +
-
-                    // Tips for LLMs
-                    "  \"llm_tips\": {\n" +
-                    "    \"workflow\": \"Use /profiler/status first to check what data is available\",\n" +
-                    "    \"exact_vs_jfr\": \"Exact timing is precise but requires code instrumentation. JFR sampling works on any code with statistical accuracy.\",\n" +
-                    "    \"hotspots\": \"Start with /profiler/hotspots to find slow methods, then use /profiler/method?name=X for caller/callee analysis\",\n" +
-                    "    \"confidence\": \"JFR results include confidence levels: HIGH (100+ samples), MEDIUM (30+), LOW (10+), VERY_LOW (<10)\"\n" +
-                    "  }\n" +
-                    "}\n";
-
-            sendJson(exchange, 200, json);
+        if (!path.equals("/") && !path.equals("/profiler") && !path.equals("/profiler/")) {
+            send(exchange, 404, map("error", "Unknown endpoint " + path + ". GET / lists them."));
             return;
         }
-        // For other paths under /profiler that don't match, return 404
-        sendJson(exchange, 404, "{\"error\":\"Endpoint not found\",\"hint\":\"GET /profiler for API documentation\"}");
+        Map<String, Object> endpoints = new LinkedHashMap<>();
+        endpoints.put("GET /profiler/status", "Server, exact timing and recording status");
+        endpoints.put("POST /profiler/jfr/start", "Start a JFR recording. Optional: ?period=N (ms, default 10), ?allocations=true to record allocations too");
+        endpoints.put("POST /profiler/jfr/stop", "Stop the recording and analyze it");
+        endpoints.put("GET /profiler/jfr", "Every method of the last recording, Java execution samples only");
+        endpoints.put("GET /profiler/hotspots", "Methods that ran the most. Optional: ?top=N (default 10)");
+        endpoints.put("GET /profiler/method", "A method's samples, callers and callees. Required: ?name=fully.qualified.Class.method");
+        endpoints.put("GET /profiler/native", "Methods threads were blocked in (I/O, locks, window system, GPU); not CPU use. Optional: ?top=N");
+        endpoints.put("GET /profiler/allocations", "Allocation bytes by class and by allocating method, when the recording had allocations=true. Optional: ?top=N");
+        endpoints.put("GET /profiler/exact", "Exact timings from MethodProfiler.begin/end instrumentation");
+        endpoints.put("GET /profiler/exact/csv", "Exact timings as CSV");
+        endpoints.put("POST /profiler/exact/enable", "Start collecting exact timings");
+        endpoints.put("POST /profiler/exact/disable", "Stop collecting exact timings");
+        endpoints.put("POST /profiler/exact/clear", "Clear exact timings");
+        endpoints.put("POST /profiler/histogram", "Live heap class histogram; runs a full GC first. Optional: ?top=N (default 50)");
+        endpoints.put("GET /profiler/resources", "CPU, GC, heap, metaspace, code cache and thread counts now");
+        endpoints.put("GET /profiler/threads", "Every thread with state and blocked/waited counts. Optional: ?stacks=true&depth=N");
+        endpoints.put("POST /profiler/gc", "Run a full GC and report what it freed");
+        Map<String, Object> help = new LinkedHashMap<>();
+        help.put("name", "VitaLite Profiler API");
+        help.put("version", "2");
+        help.put("endpoints", endpoints);
+        help.put("workflow", "POST /profiler/jfr/start, run the code for a few seconds, POST /profiler/jfr/stop, then GET /profiler/hotspots and GET /profiler/method?name=... for callers and callees");
+        help.put("notes", "Sample times are samples × period, not measured time. Confidence is HIGH at 100+ samples, MEDIUM at 30+, LOW at 10+, else VERY_LOW.");
+        sendText(exchange, 200, PRETTY.toJson(help), "application/json");
     }
 
     private void handleStatus(HttpExchange exchange) throws IOException {
-        if (!checkGet(exchange)) return;
-
-        String json = "{" +
-                "\"server\":{" +
-                "\"running\":true," +
-                "\"port\":" + port +
-                "}," +
-                "\"exact\":{" +
-                "\"enabled\":" + MethodProfiler.isEnabled() + "," +
-                "\"methodCount\":" + MethodProfiler.getMethodCount() +
-                "}," +
-                "\"jfr\":{" +
-                "\"available\":" + JFRMethodRecorder.isAvailable() + "," +
-                "\"recording\":" + (jfrRecorder != null && isJFRRecording()) + "," +
-                "\"hasResults\":" + (lastJFRResults != null) +
-                "}}";
-
-        sendJson(exchange, 200, json);
+        if (!allow(exchange, "GET")) {
+            return;
+        }
+        MethodTimingResults results = lastJFRResults;
+        send(exchange, 200, map(
+                "server", map("running", true, "port", port),
+                "exact", map("enabled", MethodProfiler.isEnabled(), "methodCount", MethodProfiler.getMethodCount()),
+                "jfr", map("available", JFRMethodRecorder.isAvailable(), "recording", jfrRecorder.isRecording(), "hasResults", results != null, "hasAllocations", results != null && results.allocations != null)));
     }
 
     private void handleExact(HttpExchange exchange) throws IOException {
-        if (!checkGet(exchange)) return;
-
-        List<MethodProfiler.MethodTiming> timings = MethodProfiler.getAllTimings();
-
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"timestamp\":").append(System.currentTimeMillis()).append(",");
-        json.append("\"enabled\":").append(MethodProfiler.isEnabled()).append(",");
-        json.append("\"methods\":[");
-
-        boolean first = true;
-        for (MethodProfiler.MethodTiming t : timings) {
-            if (!first) json.append(",");
-            first = false;
-            json.append("{");
-            json.append("\"label\":\"").append(escapeJson(t.getLabel())).append("\",");
-            json.append("\"calls\":").append(t.getCallCount()).append(",");
-            json.append("\"totalMs\":").append(String.format("%.3f", t.getTotalMs())).append(",");
-            json.append("\"avgMs\":").append(String.format("%.6f", t.getAverageMs())).append(",");
-            json.append("\"minMs\":").append(String.format("%.6f", t.getMinMs())).append(",");
-            json.append("\"maxMs\":").append(String.format("%.6f", t.getMaxMs()));
-            json.append("}");
+        if (!allow(exchange, "GET")) {
+            return;
         }
-
-        json.append("]}");
-        sendJson(exchange, 200, json.toString());
+        List<Map<String, Object>> methods = new ArrayList<>();
+        for (MethodProfiler.MethodTiming timing : MethodProfiler.getAllTimings()) {
+            methods.add(map("label", timing.getLabel(), "calls", timing.getCallCount(), "totalMs", round(timing.getTotalMs(), 3), "avgMs", round(timing.getAverageMs(), 6), "minMs", round(timing.getMinMs(), 6), "maxMs", round(timing.getMaxMs(), 6)));
+        }
+        send(exchange, 200, map("timestamp", System.currentTimeMillis(), "enabled", MethodProfiler.isEnabled(), "methods", methods));
     }
 
-    private void handleExactCSV(HttpExchange exchange) throws IOException {
-        if (!checkGet(exchange)) return;
-
-        String csv = MethodProfiler.generateCSVReport();
-        sendText(exchange, 200, csv, "text/csv");
+    private void handleExactCsv(HttpExchange exchange) throws IOException {
+        if (allow(exchange, "GET")) {
+            sendText(exchange, 200, MethodProfiler.generateCSVReport(), "text/csv");
+        }
     }
 
-    private void handleExactEnable(HttpExchange exchange) throws IOException {
-        if (!checkPost(exchange)) return;
-        MethodProfiler.setEnabled(true);
-        sendJson(exchange, 200, "{\"success\":true,\"enabled\":true}");
-    }
-
-    private void handleExactDisable(HttpExchange exchange) throws IOException {
-        if (!checkPost(exchange)) return;
-        MethodProfiler.setEnabled(false);
-        sendJson(exchange, 200, "{\"success\":true,\"enabled\":false}");
+    private void setExact(HttpExchange exchange, boolean enabled) throws IOException {
+        if (allow(exchange, "POST")) {
+            MethodProfiler.setEnabled(enabled);
+            send(exchange, 200, map("success", true, "enabled", enabled));
+        }
     }
 
     private void handleExactClear(HttpExchange exchange) throws IOException {
-        if (!checkPost(exchange)) return;
-        MethodProfiler.clear();
-        sendJson(exchange, 200, "{\"success\":true,\"cleared\":true}");
+        if (allow(exchange, "POST")) {
+            MethodProfiler.clear();
+            send(exchange, 200, map("success", true, "cleared", true));
+        }
     }
 
-    private void handleJFR(HttpExchange exchange) throws IOException {
-        if (!checkGet(exchange)) return;
-
-        if (lastJFRResults == null) {
-            sendJson(exchange, 200, "{\"hasResults\":false,\"message\":\"No JFR recording results available. Start and stop a recording first.\"}");
+    private void handleJfr(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "GET") || !hasResults(exchange)) {
             return;
         }
-
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"hasResults\":true,");
-        json.append("\"recordingDurationMs\":").append(lastJFRResults.recordingEndTime - lastJFRResults.recordingStartTime).append(",");
-        json.append("\"samplePeriodMs\":").append(lastJFRResults.samplePeriodMs).append(",");
-        json.append("\"totalSamples\":").append(lastJFRResults.totalSamples).append(",");
-        json.append("\"methodCount\":").append(lastJFRResults.getMethodCount()).append(",");
-        json.append("\"methods\":[");
-
-        List<MethodStats> methods = lastJFRResults.getAllMethodsBySelfTime();
-        boolean first = true;
-        for (MethodStats m : methods) {
-            if (!first) json.append(",");
-            first = false;
-            appendMethodStats(json, m, lastJFRResults.totalSamples, lastJFRResults.samplePeriodMs);
-        }
-
-        json.append("]}");
-        sendJson(exchange, 200, json.toString());
+        MethodTimingResults results = lastJFRResults;
+        Map<String, Object> body = recordingSummary(results);
+        body.put("methodCount", results.getMethodCount());
+        body.put("methods", methods(results.getAllMethodsBySelfTime(), results));
+        send(exchange, 200, body);
     }
 
-    private void handleJFRStart(HttpExchange exchange) throws IOException {
-        if (!checkPost(exchange)) return;
-
+    private void handleJfrStart(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "POST")) {
+            return;
+        }
         if (!JFRMethodRecorder.isAvailable()) {
-            sendJson(exchange, 500, "{\"success\":false,\"error\":\"JFR not available on this JVM\"}");
+            send(exchange, 500, map("success", false, "error", "JFR is not available in this JVM"));
             return;
         }
-
-        Map<String, String> params = parseQuery(exchange.getRequestURI().getQuery());
-        int period = 10;
-        try {
-            if (params.containsKey("period")) {
-                period = Integer.parseInt(params.get("period"));
+        Map<String, String> query = query(exchange);
+        int period = intParam(query, "period", 10);
+        boolean allocations = "true".equalsIgnoreCase(query.get("allocations"));
+        synchronized (jfrRecorder) {
+            if (jfrRecorder.isRecording()) {
+                send(exchange, 409, map("success", false, "error", "A recording is already running. POST /profiler/jfr/stop first."));
+                return;
             }
-        } catch (NumberFormatException e) {
-            // Use default
+            try {
+                jfrRecorder.setSamplePeriodMs(period);
+                jfrRecorder.setRecordAllocations(allocations);
+                jfrRecorder.startRecording();
+            } catch (Exception e) {
+                send(exchange, 500, map("success", false, "error", String.valueOf(e.getMessage())));
+                return;
+            }
         }
-
-        try {
-            jfrRecorder = new JFRMethodRecorder();
-            jfrRecorder.setSamplePeriodMs(period);
-            jfrRecorder.startRecording();
-            sendJson(exchange, 200, "{\"success\":true,\"recording\":true,\"periodMs\":" + period + "}");
-        } catch (Exception e) {
-            sendJson(exchange, 500, "{\"success\":false,\"error\":\"" + escapeJson(e.getMessage()) + "\"}");
-        }
+        send(exchange, 200, map("success", true, "recording", true, "periodMs", jfrRecorder.getSamplePeriodMs(), "allocations", allocations));
     }
 
-    private void handleJFRStop(HttpExchange exchange) throws IOException {
-        if (!checkPost(exchange)) return;
-
-        if (jfrRecorder == null) {
-            sendJson(exchange, 400, "{\"success\":false,\"error\":\"No recording in progress\"}");
+    private void handleJfrStop(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "POST")) {
             return;
         }
-
-        try {
-            jfrRecorder.stopRecording();
-            lastJFRResults = jfrRecorder.analyze();
-
-            String json = "{\"success\":true,\"recording\":false," +
-                    "\"totalSamples\":" + lastJFRResults.totalSamples + "," +
-                    "\"methodCount\":" + lastJFRResults.getMethodCount() + "," +
-                    "\"durationMs\":" + (lastJFRResults.recordingEndTime - lastJFRResults.recordingStartTime) +
-                    "}";
-
-            sendJson(exchange, 200, json);
-        } catch (Exception e) {
-            sendJson(exchange, 500, "{\"success\":false,\"error\":\"" + escapeJson(e.getMessage()) + "\"}");
+        MethodTimingResults results;
+        synchronized (jfrRecorder) {
+            if (!jfrRecorder.isRecording()) {
+                send(exchange, 400, map("success", false, "error", "No recording in progress"));
+                return;
+            }
+            try {
+                jfrRecorder.stopRecording();
+                results = jfrRecorder.analyze();
+            } catch (Exception e) {
+                send(exchange, 500, map("success", false, "error", String.valueOf(e.getMessage())));
+                return;
+            }
         }
+        lastJFRResults = results;
+        send(exchange, 200, map("success", true, "recording", false, "totalSamples", results.totalSamples, "nativeSamples", results.nativeSamples, "methodCount", results.getMethodCount(), "durationMs", results.recordingDurationMs, "allocations", results.allocations != null));
     }
 
     private void handleHotspots(HttpExchange exchange) throws IOException {
-        if (!checkGet(exchange)) return;
-
-        if (lastJFRResults == null) {
-            sendJson(exchange, 200, "{\"hasResults\":false,\"hotspots\":[]}");
+        if (!allow(exchange, "GET") || !hasResults(exchange)) {
             return;
         }
-
-        Map<String, String> params = parseQuery(exchange.getRequestURI().getQuery());
-        int top = 10;
-        try {
-            if (params.containsKey("top")) {
-                top = Integer.parseInt(params.get("top"));
-            }
-        } catch (NumberFormatException e) {
-            // Use default
-        }
-
-        List<MethodStats> hotspots = lastJFRResults.getTopMethodsBySelfTime(top);
-
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"hasResults\":true,");
-        json.append("\"recordingDurationMs\":").append(lastJFRResults.recordingEndTime - lastJFRResults.recordingStartTime).append(",");
-        json.append("\"samplePeriodMs\":").append(lastJFRResults.samplePeriodMs).append(",");
-        json.append("\"totalSamples\":").append(lastJFRResults.totalSamples).append(",");
-        json.append("\"hotspots\":[");
-
-        boolean first = true;
-        for (MethodStats m : hotspots) {
-            if (!first) json.append(",");
-            first = false;
-            appendMethodStats(json, m, lastJFRResults.totalSamples, lastJFRResults.samplePeriodMs);
-        }
-
-        json.append("]}");
-        sendJson(exchange, 200, json.toString());
+        MethodTimingResults results = lastJFRResults;
+        Map<String, Object> body = recordingSummary(results);
+        body.put("hotspots", methods(results.getTopMethodsBySelfTime(intParam(query(exchange), "top", 10)), results));
+        send(exchange, 200, body);
     }
 
     private void handleMethod(HttpExchange exchange) throws IOException {
-        if (!checkGet(exchange)) return;
-
-        Map<String, String> params = parseQuery(exchange.getRequestURI().getQuery());
-        String methodName = params.get("name");
-
-        if (methodName == null || methodName.isEmpty()) {
-            sendJson(exchange, 400, "{\"error\":\"Missing 'name' parameter\"}");
+        if (!allow(exchange, "GET")) {
             return;
         }
-
-        if (lastJFRResults == null) {
-            sendJson(exchange, 200, "{\"found\":false,\"message\":\"No JFR results available\"}");
+        String name = query(exchange).get("name");
+        if (name == null || name.isEmpty()) {
+            send(exchange, 400, map("error", "Missing 'name' parameter"));
             return;
         }
-
-        CallTreeNode node = lastJFRResults.getMethodNode(methodName);
+        if (!hasResults(exchange)) {
+            return;
+        }
+        MethodTimingResults results = lastJFRResults;
+        CallTreeNode node = results.getMethodNode(name);
         if (node == null) {
-            sendJson(exchange, 200, "{\"found\":false,\"method\":\"" + escapeJson(methodName) + "\"}");
+            send(exchange, 200, map("found", false, "method", name));
             return;
         }
-
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"found\":true,");
-        json.append("\"method\":\"").append(escapeJson(node.getMethodKey())).append("\",");
-        json.append("\"className\":\"").append(escapeJson(node.getClassName())).append("\",");
-        json.append("\"methodName\":\"").append(escapeJson(node.getMethodName())).append("\",");
-        json.append("\"selfSamples\":").append(node.getSelfSamples()).append(",");
-        json.append("\"totalSamples\":").append(node.getTotalSamples()).append(",");
-        json.append("\"selfPercent\":").append(String.format("%.2f", node.getSelfPercent(lastJFRResults.totalSamples))).append(",");
-        json.append("\"totalPercent\":").append(String.format("%.2f", node.getTotalPercent(lastJFRResults.totalSamples))).append(",");
-
-        // Callers
-        json.append("\"callers\":[");
-        List<Map.Entry<String, Integer>> callers = node.getCallersSorted();
-        boolean first = true;
-        for (Map.Entry<String, Integer> caller : callers) {
-            if (!first) json.append(",");
-            first = false;
-            json.append("{\"method\":\"").append(escapeJson(caller.getKey())).append("\",");
-            json.append("\"count\":").append(caller.getValue()).append("}");
+        List<Map<String, Object>> callers = new ArrayList<>();
+        for (Map.Entry<String, Integer> caller : node.getCallersSorted()) {
+            callers.add(map("method", caller.getKey(), "count", caller.getValue()));
         }
-        json.append("],");
-
-        // Callees
-        json.append("\"callees\":[");
-        List<Map.Entry<String, Integer>> callees = node.getCalleesSorted();
-        first = true;
-        for (Map.Entry<String, Integer> callee : callees) {
-            if (!first) json.append(",");
-            first = false;
-            json.append("{\"method\":\"").append(escapeJson(callee.getKey())).append("\",");
-            json.append("\"count\":").append(callee.getValue()).append("}");
+        List<Map<String, Object>> callees = new ArrayList<>();
+        for (Map.Entry<String, Integer> callee : node.getCalleesSorted()) {
+            callees.add(map("method", callee.getKey(), "count", callee.getValue()));
         }
-        json.append("]");
-
-        json.append("}");
-        sendJson(exchange, 200, json.toString());
+        send(exchange, 200, map("found", true, "method", node.getMethodKey(), "className", node.getClassName(), "methodName", node.getMethodName(), "selfSamples", node.getSelfSamples(), "totalSamples", node.getTotalSamples(), "selfPercent", round(node.getSelfPercent(results.totalSamples), 2), "totalPercent", round(node.getTotalPercent(results.totalSamples), 2), "callers", callers, "callees", callees));
     }
 
-    private void handleHeapHistogram(HttpExchange exchange) throws IOException {
-        if (!checkGet(exchange)) return;
-
-        Map<String, String> params = parseQuery(exchange.getRequestURI().getQuery());
-        int top = 50;
-        try {
-            if (params.containsKey("top")) {
-                top = Integer.parseInt(params.get("top"));
-            }
-        } catch (NumberFormatException e) {
-            // Use default
+    private void handleNative(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "GET") || !hasResults(exchange)) {
+            return;
         }
+        MethodTimingResults results = lastJFRResults;
+        List<Map<String, Object>> methods = new ArrayList<>();
+        for (MethodStats method : limit(results.getNativeMethodsBySelfTime(), intParam(query(exchange), "top", 20))) {
+            methods.add(map("method", method.methodKey, "selfSamples", method.getSelfSamples(), "sharePercent", round(percent(method.getSelfSamples(), results.nativeSamples), 2), "totalSamples", method.getTotalSamples()));
+        }
+        send(exchange, 200, map("hasResults", true, "nativeSamples", results.nativeSamples, "note", "Threads inside native code, mostly waiting on I/O, locks, the window system or the GPU; not CPU use", "methods", methods));
+    }
 
+    private void handleAllocations(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "GET") || !hasResults(exchange)) {
+            return;
+        }
+        MethodTimingResults.Allocations allocations = lastJFRResults.allocations;
+        if (allocations == null) {
+            send(exchange, 200, map("hasResults", false, "message", "The last recording had no allocations. Start one with POST /profiler/jfr/start?allocations=true."));
+            return;
+        }
+        int top = intParam(query(exchange), "top", 20);
+        send(exchange, 200, map("hasResults", true, "totalBytes", allocations.totalBytes, "note", "JFR samples allocations by TLAB, so bytes are estimates", "byClass", allocationRows(allocations.byClass, allocations.totalBytes, top, "className", true), "byMethod", allocationRows(allocations.bySite, allocations.totalBytes, top, "method", false)));
+    }
+
+    private void handleHistogram(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "POST")) {
+            return;
+        }
         HeapSnapshot snapshot = HeapSnapshot.capture();
-
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"timestamp\":").append(snapshot.time).append(",");
-        json.append("\"classCount\":").append(snapshot.classes.size()).append(",");
-        json.append("\"totalInstances\":").append(snapshot.totalInstances).append(",");
-        json.append("\"totalBytes\":").append(snapshot.totalBytes).append(",");
-        json.append("\"classes\":[");
-
-        boolean first = true;
-        int count = 0;
-        for (HeapSnapshot.ClassCount h : snapshot.classes) {
-            if (count++ >= top) break;
-            if (!first) json.append(",");
-            first = false;
-            json.append("{");
-            json.append("\"className\":\"").append(escapeJson(h.displayName())).append("\",");
-            json.append("\"instanceCount\":").append(h.instances).append(",");
-            json.append("\"totalBytes\":").append(h.bytes).append(",");
-            json.append("\"totalMB\":").append(String.format(java.util.Locale.ROOT, "%.2f", h.bytes / (1024.0 * 1024.0)));
-            json.append("}");
+        List<Map<String, Object>> classes = new ArrayList<>();
+        for (HeapSnapshot.ClassCount count : limit(snapshot.classes, intParam(query(exchange), "top", 50))) {
+            classes.add(map("className", count.displayName(), "module", count.module, "instanceCount", count.instances, "totalBytes", count.bytes));
         }
-
-        json.append("]}");
-        sendJson(exchange, 200, json.toString());
+        send(exchange, 200, map("timestamp", snapshot.time, "classCount", snapshot.classes.size(), "totalInstances", snapshot.totalInstances, "totalBytes", snapshot.totalBytes, "classes", classes));
     }
-
-    // ==================== RESOURCE MONITOR HANDLER ====================
 
     private void handleResources(HttpExchange exchange) throws IOException {
-        if (!checkGet(exchange)) return;
-
+        if (!allow(exchange, "GET")) {
+            return;
+        }
         MetricSnapshot snapshot = metricsCollector.collect();
-
-        String json = "{" +
-                "\"timestamp\":" + snapshot.timestamp + "," +
-
-                // CPU & GC
-                "\"cpu\":{" +
-                "\"percent\":" + String.format("%.2f", snapshot.cpuPercent) +
-                "}," +
-                "\"gc\":{" +
-                "\"percent\":" + String.format("%.2f", snapshot.gcPercent) + "," +
-                "\"count\":" + snapshot.gcCount + "," +
-                "\"totalTimeMs\":" + snapshot.gcTime +
-                "}," +
-
-                // Heap
-                "\"heap\":{" +
-                "\"usedBytes\":" + snapshot.heapUsed + "," +
-                "\"usedMB\":" + String.format("%.2f", snapshot.heapUsed / (1024.0 * 1024.0)) + "," +
-                "\"committedBytes\":" + snapshot.heapCommitted + "," +
-                "\"maxBytes\":" + snapshot.heapMax + "," +
-                "\"utilizationPercent\":" + String.format("%.2f", snapshot.getHeapUtilization()) +
-                "}," +
-
-                // Metaspace
-                "\"metaspace\":{" +
-                "\"usedBytes\":" + snapshot.metaspaceUsed + "," +
-                "\"usedMB\":" + String.format("%.2f", snapshot.metaspaceUsed / (1024.0 * 1024.0)) + "," +
-                "\"committedBytes\":" + snapshot.metaspaceCommitted + "," +
-                "\"maxBytes\":" + snapshot.metaspaceMax +
-                "}," +
-
-                // Code Cache
-                "\"codeCache\":{" +
-                "\"usedBytes\":" + snapshot.codeCacheUsed + "," +
-                "\"maxBytes\":" + snapshot.codeCacheMax +
-                "}," +
-
-                // Threads
-                "\"threads\":{" +
-                "\"count\":" + snapshot.threadCount + "," +
-                "\"daemonCount\":" + snapshot.daemonThreadCount + "," +
-                "\"peakCount\":" + snapshot.peakThreadCount + "," +
-                "\"userCount\":" + snapshot.getUserThreadCount() +
-                "}" +
-                "}";
-        sendJson(exchange, 200, json);
+        send(exchange, 200, map(
+                "timestamp", snapshot.timestamp,
+                "cpu", map("percent", round(snapshot.cpuPercent, 2)),
+                "gc", map("percent", round(snapshot.gcPercent, 2), "count", snapshot.gcCount, "totalTimeMs", snapshot.gcTime),
+                "heap", map("usedBytes", snapshot.heapUsed, "committedBytes", snapshot.heapCommitted, "maxBytes", snapshot.heapMax, "utilizationPercent", round(snapshot.getHeapUtilization(), 2)),
+                "metaspace", map("usedBytes", snapshot.metaspaceUsed, "committedBytes", snapshot.metaspaceCommitted, "maxBytes", snapshot.metaspaceMax),
+                "codeCache", map("usedBytes", snapshot.codeCacheUsed, "maxBytes", snapshot.codeCacheMax),
+                "threads", map("count", snapshot.threadCount, "daemonCount", snapshot.daemonThreadCount, "peakCount", snapshot.peakThreadCount, "userCount", snapshot.getUserThreadCount())));
     }
-
-    // ==================== THREADS HANDLER ====================
 
     private void handleThreads(HttpExchange exchange) throws IOException {
-        if (!checkGet(exchange)) return;
-
-        Map<String, String> params = parseQuery(exchange.getRequestURI().getQuery());
-        boolean includeStacks = "true".equalsIgnoreCase(params.get("stacks"));
-        int maxDepth = 32;
-        try {
-            if (params.containsKey("depth")) {
-                maxDepth = Integer.parseInt(params.get("depth"));
-            }
-        } catch (NumberFormatException e) {
-            // Use default
+        if (!allow(exchange, "GET")) {
+            return;
         }
-
-        ThreadMXBean threadBean = ManagementFactory.getThreadMXBean();
-        ThreadInfo[] threads = threadBean.dumpAllThreads(false, false);
-
-        StringBuilder json = new StringBuilder();
-        json.append("{");
-        json.append("\"timestamp\":").append(System.currentTimeMillis()).append(",");
-        json.append("\"threadCount\":").append(threads.length).append(",");
-        json.append("\"threads\":[");
-
-        boolean first = true;
-        for (ThreadInfo thread : threads) {
-            if (thread == null) continue;
-            if (!first) json.append(",");
-            first = false;
-
-            json.append("{");
-            json.append("\"id\":").append(thread.getThreadId()).append(",");
-            json.append("\"name\":\"").append(escapeJson(thread.getThreadName())).append("\",");
-            json.append("\"state\":\"").append(thread.getThreadState().name()).append("\",");
-            json.append("\"blockedCount\":").append(thread.getBlockedCount()).append(",");
-            json.append("\"blockedTimeMs\":").append(thread.getBlockedTime()).append(",");
-            json.append("\"waitedCount\":").append(thread.getWaitedCount()).append(",");
-            json.append("\"waitedTimeMs\":").append(thread.getWaitedTime());
-
-            if (includeStacks) {
-                StackTraceElement[] stack = thread.getStackTrace();
-                json.append(",\"stackTrace\":[");
-                boolean firstFrame = true;
-                int frameCount = 0;
-                for (StackTraceElement frame : stack) {
-                    if (frameCount++ >= maxDepth) break;
-                    if (!firstFrame) json.append(",");
-                    firstFrame = false;
-                    json.append("\"").append(escapeJson(frame.toString())).append("\"");
+        Map<String, String> query = query(exchange);
+        boolean stacks = "true".equalsIgnoreCase(query.get("stacks"));
+        ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+        ThreadInfo[] infos = bean.getThreadInfo(bean.getAllThreadIds(), stacks ? Math.max(0, intParam(query, "depth", 32)) : 0);
+        List<Map<String, Object>> threads = new ArrayList<>();
+        for (ThreadInfo info : infos) {
+            if (info == null) {
+                continue;
+            }
+            Map<String, Object> thread = map("id", info.getThreadId(), "name", info.getThreadName(), "state", info.getThreadState().name(), "daemon", info.isDaemon(), "blockedCount", info.getBlockedCount(), "blockedTimeMs", info.getBlockedTime(), "waitedCount", info.getWaitedCount(), "waitedTimeMs", info.getWaitedTime());
+            if (stacks) {
+                List<String> frames = new ArrayList<>();
+                for (StackTraceElement frame : info.getStackTrace()) {
+                    frames.add(frame.toString());
                 }
-                json.append("]");
+                thread.put("stackTrace", frames);
             }
-
-            json.append("}");
+            threads.add(thread);
         }
-
-        json.append("]}");
-        sendJson(exchange, 200, json.toString());
+        send(exchange, 200, map("timestamp", System.currentTimeMillis(), "threadCount", threads.size(), "threads", threads));
     }
 
-    // ==================== GC CONTROL HANDLER ====================
-
-    private void handleGC(HttpExchange exchange) throws IOException {
-        if (!checkPost(exchange)) return;
-
-        long beforeHeap = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        long startTime = System.currentTimeMillis();
-
+    private void handleGc(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "POST")) {
+            return;
+        }
+        Runtime runtime = Runtime.getRuntime();
+        long before = runtime.totalMemory() - runtime.freeMemory();
+        long start = System.currentTimeMillis();
         System.gc();
-
-        long afterHeap = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-        long duration = System.currentTimeMillis() - startTime;
-        long freedBytes = beforeHeap - afterHeap;
-
-        String json = "{" +
-                "\"success\":true," +
-                "\"durationMs\":" + duration + "," +
-                "\"beforeHeapBytes\":" + beforeHeap + "," +
-                "\"afterHeapBytes\":" + afterHeap + "," +
-                "\"freedBytes\":" + freedBytes + "," +
-                "\"freedMB\":" + String.format("%.2f", freedBytes / (1024.0 * 1024.0)) +
-                "}";
-
-        sendJson(exchange, 200, json);
+        long after = runtime.totalMemory() - runtime.freeMemory();
+        send(exchange, 200, map("success", true, "durationMs", System.currentTimeMillis() - start, "beforeHeapBytes", before, "afterHeapBytes", after, "freedBytes", before - after));
     }
 
-    // ==================== HELPERS ====================
-
-    private void appendMethodStats(StringBuilder json, MethodStats m, int totalSamples, int samplePeriodMs) {
-        json.append("{");
-        json.append("\"method\":\"").append(escapeJson(m.methodKey)).append("\",");
-        json.append("\"className\":\"").append(escapeJson(m.className)).append("\",");
-        json.append("\"methodName\":\"").append(escapeJson(m.methodName)).append("\",");
-        json.append("\"selfSamples\":").append(m.getSelfSamples()).append(",");
-        json.append("\"totalSamples\":").append(m.getTotalSamples()).append(",");
-        json.append("\"selfPercent\":").append(String.format("%.2f", m.getSelfPercent(totalSamples))).append(",");
-        json.append("\"totalPercent\":").append(String.format("%.2f", m.getTotalPercent(totalSamples))).append(",");
-        json.append("\"selfTimeMs\":").append(m.getEstimatedSelfMs(samplePeriodMs)).append(",");
-        json.append("\"totalTimeMs\":").append(m.getEstimatedTotalMs(samplePeriodMs)).append(",");
-        json.append("\"confidence\":\"").append(getConfidence(m.getSelfSamples())).append("\"");
-        json.append("}");
+    private Map<String, Object> recordingSummary(MethodTimingResults results) {
+        return map("hasResults", true, "recordingDurationMs", results.recordingDurationMs, "samplePeriodMs", results.samplePeriodMs, "totalSamples", results.totalSamples, "truncatedSamples", results.truncatedSamples, "nativeSamples", results.nativeSamples);
     }
 
-    private String getConfidence(int samples) {
-        if (samples >= 100) return "HIGH";
-        if (samples >= 30) return "MEDIUM";
-        if (samples >= 10) return "LOW";
-        return "VERY_LOW";
-    }
-
-    private boolean isJFRRecording() {
-        try {
-            java.lang.reflect.Field f = JFRMethodRecorder.class.getDeclaredField("isRecording");
-            f.setAccessible(true);
-            return (boolean) f.get(jfrRecorder);
-        } catch (Exception e) {
-            return false;
+    private static List<Map<String, Object>> methods(List<MethodStats> stats, MethodTimingResults results) {
+        List<Map<String, Object>> methods = new ArrayList<>();
+        for (MethodStats method : stats) {
+            methods.add(map("method", method.methodKey, "className", method.className, "methodName", method.methodName, "selfSamples", method.getSelfSamples(), "totalSamples", method.getTotalSamples(), "selfPercent", round(method.getSelfPercent(results.totalSamples), 2), "totalPercent", round(method.getTotalPercent(results.totalSamples), 2), "selfTimeMs", method.getEstimatedSelfMs(results.samplePeriodMs), "totalTimeMs", method.getEstimatedTotalMs(results.samplePeriodMs), "confidence", confidence(method.getSelfSamples())));
         }
+        return methods;
     }
 
-    private boolean checkGet(HttpExchange exchange) throws IOException {
-        if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-            sendJson(exchange, 405, "{\"error\":\"Method not allowed. Use GET.\"}");
-            return false;
+    private static List<Map<String, Object>> allocationRows(Map<String, long[]> totals, long all, int top, String nameKey, boolean className) {
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (Map.Entry<String, long[]> entry : limit(MethodTimingResults.Allocations.sorted(totals), top)) {
+            rows.add(map(nameKey, className ? HeapSnapshot.readable(entry.getKey()) : entry.getKey(), "bytes", entry.getValue()[0], "sharePercent", round(percent(entry.getValue()[0], all), 2), "events", entry.getValue()[1]));
         }
-        return true;
+        return rows;
     }
 
-    private boolean checkPost(HttpExchange exchange) throws IOException {
-        if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-            sendJson(exchange, 405, "{\"error\":\"Method not allowed. Use POST.\"}");
-            return false;
+    private boolean hasResults(HttpExchange exchange) throws IOException {
+        if (lastJFRResults != null) {
+            return true;
         }
-        return true;
+        send(exchange, 200, map("hasResults", false, "message", "No recording results yet. POST /profiler/jfr/start, then POST /profiler/jfr/stop."));
+        return false;
     }
 
-    private void sendJson(HttpExchange exchange, int status, String json) throws IOException {
-        sendText(exchange, status, json, "application/json");
+    private void route(String path, Handler handler) {
+        server.createContext(path, exchange -> {
+            try {
+                handler.handle(exchange);
+            } catch (Exception e) {
+                send(exchange, 500, map("error", String.valueOf(e.getMessage())));
+            } finally {
+                exchange.close();
+            }
+        });
     }
 
-    private void sendText(HttpExchange exchange, int status, String text, String contentType) throws IOException {
+    private static boolean allow(HttpExchange exchange, String method) throws IOException {
+        if (method.equalsIgnoreCase(exchange.getRequestMethod())) {
+            return true;
+        }
+        send(exchange, 405, map("error", "Method not allowed. Use " + method + "."));
+        return false;
+    }
+
+    private static void send(HttpExchange exchange, int status, Map<String, Object> body) throws IOException {
+        sendText(exchange, status, GSON.toJson(body), "application/json");
+    }
+
+    private static void sendText(HttpExchange exchange, int status, String text, String contentType) throws IOException {
         byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().add("Content-Type", contentType + "; charset=utf-8");
         exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
         exchange.sendResponseHeaders(status, bytes.length);
-        try (OutputStream os = exchange.getResponseBody()) {
-            os.write(bytes);
+        try (OutputStream body = exchange.getResponseBody()) {
+            body.write(bytes);
         }
     }
 
-    private Map<String, String> parseQuery(String query) {
+    private static Map<String, String> query(HttpExchange exchange) {
         Map<String, String> params = new HashMap<>();
+        String query = exchange.getRequestURI().getRawQuery();
         if (query == null || query.isEmpty()) {
             return params;
         }
         for (String pair : query.split("&")) {
-            int eq = pair.indexOf('=');
-            if (eq > 0) {
-                String key = URLDecoder.decode(pair.substring(0, eq), StandardCharsets.UTF_8);
-                String value = URLDecoder.decode(pair.substring(eq + 1), StandardCharsets.UTF_8);
-                params.put(key, value);
+            int equals = pair.indexOf('=');
+            if (equals > 0) {
+                params.put(URLDecoder.decode(pair.substring(0, equals), StandardCharsets.UTF_8), URLDecoder.decode(pair.substring(equals + 1), StandardCharsets.UTF_8));
             }
         }
         return params;
     }
 
-    private String escapeJson(String s) {
-        if (s == null) return "";
-        return s.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t");
+    private static int intParam(Map<String, String> query, String name, int fallback) {
+        try {
+            return query.containsKey(name) ? Integer.parseInt(query.get(name).trim()) : fallback;
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
+    }
+
+    private static Map<String, Object> map(Object... keysAndValues) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        for (int index = 0; index + 1 < keysAndValues.length; index += 2) {
+            map.put((String) keysAndValues[index], keysAndValues[index + 1]);
+        }
+        return map;
+    }
+
+    private static <T> List<T> limit(List<T> list, int top) {
+        return list.subList(0, Math.max(0, Math.min(top, list.size())));
+    }
+
+    private static double round(double value, int places) {
+        double scale = Math.pow(10, places);
+        return Math.round(value * scale) / scale;
+    }
+
+    private static double percent(long part, long total) {
+        return total == 0 ? 0 : part * 100.0 / total;
+    }
+
+    private static String confidence(int samples) {
+        return samples >= 100 ? "HIGH" : samples >= 30 ? "MEDIUM" : samples >= 10 ? "LOW" : "VERY_LOW";
+    }
+
+    private interface Handler {
+        void handle(HttpExchange exchange) throws IOException;
     }
 }
