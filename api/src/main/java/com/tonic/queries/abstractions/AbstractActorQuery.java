@@ -1,13 +1,10 @@
 package com.tonic.queries.abstractions;
 
-import com.tonic.api.entities.ActorAPI;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.data.wrappers.ActorEx;
 import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.util.Distance;
-import com.tonic.util.Location;
 import com.tonic.util.TextUtil;
-import net.runelite.api.Actor;
 import net.runelite.api.coords.WorldPoint;
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -48,13 +45,12 @@ public abstract class AbstractActorQuery<T extends ActorEx<?>, Q extends Abstrac
     }
 
     /**
-     * filter reachable actors
+     * filter to actors the player can walk now to a tile they can be interacted with from
      * @return ActorQuery
      */
     public Q isReachable()
     {
-        WorldPoint playerLoc = PlayerEx.getLocal().getWorldPoint();
-        return keepIf(o -> SceneAPI.isReachable(playerLoc, o.getWorldPoint()));
+        return keepIf(ActorEx::isReachable);
     }
 
     /**
