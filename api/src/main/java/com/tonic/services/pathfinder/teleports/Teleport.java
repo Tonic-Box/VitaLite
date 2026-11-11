@@ -8,10 +8,13 @@ import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Value
 public class Teleport
 {
+    private static final ThreadLocal<Boolean> SUPPRESSED = ThreadLocal.withInitial(() -> false);
+
     WorldPoint destination;
     int radius;
     StepHandler handlers;
@@ -45,7 +48,30 @@ public class Teleport
 
     public static List<Teleport> buildTeleportLinks()
     {
+        if (SUPPRESSED.get())
+        {
+            return new ArrayList<>();
+        }
         return new ArrayList<>(TeleportLoader.buildTeleports());
+    }
+
+    /**
+     * Runs a pathfinding call with no teleports in the links it builds on this thread.
+     * @param search the pathfinding call
+     * @return the call's result
+     */
+    public static <T> T withoutTeleports(Supplier<T> search)
+    {
+        boolean previous = SUPPRESSED.get();
+        SUPPRESSED.set(true);
+        try
+        {
+            return search.get();
+        }
+        finally
+        {
+            SUPPRESSED.set(previous);
+        }
     }
 
     public Teleport copy()

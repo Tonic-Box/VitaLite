@@ -5,6 +5,7 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class StepContext
 {
@@ -41,6 +42,10 @@ public class StepContext
 
     public boolean contains(String key) {
         return contextMap.containsKey(key);
+    }
+
+    public void removeIf(Predicate<String> key) {
+        contextMap.keySet().removeIf(key);
     }
 
     public void remove(String key) {

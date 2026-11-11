@@ -321,6 +321,19 @@ public abstract class AbstractHandlerBuilder<Q> extends HandlerBuilder
     /**
      * Adds a walk to step to the handler
      *
+     * @param location the location to walk to
+     * @param useTeleports whether the walk may start with a teleport
+     * @return the HandlerBuilder
+     */
+    public Q walkTo(WorldPoint location, boolean useTeleports)
+    {
+        walkTo(currentStep++, location, useTeleports);
+        return self();
+    }
+
+    /**
+     * Adds a walk to step to the handler
+     *
      * @param label the label for the step
      * @param location the location to walk to
      * @return the HandlerBuilder
@@ -390,6 +403,19 @@ public abstract class AbstractHandlerBuilder<Q> extends HandlerBuilder
     public Q walkToWorldPointSupplier(Supplier<WorldPoint> location)
     {
         walkToWorldPointSupplier(currentStep++, location);
+        return self();
+    }
+
+    /**
+     * Adds a walk to step to the handler
+     *
+     * @param location the location to walk to
+     * @param useTeleports whether the walk may start with a teleport
+     * @return the HandlerBuilder
+     */
+    public Q walkToWorldPointSupplier(Supplier<WorldPoint> location, boolean useTeleports)
+    {
+        walkToWorldPointSupplier(currentStep++, location, useTeleports);
         return self();
     }
 

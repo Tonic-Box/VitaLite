@@ -64,6 +64,7 @@ public class WalkerPath
     private final int prayerDangerZone;
     private WorldPoint destination;
     private boolean ranInit = false;
+    private boolean useTeleports = true;
     private int timesDialogueSeen = 0;
     private String lastText = null;
 
@@ -74,10 +75,23 @@ public class WalkerPath
      */
     public static WalkerPath get(WorldPoint target)
     {
-        target = Walker.getCollisionMap().nearestWalkableEuclidean(target, 5);
+        return get(target, true);
+    }
+
+    /**
+     * Get a WalkerPath to a single target, optionally without teleports. Repaths keep the same choice.
+     * @param target The target WorldPoint
+     * @param useTeleports whether the path may start with a teleport
+     * @return The WalkerPath
+     */
+    public static WalkerPath get(WorldPoint target, boolean useTeleports)
+    {
+        WorldPoint walkable = Walker.getCollisionMap().nearestWalkableEuclidean(target, 5);
         final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
-        List<? extends IStep> path = engine.find(target);
-        return new WalkerPath(path, engine.getTeleport());
+        List<? extends IStep> path = useTeleports ? engine.find(walkable) : Teleport.withoutTeleports(() -> engine.find(walkable));
+        WalkerPath walkerPath = new WalkerPath(path, engine.getTeleport());
+        walkerPath.useTeleports = useTeleports;
+        return walkerPath;
     }
 
     /**
@@ -139,7 +153,7 @@ public class WalkerPath
     {
         steps.clear();
         final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
-        steps.addAll(engine.find(destination));
+        steps.addAll(useTeleports ? engine.find(destination) : Teleport.withoutTeleports(() -> engine.find(destination)));
     }
 
     /**

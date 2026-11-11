@@ -1,17 +1,10 @@
 package com.tonic.util.handler;
 
 import com.tonic.Logger;
-import com.tonic.Static;
-import com.tonic.api.entities.PlayerAPI;
-import com.tonic.api.game.SceneAPI;
 import com.tonic.api.threaded.Delays;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import lombok.Getter;
-import net.runelite.api.Client;
-import net.runelite.api.coords.WorldPoint;
-
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -90,6 +83,7 @@ public final class StepHandler
                 ((WalkerPath) value).shutdown();
             }
         }
+        context.removeIf(HandlerBuilder::isInternalKey);
     }
 
     /**
