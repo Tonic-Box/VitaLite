@@ -139,4 +139,19 @@ public interface TClient
      * @return the client version
      */
     int getServerRevision();
+
+    /**
+     * Gets the software renderer's depth buffer, larger values being nearer, cleared to 0 each frame.
+     *
+     * @return the depth buffer, one value per pixel of the main buffer, or null while it has none
+     */
+    float[] getRasterDepth();
+
+    /**
+     * Gets the depth the software renderer stores for a point at a distance in front of the camera.
+     *
+     * @param viewZ the point's distance along the camera's view
+     * @return the depth value
+     */
+    float depthOf(float viewZ);
 }

@@ -60,6 +60,11 @@ public interface ClientConfig extends VitaConfig {
     @ConfigKey(value = "drawInteractable")
     void setShouldDrawInteractable(boolean shouldDraw);
 
+    @ConfigKey(value = "drawGroundUnderObjects", defaultValue = "true")
+    boolean shouldDrawGroundUnderObjects();
+    @ConfigKey(value = "drawGroundUnderObjects")
+    void setShouldDrawGroundUnderObjects(boolean shouldDraw);
+
     @ConfigKey(value = "logNames", defaultValue = "true")
     boolean shouldLogNames();
     @ConfigKey(value = "logNames")

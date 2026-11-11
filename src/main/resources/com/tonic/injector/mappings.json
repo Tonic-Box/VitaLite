@@ -30418,6 +30418,7 @@
         "isStatic": false
       },
       {
+        "name": "depthOf",
         "obfuscatedName": "ag",
         "ownerObfuscatedName": "ex",
         "descriptor": "(FB)F",
@@ -103191,7 +103192,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "rasterDepth",
         "obfuscatedName": "af",
         "ownerObfuscatedName": "zr",
         "descriptor": "[F",

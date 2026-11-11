@@ -4,6 +4,7 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.game.reach.Reachability;
 import com.tonic.api.game.sailing.BoatStatsAPI;
+import com.tonic.services.ground.GroundOverlays;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
 import com.tonic.services.pathfinder.sailing.BoatPathing;
 import com.tonic.services.pathfinder.sailing.Sailing;
@@ -417,14 +418,15 @@ public class GameManager extends Overlay {
         overlayManager.add(moveVizOverlay);
 
         StratPathOverlay stratPathOverlay = Static.getInjector().getInstance(StratPathOverlay.class);
-        overlayManager.add(stratPathOverlay);
+        GroundOverlays.add(stratPathOverlay);
 
         setPosition(OverlayPosition.DYNAMIC);
         setPriority(PRIORITY_LOW);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
 
-        TileOverlays tileOverlays = new TileOverlays(this);
-        overlayManager.add(tileOverlays);
+        overlayManager.add(new BoatDebugOverlay());
+        GroundOverlays.add(new TileOverlays(this));
+        GroundOverlays.add(new CollisionOverlay());
 
         DistanceOverlays distanceOverlays = new DistanceOverlays();
         overlayManager.add(distanceOverlays);

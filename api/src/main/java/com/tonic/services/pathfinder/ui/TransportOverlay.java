@@ -4,6 +4,8 @@ import com.google.common.base.Strings;
 import com.tonic.Static;
 import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.data.wrappers.PlayerEx;
+import com.tonic.services.ground.GroundCanvas;
+import com.tonic.services.ground.GroundOverlay;
 import com.tonic.services.pathfinder.model.TransportDto;
 import com.tonic.services.pathfinder.transports.Transport;
 import com.tonic.services.pathfinder.transports.TransportLoader;
@@ -13,6 +15,7 @@ import net.runelite.api.*;
 import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.MenuEntryAdded;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.FontManager;
@@ -28,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TransportOverlay extends Overlay
+public class TransportOverlay extends Overlay implements GroundOverlay
 {
     private static final int MAX_DRAW_DISTANCE = 32;
     private static final Font FONT = FontManager.getRunescapeFont().deriveFont(Font.BOLD, 16);
@@ -92,49 +95,61 @@ public class TransportOverlay extends Overlay
         }
     }
 
+    @Subscribe
+    public void onGameTick(GameTick tick)
+    {
+        if (active)
+        {
+            getPoints();
+        }
+        else
+        {
+            points.clear();
+        }
+    }
+
+    @Override
+    public void paint(GroundCanvas canvas)
+    {
+        if (!active)
+        {
+            return;
+        }
+        for (WorldPoint point : points.keySet())
+        {
+            canvas.markTile(point.getX(), point.getY(), point.getPlane(), Color.CYAN, null, GroundCanvas.THIN);
+        }
+    }
+
     @Override
     public Dimension render(Graphics2D graphics)
     {
         graphics.setFont(FONT);
-        getPoints();
-        Stroke stroke = new BasicStroke((float) 1);
         for(var entry : points.entrySet())
         {
-            drawTile(graphics, entry.getKey(), entry.getValue() + " transport(s)", stroke);
+            drawLabel(graphics, entry.getKey(), entry.getValue() + " transport(s)");
         }
         return null;
     }
 
-    private void drawTile(Graphics2D graphics, WorldPoint point, @Nullable String label, Stroke borderStroke)
+    private void drawLabel(Graphics2D graphics, WorldPoint point, @Nullable String label)
     {
-        Client client = Static.getClient();
-        WorldView wv = client.getTopLevelWorldView();
-        WorldPoint playerLocation = PlayerEx.getLocal().getWorldPoint();
-
-        if (point.distanceTo(playerLocation) >= MAX_DRAW_DISTANCE)
+        if (Strings.isNullOrEmpty(label))
         {
             return;
         }
 
-        LocalPoint lp = LocalPoint.fromWorld(wv, point);
+        Client client = Static.getClient();
+        LocalPoint lp = LocalPoint.fromWorld(client.getTopLevelWorldView(), point);
         if (lp == null)
         {
             return;
         }
 
-        Polygon poly = Perspective.getCanvasTilePoly(client, lp);
-        if (poly != null)
+        Point canvasTextLocation = Perspective.getCanvasTextLocation(client, graphics, lp, label, 0);
+        if (canvasTextLocation != null)
         {
-            OverlayUtil.renderPolygon(graphics, poly, Color.CYAN, new Color(0, 0, 0, .01f), borderStroke);
-        }
-
-        if (!Strings.isNullOrEmpty(label))
-        {
-            Point canvasTextLocation = Perspective.getCanvasTextLocation(client, graphics, lp, label, 0);
-            if (canvasTextLocation != null)
-            {
-                OverlayUtil.renderTextLocation(graphics, canvasTextLocation, label, Color.WHITE);
-            }
+            OverlayUtil.renderTextLocation(graphics, canvasTextLocation, label, Color.WHITE);
         }
     }
 
@@ -154,6 +169,10 @@ public class TransportOverlay extends Overlay
         Tile tile;
         WorldPoint point;
 
+        if (PlayerEx.getLocal() == null)
+        {
+            return;
+        }
         WorldPoint player = PlayerEx.getLocal().getWorldPoint();
         int px = player.getX() - wv.getBaseX();
         int py = player.getY() - wv.getBaseY();
@@ -180,7 +199,7 @@ public class TransportOverlay extends Overlay
                 List<TransportDto> trIndexed = TRANSPORT_INDEX.get(key);
                 if(trIndexed != null && !trIndexed.isEmpty())
                 {
-                    points.put(point, trIndexed.size());
+                    points.put(tile.getWorldLocation(), trIndexed.size());
                 }
 
             }

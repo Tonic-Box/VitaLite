@@ -51,7 +51,6 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ToggleSlider sendMouseMovement;
     private final ToggleSlider recordTrajectory;
     private Timer trajectoryCheckTimer;
-    private final boolean shouldRestoreGpu = false;
 
     private VitaLiteOptionsPanel() {
         super(false);
@@ -369,6 +368,16 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
 
         // Scene Settings
         CollapsiblePanel scenePanel = new CollapsiblePanel("Scene");
+
+        ToggleSlider drawGroundUnderObjects = new ToggleSlider();
+        drawGroundUnderObjects.setSelected(Static.getVitaConfig().shouldDrawGroundUnderObjects());
+        scenePanel.addContent(createToggleOption(
+                "Ground Overlays Under Objects",
+                "Draw tile overlays on the ground, hidden by what stands in front of them.",
+                drawGroundUnderObjects,
+                () -> Static.getVitaConfig().setShouldDrawGroundUnderObjects(drawGroundUnderObjects.isSelected())
+        ));
+        scenePanel.addVerticalStrut(12);
 
         ToggleSlider drawCollision = new ToggleSlider();
         drawCollision.setSelected(Static.getVitaConfig().shouldDrawCollision());

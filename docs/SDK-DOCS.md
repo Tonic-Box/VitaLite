@@ -11,7 +11,7 @@ VitaLite runs RuneLite plugins and gives them more to work with: a game API for 
 5. [Navigation](sdk/navigation.md): the walker, pathfinding, transports and sailing routes.
 6. [Game data](sdk/game-data.md): enums and constants for spells, skills, shops, locations and ids.
 7. [Services](sdk/services.md): game state caches, break handler, messaging between clients, clicks and mouse, settings storage, proxies, packet events.
-8. [UI](sdk/ui.md): Swing components and overlay drawing helpers.
+8. [UI](sdk/ui.md): Swing components, overlay drawing helpers and ground overlays.
 9. [Utilities](sdk/utilities.md): threads, reflection, text, distances and points.
 10. [Client features](sdk/client-features.md): sideloading, Vita Hub, built-in plugins, the settings panel and launch options.
 
