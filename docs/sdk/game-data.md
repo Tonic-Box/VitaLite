@@ -19,6 +19,7 @@
 | `RegionInfo` | Named regions (bosses, minigames, cities and so on) by region id. |
 | `SailingConstants` | Sailing ids and values. |
 | `StrongholdSecurityQuestion` | Stronghold of Security door questions and answers. |
+| `settings.SettingID` | Every setting in the settings menu as a typed key, generated from the cache, with each dropdown's options and the keys a key binding can take. Used by `SettingsAPI` and `Settings`. |
 | `Tab` | Side tabs, used by `TabsAPI`. |
 | `VarrockMuseumAnswer` | Varrock Museum quiz answers. |
 | `Walls` | The wall objects on and around a tile. Reach doesn't use it; see [interaction tiles](queries-and-wrappers.md#interaction-tiles-and-reachability). |

@@ -5,7 +5,7 @@ VitaLite runs RuneLite plugins and gives them more to work with: a game API for 
 ## Pages
 
 1. [Getting started](sdk/getting-started.md): depending on VitaLite, `Static`, the threading rule, `VitaPlugin`, `Logger`.
-2. [Game API](sdk/game-api.md): entities, game state, sailing, interfaces, and the threaded task classes.
+2. [Game API](sdk/game-api.md): entities, game state, sailing, interfaces, in-game settings, and the threaded task classes.
 3. [Queries and wrappers](sdk/queries-and-wrappers.md): searching NPCs, items, objects, widgets and worlds, and the objects queries return.
 4. [Automation](sdk/automation.md): step handlers and their builders, the Script DSL, loadouts, dialogue trees.
 5. [Navigation](sdk/navigation.md): the walker, pathfinding, transports and sailing routes.
