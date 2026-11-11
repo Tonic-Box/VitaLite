@@ -82,7 +82,7 @@ public class ClickManagerUtil
     {
         Static.invoke(() -> {
             Widget widget = WidgetAPI.get(interfaceId);
-            Shape shape = widget.getBounds();
+            Shape shape = widget == null ? null : widget.getBounds();
             if(shape == null)
             {
                 shape = Static.getRuneLite().getGameApplet().getSideMenuArea();

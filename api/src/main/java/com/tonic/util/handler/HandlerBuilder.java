@@ -8,7 +8,6 @@ import net.runelite.api.coords.WorldPoint;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
 
 /**
@@ -17,6 +16,9 @@ import java.util.function.*;
 public class HandlerBuilder
 {
     public static final int END_EXECUTION = Integer.MAX_VALUE;
+    static final String PATH_KEY = "PATH";
+    static final String TARGET_KEY = "TARGET_AREA";
+    private static final String DELAY_PREFIX = "DELAY_";
 
     /**
      * Creates a new HandlerBuilder
@@ -112,13 +114,15 @@ public class HandlerBuilder
      */
     public HandlerBuilder addDelay(int step, int delay)
     {
-        AtomicInteger remaining = new AtomicInteger(delay);
+        String key = DELAY_PREFIX + step;
         handler.add(step, context -> {
-            if (remaining.decrementAndGet() <= 1) {
-                remaining.set(delay);
+            int remaining = context.getOrDefault(key, delay) - 1;
+            if (remaining <= 1) {
+                context.remove(key);
                 context.put("SPEED_UP", true);
                 return step + 1;
             }
+            context.put(key, remaining);
             return step;
         });
         return this;
@@ -133,19 +137,21 @@ public class HandlerBuilder
      */
     public HandlerBuilder addDelayUntil(int step, int timeout, Predicate<StepContext> condition, Consumer<StepContext> onTimeout)
     {
-        AtomicInteger remaining = new AtomicInteger(timeout);
+        String key = DELAY_PREFIX + step;
         handler.add(step, context -> {
             boolean met = condition.test(context);
             if (met) {
-                remaining.set(timeout);
+                context.remove(key);
                 context.put("SPEED_UP", true);
                 return step + 1;
             }
-            if (remaining.decrementAndGet() <= 0) {
-                remaining.set(timeout);
+            int remaining = context.getOrDefault(key, timeout) - 1;
+            if (remaining <= 0) {
+                context.remove(key);
                 onTimeout.accept(context);
                 return END_EXECUTION;
             }
+            context.put(key, remaining);
             return step;
         });
         return this;
@@ -216,18 +222,23 @@ public class HandlerBuilder
 
     public HandlerBuilder walkTo(int step, WorldPoint location)
     {
+        return walkTo(step, location, true);
+    }
+
+    public HandlerBuilder walkTo(int step, WorldPoint location, boolean useTeleports)
+    {
         HandlerBuilder builder = HandlerBuilder.get()
                 .addDelayUntil(0, context -> {
-                    WalkerPath path = context.get("PATH");
+                    WalkerPath path = context.get(PATH_KEY);
                     if(path == null)
                     {
-                        path = WalkerPath.get(location);
-                        context.put("PATH", path);
+                        path = WalkerPath.get(location, useTeleports);
+                        context.put(PATH_KEY, path);
                     }
                     boolean value = !path.step();
                     if(value)
                     {
-                        context.remove("PATH");
+                        context.remove(PATH_KEY);
                     }
                     return value;
                 })
@@ -237,25 +248,30 @@ public class HandlerBuilder
 
     public HandlerBuilder walkToWorldPointSupplier(int step, Supplier<WorldPoint> locationSupplier)
     {
+        return walkToWorldPointSupplier(step, locationSupplier, true);
+    }
+
+    public HandlerBuilder walkToWorldPointSupplier(int step, Supplier<WorldPoint> locationSupplier, boolean useTeleports)
+    {
         HandlerBuilder builder = HandlerBuilder.get()
                 .addDelayUntil(0, context -> {
-                    WorldPoint location = context.get("TARGET_AREA");
+                    WorldPoint location = context.get(TARGET_KEY);
                     if(location == null)
                     {
                         location = locationSupplier.get();
-                        context.put("TARGET_AREA", location);
+                        context.put(TARGET_KEY, location);
                     }
-                    WalkerPath path = context.get("PATH");
+                    WalkerPath path = context.get(PATH_KEY);
                     if(path == null)
                     {
-                        path = WalkerPath.get(location);
-                        context.put("PATH", path);
+                        path = WalkerPath.get(location, useTeleports);
+                        context.put(PATH_KEY, path);
                     }
                     boolean value = !path.step();
                     if(value)
                     {
-                        context.remove("TARGET_AREA");
-                        context.remove("PATH");
+                        context.remove(TARGET_KEY);
+                        context.remove(PATH_KEY);
                     }
                     return value;
                 })
@@ -269,19 +285,19 @@ public class HandlerBuilder
                 .addDelayUntil(0, context -> {
                     if(location.contains(PlayerEx.getLocal().getWorldPoint()))
                     {
-                        context.remove("PATH");
+                        context.remove(PATH_KEY);
                         return true;
                     }
-                    WalkerPath path = context.get("PATH");
+                    WalkerPath path = context.get(PATH_KEY);
                     if(path == null)
                     {
                         path = WalkerPath.get(List.of(location));
-                        context.put("PATH", path);
+                        context.put(PATH_KEY, path);
                     }
                     boolean value = !path.step();
                     if(value)
                     {
-                        context.remove("PATH");
+                        context.remove(PATH_KEY);
                     }
                     return value;
                 })
@@ -293,29 +309,29 @@ public class HandlerBuilder
     {
         HandlerBuilder builder = HandlerBuilder.get()
                 .addDelayUntil(0, context -> {
-                    WorldArea location = context.get("TARGET_AREA");
+                    WorldArea location = context.get(TARGET_KEY);
                     if(location == null)
                     {
                         location = locationSupplier.get();
-                        context.put("TARGET_AREA", location);
+                        context.put(TARGET_KEY, location);
                     }
                     if(location.contains(PlayerEx.getLocal().getWorldPoint()))
                     {
-                        context.remove("TARGET_AREA");
-                        context.remove("PATH");
+                        context.remove(TARGET_KEY);
+                        context.remove(PATH_KEY);
                         return true;
                     }
-                    WalkerPath path = context.get("PATH");
+                    WalkerPath path = context.get(PATH_KEY);
                     if(path == null)
                     {
                         path = WalkerPath.get(List.of(location));
-                        context.put("PATH", path);
+                        context.put(PATH_KEY, path);
                     }
                     boolean value = !path.step();
                     if(value)
                     {
-                        context.remove("TARGET_AREA");
-                        context.remove("PATH");
+                        context.remove(TARGET_KEY);
+                        context.remove(PATH_KEY);
                     }
                     return value;
                 })
@@ -334,5 +350,10 @@ public class HandlerBuilder
             handler.getContext().getLabels().putAll(LABELS);
         }
         return handler;
+    }
+
+    static boolean isInternalKey(String key)
+    {
+        return key.equals(PATH_KEY) || key.equals(TARGET_KEY) || key.startsWith(DELAY_PREFIX);
     }
 }
