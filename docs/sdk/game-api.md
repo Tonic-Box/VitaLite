@@ -23,7 +23,7 @@ Static classes for reading the game and acting in it. Calls are instant unless m
 | Class | What it is |
 |---|---|
 | `CameraAPI` | Camera yaw, pitch and speed; turn, tilt, face north, look at a tile. |
-| `ClientScriptAPI` | Run client scripts, such as closing an interface or switching tabs. |
+| `ClientScriptAPI` | Run client scripts, such as closing an interface or switching tabs. Scripts it runs may send packets, as the game's own do. |
 | `CombatAPI` | Hitpoints, special attack, attack style, auto retaliate, poison, venom, antifire, teleblock, multi-combat and PvP area checks. |
 | `GameAPI` | Logged-in and login-screen state, logout, wilderness level, cutscenes, membership days, raw menu actions. |
 | `HouseAPI` | Player-owned house locations and where you leave the house. |
@@ -67,6 +67,7 @@ Static classes for reading the game and acting in it. Calls are instant unless m
 | `MakeXAPI` | The "make how many" interface. |
 | `MiniMapAPI` | Drawing paths and points on the minimap. |
 | `PrayerAPI` | An enum of prayers with on, off and toggle, plus quick prayers, flicking and best-prayer helpers. |
+| `SettingsAPI` | Read any setting, and change it in the open settings menu with every step sent in the same tick: toggles, dropdowns, key bindings, stepped sliders, numbers, colours and action buttons. Volumes are read only. |
 | `ShopAPI` | Buy and sell in shops, and shop stock. `sellX` (waits) between sells of non-stackable items. |
 | `SlayerRewardsAPI` | Slayer rewards interface and points. |
 | `SmithingAPI` | Anvil interface: smith an item, bar and hammer checks. |
@@ -87,5 +88,40 @@ Static classes for reading the game and acting in it. Calls are instant unless m
 | `GrandExchange` | Full buy and sell flows, raising the price on retries. |
 | `Cannon` | Place, reload, repair and pick up a dwarf multicannon, or keep it running. |
 | `Minigames` | Minigame group teleports. |
+| `Settings` | Open the settings menu and change a setting, waiting until the game shows the new value; returns a `SettingResult`. |
+
+## In-game settings
+
+The game's settings menu (the "All settings" window) can be read and changed from code. Every setting has a typed key in `com.tonic.data.settings.SettingID`, one nested class per menu tab:
+
+```java
+SettingID.Activities.TILE_HIGHLIGHTING             // ToggleSetting
+SettingID.Activities.NPC_HIGHLIGHT_DISPLAY_NAME    // DropdownSetting
+SettingID.Activities.NpcHighlightDisplayName.ON_BOLD
+SettingID.Controls.COMBAT_TAB_KEYBIND              // KeyBindingSetting
+SettingID.KeyBindings.F1
+SettingID.Audio.MASTER_VOLUME                      // SliderSetting
+```
+
+`SettingID` is generated from the game cache, so a setting the game adds shows up once the file is regenerated. The menu's layout is read from the live client, so keys keep working when the game reorders the menu.
+
+**Reading** works any time, menu open or not, through `SettingsAPI`: `isEnabled` for toggles, and `get` for sliders, dropdowns, key bindings, numbers and colours. `isAvailable` and `isEditable` tell whether the menu lists a setting and whether the game lets it be changed right now (some settings, such as tile highlighting, exist only on the official clients and are never listed here); `getBlockedMessage` gives the reason the game shows when it can't be.
+
+**Changing** comes in two forms:
+
+| | What it does |
+|---|---|
+| `SettingsAPI` | Needs the menu open (`SettingsAPI.open()` opens it). Sends the whole change in the same tick: the tab, the row and, for dropdowns, key bindings, numbers and colours, the follow-up. Returns `true` when the change was sent or the setting already had the value, `false` when nothing was sent (menu closed, setting blocked or not listed). |
+| `Settings` (threaded) | Opens the menu if needed, sends the change through `SettingsAPI`, then (waits) until the game shows the new value. Returns a `SettingResult`: `DONE`, `BLOCKED`, `NOT_AVAILABLE`, `NOT_OPEN`, `NOT_CONFIRMED` or `NOT_IN_GAME`. Leaves the menu open. |
+
+```java
+SettingResult result = Settings.set(SettingID.Activities.TILE_HIGHLIGHTING, true);
+Settings.select(SettingID.Activities.NpcHighlightDisplayName.ON_BOLD);
+Settings.set(SettingID.Controls.COMBAT_TAB_KEYBIND, SettingID.KeyBindings.F1);
+```
+
+Accept aid (`SettingID.Gameplay.ACCEPT_AID`) is changed with its button on the settings side panel, so it needs no menu, and `SettingsAPI.setRun` / `Settings.setRun` turn run on or off the same way.
+
+Toggles, dropdowns, key bindings, stepped sliders (by step, from 0), numbers, colours (`0xRRGGBB`) and action buttons can be changed. `SettingsAPI.run` only presses an action button; `Settings.run` also answers its confirmation. Volumes can be read (0 to 100) but not changed, and smooth sliders other than the volumes, such as camera zoom, and the loot tracker's list editors aren't supported.
 
 [SDK index](../SDK-DOCS.md) · [← Getting started](getting-started.md) · [Queries and wrappers →](queries-and-wrappers.md)
