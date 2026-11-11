@@ -3,6 +3,7 @@ package com.tonic.services.pathfinder.model;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.entities.TileObjectAPI;
+import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.api.widgets.DialogueAPI;
@@ -50,6 +51,7 @@ public class WalkerPath
         ItemID._3DOSE2STAMINA,
         ItemID._4DOSE2STAMINA
     };
+    private static final int MAX_TELEPORT_RETRIES = 2;
     private final Client client;
     @Getter
     private final List<IStep> steps;
@@ -66,6 +68,7 @@ public class WalkerPath
     private boolean ranInit = false;
     private boolean useTeleports = true;
     private int timesDialogueSeen = 0;
+    private int teleportRetries = 0;
     private String lastText = null;
 
     /**
@@ -154,6 +157,12 @@ public class WalkerPath
         steps.clear();
         final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
         steps.addAll(useTeleports ? engine.find(destination) : Teleport.withoutTeleports(() -> engine.find(destination)));
+        teleport = engine.getTeleport();
+        if(teleport != null && ++teleportRetries > MAX_TELEPORT_RETRIES)
+        {
+            Logger.warn("[Pathfinder] Teleport to " + teleport.getDestination() + " still failing after " + MAX_TELEPORT_RETRIES + " retries, stopping");
+            cancel();
+        }
     }
 
     /**
@@ -408,6 +417,11 @@ public class WalkerPath
 
     private boolean handleTeleport() {
         if (teleport != null) {
+            int modal = LayoutView.MAINMODEL.getCurrentID();
+            if(!teleport.getHandlers().isStarted() && Static.invoke(() -> client.getComponentTable().get(modal) != null))
+            {
+                ClientScriptAPI.closeInterface();
+            }
             boolean state = teleport.getHandlers().step();
             if(!state) {
                 teleport = null;

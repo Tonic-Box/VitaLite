@@ -190,6 +190,10 @@ public class Walker
                 }
                 Delays.tick();
             }
+            if(currentPath.isCanceled())
+            {
+                return false;
+            }
             int timeout = 50;
             WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
             while(!worldPoint.equals(end) && timeout > 0)
