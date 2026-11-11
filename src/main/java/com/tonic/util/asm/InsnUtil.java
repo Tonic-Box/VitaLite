@@ -1,8 +1,9 @@
 package com.tonic.util.asm;
 
-import com.tonic.util.asm.BytecodeBuilder;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.objectweb.asm.Opcodes.*;
 
@@ -95,6 +96,26 @@ public class InsnUtil
     public static boolean isReturn(InsnNode node)
     {
         return node.getOpcode() >= IRETURN && node.getOpcode() <= RETURN;
+    }
+
+    /**
+     * Collects a method's instructions with an opcode, such as every return of one kind, so code can be inserted around them.
+     *
+     * @param method the method
+     * @param opcode the opcode to find
+     * @return the matching instructions, in order
+     */
+    public static List<AbstractInsnNode> withOpcode(MethodNode method, int opcode)
+    {
+        List<AbstractInsnNode> found = new ArrayList<>();
+        for (AbstractInsnNode instruction : method.instructions)
+        {
+            if (instruction.getOpcode() == opcode)
+            {
+                found.add(instruction);
+            }
+        }
+        return found;
     }
 
     public static InsnList generateDefaultReturn(MethodNode method) {

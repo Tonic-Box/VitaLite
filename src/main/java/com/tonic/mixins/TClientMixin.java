@@ -19,6 +19,20 @@ public abstract class TClientMixin implements TClient
     @Shadow("serverRevision")
     private static int serverRevision;
 
+    @Shadow("rasterDepth")
+    private static float[] rasterDepth;
+
+    @Inject
+    @Override
+    public float[] getRasterDepth()
+    {
+        return rasterDepth;
+    }
+
+    @Override
+    @Shadow("depthOf")
+    public abstract float depthOf(float viewZ);
+
     @Inject
     //@Override
     public int getServerRevision()

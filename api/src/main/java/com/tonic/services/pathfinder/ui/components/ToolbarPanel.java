@@ -1,18 +1,14 @@
 package com.tonic.services.pathfinder.ui.components;
 
 import com.tonic.Static;
-import com.tonic.data.locatables.BankLocations;
+import com.tonic.services.ground.GroundOverlays;
 import com.tonic.services.pathfinder.transports.TransportLoader;
 import com.tonic.services.pathfinder.ui.TransportEditorFrame;
 import com.tonic.services.pathfinder.ui.TransportOverlay;
-import com.tonic.util.ThreadPool;
 import net.runelite.client.ui.overlay.OverlayManager;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Toolbar panel with file operations and main action buttons
@@ -102,10 +98,11 @@ public class ToolbarPanel extends JPanel {
             if (isSelected) {
                 TransportLoader.refreshTransports(false);
                 overlayManager.add(overlay);
+                GroundOverlays.add(overlay);
                 overlay.setActive(true);
             } else {
-                Static.getRuneLite().getEventBus().unregister(overlay);
                 overlayManager.remove(overlay);
+                GroundOverlays.remove(overlay);
                 overlay.setActive(false);
             }
         });
