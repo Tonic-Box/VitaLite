@@ -232,6 +232,10 @@ public class PacketMapReader
                     int number = (int) object;
                     doWrite(buffer, entry.getWrites().get(i), number);
                 }
+                else if(object instanceof Long)
+                {
+                    doWriteLong(buffer, entry.getWrites().get(i), (long) object);
+                }
                 else if(object instanceof String)
                 {
                     String string = (String) object;
@@ -249,6 +253,16 @@ public class PacketMapReader
             }
         }
         return buffer;
+    }
+
+    private static void doWriteLong(PacketBuffer buffer, String method, long value)
+    {
+        if ("writeLong".equals(method))
+        {
+            buffer.writeLong(value);
+            return;
+        }
+        doWrite(buffer, method, (int) value);
     }
 
     private static void doWriteStr(PacketBuffer buffer, String method, String value) {

@@ -157,7 +157,7 @@ public class GrandExchangeAPI
             }
             int option = noted == (slot.getQuantity() != 1) ? 1 : 2;
             WidgetAPI.interact(option, InterfaceID.GeOffers.DETAILS_COLLECT, 2, itemId);
-            WidgetAPI.interact(1, InterfaceID.GeOffers.DETAILS_COLLECT, 3, ItemID.COINS);
+            WidgetAPI.interact(2, InterfaceID.GeOffers.DETAILS_COLLECT, 3, ItemID.COINS);
         });
     }
 
@@ -193,6 +193,18 @@ public class GrandExchangeAPI
      */
     public static GrandExchangeSlot startBuyOffer(int itemId, int amount, int price)
     {
+        return startBuyOffer(itemId, amount, (long) price);
+    }
+
+    /**
+     * Starts a buy offer in the first free Grand Exchange slot.
+     * @param itemId The item ID to buy.
+     * @param amount The amount to buy.
+     * @param price The price per item.
+     * @return The GrandExchangeSlot object representing the slot used, or null if no slot is free or an error occurs.
+     */
+    public static GrandExchangeSlot startBuyOffer(int itemId, int amount, long price)
+    {
         int slotNumber = freeSlot();
         if(slotNumber == -1)
             return null;
@@ -203,7 +215,7 @@ public class GrandExchangeAPI
             WidgetAPI.interact(1, slot.getId(), slot.getBuyChild(), -1);
             DialogueAPI.resumeObjectDialogue(itemId);
             WidgetAPI.interact(1, InterfaceID.GeOffers.SETUP, 12, -1);
-            DialogueAPI.resumeNumericDialogue(price);
+            DialogueAPI.resumeLongNumericDialogue(price);
             WidgetAPI.interact(1, InterfaceID.GeOffers.SETUP, 7, -1);
             DialogueAPI.resumeNumericDialogue(amount);
             WidgetAPI.interact(1, InterfaceID.GeOffers.SETUP_CONFIRM, -1, -1);
@@ -262,6 +274,18 @@ public class GrandExchangeAPI
      */
     public static GrandExchangeSlot startSellOffer(int itemId, int amount, int price)
     {
+        return startSellOffer(itemId, amount, (long) price);
+    }
+
+    /**
+     * Starts a sell offer in the first free Grand Exchange slot.
+     * @param itemId The item ID to sell.
+     * @param amount The amount to sell. Use -1 to sell all available.
+     * @param price The price per item.
+     * @return The GrandExchangeSlot object representing the slot used, or null if no slot is free or an error occurs.
+     */
+    public static GrandExchangeSlot startSellOffer(int itemId, int amount, long price)
+    {
         int slotNumber = freeSlot();
         if(slotNumber == -1)
             return null;
@@ -274,7 +298,7 @@ public class GrandExchangeAPI
             client.getPacketWriter().widgetActionPacket(1, InterfaceID.GeOffersSide.ITEMS, getItemSlot(itemId), itemId);
 
             client.getPacketWriter().widgetActionPacket(1, InterfaceID.GeOffers.SETUP, 12, -1);
-            client.getPacketWriter().resumeCountDialoguePacket(price);
+            client.getPacketWriter().resumeCountDialogueLongPacket(price);
             if(amount != -1)
             {
                 client.getPacketWriter().widgetActionPacket(1, InterfaceID.GeOffers.SETUP, 7, -1);
@@ -344,7 +368,7 @@ public class GrandExchangeAPI
             int itemId = slot.getItemId();
             WidgetAPI.interact(1, slot.getId(), 2, -1);
             WidgetAPI.interact(n, InterfaceID.GeOffers.DETAILS_COLLECT, 2, itemId);
-            WidgetAPI.interact(1, InterfaceID.GeOffers.DETAILS_COLLECT, 3, ItemID.COINS);
+            WidgetAPI.interact(2, InterfaceID.GeOffers.DETAILS_COLLECT, 3, ItemID.COINS);
         });
     }
 
