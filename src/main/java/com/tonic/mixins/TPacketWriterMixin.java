@@ -175,6 +175,16 @@ public abstract class TPacketWriterMixin implements TPacketWriter
 
     @Inject
     @Override
+    public void resumeCountDialogueLongPacket(long count)
+    {
+        MapEntry entry = PacketMapReader.get("OP_RESUME_COUNTDIALOG_LONG");
+        Map<String,Object> args = new HashMap<>();
+        args.put("count", count);
+        this.addNodeSwitch(PacketMapReader.createBuffer(entry, args).toPacketBufferNode(client));
+    }
+
+    @Inject
+    @Override
     public void resumePauseWidgetPacket(int widgetID, int optionIndex)
     {
         MapEntry entry = PacketMapReader.get("OP_RESUME_PAUSEBUTTON");

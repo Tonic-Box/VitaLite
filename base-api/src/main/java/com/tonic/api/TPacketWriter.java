@@ -87,6 +87,13 @@ public interface TPacketWriter
     void resumeCountDialoguePacket(int count);
 
     /**
+     * Sends a resume count dialogue packet carrying a long, as the Grand Exchange price prompt expects.
+     *
+     * @param count the count value
+     */
+    void resumeCountDialogueLongPacket(long count);
+
+    /**
      * Sends a resume string dialogue packet.
      *
      * @param text the text input

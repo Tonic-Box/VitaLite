@@ -1139,6 +1139,16 @@
     "writes": ["writeInt"]
   },
   {
+    "args": ["count"],
+    "name": "OP_RESUME_COUNTDIALOG_LONG",
+    "reads": ["readLong"],
+    "packet": {
+      "length": 8,
+      "id": 27
+    },
+    "writes": ["writeLong"]
+  },
+  {
     "args": ["id"],
     "name": "OP_RESUME_OBJDIALOG",
     "reads": ["readShort"],

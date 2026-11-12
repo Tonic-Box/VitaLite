@@ -250,6 +250,20 @@ public class DialogueAPI
     }
 
     /**
+     * Resumes a numeric dialogue that takes a long, such as the Grand Exchange price prompt
+     *
+     * @param value The number to input
+     */
+    public static void resumeLongNumericDialogue(long value)
+    {
+        TClient client = Static.getClient();
+        Static.invoke(() -> {
+            client.getPacketWriter().resumeCountDialogueLongPacket(value);
+            ClientScriptAPI.closeNumericInputDialogue();
+        });
+    }
+
+    /**
      * Sends a resume/pause for a specific widget and option index.
      *
      * @param widgetID    The ID of the widget to interact with.
