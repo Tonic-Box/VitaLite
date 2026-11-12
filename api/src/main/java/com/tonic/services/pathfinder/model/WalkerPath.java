@@ -3,7 +3,6 @@ package com.tonic.services.pathfinder.model;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.api.entities.TileObjectAPI;
-import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.api.game.MovementAPI;
 import com.tonic.api.game.SceneAPI;
 import com.tonic.api.widgets.DialogueAPI;
@@ -417,11 +416,6 @@ public class WalkerPath
 
     private boolean handleTeleport() {
         if (teleport != null) {
-            int modal = LayoutView.MAINMODEL.getCurrentID();
-            if(!teleport.getHandlers().isStarted() && Static.invoke(() -> client.getComponentTable().get(modal) != null))
-            {
-                ClientScriptAPI.closeInterface();
-            }
             boolean state = teleport.getHandlers().step();
             if(!state) {
                 teleport = null;
