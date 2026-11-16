@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("8")
+val vitaVersion by extra("9")
 val runeliteVersion by extra("1.13.6")
 
 group = "com.tonic"
@@ -358,12 +358,10 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-feature"
+    val title = "${tag}-bugfix"
     val body = "# ${tag}\n" +
-            "- Optional no-teleport walking\n" +
-            "- Tile overlays now render under objects/actors\n" +
-            "- Game Settings API (SettingsAPI / Settings)\n" +
-            "- update collision\n"
+            "- Fixed some transport issues" +
+            "- update GE API and fix it to use the new long input packet\n"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
