@@ -291,7 +291,7 @@ public class TransportLoader
                 }
 
                 // Al Kharid to and from Ruins of Unkah
-                transports.add(npcTransport(new WorldPoint(3272, 3144, 0), new WorldPoint(3148, 2842, 0), NpcID.TEMPOROSS_FERRY_TO_LOBBY_NPC, "Ferry"));
+                transports.add(npcTransport(new WorldPoint(3272, 3144, 0), new WorldPoint(3148, 2842, 0), NpcID.TEMPOROSS_FERRY_TO_LOBBY_NPC, "Ferry", 2));
                 transports.add(npcTransport(new WorldPoint(3148, 2842, 0), new WorldPoint(3272, 3144, 0), NpcID.TEMPOROSS_FERRY_FROM_LOBBY_NPC, "Ferry"));
 
                 // Entrana
@@ -1048,6 +1048,35 @@ public class TransportLoader
                     WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
                     return Distance.pathDistanceTo(worldPoint, destination) < 5;
                 });
+        return new Transport(source, destination, 10, 0, builder.build(), -1);
+    }
+
+    public static Transport npcTransport(
+            WorldPoint source,
+            WorldPoint destination,
+            int npcId,
+            String action,
+            int settleTicks
+    )
+    {
+        HandlerBuilder builder = HandlerBuilder.get()
+                .add(0, () -> {
+                    NpcEx npc = new NpcQuery()
+                            .withIds(npcId)
+                            .within(source, 10)
+                            .first();
+                    if (npc != null)
+                    {
+                        NpcAPI.interact(npc, action);
+                        return 1;
+                    }
+                    return 0;
+                })
+                .addDelayUntil(1, () -> {
+                    WorldPoint worldPoint = PlayerEx.getLocal().getWorldPoint();
+                    return Distance.pathDistanceTo(worldPoint, destination) < 5;
+                })
+                .addDelay(2, settleTicks);
         return new Transport(source, destination, 10, 0, builder.build(), -1);
     }
 
