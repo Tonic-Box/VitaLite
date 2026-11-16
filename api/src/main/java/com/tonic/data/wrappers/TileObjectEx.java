@@ -9,6 +9,7 @@ import com.tonic.api.game.reach.ReachRule;
 import com.tonic.api.game.reach.SceneCollision;
 import com.tonic.data.wrappers.abstractions.Entity;
 import com.tonic.services.GameManager;
+import com.tonic.util.ActionMatch;
 import com.tonic.util.Distance;
 import com.tonic.util.TextUtil;
 import lombok.Getter;
@@ -165,16 +166,7 @@ public class TileObjectEx implements Entity
     }
 
     public int getActionIndex(String action) {
-        String[] actions = getActions();
-        for(int i = 0; i < actions.length; i++)
-        {
-            if(actions[i] == null)
-                continue;
-            if(!actions[i].toLowerCase().contains(action.toLowerCase()))
-                continue;
-            return i;
-        }
-        return -1;
+        return ActionMatch.indexOf(getActions(), action);
     }
 
     @Override
@@ -328,7 +320,7 @@ public class TileObjectEx implements Entity
             SceneCollision map = SceneCollision.of(view, tileObject.getPlane());
             ReachRule.Target target = target();
             if(map == null || target == null)
-                return new LinkedHashSet<WorldPoint>();
+                return new LinkedHashSet<>();
             return new LinkedHashSet<>(ReachRule.tiles(map, target));
         });
     }

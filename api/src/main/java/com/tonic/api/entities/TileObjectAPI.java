@@ -6,6 +6,7 @@ import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
+import com.tonic.util.ActionMatch;
 import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 
@@ -143,16 +144,7 @@ public class TileObjectAPI
     }
 
     private static int getAction(TileObject object, String action) {
-        String[] actions = getActions(object);
-        for(int i = 0; i < actions.length; i++)
-        {
-            if(actions[i] == null)
-                continue;
-            if(!actions[i].toLowerCase().contains(action.toLowerCase()))
-                continue;
-            return i;
-        }
-        return -1;
+        return ActionMatch.indexOf(getActions(object), action);
     }
 
     /**

@@ -6,6 +6,7 @@ import com.tonic.data.wrappers.PlayerEx;
 import com.tonic.queries.PlayerQuery;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickPacket.ClickType;
+import com.tonic.util.ActionMatch;
 
 /**
  * Player API
@@ -41,13 +42,11 @@ public class PlayerAPI extends ActorAPI
         String[] playerActions = player.getActions();
         for (String action : actions)
         {
-            for(int i = 0; i < playerActions.length; i++)
+            int index = ActionMatch.indexOf(playerActions, action);
+            if (index != -1)
             {
-                if(playerActions[i] != null && playerActions[i].toLowerCase().contains(action.toLowerCase()))
-                {
-                    interact(player, i);
-                    return;
-                }
+                interact(player, index);
+                return;
             }
         }
     }

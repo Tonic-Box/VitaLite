@@ -4,6 +4,7 @@ import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.data.wrappers.*;
 import com.tonic.queries.InventoryQuery;
+import com.tonic.util.ActionMatch;
 import com.tonic.util.TextUtil;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.InterfaceID;
@@ -11,6 +12,7 @@ import net.runelite.api.gameval.InventoryID;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.Widget;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -278,32 +280,25 @@ public class InventoryAPI
      */
     private static int getAction(ItemEx item, String option)
     {
-        option = option.toLowerCase();
-        if (option.equals("examine"))
+        if (option.equalsIgnoreCase("examine"))
         {
             return EXAMINE_OP;
         }
         String[] shown = shownActions(item);
         if (shown != null)
         {
+            String[] names = new String[shown.length];
             for (int i = 0; i < shown.length; i++)
             {
-                if (shown[i] != null && TextUtil.sanitize(shown[i]).toLowerCase().contains(option))
-                {
-                    return i + 1;
-                }
+                names[i] = shown[i] == null ? null : TextUtil.sanitize(shown[i]);
             }
-            return -1;
+            int index = ActionMatch.indexOf(names, option);
+            return index == -1 ? -1 : index + 1;
         }
         String[] actions = item.getActions();
-        for (int i = 0; i < actions.length && i < ITEM_OPS.length; i++)
-        {
-            if (actions[i] != null && actions[i].toLowerCase().contains(option))
-            {
-                return ITEM_OPS[i];
-            }
-        }
-        return -1;
+        String[] ops = actions == null ? null : Arrays.copyOf(actions, Math.min(actions.length, ITEM_OPS.length));
+        int index = ActionMatch.indexOf(ops, option);
+        return index == -1 ? -1 : ITEM_OPS[index];
     }
 
     private static String[] shownActions(ItemEx item)
@@ -339,7 +334,7 @@ public class InventoryAPI
         int count = 0;
         for(int id : ids)
         {
-            count = dropAll(id);
+            count += dropAll(id);
         }
         return (int) Math.ceil((double) count / 10);
     }
@@ -354,7 +349,7 @@ public class InventoryAPI
         int count = 0;
         for(String name : names)
         {
-            count = dropAll(name);
+            count += dropAll(name);
         }
         return (int) Math.ceil((double) count / 10);
     }
