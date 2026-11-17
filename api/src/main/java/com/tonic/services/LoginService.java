@@ -33,6 +33,7 @@ public class LoginService {
 
     public static boolean login(String sessionId, String characterId, String displayName, boolean shouldLogin) {
         Client client = Static.getClient();
+        TClient tClient = (TClient) client;
         return Static.invokeLater(() -> {
             if (client.getGameState() != GameState.LOGIN_SCREEN)
             {
@@ -44,6 +45,7 @@ public class LoginService {
 
             if (shouldLogin)
             {
+                tClient.useJagexAccountLoginType();
                 client.setGameState(GameState.LOGGING_IN);
             }
             return true;

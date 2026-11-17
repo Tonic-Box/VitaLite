@@ -2354,7 +2354,7 @@
         "isStatic": false
       },
       {
-        "name": "",
+        "name": "LoginType_jagexAccount",
         "obfuscatedName": "ao",
         "ownerObfuscatedName": "abz",
         "descriptor": "Labz;",
@@ -13169,7 +13169,7 @@
         "isStatic": true
       },
       {
-        "name": "",
+        "name": "loginType",
         "obfuscatedName": "cc",
         "owner": "Client",
         "ownerObfuscatedName": "client",
