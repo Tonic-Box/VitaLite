@@ -1,4 +1,6 @@
-package com.tonic.ui.sdn;
+package com.tonic.ui;
+
+import net.runelite.client.ui.PluginPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +12,7 @@ import java.util.Map;
  * Text that wraps at whatever width it is given and grows tall enough for every line, so nothing is ever cut off; with a
  * line limit, the last line ends in an ellipsis and the full text shows as a tooltip.
  */
-final class WrappedText extends JComponent {
+public final class WrappedText extends JComponent {
     private static final String ELLIPSIS = "…";
 
     private String text = "";
@@ -26,7 +28,7 @@ final class WrappedText extends JComponent {
      * @param color    its colour
      * @param maxLines the most lines to show, or 0 for no limit
      */
-    WrappedText(String text, Font font, Color color, int maxLines) {
+    public WrappedText(String text, Font font, Color color, int maxLines) {
         setFont(font);
         setForeground(color);
         setOpaque(false);
@@ -37,7 +39,7 @@ final class WrappedText extends JComponent {
     /**
      * @param text the text, with \n for line breaks
      */
-    void setText(String text) {
+    public void setText(String text) {
         this.text = text == null ? "" : text;
         laidOutWidth = -1;
         revalidate();
@@ -47,23 +49,21 @@ final class WrappedText extends JComponent {
     /**
      * @param maxLines the most lines to show, or 0 for no limit
      */
-    void setMaxLines(int maxLines) {
+    public void setMaxLines(int maxLines) {
         this.maxLines = maxLines;
         laidOutWidth = -1;
         revalidate();
         repaint();
     }
 
-    /**
-     *
-     */
-    void setCentered() {
+    /** Centres each line in the width it is given. */
+    public void setCentered() {
         this.centered = true;
         repaint();
     }
 
     /** @return whether the line limit hid some of the text */
-    boolean isTruncated() {
+    public boolean isTruncated() {
         layout(currentWidth());
         return truncated;
     }
@@ -131,7 +131,7 @@ final class WrappedText extends JComponent {
         while (parent != null && parent.getWidth() <= 0) {
             parent = parent.getParent();
         }
-        int width = parent == null ? HubTheme.fallbackWidth() : parent.getWidth();
+        int width = parent == null ? PluginPanel.PANEL_WIDTH : parent.getWidth();
         return Math.max(1, width - getInsets().left - getInsets().right);
     }
 

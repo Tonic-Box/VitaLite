@@ -7,117 +7,201 @@ import com.tonic.plugins.profiles.jagex.JagexAccounts;
 import com.tonic.plugins.profiles.jagex.JagexAuthClient;
 import com.tonic.plugins.profiles.jagex.JagexLoginException;
 import com.tonic.plugins.profiles.session.ProfilesSession;
-import lombok.extern.slf4j.Slf4j;
+import com.tonic.ui.ScrollColumn;
+import com.tonic.ui.VitaTheme;
+import com.tonic.ui.WrappedText;
+import net.runelite.client.ui.DynamicGridLayout;
 import net.runelite.client.ui.PluginPanel;
-import org.apache.commons.lang3.StringUtils;
+import net.runelite.client.ui.components.IconTextField;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-@Slf4j
+/**
+ * The Profiles tab: a header to add Jagex accounts, a search box, a card per Jagex account and the legacy accounts
+ * in a collapsible group. Which cards are collapsed and which sessions expired is kept for the session.
+ */
 public class ProfilesRootPanel extends PluginPanel {
-
-    private final JPanel profilesPanel;
-    private final JLabel unreadableBanner;
+    private static final Color ERROR_BACKGROUND = new Color(70, 35, 30);
 
     private final ProfilesSession profiles;
     private final JagexAccounts jagexAccounts;
-    private final List<JagexAccountCard> jagexCards = new ArrayList<>();
-    private final List<ProfilePanel> legacyPanels = new ArrayList<>();
-    private AddJagexAccountPanel addJagexAccountPanel;
-    private JTextField searchField;
+    private final Set<String> collapsed = new HashSet<>();
+    private final Set<String> expired = new HashSet<>();
+    private final JPanel list = VitaTheme.row(new DynamicGridLayout(0, 1, 0, VitaTheme.GAP));
+    private final IconTextField search = new IconTextField();
+    private final JButton addButton = VitaTheme.textButton("+ Add account", VitaTheme.accent(), this::showAddMenu);
+    private final WrappedText busyLine = new WrappedText("", VitaTheme.textFont(), VitaTheme.MUTED, 0);
+    private final WrappedText errorText = new WrappedText("", VitaTheme.textFont(), JagexAccountCard.EXPIRED_TEXT, 0);
+    private final JPanel errorBox = new JPanel(new BorderLayout());
+    private final JagexAccountCard.Host host = new CardHost();
+    private final JPanel header = VitaTheme.row(new DynamicGridLayout(0, 1, 0, 8));
+    private final JPanel titleRow = VitaTheme.row(new BorderLayout(VitaTheme.GAP, 0));
+    private boolean legacyOpen;
+    private boolean adding;
 
-
+    /**
+     * @param profiles the profile store the tab shows and edits
+     */
     public ProfilesRootPanel(ProfilesSession profiles) {
+        super(false);
         this.profiles = profiles;
         this.jagexAccounts = new JagexAccounts(profiles, new JagexAuthClient());
-        this.profilesPanel = new JPanel();
-        this.unreadableBanner = new JLabel();
 
-        this.initialize();
+        setLayout(new BorderLayout());
+        setBackground(VitaTheme.BACKGROUND);
+        buildHeader();
+        add(header, BorderLayout.NORTH);
 
-        this.profiles.loadProfilesFromFile();
-        loadProfilesList();
+        ScrollColumn column = new ScrollColumn();
+        column.setLayout(new BorderLayout());
+        column.setBorder(new EmptyBorder(0, 10, 10, 10));
+        column.add(list, BorderLayout.NORTH);
+        JScrollPane scroll = new JScrollPane(column, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        scroll.getViewport().setBackground(VitaTheme.BACKGROUND);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        add(scroll, BorderLayout.CENTER);
+
+        profiles.loadProfilesFromFile();
+        rebuild();
     }
 
-    private void initialize() {
-        setLayout(new GridBagLayout());
-        AddLegacyAccountPanel addProxyPanel = createAddAccountPanel();
-        profilesPanel.setLayout(new BoxLayout(profilesPanel, BoxLayout.Y_AXIS));
+    private void buildHeader() {
+        header.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.NORTH;
-        gbc.insets = new Insets(0, 0, 2, 0);
+        JLabel title = new JLabel("Profiles");
+        title.setFont(VitaTheme.titleFont());
+        title.setForeground(VitaTheme.TITLE);
+        titleRow.add(title, BorderLayout.WEST);
+        addButton.setToolTipText("Add a Jagex account with all of its characters");
+        titleRow.add(addButton, BorderLayout.EAST);
 
-        this.add(addProxyPanel, gbc);
+        errorBox.setBackground(ERROR_BACKGROUND);
+        errorBox.setBorder(new EmptyBorder(6, 8, 6, 8));
+        errorBox.add(errorText, BorderLayout.CENTER);
 
-        gbc.gridy++;
-        addJagexAccountPanel = createJagexAccountPanel();
-        this.add(addJagexAccountPanel, gbc);
-
-        gbc.gridy++;
-        JPanel profilesHeader = new JPanel(new BorderLayout());
-        profilesHeader.setPreferredSize(new Dimension(220, 32));
-        profilesHeader.setMinimumSize(new Dimension(220, 32));
-        profilesHeader.setMaximumSize(new Dimension(220, 32));
-        profilesHeader.setBackground(new Color(30, 30, 30));
-        JLabel profilesLabel = new JLabel("Profiles");
-        profilesLabel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 0));
-        profilesLabel.setForeground(Color.WHITE);
-        profilesHeader.add(profilesLabel, BorderLayout.WEST);
-        this.add(profilesHeader, gbc);
-
-        gbc.gridy++;
-        unreadableBanner.setForeground(new Color(255, 120, 120));
-        unreadableBanner.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        unreadableBanner.setVisible(false);
-        this.add(unreadableBanner, gbc);
-
-        gbc.gridy++;
-        searchField = new JTextField();
-        searchField.getDocument().addDocumentListener(new DocumentListener() {
+        search.setIcon(IconTextField.Icon.SEARCH);
+        search.setBackground(VitaTheme.CARD);
+        search.setHoverBackgroundColor(VitaTheme.CARD_HOVER);
+        search.setPreferredSize(new Dimension(0, 30));
+        search.setToolTipText("Search accounts or characters");
+        search.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                showFilteredList();
+                rebuild();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                showFilteredList();
+                rebuild();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                showFilteredList();
+                rebuild();
             }
         });
-        this.add(searchField, gbc);
-
-        gbc.gridy++;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.anchor = GridBagConstraints.NORTH;
-
-        this.add(profilesPanel, gbc);
-        this.revalidate();
-        this.repaint();
+        search.addClearListener(this::rebuild);
     }
 
-    private AddJagexAccountPanel createJagexAccountPanel() {
-        AddJagexAccountPanel panel = new AddJagexAccountPanel();
-        panel.addJagexAccountActionListener(event -> addJagexAccount());
-        panel.addImportJagexAccountActionListener(event -> importJagexSession());
-        return panel;
+    private void layoutHeader() {
+        header.removeAll();
+        header.add(titleRow);
+        if (adding) {
+            header.add(busyLine);
+        }
+        if (profiles.isUnreadable()) {
+            header.add(errorBox);
+        }
+        header.add(search);
+        header.revalidate();
+        header.repaint();
+    }
+
+    private void rebuild() {
+        boolean unreadable = profiles.isUnreadable();
+        if (unreadable) {
+            errorText.setText("Profiles can't be loaded, so nothing is shown or saved. " + (profiles.getLoadError() == null ? "" : profiles.getLoadError()));
+        }
+        layoutHeader();
+
+        String query = search.getText() == null ? "" : search.getText().trim().toLowerCase();
+        list.removeAll();
+
+        List<JagexAccount> accounts = profiles.getJagexAccounts();
+        accounts.sort(Comparator.comparing(JagexAccount::getLabel, String.CASE_INSENSITIVE_ORDER));
+        int shown = 0;
+        for (JagexAccount account : accounts) {
+            if (matches(account, query)) {
+                list.add(new JagexAccountCard(account, profiles, jagexAccounts, host, !query.isEmpty()));
+                shown++;
+            }
+        }
+
+        List<Profile> legacy = new ArrayList<>();
+        for (Profile profile : profiles.getLegacyProfiles()) {
+            if (matches(profile, query)) {
+                legacy.add(profile);
+            }
+        }
+        legacy.sort(Comparator.comparing(Profile::getIdentifier, String.CASE_INSENSITIVE_ORDER));
+
+        if (accounts.isEmpty() && query.isEmpty() && !unreadable) {
+            list.add(emptyState());
+        } else if (shown == 0 && legacy.isEmpty() && !query.isEmpty()) {
+            list.add(new WrappedText("No matches", VitaTheme.textFont(), VitaTheme.MUTED, 0));
+        }
+        if (!legacy.isEmpty()) {
+            list.add(new LegacySection(legacy, profiles, legacyOpen || !query.isEmpty(), this::toggleLegacy, this::rebuild));
+        }
+
+        list.revalidate();
+        list.repaint();
+    }
+
+    private JPanel emptyState() {
+        JPanel card = new JPanel(new DynamicGridLayout(0, 1, 0, 8));
+        card.setBackground(VitaTheme.CARD);
+        card.setBorder(new EmptyBorder(VitaTheme.PADDING, VitaTheme.PADDING, VitaTheme.PADDING, VitaTheme.PADDING));
+        card.add(new WrappedText("No Jagex accounts yet", VitaTheme.titleFont(), VitaTheme.TITLE, 0));
+        card.add(new WrappedText("Sign in on Jagex's own page in your browser and every character on the account is added, ready to log in from here.", VitaTheme.textFont(), VitaTheme.TEXT, 0));
+        card.add(VitaTheme.textButton("Add Jagex account", VitaTheme.accent(), this::addJagexAccount));
+        card.add(new WrappedText("Have a session id? Use + Add account, then Import session id.", VitaTheme.textFont(), VitaTheme.MUTED, 0));
+        return card;
+    }
+
+    private void toggleLegacy() {
+        legacyOpen = !legacyOpen;
+        rebuild();
+    }
+
+    private void showAddMenu() {
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem signIn = new JMenuItem("Sign in with browser...");
+        signIn.addActionListener(e -> addJagexAccount());
+        menu.add(signIn);
+        JMenuItem importSession = new JMenuItem("Import session id...");
+        importSession.addActionListener(e -> importJagexSession());
+        menu.add(importSession);
+        menu.show(addButton, 0, addButton.getHeight());
+    }
+
+    private void setAdding(String status) {
+        adding = status != null;
+        addButton.setEnabled(!adding);
+        addButton.setBackground(adding ? VitaTheme.BUSY : VitaTheme.accent());
+        busyLine.setText(adding ? status : "");
+        layoutHeader();
     }
 
     private void addJagexAccount() {
@@ -126,14 +210,14 @@ public class ProfilesRootPanel extends PluginPanel {
             return;
         }
 
-        addJagexAccountPanel.setBusy(true);
+        setAdding("Waiting for the browser sign-in for " + label + "...");
         JagexSignInDialog.run(this, "Add Jagex Account: " + label, idToken -> jagexAccounts.add(label, idToken),
                 account -> {
-                    addJagexAccountPanel.setBusy(false);
-                    loadProfilesList();
+                    setAdding(null);
+                    rebuild();
                 },
                 failure -> {
-                    addJagexAccountPanel.setBusy(false);
+                    setAdding(null);
                     boolean cancelled = failure instanceof JagexLoginException && ((JagexLoginException) failure).getKind() == JagexLoginException.Kind.CANCELLED;
                     if (!cancelled) {
                         showError("Couldn't add the Jagex account", failure.getMessage());
@@ -174,7 +258,7 @@ public class ProfilesRootPanel extends PluginPanel {
 
         String importLabel = label;
         String importSessionId = sessionId;
-        addJagexAccountPanel.setBusy(true);
+        setAdding("Importing " + importLabel + "...");
         new SwingWorker<JagexAccount, Void>() {
             @Override
             protected JagexAccount doInBackground() throws Exception {
@@ -183,10 +267,10 @@ public class ProfilesRootPanel extends PluginPanel {
 
             @Override
             protected void done() {
-                addJagexAccountPanel.setBusy(false);
+                setAdding(null);
                 try {
                     get();
-                    loadProfilesList();
+                    rebuild();
                 } catch (InterruptedException | ExecutionException e) {
                     Throwable cause = e instanceof ExecutionException && e.getCause() != null ? e.getCause() : e;
                     showError("Couldn't import the session", cause.getMessage());
@@ -213,90 +297,8 @@ public class ProfilesRootPanel extends PluginPanel {
         }
     }
 
-    private AddLegacyAccountPanel createAddAccountPanel() {
-        AddLegacyAccountPanel addProxyPanel = new AddLegacyAccountPanel();
-
-        addProxyPanel.addRsAccountActionListener((event) -> {
-            String bankPin = "";
-            if (StringUtils.isNumeric(addProxyPanel.getBankPin())) {
-                bankPin = addProxyPanel.getBankPin();
-            }
-
-            Profile profile = new Profile(addProxyPanel.getIdentifierField().getText().trim(),
-                    false,
-                    addProxyPanel.getUsername(),
-                    addProxyPanel.getPassword(),
-                    addProxyPanel.getUsername(),
-                    "",
-                    "",
-                    bankPin);
-
-            try {
-                profiles.addLegacy(profile);
-            } catch (Exception e) {
-                showError("Couldn't add the account", e.getMessage());
-                return;
-            }
-            loadProfilesList();
-        });
-        return addProxyPanel;
-    }
-
-    private void loadProfilesList() {
-        unreadableBanner.setVisible(profiles.isUnreadable());
-        if (profiles.isUnreadable()) {
-            unreadableBanner.setText("<html><body style='width:180px'>Profiles can't be loaded, so nothing is shown or saved. "
-                    + escape(profiles.getLoadError()) + "</body></html>");
-        }
-
-        jagexCards.clear();
-        List<JagexAccount> accounts = profiles.getJagexAccounts();
-        accounts.sort(Comparator.comparing(JagexAccount::getLabel, String.CASE_INSENSITIVE_ORDER));
-        for (JagexAccount account : accounts) {
-            jagexCards.add(new JagexAccountCard(account, profiles, jagexAccounts, this::loadProfilesList));
-        }
-
-        legacyPanels.clear();
-        List<Profile> legacyProfiles = profiles.getLegacyProfiles();
-        legacyProfiles.sort(Comparator.comparing(Profile::getIdentifier, String.CASE_INSENSITIVE_ORDER));
-        for (Profile profile : legacyProfiles) {
-            ProfilePanel panel = new ProfilePanel(profile);
-            panel.getDeleteButton().addActionListener(e -> {
-                int result = JOptionPane.showConfirmDialog(null, "Do you want to delete " + profile.getIdentifier() + "?", "Remove account", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null);
-
-                if (result == JOptionPane.YES_OPTION) {
-                    removeProfile(profile);
-                }
-            });
-            panel.getEditButton().addActionListener(e -> editLegacyProfile(profile));
-            legacyPanels.add(panel);
-        }
-
-        showFilteredList();
-    }
-
-    private void showFilteredList() {
-        String query = searchField == null ? "" : searchField.getText().trim().toLowerCase();
-        profilesPanel.removeAll();
-
-        for (JagexAccountCard card : jagexCards) {
-            if (matches(card.getAccount(), query)) {
-                profilesPanel.add(card);
-                profilesPanel.add(Box.createRigidArea(new Dimension(0, 4)));
-            }
-        }
-
-        for (ProfilePanel panel : legacyPanels) {
-            if (query.isEmpty() || panel.getProfile().getIdentifier().toLowerCase().contains(query)) {
-                profilesPanel.add(panel);
-                profilesPanel.add(Box.createRigidArea(new Dimension(0, 4)));
-            }
-        }
-
-        profilesPanel.revalidate();
-        profilesPanel.repaint();
-        revalidate();
-        repaint();
+    private void showError(String title, String message) {
+        JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
     }
 
     private static boolean matches(JagexAccount account, String query) {
@@ -311,119 +313,57 @@ public class ProfilesRootPanel extends PluginPanel {
         return false;
     }
 
-    private void editLegacyProfile(Profile profile) {
-        JTextField tag = new JTextField(profile.getIdentifier());
-        JTextField username = new JTextField(profile.getUsername());
-        JPasswordField password = new JPasswordField(profile.getPassword());
-        JTextField bankPin = new JTextField(profile.getBankPin(), 4);
-        JPanel editPanel = createEditPanel(tag, username, password, bankPin);
-
-        while (true) {
-            int result = JOptionPane.showConfirmDialog(null,
-                    editPanel, "Editing: " + profile.getIdentifier(),
-                    JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, null);
-
-            if (result != JOptionPane.YES_OPTION) {
-                return;
-            }
-            if (!bankPin.getText().isEmpty() && (!StringUtils.isNumeric(bankPin.getText()) || bankPin.getText().length() != 4)) {
-                JOptionPane.showMessageDialog(null, "Invalid bank pin");
-                continue;
-            }
-
-            Profile updated = new Profile(tag.getText().trim(), false, username.getText(), new String(password.getPassword()),
-                    username.getText(), "", "", bankPin.getText());
-            try {
-                profiles.updateLegacy(profile.getIdentifier(), updated);
-            } catch (IllegalArgumentException e) {
-                showError("Couldn't save", e.getMessage());
-                continue;
-            } catch (Exception e) {
-                showError("Couldn't save", e.getMessage());
-                return;
-            }
-            loadProfilesList();
-            return;
+    private static boolean matches(Profile profile, String query) {
+        if (query.isEmpty()) {
+            return true;
         }
+        String username = profile.getUsername() == null ? "" : profile.getUsername().toLowerCase();
+        return profile.getIdentifier().toLowerCase().contains(query) || username.contains(query);
     }
 
-    private void removeProfile(Profile profile) {
-        try {
-            profiles.removeLegacy(profile.getIdentifier());
-        } catch (Exception e) {
-            showError("Couldn't delete", e.getMessage());
-            return;
+    private final class CardHost implements JagexAccountCard.Host {
+        @Override
+        public boolean isCollapsed(String label) {
+            return collapsed.contains(label);
         }
-        loadProfilesList();
-    }
 
-    private void showError(String title, String message) {
-        JOptionPane.showMessageDialog(this, message, title, JOptionPane.ERROR_MESSAGE);
-    }
+        @Override
+        public void setCollapsed(String label, boolean nowCollapsed) {
+            if (nowCollapsed) {
+                collapsed.add(label);
+            } else {
+                collapsed.remove(label);
+            }
+        }
 
-    private static String escape(String text) {
-        return text == null ? "" : text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-    }
+        @Override
+        public boolean isExpired(String label) {
+            return expired.contains(label);
+        }
 
-    private JPanel createEditPanel(JTextField tagField, JTextField usernameField, JTextField passwordField, JTextField bankPinField) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        @Override
+        public void setExpired(String label, boolean nowExpired) {
+            if (nowExpired) {
+                expired.add(label);
+            } else {
+                expired.remove(label);
+            }
+        }
 
+        @Override
+        public void renamed(String from, String to) {
+            if (collapsed.remove(from)) {
+                collapsed.add(to);
+            }
+            if (expired.remove(from)) {
+                expired.add(to);
+            }
+            rebuild();
+        }
 
-        JLabel tagLabel = new JLabel("Profile Tag:");
-        tagField.setMinimumSize(new Dimension(186, 32));
-        tagField.setMaximumSize(new Dimension(186, 32));
-        tagField.setPreferredSize(new Dimension(186, 32));
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        panel.add(tagLabel, gbc);
-
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        panel.add(tagField, gbc);
-
-        JLabel usernameLabel = new JLabel("Username:");
-        usernameField.setMinimumSize(new Dimension(186, 32));
-        usernameField.setPreferredSize(new Dimension(186, 32));
-        usernameField.setMaximumSize(new Dimension(186, 32));
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        panel.add(usernameLabel, gbc);
-
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        panel.add(usernameField, gbc);
-
-        JLabel passwordLabel = new JLabel("Password:");
-        passwordField.setMinimumSize(new Dimension(186, 32));
-        passwordField.setPreferredSize(new Dimension(186, 32));
-        passwordField.setMaximumSize(new Dimension(186, 32));
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.EAST;
-        panel.add(passwordLabel, gbc);
-
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        panel.add(passwordField, gbc);
-
-        JLabel bankPinLabel = new JLabel("Bank Pin:");
-        bankPinField.setMinimumSize(new Dimension(64, 32));
-        bankPinField.setPreferredSize(new Dimension(64, 32));
-        bankPinField.setMaximumSize(new Dimension(64, 32));
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.anchor = GridBagConstraints.EAST;
-        panel.add(bankPinLabel, gbc);
-
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        panel.add(bankPinField, gbc);
-        return panel;
+        @Override
+        public void listChanged() {
+            rebuild();
+        }
     }
 }

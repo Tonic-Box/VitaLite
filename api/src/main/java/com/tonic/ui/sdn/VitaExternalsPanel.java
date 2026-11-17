@@ -8,6 +8,9 @@ import com.tonic.services.hub.HubPlugin;
 import com.tonic.services.hub.HubRepo;
 import com.tonic.services.hub.HubService;
 import com.tonic.services.hub.HubState;
+import com.tonic.ui.ScrollColumn;
+import com.tonic.ui.VitaTheme;
+import com.tonic.ui.WrappedText;
 import com.tonic.util.ThreadPool;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.ui.DynamicGridLayout;
@@ -59,7 +62,7 @@ public class VitaExternalsPanel extends PluginPanel {
     private final IconTextField search = new IconTextField();
     private final JComboBox<String> repoFilter = new JComboBox<>();
     private final Map<String, String> repoUrls = new LinkedHashMap<>();
-    private final JPanel list = HubTheme.row(new DynamicGridLayout(0, 1, 0, HubTheme.GAP));
+    private final JPanel list = VitaTheme.row(new DynamicGridLayout(0, 1, 0, VitaTheme.GAP));
     private final ReposPage reposPage = new ReposPage(() -> showPage(MAIN));
     private final Set<String> expanded = new HashSet<>();
     private boolean browsing;
@@ -73,22 +76,22 @@ public class VitaExternalsPanel extends PluginPanel {
     public VitaExternalsPanel() {
         super(false);
         setLayout(pages);
-        setBackground(HubTheme.BACKGROUND);
+        setBackground(VitaTheme.BACKGROUND);
         if (!pluginDirectory.exists()) {
             pluginDirectory.mkdirs();
         }
 
         JPanel main = new JPanel(new BorderLayout());
-        main.setBackground(HubTheme.BACKGROUND);
+        main.setBackground(VitaTheme.BACKGROUND);
         main.add(header(), BorderLayout.NORTH);
 
-        ReposPage.ScrollColumn column = new ReposPage.ScrollColumn();
+        ScrollColumn column = new ScrollColumn();
         column.setLayout(new BorderLayout());
         column.setBorder(new EmptyBorder(0, 10, 10, 10));
         column.add(list, BorderLayout.NORTH);
         JScrollPane scroll = new JScrollPane(column, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setBorder(BorderFactory.createEmptyBorder());
-        scroll.getViewport().setBackground(HubTheme.BACKGROUND);
+        scroll.getViewport().setBackground(VitaTheme.BACKGROUND);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         main.add(scroll, BorderLayout.CENTER);
 
@@ -116,7 +119,7 @@ public class VitaExternalsPanel extends PluginPanel {
     }
 
     private JPanel header() {
-        JPanel header = HubTheme.row(new DynamicGridLayout(0, 1, 0, 8));
+        JPanel header = VitaTheme.row(new DynamicGridLayout(0, 1, 0, 8));
         header.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         installedTab.setOnSelectEvent(() -> {
@@ -132,15 +135,15 @@ public class VitaExternalsPanel extends PluginPanel {
             queueRebuild();
             return true;
         });
-        installedTab.setFont(HubTheme.regularFont());
-        browseTab.setFont(HubTheme.regularFont());
+        installedTab.setFont(VitaTheme.regularFont());
+        browseTab.setFont(VitaTheme.regularFont());
         tabs.addTab(installedTab);
         tabs.addTab(browseTab);
         header.add(tabs);
 
         search.setIcon(IconTextField.Icon.SEARCH);
-        search.setBackground(HubTheme.CARD);
-        search.setHoverBackgroundColor(HubTheme.CARD_HOVER);
+        search.setBackground(VitaTheme.CARD);
+        search.setHoverBackgroundColor(VitaTheme.CARD_HOVER);
         search.setPreferredSize(new Dimension(0, 30));
         search.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) { queueRebuild(); }
@@ -150,7 +153,7 @@ public class VitaExternalsPanel extends PluginPanel {
         search.addClearListener(this::queueRebuild);
         header.add(search);
 
-        repoFilter.setFont(HubTheme.textFont());
+        repoFilter.setFont(VitaTheme.textFont());
         repoFilter.setFocusable(false);
         repoFilter.setToolTipText("Show one repository's plugins");
         repoFilter.addActionListener(e -> {
@@ -159,12 +162,12 @@ public class VitaExternalsPanel extends PluginPanel {
             }
         });
 
-        JPanel buttons = HubTheme.row(new FlowLayout(FlowLayout.RIGHT, 2, 0));
-        buttons.add(HubTheme.iconButton(HubTheme.reload(), "Check repositories for new plugins and updates", hub::refresh));
-        moreButton = HubTheme.iconButton(HubTheme.more(), "More", this::showMenu);
+        JPanel buttons = VitaTheme.row(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+        buttons.add(VitaTheme.iconButton(VitaTheme.reload(), "Check repositories for new plugins and updates", hub::refresh));
+        moreButton = VitaTheme.iconButton(VitaTheme.more(), "More", this::showMenu);
         buttons.add(moreButton);
 
-        JPanel toolbar = HubTheme.row(new BorderLayout(HubTheme.GAP, 0));
+        JPanel toolbar = VitaTheme.row(new BorderLayout(VitaTheme.GAP, 0));
         toolbar.add(repoFilter, BorderLayout.CENTER);
         toolbar.add(buttons, BorderLayout.EAST);
         header.add(toolbar);
@@ -241,10 +244,10 @@ public class VitaExternalsPanel extends PluginPanel {
         List<JComponent> banners = new ArrayList<>();
         String error = hub.error();
         if (error != null) {
-            banners.add(banner(error, HubTheme.ERROR, "Dismiss", HubTheme.BUSY, hub::clearError));
+            banners.add(banner(error, VitaTheme.ERROR, "Dismiss", VitaTheme.BUSY, hub::clearError));
         }
         if (notice != null) {
-            banners.add(banner(notice, HubTheme.TEXT, "Dismiss", HubTheme.BUSY, () -> {
+            banners.add(banner(notice, VitaTheme.TEXT, "Dismiss", VitaTheme.BUSY, () -> {
                 notice = null;
                 queueRebuild();
             }));
@@ -252,23 +255,23 @@ public class VitaExternalsPanel extends PluginPanel {
         for (HubFetcher.Result result : hub.results()) {
             if (result.error != null) {
                 String text = "Couldn't load " + repoName(result.repo) + ": " + result.error + ".";
-                banners.add(banner(text, result.manifest == null ? HubTheme.ERROR : HubTheme.WARNING, "Retry", HubTheme.BUSY, hub::refresh));
+                banners.add(banner(text, result.manifest == null ? VitaTheme.ERROR : VitaTheme.WARNING, "Retry", VitaTheme.BUSY, hub::refresh));
             }
         }
         if (!browsing && updates > 0) {
             String text = updates == 1 ? "1 update available" : updates + " updates available";
-            banners.add(banner(text, HubTheme.TITLE, "Update all", HubTheme.accent(), hub::updateAll));
+            banners.add(banner(text, VitaTheme.TITLE, "Update all", VitaTheme.accent(), hub::updateAll));
         }
         return banners;
     }
 
     private JComponent banner(String text, Color color, String action, Color actionColor, Runnable onAction) {
-        JPanel banner = new JPanel(new BorderLayout(HubTheme.GAP, 0));
-        banner.setBackground(HubTheme.CARD);
-        banner.setBorder(new EmptyBorder(6, HubTheme.PADDING, 6, HubTheme.PADDING));
-        banner.add(new WrappedText(text, HubTheme.textFont(), color, 0), BorderLayout.CENTER);
-        JPanel button = HubTheme.row(new GridBagLayout());
-        button.add(HubTheme.textButton(action, actionColor, onAction));
+        JPanel banner = new JPanel(new BorderLayout(VitaTheme.GAP, 0));
+        banner.setBackground(VitaTheme.CARD);
+        banner.setBorder(new EmptyBorder(6, VitaTheme.PADDING, 6, VitaTheme.PADDING));
+        banner.add(new WrappedText(text, VitaTheme.textFont(), color, 0), BorderLayout.CENTER);
+        JPanel button = VitaTheme.row(new GridBagLayout());
+        button.add(VitaTheme.textButton(action, actionColor, onAction));
         banner.add(button, BorderLayout.EAST);
         return banner;
     }
@@ -283,7 +286,7 @@ public class VitaExternalsPanel extends PluginPanel {
         } else {
             text = "Nothing installed yet. Open Browse to find plugins.";
         }
-        WrappedText label = new WrappedText(text, HubTheme.textFont(), HubTheme.MUTED, 0);
+        WrappedText label = new WrappedText(text, VitaTheme.textFont(), VitaTheme.MUTED, 0);
         label.setCentered();
         label.setBorder(new EmptyBorder(30, 0, 0, 0));
         return label;
@@ -368,18 +371,18 @@ public class VitaExternalsPanel extends PluginPanel {
             model.version = "Installed from another repository";
         } else if (installed != null && entry.hasUpdate()) {
             model.version = installed.version + " → " + plugin.version;
-            model.versionColor = HubTheme.accent();
-            primary(model, "Update", HubTheme.accent(), () -> hub.update(plugin.id));
+            model.versionColor = VitaTheme.accent();
+            primary(model, "Update", VitaTheme.accent(), () -> hub.update(plugin.id));
         } else if (installed != null) {
             model.version = browsing ? "Installed " + installed.version : installed.version;
-            model.versionColor = browsing ? HubTheme.INSTALL : null;
+            model.versionColor = browsing ? VitaTheme.SUCCESS : null;
         } else if (!entry.isCompatible()) {
             model.version = "Needs VitaLite " + plugin.minVita + " or newer";
-            model.versionColor = HubTheme.ERROR;
-            primary(model, "Unavailable", HubTheme.BUSY, null);
+            model.versionColor = VitaTheme.ERROR;
+            primary(model, "Unavailable", VitaTheme.BUSY, null);
         } else {
             model.version = plugin.version;
-            primary(model, "Install", HubTheme.INSTALL, () -> hub.install(entry.repo.url, plugin.id));
+            primary(model, "Install", VitaTheme.SUCCESS, () -> hub.install(entry.repo.url, plugin.id));
         }
 
         if (installed != null && entry.isInstalled()) {
@@ -438,7 +441,7 @@ public class VitaExternalsPanel extends PluginPanel {
     private void busy(PluginCard.Model model, String id) {
         String operation = hub.operation(id);
         if (operation != null) {
-            primary(model, operation + "…", HubTheme.BUSY, null);
+            primary(model, operation + "…", VitaTheme.BUSY, null);
             model.trash = null;
         }
     }

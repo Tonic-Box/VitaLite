@@ -165,7 +165,7 @@ public class ProfilesSession
             {
                 return;
             }
-            enc = new String(Files.readAllBytes(file), StandardCharsets.UTF_8).trim();
+            enc = Files.readString(file).trim();
         }
         catch (IOException e)
         {
@@ -214,30 +214,6 @@ public class ProfilesSession
     {
         requireReadable();
         requireFreeName(name, null);
-    }
-
-    /**
-     * Adds a legacy profile.
-     *
-     * @param profile the profile
-     * @throws IllegalArgumentException when its identifier is blank, contains " / " or is taken
-     * @throws IllegalStateException when profiles.db could not be read
-     * @throws IOException when saving fails; nothing is added then
-     */
-    public synchronized void addLegacy(Profile profile) throws IOException
-    {
-        requireReadable();
-        requireFreeName(profile.getIdentifier(), null);
-        legacy.add(copy(profile));
-        try
-        {
-            save();
-        }
-        catch (IOException e)
-        {
-            legacy.remove(legacy.size() - 1);
-            throw e;
-        }
     }
 
     /**

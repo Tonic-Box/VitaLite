@@ -4,6 +4,7 @@ import com.tonic.Logger;
 import com.tonic.services.hub.HubFetcher;
 import com.tonic.services.hub.HubPlugin;
 import com.tonic.services.hub.HubState;
+import com.tonic.ui.VitaTheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
 
@@ -80,7 +81,7 @@ final class HubIcons {
             if (image == null) {
                 image = ImageUtil.loadImageResource(PluginPanel.class, "/net/runelite/client/plugins/config/pluginhub_missingicon.png");
             }
-            fallback = HubTheme.icon(image, HubTheme.ICON_SIZE, null);
+            fallback = VitaTheme.icon(image, HubTheme.ICON_SIZE, null);
         }
         return fallback;
     }
@@ -102,7 +103,7 @@ final class HubIcons {
             if (image == null) {
                 return;
             }
-            ICONS.put(key, HubTheme.icon(image, HubTheme.ICON_SIZE, null));
+            ICONS.put(key, VitaTheme.icon(image, HubTheme.ICON_SIZE, null));
             for (Runnable listener : LISTENERS) {
                 listener.run();
             }
