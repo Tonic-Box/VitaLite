@@ -18131,6 +18131,7 @@
         "isStatic": true
       },
       {
+        "name": "writeRandomDat",
         "obfuscatedName": "au",
         "ownerObfuscatedName": "cn",
         "descriptor": "(Lyh;IB)V",

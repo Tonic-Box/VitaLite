@@ -2,6 +2,7 @@ package com.tonic.mixins;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.api.TBuffer;
 import com.tonic.api.TClient;
 import com.tonic.injector.annotations.*;
 import com.tonic.model.RandomDat;
@@ -19,24 +20,29 @@ public abstract class TRandomDatMixin
     @Shadow("randomDat")
     public static byte[] randomDat;
 
-//    @Insert(method = "randomDatData2", at = @At(value = AtTarget.RETURN, shift = Shift.HEAD), all = true)
-//    public static void onWriteNewRandomDatData(byte[] buffer, int var1) //writeRandomDat
-//    {
-//        if (!Static.getVitaConfig().shouldCacheRandomDat())
-//        {
-//            return;
-//        }
-//
-//        String username = ReflectBuilder.of(client)
-//                .method("getUsername", null, null)
-//                .get();
-//
-//        String identifier = username != null && !username.isEmpty() ? username : characterId;
-//
-//        byte[] newRandomDatData = Arrays.copyOf(buffer, 24);
-//        RandomDat.writeCachedRandomDatData(identifier, newRandomDatData);
-//        Logger.info("Storing cached random.dat data for user " + identifier);
-//    }
+    @Disable("writeRandomDat")
+    public static boolean onWriteRandomDat(TBuffer buffer, int offset)
+    {
+        if (!Static.getVitaConfig().shouldCacheRandomDat())
+        {
+            return false;
+        }
+
+        String username = ReflectBuilder.of(client)
+                .method("getUsername", null, null)
+                .get();
+
+        String identifier = username != null && !username.isEmpty() ? username : ((TClient) client).getCharacterId();
+        if (identifier == null || identifier.isEmpty())
+        {
+            return true;
+        }
+
+        byte[] data = Arrays.copyOfRange(buffer.getArray(), offset, offset + 24);
+        RandomDat.writeCachedRandomDatData(identifier, data);
+        Logger.info("Storing cached random.dat data for user " + identifier);
+        return true;
+    }
 
     @Inject
     public static void setRandomDat(String caller)
