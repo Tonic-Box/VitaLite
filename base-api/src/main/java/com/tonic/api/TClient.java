@@ -130,6 +130,11 @@ public interface TClient
 
     void setLoginIndex(int index);
 
+    /**
+     * Makes the next login a Jagex account login, which fetches its one-time token, as the login screen's Play does.
+     */
+    void useJagexAccountLoginType();
+
     int getShipHeading();
 
     void setShipHeading(int heading);
