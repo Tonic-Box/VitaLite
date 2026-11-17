@@ -5,6 +5,9 @@ import com.tonic.services.hub.HubFetcher;
 import com.tonic.services.hub.HubRepo;
 import com.tonic.services.hub.HubService;
 import com.tonic.services.hub.HubState;
+import com.tonic.ui.ScrollColumn;
+import com.tonic.ui.VitaTheme;
+import com.tonic.ui.WrappedText;
 import net.runelite.client.ui.DynamicGridLayout;
 import net.runelite.client.ui.components.FlatTextField;
 
@@ -26,9 +29,9 @@ final class ReposPage extends JPanel {
     private static final String THIRD_PARTY_CONFIRM = "Are you sure? Anything you install from this repository can access your accounts and files.";
 
     private final HubService hub = HubService.get();
-    private final JPanel repos = HubTheme.row(new DynamicGridLayout(0, 1, 0, HubTheme.GAP));
+    private final JPanel repos = VitaTheme.row(new DynamicGridLayout(0, 1, 0, VitaTheme.GAP));
     private final FlatTextField input = new FlatTextField();
-    private final WrappedText status = new WrappedText("", HubTheme.textFont(), HubTheme.MUTED, 0);
+    private final WrappedText status = new WrappedText("", VitaTheme.textFont(), VitaTheme.MUTED, 0);
     private String localStatus;
 
     /**
@@ -36,12 +39,12 @@ final class ReposPage extends JPanel {
      */
     ReposPage(Runnable back) {
         super(new BorderLayout());
-        setBackground(HubTheme.BACKGROUND);
+        setBackground(VitaTheme.BACKGROUND);
 
-        JPanel title = HubTheme.row(new BorderLayout(HubTheme.GAP, 0));
+        JPanel title = VitaTheme.row(new BorderLayout(VitaTheme.GAP, 0));
         title.setBorder(new EmptyBorder(10, 10, 10, 10));
-        title.add(HubTheme.iconButton(HubTheme.back(), "Back", back), BorderLayout.WEST);
-        title.add(new WrappedText("Repositories", HubTheme.titleFont(), HubTheme.TITLE, 0), BorderLayout.CENTER);
+        title.add(VitaTheme.iconButton(HubTheme.back(), "Back", back), BorderLayout.WEST);
+        title.add(new WrappedText("Repositories", VitaTheme.titleFont(), VitaTheme.TITLE, 0), BorderLayout.CENTER);
         add(title, BorderLayout.NORTH);
 
         JPanel column = new ScrollColumn();
@@ -55,7 +58,7 @@ final class ReposPage extends JPanel {
         top.add(column, BorderLayout.NORTH);
         JScrollPane scroll = new JScrollPane(top, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setBorder(BorderFactory.createEmptyBorder());
-        scroll.getViewport().setBackground(HubTheme.BACKGROUND);
+        scroll.getViewport().setBackground(VitaTheme.BACKGROUND);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         add(scroll, BorderLayout.CENTER);
     }
@@ -74,13 +77,13 @@ final class ReposPage extends JPanel {
         }
         String error = hub.error();
         if (localStatus != null) {
-            status.setForeground(HubTheme.ERROR);
+            status.setForeground(VitaTheme.ERROR);
             status.setText(localStatus);
         } else if (error != null) {
-            status.setForeground(HubTheme.ERROR);
+            status.setForeground(VitaTheme.ERROR);
             status.setText(error);
         } else {
-            status.setForeground(HubTheme.MUTED);
+            status.setForeground(VitaTheme.MUTED);
             status.setText(busy ? hub.message() : "");
         }
         revalidate();
@@ -88,19 +91,19 @@ final class ReposPage extends JPanel {
     }
 
     private JComponent addSection() {
-        JPanel section = HubTheme.row(new DynamicGridLayout(0, 1, 0, HubTheme.GAP));
-        section.add(new WrappedText("Add a repository", HubTheme.titleFont(), HubTheme.TITLE, 0));
-        section.add(new WrappedText("Enter owner/repo, a github.com link, or the https address of a plugins.json.", HubTheme.textFont(), HubTheme.MUTED, 0));
+        JPanel section = VitaTheme.row(new DynamicGridLayout(0, 1, 0, VitaTheme.GAP));
+        section.add(new WrappedText("Add a repository", VitaTheme.titleFont(), VitaTheme.TITLE, 0));
+        section.add(new WrappedText("Enter owner/repo, a github.com link, or the https address of a plugins.json.", VitaTheme.textFont(), VitaTheme.MUTED, 0));
 
-        input.setBackground(HubTheme.CARD);
-        input.setHoverBackgroundColor(HubTheme.CARD_HOVER);
+        input.setBackground(VitaTheme.CARD);
+        input.setHoverBackgroundColor(VitaTheme.CARD_HOVER);
         input.setBorder(new EmptyBorder(0, 6, 0, 6));
         input.setPreferredSize(new Dimension(0, 28));
         input.addActionListener(e -> add());
 
-        JPanel row = HubTheme.row(new BorderLayout(HubTheme.GAP, 0));
+        JPanel row = VitaTheme.row(new BorderLayout(VitaTheme.GAP, 0));
         row.add(input, BorderLayout.CENTER);
-        row.add(HubTheme.textButton("Add", HubTheme.accent(), this::add), BorderLayout.EAST);
+        row.add(VitaTheme.textButton("Add", VitaTheme.accent(), this::add), BorderLayout.EAST);
         section.add(row);
         section.add(status);
         return section;
@@ -108,15 +111,15 @@ final class ReposPage extends JPanel {
 
     private JComponent card(HubRepo repo, boolean busy) {
         JPanel card = new JPanel(new GridBagLayout());
-        card.setBackground(HubTheme.CARD);
-        card.setBorder(new EmptyBorder(HubTheme.PADDING, HubTheme.PADDING, HubTheme.PADDING, HubTheme.PADDING));
+        card.setBackground(VitaTheme.CARD);
+        card.setBorder(new EmptyBorder(VitaTheme.PADDING, VitaTheme.PADDING, VitaTheme.PADDING, VitaTheme.PADDING));
 
-        JPanel text = HubTheme.row(new DynamicGridLayout(0, 1, 0, 2));
-        text.add(new WrappedText(repo.official ? "Official" : repo.label(), HubTheme.titleFont(), HubTheme.TITLE, 0));
+        JPanel text = VitaTheme.row(new DynamicGridLayout(0, 1, 0, 2));
+        text.add(new WrappedText(repo.official ? "Official" : repo.label(), VitaTheme.titleFont(), VitaTheme.TITLE, 0));
         String[] detail = detail(repo);
-        text.add(new WrappedText(detail[0], HubTheme.textFont(), detail[1] == null ? HubTheme.MUTED : HubTheme.ERROR, 0));
+        text.add(new WrappedText(detail[0], VitaTheme.textFont(), detail[1] == null ? VitaTheme.MUTED : VitaTheme.ERROR, 0));
         if (detail[1] != null && !detail[1].isEmpty()) {
-            text.add(new WrappedText(detail[1], HubTheme.textFont(), HubTheme.ERROR, 0));
+            text.add(new WrappedText(detail[1], VitaTheme.textFont(), VitaTheme.ERROR, 0));
         }
         text.setToolTipText(repo.url);
 
@@ -135,11 +138,11 @@ final class ReposPage extends JPanel {
         cell = new GridBagConstraints();
         cell.gridx = 1;
         cell.anchor = GridBagConstraints.NORTHEAST;
-        cell.insets = new Insets(0, HubTheme.GAP, 0, 0);
+        cell.insets = new Insets(0, VitaTheme.GAP, 0, 0);
         card.add(enabled, cell);
 
         if (!repo.official) {
-            JButton remove = HubTheme.iconButton(HubTheme.trash(), "Remove this repository", () -> remove(repo));
+            JButton remove = VitaTheme.iconButton(VitaTheme.trash(), "Remove this repository", () -> remove(repo));
             remove.setEnabled(!busy);
             cell = new GridBagConstraints();
             cell.gridx = 2;
@@ -242,37 +245,5 @@ final class ReposPage extends JPanel {
 
     static String plural(int count) {
         return count + " " + "plugin" + (count == 1 ? "" : "s");
-    }
-
-    /** A panel that always takes the scroll pane's width, so its contents wrap rather than scroll sideways. */
-    static final class ScrollColumn extends JPanel implements Scrollable {
-        ScrollColumn() {
-            setBackground(HubTheme.BACKGROUND);
-        }
-
-        @Override
-        public Dimension getPreferredScrollableViewportSize() {
-            return getPreferredSize();
-        }
-
-        @Override
-        public int getScrollableUnitIncrement(Rectangle visible, int orientation, int direction) {
-            return 16;
-        }
-
-        @Override
-        public int getScrollableBlockIncrement(Rectangle visible, int orientation, int direction) {
-            return Math.max(16, visible.height - 16);
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportWidth() {
-            return true;
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportHeight() {
-            return false;
-        }
     }
 }

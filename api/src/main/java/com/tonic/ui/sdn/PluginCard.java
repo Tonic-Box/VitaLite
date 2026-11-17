@@ -1,5 +1,7 @@
 package com.tonic.ui.sdn;
 
+import com.tonic.ui.VitaTheme;
+import com.tonic.ui.WrappedText;
 import net.runelite.client.ui.DynamicGridLayout;
 import net.runelite.client.util.LinkBrowser;
 import net.runelite.client.util.SwingUtil;
@@ -53,26 +55,26 @@ final class PluginCard extends JPanel {
         super(new GridBagLayout());
         this.model = model;
         this.expanded = expanded;
-        setBackground(HubTheme.CARD);
-        setBorder(new EmptyBorder(HubTheme.PADDING, HubTheme.PADDING, HubTheme.PADDING, HubTheme.PADDING));
+        setBackground(VitaTheme.CARD);
+        setBorder(new EmptyBorder(VitaTheme.PADDING, VitaTheme.PADDING, VitaTheme.PADDING, VitaTheme.PADDING));
 
-        JLabel icon = HubTheme.clear(new JLabel(model.icon));
+        JLabel icon = VitaTheme.clear(new JLabel(model.icon));
         icon.setVerticalAlignment(SwingConstants.TOP);
         GridBagConstraints iconCell = new GridBagConstraints();
         iconCell.gridx = 0;
         iconCell.gridy = 0;
         iconCell.gridheight = 6;
         iconCell.anchor = GridBagConstraints.NORTHWEST;
-        iconCell.insets = new Insets(0, 0, 0, HubTheme.PADDING);
+        iconCell.insets = new Insets(0, 0, 0, VitaTheme.PADDING);
         add(icon, iconCell);
 
         add(header(), cell(0, 0));
 
         if (model.meta != null && !model.meta.isEmpty()) {
-            add(new WrappedText(model.meta, HubTheme.textFont(), HubTheme.MUTED, 0), cell(1, 2));
+            add(new WrappedText(model.meta, VitaTheme.textFont(), VitaTheme.MUTED, 0), cell(1, 2));
         }
 
-        description = new WrappedText(model.description, HubTheme.textFont(), HubTheme.TEXT, expanded ? 0 : 2);
+        description = new WrappedText(model.description, VitaTheme.textFont(), VitaTheme.TEXT, expanded ? 0 : 2);
         if (model.description != null && !model.description.isEmpty()) {
             add(description, cell(2, 4));
         }
@@ -82,7 +84,7 @@ final class PluginCard extends JPanel {
         add(details, cell(3, 4));
 
         if (model.version != null && !model.version.isEmpty()) {
-            add(new WrappedText(model.version, HubTheme.textFont(), model.versionColor == null ? HubTheme.MUTED : model.versionColor, 0), cell(4, 4));
+            add(new WrappedText(model.version, VitaTheme.textFont(), model.versionColor == null ? VitaTheme.MUTED : model.versionColor, 0), cell(4, 4));
         }
 
         JPanel actions = actions();
@@ -93,13 +95,13 @@ final class PluginCard extends JPanel {
         MouseAdapter mouse = new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                setBackground(HubTheme.CARD_HOVER);
+                setBackground(VitaTheme.CARD_HOVER);
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
                 if (!contains(SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), PluginCard.this))) {
-                    setBackground(HubTheme.CARD);
+                    setBackground(VitaTheme.CARD);
                 }
             }
 
@@ -115,18 +117,18 @@ final class PluginCard extends JPanel {
     }
 
     private JPanel header() {
-        JPanel header = HubTheme.row(new BorderLayout(HubTheme.GAP, 0));
-        header.add(new WrappedText(model.name, HubTheme.titleFont(), HubTheme.TITLE, 0), BorderLayout.CENTER);
+        JPanel header = VitaTheme.row(new BorderLayout(VitaTheme.GAP, 0));
+        header.add(new WrappedText(model.name, VitaTheme.titleFont(), VitaTheme.TITLE, 0), BorderLayout.CENTER);
 
-        JPanel controls = HubTheme.row(new FlowLayout(FlowLayout.RIGHT, 2, 0));
+        JPanel controls = VitaTheme.row(new FlowLayout(FlowLayout.RIGHT, 2, 0));
         if (model.openConfig != null) {
-            controls.add(HubTheme.iconButton(HubTheme.cog(), "Edit plugin configuration", model.openConfig));
+            controls.add(VitaTheme.iconButton(VitaTheme.cog(), "Edit plugin configuration", model.openConfig));
         }
         if (model.active != null) {
             JToggleButton toggle = new JToggleButton(HubTheme.switchOff());
             toggle.setSelectedIcon(HubTheme.switchOn());
             SwingUtil.removeButtonDecorations(toggle);
-            HubTheme.bare(toggle);
+            VitaTheme.bare(toggle);
             toggle.setFocusable(false);
             toggle.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             toggle.setSelected(model.active);
@@ -144,12 +146,12 @@ final class PluginCard extends JPanel {
     }
 
     private JPanel details() {
-        JPanel panel = HubTheme.row(new DynamicGridLayout(0, 1, 0, 2));
+        JPanel panel = VitaTheme.row(new DynamicGridLayout(0, 1, 0, 2));
         if (!model.requires.isEmpty()) {
-            panel.add(new WrappedText("Requires " + String.join(", ", model.requires), HubTheme.textFont(), HubTheme.MUTED, 0));
+            panel.add(new WrappedText("Requires " + String.join(", ", model.requires), VitaTheme.textFont(), VitaTheme.MUTED, 0));
         }
         if (hasSource()) {
-            WrappedText link = new WrappedText(model.source.replaceFirst("^https://", ""), HubTheme.textFont(), HubTheme.accent(), 0);
+            WrappedText link = new WrappedText(model.source.replaceFirst("^https://", ""), VitaTheme.textFont(), VitaTheme.accent(), 0);
             link.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             link.setToolTipText("Open in your browser");
             link.addMouseListener(new MouseAdapter() {
@@ -165,21 +167,21 @@ final class PluginCard extends JPanel {
     }
 
     private JPanel actions() {
-        JPanel actions = HubTheme.row(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+        JPanel actions = VitaTheme.row(new FlowLayout(FlowLayout.RIGHT, 4, 0));
         if (isWebLink(model.readme)) {
-            actions.add(HubTheme.iconButton(HubTheme.info(), "Open the readme in your browser", () -> LinkBrowser.browse(model.readme)));
+            actions.add(VitaTheme.iconButton(HubTheme.info(), "Open the readme in your browser", () -> LinkBrowser.browse(model.readme)));
         }
         if (hasSource()) {
-            actions.add(HubTheme.iconButton(HubTheme.github(), "Open the source on GitHub", () -> LinkBrowser.browse(model.source)));
+            actions.add(VitaTheme.iconButton(HubTheme.github(), "Open the source on GitHub", () -> LinkBrowser.browse(model.source)));
         }
         if (model.reload != null) {
-            actions.add(HubTheme.iconButton(HubTheme.reload(), "Reload", model.reload));
+            actions.add(VitaTheme.iconButton(VitaTheme.reload(), "Reload", model.reload));
         }
         if (model.trash != null) {
-            actions.add(HubTheme.iconButton(HubTheme.trash(), "Uninstall", model.trash));
+            actions.add(VitaTheme.iconButton(VitaTheme.trash(), "Uninstall", model.trash));
         }
         if (model.primary != null) {
-            actions.add(HubTheme.textButton(model.primary, model.primaryColor, model.primaryAction));
+            actions.add(VitaTheme.textButton(model.primary, model.primaryColor, model.primaryAction));
         }
         return actions;
     }

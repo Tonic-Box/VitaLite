@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * browser did not open, offers Cancel, and once the sign-in returns runs the step that uses its id token.
  */
 public class JagexSignInDialog extends JDialog {
-    private static final Duration TIMEOUT = Duration.ofMinutes(2);
+    private static final Duration TIMEOUT = Duration.ofMinutes(15);
 
     /**
      * What to do with the id token a sign-in returned; runs off the event thread.
@@ -85,7 +85,7 @@ public class JagexSignInDialog extends JDialog {
      */
     public static <T> void run(Component parent, String title, SignInStep<T> step, Consumer<T> onSuccess, Consumer<Exception> onFailure) {
         JagexSignInDialog dialog = new JagexSignInDialog(parent, title);
-        SwingWorker<T, String> worker = new SwingWorker<T, String>() {
+        SwingWorker<T, String> worker = new SwingWorker<>() {
             @Override
             protected T doInBackground() throws Exception {
                 String idToken = dialog.login.await(this::openBrowser, TIMEOUT);

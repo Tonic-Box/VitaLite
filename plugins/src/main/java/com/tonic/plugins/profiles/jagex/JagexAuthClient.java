@@ -26,7 +26,7 @@ import java.util.Optional;
  * cookie jar, so Cloudflare's clearance cookies persist across calls.
  */
 public class JagexAuthClient {
-    public static final String LIVE_BASE_URL = "https://auth.jagex.com/";
+    public static final String LIVE_BASE_URL = "https://auth.runescape.com/";
     static final String SESSIONS_PATH = "game-session/v1/sessions";
     static final String ACCOUNTS_PATH = "game-session/v1/accounts";
     static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
