@@ -11,6 +11,33 @@ public abstract class TRasterStateMixin implements TRasterState
     @Shadow("zoom")
     public int zoom;
 
+    @Shadow("rasterWidth")
+    public int rasterWidth;
+
+    @Shadow("rasterHeight")
+    public int rasterHeight;
+
+    @Inject
+    @Override
+    public int getRasterWidth()
+    {
+        return rasterWidth;
+    }
+
+    @Inject
+    @Override
+    public int getRasterHeight()
+    {
+        return rasterHeight;
+    }
+
+    @Inject
+    @Override
+    public void setRasterHeight(int height)
+    {
+        rasterHeight = height;
+    }
+
     @Inject
     @Override
     public int getZoom()

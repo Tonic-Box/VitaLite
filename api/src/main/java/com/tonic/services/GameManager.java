@@ -436,6 +436,7 @@ public class GameManager extends Overlay {
                 .register(this);
         TransportLoader.init();
         BankCache.init();
+        SceneCacheEvents.init();
 
         ThreadPool.submit(() -> {
             Client client = Static.getClient();

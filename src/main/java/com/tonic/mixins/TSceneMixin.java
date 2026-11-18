@@ -12,16 +12,26 @@ import com.tonic.injector.annotations.Mixin;
 import com.tonic.injector.annotations.Shadow;
 import com.tonic.injector.annotations.Shift;
 import com.tonic.services.PickCamera;
+import com.tonic.services.SceneCache;
 import com.tonic.services.SceneScale;
 import net.runelite.api.BufferProvider;
 import net.runelite.api.Client;
+import net.runelite.api.Model;
+import net.runelite.api.SceneTileModel;
+import net.runelite.api.SceneTilePaint;
+import net.runelite.api.Texture;
+import net.runelite.api.TextureProvider;
+
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Draws the scene from the PickCamera while one is set, so everything the game picks under the mouse is
  * picked down its ray. The game's camera is only borrowed: the draw's caller puts the camera back once
  * the scene is drawn, as it does after shaking it, and the exact camera is worked out afresh each frame.
  * In CPU mode it also draws the scene at the SceneScale size and stretches it over the viewport before
- * anything is drawn on it, with picking scaled to match.
+ * anything is drawn on it, with picking scaled to match, and reuses the still opaque scene through
+ * SceneCache by setting the rasterizer's fill height per tile and renderable.
  */
 @Mixin("Scene")
 public abstract class TSceneMixin
@@ -58,6 +68,16 @@ public abstract class TSceneMixin
     private int pickX;
     @Shadow("pickY")
     private int pickY;
+    @Shadow("rasterDepth")
+    private static float[] rasterDepth;
+    @Shadow("tilePaints")
+    private SceneTilePaint[] tilePaints;
+    @Shadow("tileModels")
+    private SceneTileModel[] tileModels;
+    @Shadow("passCycle")
+    private int passCycle;
+    @Shadow("frameProjection")
+    private Object frameProjection;
 
     @Inject
     private static boolean sceneScaled;
@@ -67,9 +87,165 @@ public abstract class TSceneMixin
     private static int sceneMouseX;
     @Inject
     private static int sceneMouseY;
+    @Inject
+    private static boolean[] animatedTextures;
+    @Inject
+    private static Map<Model, Boolean> animatedModels;
 
     @Shadow("setRasterArea")
     public abstract void setRasterArea(int left, int top, int right, int bottom);
+
+    @Shadow("drawOpaque")
+    public abstract void drawOpaque(Object projection);
+
+    @Insert(method = "drawScene", at = @At(value = AtTarget.INVOKE, target = "drawOpaque", shift = Shift.HEAD))
+    public void beginCachedScene(int x, int y, int z, Object pitch, Object yaw, int plane)
+    {
+        Client client = Static.getClient();
+        BufferProvider buffer = client.getBufferProvider();
+        TextureProvider textures = client.getTextureProvider();
+        if (textures == null)
+        {
+            return;
+        }
+        int fill = SceneCache.begin(cameraExactX, cameraExactY, cameraExactZ, cameraPitchRadians, cameraYawRadians, rasterState.getZoom(), plane, textures.getBrightness(), client.getViewportXOffset(), client.getViewportYOffset(), rasterState.getRasterWidth(), rasterState.getRasterHeight(), buffer.getPixels(), rasterDepth, buffer.getWidth());
+        if (SceneCache.building())
+        {
+            loadAnimatedTextures(textures);
+        }
+        if (SceneCache.active())
+        {
+            rasterState.setRasterHeight(fill);
+        }
+    }
+
+    @Inject
+    private static void loadAnimatedTextures(TextureProvider provider)
+    {
+        Texture[] textures = provider.getTextures();
+        boolean[] animated = new boolean[textures == null ? 0 : textures.length];
+        for (int id = 0; id < animated.length; id++)
+        {
+            animated[id] = textures[id] != null && textures[id].getAnimationSpeed() != 0;
+        }
+        animatedTextures = animated;
+        if (animatedModels == null)
+        {
+            animatedModels = new WeakHashMap<>();
+        }
+    }
+
+    @Inject
+    private static boolean animatedTexture(int texture)
+    {
+        return texture >= 0 && texture < animatedTextures.length && animatedTextures[texture];
+    }
+
+    @Inject
+    private static boolean renderableMoves(Object renderable)
+    {
+        if (!(renderable instanceof Model))
+        {
+            return true;
+        }
+        Model model = (Model) renderable;
+        short[] textures = model.getFaceTextures();
+        if (textures == null)
+        {
+            return false;
+        }
+        Boolean known = animatedModels.get(model);
+        if (known != null)
+        {
+            return known;
+        }
+        boolean animated = false;
+        for (short texture : textures)
+        {
+            if (animatedTexture(texture))
+            {
+                animated = true;
+                break;
+            }
+        }
+        animatedModels.put(model, animated);
+        return animated;
+    }
+
+    @Inject
+    private static boolean terrainMoves(SceneTilePaint paint, SceneTileModel model)
+    {
+        if (paint != null && animatedTexture(paint.getTexture()))
+        {
+            return true;
+        }
+        int[] textures = model == null ? null : model.getTriangleTextureId();
+        if (textures == null)
+        {
+            return false;
+        }
+        for (int texture : textures)
+        {
+            if (animatedTexture(texture))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Insert(method = "drawScene", at = @At(value = AtTarget.INVOKE, target = "drawOpaque"))
+    public void endCachedScene()
+    {
+        if (!SceneCache.active())
+        {
+            return;
+        }
+        if (SceneCache.building())
+        {
+            Client client = Static.getClient();
+            rasterState.setRasterHeight(SceneCache.keep(client.getBufferProvider().getPixels(), rasterDepth));
+            passCycle++;
+            drawOpaque(frameProjection);
+        }
+        rasterState.setRasterHeight(SceneCache.end());
+    }
+
+    @MethodHook("drawRenderable")
+    public void enterCachedRenderable(Object projection, Object renderable)
+    {
+        if (SceneCache.active())
+        {
+            rasterState.setRasterHeight(SceneCache.enter(renderableMoves(renderable)));
+        }
+    }
+
+    @Insert(method = "drawRenderable", at = @At(value = AtTarget.RETURN), all = true)
+    public void exitCachedRenderable()
+    {
+        if (SceneCache.active())
+        {
+            rasterState.setRasterHeight(SceneCache.exit());
+        }
+    }
+
+    @MethodHook("drawTile")
+    public void enterCachedTile(Object projection, int tile)
+    {
+        if (SceneCache.active())
+        {
+            rasterState.setRasterHeight(SceneCache.enter(terrainMoves(tilePaints[tile], tileModels[tile])));
+        }
+    }
+
+    @Insert(method = "drawTile", at = @At(value = AtTarget.RETURN), all = true)
+    public void exitCachedTile()
+    {
+        if (SceneCache.active())
+        {
+            rasterState.setRasterHeight(SceneCache.exit());
+        }
+    }
 
     @Insert(method = "setPick", at = @At(value = AtTarget.RETURN))
     public void scalePick()
