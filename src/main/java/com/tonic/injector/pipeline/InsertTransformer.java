@@ -11,6 +11,7 @@ import com.tonic.injector.types.InstructionMatcher;
 import com.tonic.injector.util.AnnotationUtil;
 import com.tonic.injector.util.TransformerUtil;
 import com.tonic.util.ReflectBuilder;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
@@ -72,11 +73,7 @@ public class InsertTransformer {
             } else {
                 int ordinal = insertAnnotation.ordinal();
                 if (ordinal == -1) {
-                    if (!matches.isEmpty()) {
-                        targetMatches = List.of(matches.get(matches.size() - 1));
-                    } else {
-                        return;
-                    }
+                    targetMatches = List.of(matches.get(matches.size() - 1));
                 } else if (ordinal >= 0 && ordinal < matches.size()) {
                     targetMatches = List.of(matches.get(ordinal));
                 } else {
@@ -149,9 +146,9 @@ public class InsertTransformer {
     }
     
     /**
-     * Inserts method call at specified instruction point.
+     * Inserts method call at specified instruction point, always before one that leaves the method.
      * @param targetMethod method to inject into
-     * @param insertPoint instruction to insert after
+     * @param insertPoint instruction to insert at
      * @param gamepackClass class containing injected method
      * @param injectedMethod method to inject
      * @param pattern injection pattern
@@ -162,7 +159,9 @@ public class InsertTransformer {
         InsnList callInstructions = MethodUtil.generateContextAwareInvoke(gamepackClass, targetMethod, injectedMethod, true);
         
         Shift shiftType = getShiftType(pattern);
-        if (shiftType == Shift.HEAD) {
+        int opcode = insertPoint.getOpcode();
+        boolean exits = (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) || opcode == Opcodes.ATHROW;
+        if (shiftType == Shift.HEAD || exits) {
             targetMethod.instructions.insertBefore(insertPoint, callInstructions);
         } else {
             targetMethod.instructions.insert(insertPoint, callInstructions);
@@ -234,7 +233,7 @@ public class InsertTransformer {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return null;
     }

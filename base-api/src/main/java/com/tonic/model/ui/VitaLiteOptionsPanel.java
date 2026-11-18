@@ -7,6 +7,7 @@ import com.tonic.events.PacketSent;
 import com.tonic.model.ui.components.*;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
+import com.tonic.services.RenderScale;
 import com.tonic.services.mouserecorder.DecodedMousePacket;
 import com.tonic.services.mouserecorder.MousePacketDecoder;
 import com.tonic.services.mouserecorder.trajectory.TrajectoryService;
@@ -377,6 +378,12 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 drawGroundUnderObjects,
                 () -> Static.getVitaConfig().setShouldDrawGroundUnderObjects(drawGroundUnderObjects.isSelected())
         ));
+        scenePanel.addVerticalStrut(12);
+
+        FancyDropdown<RenderScale> renderScale = new FancyDropdown<>("CPU Render Scale", RenderScale.class);
+        renderScale.setSelectedItem(Static.getVitaConfig().getRenderScale());
+        renderScale.addSelectionListener(event -> Static.getVitaConfig().setRenderScale(renderScale.getSelectedItem()));
+        scenePanel.addContent(renderScale);
         scenePanel.addVerticalStrut(12);
 
         ToggleSlider drawCollision = new ToggleSlider();

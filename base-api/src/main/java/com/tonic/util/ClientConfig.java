@@ -1,6 +1,7 @@
 package com.tonic.util;
 
 import com.tonic.services.ClickStrategy;
+import com.tonic.services.RenderScale;
 import com.tonic.services.pathfinder.PathfinderAlgo;
 import com.tonic.util.config.ConfigGroup;
 import com.tonic.util.config.ConfigKey;
@@ -64,6 +65,11 @@ public interface ClientConfig extends VitaConfig {
     boolean shouldDrawGroundUnderObjects();
     @ConfigKey(value = "drawGroundUnderObjects")
     void setShouldDrawGroundUnderObjects(boolean shouldDraw);
+
+    @ConfigKey(value = "renderScale", defaultValue = "FULL")
+    RenderScale getRenderScale();
+    @ConfigKey(value = "renderScale")
+    void setRenderScale(RenderScale scale);
 
     @ConfigKey(value = "logNames", defaultValue = "true")
     boolean shouldLogNames();
