@@ -13,7 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.FileVisitOption;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -45,46 +47,54 @@ public class PluginReloader {
             PluginContext.getLoadedPlugins().clear();
         }, "PluginClassLoader-Cleanup"));
 
-        List<File> jars = findJars().stream()
-                .map(Path::toFile)
-                .collect(Collectors.toList());
+        registerLoaded(pluginManager);
+    }
 
-        for (File jar : jars) {
-            try
-            {
-                PluginClassLoader classLoader = new PluginClassLoader(jar, Static.getClassLoader());
-                List<Class<?>> pluginClasses = classLoader.getPluginClasses();
+    /**
+     * Gives every sideloaded jar whose plugins are loaded a context holding the class loader they were loaded with, so
+     * they can be reloaded; jars that already have one keep it.
+     *
+     * @param manager the client's plugin manager
+     */
+    public static synchronized void registerLoaded(PluginManager manager) {
+        try {
+            usePluginManager(manager);
+            register(manager);
+        } catch (Throwable e) {
+            Logger.error("Failed to register sideloaded plugins for reloading: " + e);
+        }
+    }
 
-                List<Plugin> plugins = new ArrayList<>();
-                for(Class<?> clazz : pluginClasses)
-                {
-                    Plugin plugin = findLoadedPlugin(clazz);
-                    if(plugin != null)
-                    {
-                        plugins.add(plugin);
-                    }
-                }
-
-                PluginContext.getLoadedPlugins().put(jar.getAbsolutePath(), new PluginContext(
-                        classLoader, plugins, jar.lastModified()
-                ));
+    private static void register(PluginManager manager) {
+        Map<PluginClassLoader, List<Plugin>> byLoader = new LinkedHashMap<>();
+        for (Plugin plugin : manager.getPlugins()) {
+            ClassLoader loader = plugin.getClass().getClassLoader();
+            if (loader instanceof PluginClassLoader) {
+                byLoader.computeIfAbsent((PluginClassLoader) loader, key -> new ArrayList<>()).add(plugin);
             }
-            catch (Exception e) {
-                e.printStackTrace();
+        }
+
+        for (Path path : findJars()) {
+            File jar = path.toFile();
+            String key = jar.getAbsolutePath();
+            if (PluginContext.getLoadedPlugins().containsKey(key)) {
+                continue;
+            }
+            for (Map.Entry<PluginClassLoader, List<Plugin>> entry : byLoader.entrySet()) {
+                if (sameFile(entry.getKey().getPluginFile(), jar)) {
+                    PluginContext.getLoadedPlugins().put(key, new PluginContext(entry.getKey(), entry.getValue(), jar.lastModified()));
+                    break;
+                }
             }
         }
     }
 
-    private static Plugin findLoadedPlugin(Class<?> clazz)
-    {
-        for(Plugin plugin : pluginManager.getPlugins())
-        {
-            if(plugin.getClass().getName().equals(clazz.getName()))
-            {
-                return plugin;
-            }
+    private static boolean sameFile(File a, File b) {
+        try {
+            return a.getCanonicalFile().equals(b.getCanonicalFile());
+        } catch (IOException e) {
+            return a.getAbsoluteFile().equals(b.getAbsoluteFile());
         }
-        return null;
     }
 
     public static boolean reloadPlugin(File jarFile) {
