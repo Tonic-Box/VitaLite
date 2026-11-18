@@ -16,6 +16,7 @@ import java.util.zip.ZipFile;
 
 public class PluginClassLoader extends URLClassLoader {
     private final ClassLoader parent;
+    private final File pluginFile;
     private final JarFile jarFile;
     private final List<ClassLoader> dependencies;
 
@@ -34,6 +35,7 @@ public class PluginClassLoader extends URLClassLoader {
     {
         super(new URL[]{plugin.toURI().toURL()}, null);
         this.dependencies = List.copyOf(dependencies);
+        this.pluginFile = plugin;
         try
         {
             jarFile = new JarFile(plugin, true, ZipFile.OPEN_READ, JarFile.runtimeVersion());
@@ -42,6 +44,13 @@ public class PluginClassLoader extends URLClassLoader {
             throw new RuntimeException(ex);
         }
         this.parent = parent;
+    }
+
+    /**
+     * @return the plugin jar this loader reads
+     */
+    public File getPluginFile() {
+        return pluginFile;
     }
 
     public List<Class<?>> getPluginClasses() throws IOException {

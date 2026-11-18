@@ -79,6 +79,8 @@ public class PluginManagerMixin {
             }
             InsnList hub = new InsnList();
             hub.add(new VarInsnNode(ALOAD, 0));
+            hub.add(new MethodInsnNode(INVOKESTATIC, "com/tonic/services/hotswapper/PluginReloader", "registerLoaded", "(Lnet/runelite/client/plugins/PluginManager;)V", false));
+            hub.add(new VarInsnNode(ALOAD, 0));
             hub.add(new MethodInsnNode(INVOKESTATIC, "com/tonic/services/hub/HubLoader", "load", "(Lnet/runelite/client/plugins/PluginManager;)V", false));
             method.instructions.insertBefore(node, hub);
         }
