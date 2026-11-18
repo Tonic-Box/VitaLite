@@ -9,11 +9,12 @@ import net.runelite.api.WorldView;
 import java.util.List;
 
 /**
- * Draws ground triangles into the software renderer's frame: projected as the scene was, tested against the scene's depth without writing it, and blended once per pixel.
+ * Draws ground triangles into the software renderer's frame: projected as the scene was, tested against the scene's depth without writing it (pulled a few units toward the camera so the terrain under it never wins a near tie), and blended once per pixel.
  */
 final class GroundRaster
 {
     private static final float NEAR = 80f;
+    private static final float DEPTH_BIAS = 10f;
     private static final int MAX_CORNERS = 4;
 
     private final float[] viewX = new float[MAX_CORNERS];
@@ -179,7 +180,7 @@ final class GroundRaster
         }
         for (int corner = 0; corner < count; corner++)
         {
-            depths[corner] = tclient.depthOf(clippedZ[corner]);
+            depths[corner] = tclient.depthOf(Math.max(NEAR, clippedZ[corner] - DEPTH_BIAS));
         }
         for (int corner = 1; corner + 1 < count; corner++)
         {

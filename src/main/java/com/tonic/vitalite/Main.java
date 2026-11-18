@@ -72,6 +72,7 @@ public class Main {
         RLUpdater.run();
         loadArtifacts();
         SignerMapper.map();
+        LIBS.releaseOther();
         loadClassLoader();
 
         if(optionsParser.isRunInjector())
