@@ -7,60 +7,84 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Reads object ID data from a saved object map file.
- * Provides efficient lookup of object IDs at world coordinates.
+ * The object ids at each world tile, read from the saved object map. Each tile keeps its first id beside its
+ * coordinate; the few tiles holding more than one keep the rest in a separate overflow table.
  */
 public class ObjectMap {
-    private final long[] coordinates;
-    private final int[] offsets;
-    private final int[] objectIds;
+    private static final int NO_OBJECT = -1;
+
+    private final int[] coordinates;
+    private final int[] firstIds;
+    private final int[] extraTiles;
+    private final int[] extraOffsets;
+    private final int[] extraIds;
     @Getter
     private final int version;
 
-    private ObjectMap(long[] coordinates, int[] offsets, int[] objectIds, int version) {
+    private ObjectMap(int[] coordinates, int[] firstIds, int[] extraTiles, int[] extraOffsets, int[] extraIds, int version) {
         this.coordinates = coordinates;
-        this.offsets = offsets;
-        this.objectIds = objectIds;
+        this.firstIds = firstIds;
+        this.extraTiles = extraTiles;
+        this.extraOffsets = extraOffsets;
+        this.extraIds = extraIds;
         this.version = version;
     }
 
     /**
-     * Gets all object IDs at the specified world coordinates.
+     * @param x the world x
+     * @param y the world y
+     * @param z the plane
+     * @return the object ids on that tile, empty when it has none
      */
     public List<Integer> getObjects(int x, int y, int z) {
-        long packedCoord = packCoordinate((short) x, (short)y, (byte)z);
-        int index = Arrays.binarySearch(coordinates, packedCoord);
-
-        if (index < 0) {
+        int tile = Arrays.binarySearch(coordinates, packCoordinate((short) x, (short) y, (byte) z));
+        if (tile < 0 || firstIds[tile] == NO_OBJECT) {
             return Collections.emptyList();
         }
 
-        int startOffset = offsets[index];
-        int endOffset = (index + 1 < offsets.length) ? offsets[index + 1] : objectIds.length;
-
-        List<Integer> result = new ArrayList<>(endOffset - startOffset);
-        for (int i = startOffset; i < endOffset; i++) {
-            result.add(objectIds[i]);
+        int extra = Arrays.binarySearch(extraTiles, tile);
+        if (extra < 0) {
+            List<Integer> result = new ArrayList<>(1);
+            result.add(firstIds[tile]);
+            return result;
         }
 
+        int start = extraOffsets[extra];
+        int end = extra + 1 < extraOffsets.length ? extraOffsets[extra + 1] : extraIds.length;
+        List<Integer> result = new ArrayList<>(1 + end - start);
+        result.add(firstIds[tile]);
+        for (int i = start; i < end; i++) {
+            result.add(extraIds[i]);
+        }
         return result;
     }
 
+    /**
+     * @param x the world x
+     * @param y the world y
+     * @param z the plane
+     * @return whether the map lists that tile
+     */
     public boolean hasObjects(int x, int y, int z) {
-        long packedCoord = packCoordinate((short) x, (short)y, (byte)z);
-        return Arrays.binarySearch(coordinates, packedCoord) >= 0;
+        return Arrays.binarySearch(coordinates, packCoordinate((short) x, (short) y, (byte) z)) >= 0;
     }
 
+    /**
+     * @return the number of tiles the map lists
+     */
     public int size() {
         return coordinates.length;
     }
 
-    private long packCoordinate(short x, short y, byte z) {
-        return (x & 8191) | ((long)(y & 32767) << 13) | ((long)(z & 15) << 28);
+    private static int packCoordinate(short x, short y, byte z) {
+        return (x & 8191) | ((y & 32767) << 13) | ((z & 15) << 28);
     }
 
     /**
-     * Loads compressed object map from InputStream.
+     * Loads the object map bundled with the walker.
+     *
+     * @return the map, or null when the resource is missing
+     * @throws IOException when the resource cannot be read or is not a version 2 object map
      */
     public static ObjectMap load() throws IOException {
         InputStream inputStream = Walker.class.getResourceAsStream("objects.dat");
@@ -71,67 +95,80 @@ public class ObjectMap {
 
         long startTime = System.currentTimeMillis();
         int version;
-        long[] coordinates;
-        int[] offsets;
-        int[] objectIds;
+        int[] coordinates;
+        int[] firstIds;
+        IntList extraTiles = new IntList();
+        IntList extraOffsets = new IntList();
+        IntList extraIds = new IntList();
+        long objectTotal = 0;
 
-        try (DataInputStream dis = new DataInputStream(
-                new BufferedInputStream(inputStream, 131072))) {
-
+        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(inputStream, 131072))) {
             version = dis.readInt();
-
             if (version != 2) {
                 throw new IOException("Unsupported compressed format version: " + version);
             }
 
-            // Read entry count
             int entryCount = VarInt.readVarInt(dis);
-
             if (entryCount < 0 || entryCount > 10_000_000) {
                 throw new IOException("Invalid entry count: " + entryCount);
             }
 
-            coordinates = new long[entryCount];
-            offsets = new int[entryCount];
-            List<Integer> objectIdList = new ArrayList<>(entryCount * 3);
-
+            coordinates = new int[entryCount];
+            firstIds = new int[entryCount];
             long currentCoord = 0;
-            int currentOffset = 0;
 
             for (int i = 0; i < entryCount; i++) {
-                // Read delta-encoded coordinate
-                long delta = VarInt.readVarLong(dis);
-                currentCoord += delta;
-                coordinates[i] = currentCoord;
+                currentCoord += VarInt.readVarLong(dis);
+                if (currentCoord < 0 || currentCoord > Integer.MAX_VALUE) {
+                    throw new IOException("Invalid coordinate at entry " + i + ": " + currentCoord);
+                }
+                coordinates[i] = (int) currentCoord;
 
-                // Read object count
                 int objectCount = VarInt.readVarInt(dis);
-
                 if (objectCount < 0 || objectCount > 1000) {
                     throw new IOException("Invalid object count at entry " + i + ": " + objectCount);
                 }
+                objectTotal += objectCount;
 
-                offsets[i] = currentOffset;
-
-                // Read object IDs
-                for (int j = 0; j < objectCount; j++) {
-                    objectIdList.add(VarInt.readVarInt(dis));
+                if (objectCount == 0) {
+                    firstIds[i] = NO_OBJECT;
+                    continue;
                 }
 
-                currentOffset += objectCount;
-            }
-
-            // Convert to primitive array
-            objectIds = new int[objectIdList.size()];
-            for (int i = 0; i < objectIdList.size(); i++) {
-                objectIds[i] = objectIdList.get(i);
+                firstIds[i] = VarInt.readVarInt(dis);
+                if (objectCount > 1) {
+                    extraTiles.add(i);
+                    extraOffsets.add(extraIds.size());
+                    for (int j = 1; j < objectCount; j++) {
+                        extraIds.add(VarInt.readVarInt(dis));
+                    }
+                }
             }
         }
 
         long loadTime = System.currentTimeMillis() - startTime;
-        System.out.println("Loaded compressed object map: " + coordinates.length +
-                " coordinates, " + objectIds.length + " objects in " + loadTime + "ms");
+        System.out.println("Loaded compressed object map: " + coordinates.length + " coordinates, " + objectTotal + " objects in " + loadTime + "ms");
 
-        return new ObjectMap(coordinates, offsets, objectIds, version);
+        return new ObjectMap(coordinates, firstIds, extraTiles.toArray(), extraOffsets.toArray(), extraIds.toArray(), version);
+    }
+
+    private static final class IntList {
+        private int[] values = new int[1024];
+        private int size;
+
+        void add(int value) {
+            if (size == values.length) {
+                values = Arrays.copyOf(values, size * 2);
+            }
+            values[size++] = value;
+        }
+
+        int size() {
+            return size;
+        }
+
+        int[] toArray() {
+            return Arrays.copyOf(values, size);
+        }
     }
 }

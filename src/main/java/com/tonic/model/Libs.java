@@ -24,17 +24,37 @@ public class Libs
         ArtifactReader.read(this, urls);
     }
 
-    public byte[] gamepackByName(String name)
+    public synchronized byte[] gamepackByName(String name)
     {
         return gamepack.classes.get(name);
     }
 
-    public byte[] classByName(String className) {
+    public synchronized byte[] classByName(String className) {
         byte[] classBytes = runelite.classes.get(className);
         if (classBytes != null)
         {
             return classBytes;
         }
         return other.classes.get(className);
+    }
+
+    /**
+     * Drops the bytes of a gamepack or RuneLite class once it has been defined, as they are never read again.
+     *
+     * @param className the class name
+     */
+    public synchronized void release(String className)
+    {
+        gamepack.classes.remove(className);
+        runelite.classes.remove(className);
+    }
+
+    /**
+     * Drops the classes of the other jars, which are read only to map signer checks at startup; class
+     * loading reads those jars from disk.
+     */
+    public synchronized void releaseOther()
+    {
+        other.classes.clear();
     }
 }

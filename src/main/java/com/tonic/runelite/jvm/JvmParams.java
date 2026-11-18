@@ -25,7 +25,10 @@ public class JvmParams
     {
         for (var entry : params.entrySet())
         {
-            System.setProperty(entry.getKey(), entry.getValue());
+            if (System.getProperty(entry.getKey()) == null)
+            {
+                System.setProperty(entry.getKey(), entry.getValue());
+            }
         }
     }
 }

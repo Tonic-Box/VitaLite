@@ -116,8 +116,12 @@ public class RLClassLoader extends URLClassLoader {
                 bytes = Main.LIBS.classByName(name);
 
             loadedClass = loadArtifactClass(name, bytes);
-            if (loadedClass != null)
+            if (loadedClass != null) {
+                if (this == Main.CLASSLOADER) {
+                    Main.LIBS.release(name);
+                }
                 return loadedClass;
+            }
         } catch (Exception ignored) {
         }
         return super.loadClass(name);
@@ -175,9 +179,9 @@ public class RLClassLoader extends URLClassLoader {
                         return loadedClass;
                     }
                 }
-            } catch (Exception | ClassFormatError ignored) {
-                System.out.println("Failed to load class " + name + ": " + ignored.getMessage());
-                ignored.printStackTrace();
+            } catch (Exception | ClassFormatError ex) {
+                System.out.println("Failed to load class " + name + ": " + ex.getMessage());
+                ex.printStackTrace();
                 System.exit(0);
             }
         }
