@@ -8,8 +8,8 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("12")
-val runeliteVersion by extra("1.13.6")
+val vitaVersion by extra("0")
+val runeliteVersion by extra("1.13.7")
 
 group = "com.tonic"
 version = runeliteVersion + "_" + vitaVersion
@@ -358,9 +358,13 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-feature"
+    val title = "${tag}-subrev"
     val body = "# ${tag}\n" +
-            "- Revamped profiles plugin per legacy account support depreciation"
+            "- Updated to Runelite ${runeliteVersion}\n" +
+            "- Fixed a few NPE issues native to RL\n" +
+            "- Fixed z-flight issue with ground overlays in CPU rendering\n" +
+            "- Optimized external plugin loading\n" +
+            "- Other various perf and memory improvements\n"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
