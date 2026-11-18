@@ -16,4 +16,21 @@ public interface TRasterState
      * @param zoom the zoom
      */
     void setZoom(int zoom);
+
+    /**
+     * @return the width of the area triangles are filled in
+     */
+    int getRasterWidth();
+
+    /**
+     * @return the height of the area triangles are filled in
+     */
+    int getRasterHeight();
+
+    /**
+     * Sets the height of the area triangles are filled in; 0 fills nothing while still projecting and picking.
+     *
+     * @param height the height
+     */
+    void setRasterHeight(int height);
 }

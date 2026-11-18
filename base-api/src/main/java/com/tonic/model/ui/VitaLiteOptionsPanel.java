@@ -386,6 +386,16 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         scenePanel.addContent(renderScale);
         scenePanel.addVerticalStrut(12);
 
+        ToggleSlider reuseStillScene = new ToggleSlider();
+        reuseStillScene.setSelected(Static.getVitaConfig().shouldReuseStillScene());
+        scenePanel.addContent(createToggleOption(
+                "Reuse Still Scene",
+                "In CPU mode, while the camera is still, redraw only what moves.",
+                reuseStillScene,
+                () -> Static.getVitaConfig().setShouldReuseStillScene(reuseStillScene.isSelected())
+        ));
+        scenePanel.addVerticalStrut(12);
+
         ToggleSlider drawCollision = new ToggleSlider();
         drawCollision.setSelected(Static.getVitaConfig().shouldDrawCollision());
         scenePanel.addContent(createToggleOption(

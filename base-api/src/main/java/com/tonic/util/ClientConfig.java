@@ -71,6 +71,11 @@ public interface ClientConfig extends VitaConfig {
     @ConfigKey(value = "renderScale")
     void setRenderScale(RenderScale scale);
 
+    @ConfigKey(value = "reuseStillScene", defaultValue = "false")
+    boolean shouldReuseStillScene();
+    @ConfigKey(value = "reuseStillScene")
+    void setShouldReuseStillScene(boolean reuse);
+
     @ConfigKey(value = "logNames", defaultValue = "true")
     boolean shouldLogNames();
     @ConfigKey(value = "logNames")
