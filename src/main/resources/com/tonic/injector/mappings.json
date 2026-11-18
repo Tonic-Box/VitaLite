@@ -28389,6 +28389,7 @@
         "isStatic": false
       },
       {
+        "name": "pickX",
         "obfuscatedName": "cz",
         "owner": "Scene",
         "ownerObfuscatedName": "ei",
@@ -28396,6 +28397,7 @@
         "isStatic": false
       },
       {
+        "name": "pickY",
         "obfuscatedName": "cu",
         "owner": "Scene",
         "ownerObfuscatedName": "ei",
@@ -29196,6 +29198,7 @@
         "isStatic": true
       },
       {
+        "name": "setPick",
         "obfuscatedName": "no",
         "owner": "Scene",
         "ownerObfuscatedName": "ei",
@@ -33349,190 +33352,225 @@
     ]
   },
   {
+    "name": "RasterState",
     "obfuscatedName": "fg",
     "fields": [
       {
         "obfuscatedName": "aa",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "Lfp;",
         "isStatic": false
       },
       {
         "obfuscatedName": "as",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "F",
         "isStatic": true
       },
       {
         "obfuscatedName": "ag",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "F",
         "isStatic": true
       },
       {
         "obfuscatedName": "ax",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": true
       },
       {
         "obfuscatedName": "ah",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "au",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "F",
         "isStatic": true
       },
       {
         "obfuscatedName": "ad",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": true
       },
       {
         "obfuscatedName": "ak",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "am",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": true
       },
       {
         "obfuscatedName": "av",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": true
       },
       {
         "obfuscatedName": "ay",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": true
       },
       {
         "obfuscatedName": "aj",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "af",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "Z",
         "isStatic": false
       },
       {
         "obfuscatedName": "an",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "Z",
         "isStatic": false
       },
       {
         "obfuscatedName": "ao",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": true
       },
       {
         "obfuscatedName": "aw",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
       },
       {
+        "name": "zoom",
+        "name": "zoom",
+        "owner": "RasterState",
         "obfuscatedName": "ab",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "ac",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "aq",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "Lfx;",
         "isStatic": false
       },
       {
         "obfuscatedName": "ar",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "al",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "F",
         "isStatic": true
       },
       {
         "obfuscatedName": "ai",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "F",
         "isStatic": true
       },
       {
         "obfuscatedName": "ap",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "az",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "ae",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "at",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "bf",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "[I",
         "isStatic": false
       },
       {
         "obfuscatedName": "bd",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": true
       },
       {
         "obfuscatedName": "bw",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": true
       },
       {
         "obfuscatedName": "bj",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "bl",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "I",
         "isStatic": false
@@ -33541,78 +33579,91 @@
     "methods": [
       {
         "obfuscatedName": "hh",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "()I",
         "isStatic": false
       },
       {
         "obfuscatedName": "fw",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "()I",
         "isStatic": false
       },
       {
         "obfuscatedName": "ao",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "(IIII)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "sj",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "(Z)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "xl",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "(Lfg;)V",
         "isStatic": true
       },
       {
         "obfuscatedName": "rh",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "()I",
         "isStatic": false
       },
       {
         "obfuscatedName": "vn",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "()I",
         "isStatic": false
       },
       {
         "obfuscatedName": "is",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "()I",
         "isStatic": false
       },
       {
         "obfuscatedName": "qj",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "()I",
         "isStatic": false
       },
       {
         "obfuscatedName": "\u003cinit\u003e",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "()V",
         "isStatic": false
       },
       {
         "obfuscatedName": "we",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "()I",
         "isStatic": false
       },
       {
         "obfuscatedName": "gq",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "(I)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "ax",
+        "owner": "RasterState",
         "ownerObfuscatedName": "fg",
         "descriptor": "()V",
         "isStatic": false
@@ -34099,6 +34150,7 @@
         "isStatic": true
       },
       {
+        "name": "viewportMouseX",
         "obfuscatedName": "bn",
         "ownerObfuscatedName": "fk",
         "descriptor": "I",
@@ -34107,6 +34159,7 @@
         "isStatic": true
       },
       {
+        "name": "viewportMouseY",
         "obfuscatedName": "bu",
         "ownerObfuscatedName": "fk",
         "descriptor": "I",
@@ -37009,6 +37062,7 @@
         "isStatic": true
       },
       {
+        "name": "rasterState",
         "obfuscatedName": "av",
         "ownerObfuscatedName": "fw",
         "descriptor": "Lfg;",
@@ -37126,6 +37180,7 @@
         "isStatic": true
       },
       {
+        "name": "setRasterArea",
         "obfuscatedName": "aq",
         "ownerObfuscatedName": "fw",
         "descriptor": "(IIII)V",

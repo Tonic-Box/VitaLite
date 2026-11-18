@@ -3,6 +3,7 @@ package com.tonic.mixins;
 import com.tonic.Static;
 import com.tonic.api.*;
 import com.tonic.injector.annotations.*;
+import com.tonic.services.SceneScale;
 
 @Mixin("Client")
 public abstract class TClientMixin implements TClient
@@ -26,6 +27,7 @@ public abstract class TClientMixin implements TClient
     @Override
     public float[] getRasterDepth()
     {
+        SceneScale.stretchDepth(rasterDepth);
         return rasterDepth;
     }
 
