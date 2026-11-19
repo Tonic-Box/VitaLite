@@ -73,6 +73,37 @@ public class PluginManagerMixin {
 
         for (AbstractInsnNode node : method.instructions.toArray())
         {
+            if (!(node instanceof MethodInsnNode) || !((MethodInsnNode) node).owner.equals("com/google/common/reflect/ClassPath") || !((MethodInsnNode) node).name.equals("from"))
+            {
+                continue;
+            }
+            AbstractInsnNode end = node;
+            while (end != null && !(end instanceof TypeInsnNode && end.getOpcode() == CHECKCAST && ((TypeInsnNode) end).desc.equals("java/util/List")))
+            {
+                end = end.getNext();
+            }
+            if (end == null)
+            {
+                continue;
+            }
+            InsnList scan = new InsnList();
+            scan.add(new TypeInsnNode(CHECKCAST, "com/tonic/services/hotswapper/PluginClassLoader"));
+            scan.add(new MethodInsnNode(INVOKEVIRTUAL, "com/tonic/services/hotswapper/PluginClassLoader", "getClasses", "()Ljava/util/List;", false));
+            method.instructions.insertBefore(node, scan);
+            AbstractInsnNode stop = end.getNext();
+            for (AbstractInsnNode remove = node; remove != stop; )
+            {
+                AbstractInsnNode next = remove.getNext();
+                if (!(remove instanceof LabelNode) && !(remove instanceof LineNumberNode))
+                {
+                    method.instructions.remove(remove);
+                }
+                remove = next;
+            }
+        }
+
+        for (AbstractInsnNode node : method.instructions.toArray())
+        {
             if (node.getOpcode() != RETURN)
             {
                 continue;
