@@ -119,7 +119,8 @@ public class JPSAlgo implements IPathfinder
 
             // Set teleport if path starts with one
             for (Teleport tp : teleports) {
-                if (WorldPointUtil.compress(tp.getDestination()) == path.get(0).getPackedPosition()) {
+                if (WorldPointUtil.compress(tp.getDestination()) == path.get(0).getPackedPosition()
+                        && path.get(0).getPackedPosition() != playerStartPos) {
                     teleport = tp.copy();
                     break;
                 }
