@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("0")
+val vitaVersion by extra("1")
 val runeliteVersion by extra("1.13.7")
 
 group = "com.tonic"
@@ -358,13 +358,13 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-subrev"
+    val title = "${tag}-optimizations"
     val body = "# ${tag}\n" +
-            "- Updated to Runelite ${runeliteVersion}\n" +
-            "- Fixed a few NPE issues native to RL\n" +
-            "- Fixed z-flight issue with ground overlays in CPU rendering\n" +
-            "- Optimized external plugin loading\n" +
-            "- Other various perf and memory improvements\n"
+            "- Implemented cpu render scaling for optional perf\n" +
+            "- Reuse the still CPU scene and redraw only what moves while the camera is still\n" +
+            "- GPU zone buffers sized by the faces actually uploaded\n" +
+            "- Pathfinder collision and object maps memory-mapped from shared files\n" +
+            "- Plugin jars load only their plugin classes up front, @LoadAllClasses annotation on main plugin class opts out\n"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
