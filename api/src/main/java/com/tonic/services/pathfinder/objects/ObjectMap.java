@@ -1,33 +1,47 @@
 package com.tonic.services.pathfinder.objects;
 
+import com.tonic.services.pathfinder.SharedMapFile;
 import com.tonic.services.pathfinder.Walker;
 import lombok.Getter;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.*;
 
 /**
- * The object ids at each world tile, read from the saved object map. Each tile keeps its first id beside its
- * coordinate; the few tiles holding more than one keep the rest in a separate overflow table.
+ * The object ids at each world tile, read from a file built from the saved object map that all local clients map.
+ * Each tile keeps its first id beside its coordinate; the few tiles holding more than one keep the rest in a
+ * separate overflow table.
  */
 public class ObjectMap {
     private static final int NO_OBJECT = -1;
+    private static final int FORMAT = 1;
+    private static final int HEADER = 16;
 
-    private final int[] coordinates;
-    private final int[] firstIds;
-    private final int[] extraTiles;
-    private final int[] extraOffsets;
-    private final int[] extraIds;
+    private final IntBuffer coordinates;
+    private final IntBuffer firstIds;
+    private final IntBuffer extraTiles;
+    private final IntBuffer extraOffsets;
+    private final IntBuffer extraIds;
     @Getter
     private final int version;
 
-    private ObjectMap(int[] coordinates, int[] firstIds, int[] extraTiles, int[] extraOffsets, int[] extraIds, int version) {
-        this.coordinates = coordinates;
-        this.firstIds = firstIds;
-        this.extraTiles = extraTiles;
-        this.extraOffsets = extraOffsets;
-        this.extraIds = extraIds;
-        this.version = version;
+    private ObjectMap(ByteBuffer data) {
+        version = data.getInt(0);
+        int tiles = data.getInt(4);
+        int extras = data.getInt(8);
+        int extraIdCount = data.getInt(12);
+        int at = HEADER;
+        coordinates = SharedMapFile.slice(data, at, tiles * 4).asIntBuffer();
+        at += tiles * 4;
+        firstIds = SharedMapFile.slice(data, at, tiles * 4).asIntBuffer();
+        at += tiles * 4;
+        extraTiles = SharedMapFile.slice(data, at, extras * 4).asIntBuffer();
+        at += extras * 4;
+        extraOffsets = SharedMapFile.slice(data, at, extras * 4).asIntBuffer();
+        at += extras * 4;
+        extraIds = SharedMapFile.slice(data, at, extraIdCount * 4).asIntBuffer();
     }
 
     /**
@@ -37,24 +51,24 @@ public class ObjectMap {
      * @return the object ids on that tile, empty when it has none
      */
     public List<Integer> getObjects(int x, int y, int z) {
-        int tile = Arrays.binarySearch(coordinates, packCoordinate((short) x, (short) y, (byte) z));
-        if (tile < 0 || firstIds[tile] == NO_OBJECT) {
+        int tile = binarySearch(coordinates, packCoordinate((short) x, (short) y, (byte) z));
+        if (tile < 0 || firstIds.get(tile) == NO_OBJECT) {
             return Collections.emptyList();
         }
 
-        int extra = Arrays.binarySearch(extraTiles, tile);
+        int extra = binarySearch(extraTiles, tile);
         if (extra < 0) {
             List<Integer> result = new ArrayList<>(1);
-            result.add(firstIds[tile]);
+            result.add(firstIds.get(tile));
             return result;
         }
 
-        int start = extraOffsets[extra];
-        int end = extra + 1 < extraOffsets.length ? extraOffsets[extra + 1] : extraIds.length;
+        int start = extraOffsets.get(extra);
+        int end = extra + 1 < extraOffsets.limit() ? extraOffsets.get(extra + 1) : extraIds.limit();
         List<Integer> result = new ArrayList<>(1 + end - start);
-        result.add(firstIds[tile]);
+        result.add(firstIds.get(tile));
         for (int i = start; i < end; i++) {
-            result.add(extraIds[i]);
+            result.add(extraIds.get(i));
         }
         return result;
     }
@@ -66,41 +80,62 @@ public class ObjectMap {
      * @return whether the map lists that tile
      */
     public boolean hasObjects(int x, int y, int z) {
-        return Arrays.binarySearch(coordinates, packCoordinate((short) x, (short) y, (byte) z)) >= 0;
+        return binarySearch(coordinates, packCoordinate((short) x, (short) y, (byte) z)) >= 0;
     }
 
     /**
      * @return the number of tiles the map lists
      */
     public int size() {
-        return coordinates.length;
+        return coordinates.limit();
     }
 
     private static int packCoordinate(short x, short y, byte z) {
         return (x & 8191) | ((y & 32767) << 13) | ((z & 15) << 28);
     }
 
+    private static int binarySearch(IntBuffer values, int key) {
+        int low = 0;
+        int high = values.limit() - 1;
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+            int value = values.get(mid);
+            if (value < key) {
+                low = mid + 1;
+            } else if (value > key) {
+                high = mid - 1;
+            } else {
+                return mid;
+            }
+        }
+        return -(low + 1);
+    }
+
     /**
-     * Loads the object map bundled with the walker.
+     * Maps the object map built from the one bundled with the walker, shared by every local client.
      *
-     * @return the map, or null when the resource is missing
-     * @throws IOException when the resource cannot be read or is not a version 2 object map
+     * @return the map
+     * @throws IOException when the resource is missing, cannot be read, is not a version 2 object map, or the shared file cannot be built or mapped
      */
     public static ObjectMap load() throws IOException {
+        long startTime = System.currentTimeMillis();
+        ObjectMap map = new ObjectMap(SharedMapFile.open("objects", "objects.dat", FORMAT, ObjectMap::write));
+        System.out.println("Mapped object map: " + map.size() + " coordinates in " + (System.currentTimeMillis() - startTime) + "ms");
+        return map;
+    }
+
+    private static void write(SharedMapFile.Output out) throws IOException {
         InputStream inputStream = Walker.class.getResourceAsStream("objects.dat");
         if (inputStream == null) {
-            System.err.println("Object map input stream is null");
-            return null;
+            throw new IOException("Missing walker resource objects.dat");
         }
 
-        long startTime = System.currentTimeMillis();
         int version;
         int[] coordinates;
         int[] firstIds;
         IntList extraTiles = new IntList();
         IntList extraOffsets = new IntList();
         IntList extraIds = new IntList();
-        long objectTotal = 0;
 
         try (DataInputStream dis = new DataInputStream(new BufferedInputStream(inputStream, 131072))) {
             version = dis.readInt();
@@ -128,7 +163,6 @@ public class ObjectMap {
                 if (objectCount < 0 || objectCount > 1000) {
                     throw new IOException("Invalid object count at entry " + i + ": " + objectCount);
                 }
-                objectTotal += objectCount;
 
                 if (objectCount == 0) {
                     firstIds[i] = NO_OBJECT;
@@ -146,10 +180,21 @@ public class ObjectMap {
             }
         }
 
-        long loadTime = System.currentTimeMillis() - startTime;
-        System.out.println("Loaded compressed object map: " + coordinates.length + " coordinates, " + objectTotal + " objects in " + loadTime + "ms");
+        out.writeInt(version);
+        out.writeInt(coordinates.length);
+        out.writeInt(extraTiles.size());
+        out.writeInt(extraIds.size());
+        writeAll(out, coordinates, coordinates.length);
+        writeAll(out, firstIds, firstIds.length);
+        writeAll(out, extraTiles.values, extraTiles.size());
+        writeAll(out, extraOffsets.values, extraOffsets.size());
+        writeAll(out, extraIds.values, extraIds.size());
+    }
 
-        return new ObjectMap(coordinates, firstIds, extraTiles.toArray(), extraOffsets.toArray(), extraIds.toArray(), version);
+    private static void writeAll(SharedMapFile.Output out, int[] values, int count) throws IOException {
+        for (int i = 0; i < count; i++) {
+            out.writeInt(values[i]);
+        }
     }
 
     private static final class IntList {
@@ -165,10 +210,6 @@ public class ObjectMap {
 
         int size() {
             return size;
-        }
-
-        int[] toArray() {
-            return Arrays.copyOf(values, size);
         }
     }
 }
