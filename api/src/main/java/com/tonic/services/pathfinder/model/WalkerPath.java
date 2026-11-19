@@ -50,6 +50,7 @@ public class WalkerPath
         ItemID._3DOSE2STAMINA,
         ItemID._4DOSE2STAMINA
     };
+    private static final int MAX_TELEPORT_RETRIES = 2;
     private final Client client;
     @Getter
     private final List<IStep> steps;
@@ -66,6 +67,8 @@ public class WalkerPath
     private boolean ranInit = false;
     private boolean useTeleports = true;
     private int timesDialogueSeen = 0;
+    private int teleportRetries = 0;
+    private WorldPoint teleportStart = null;
     private String lastText = null;
 
     /**
@@ -151,9 +154,17 @@ public class WalkerPath
 
     private void repath()
     {
+        teleportRetries = PlayerEx.getLocal().getWorldPoint().equals(teleportStart) ? teleportRetries + 1 : 0;
+        teleportStart = null;
         steps.clear();
         final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
         steps.addAll(useTeleports ? engine.find(destination) : Teleport.withoutTeleports(() -> engine.find(destination)));
+        teleport = engine.getTeleport();
+        if(teleport != null && teleportRetries > MAX_TELEPORT_RETRIES)
+        {
+            Logger.warn("[Pathfinder] Teleport to " + teleport.getDestination() + " still failing after " + MAX_TELEPORT_RETRIES + " retries, stopping");
+            cancel();
+        }
     }
 
     /**
@@ -408,6 +419,10 @@ public class WalkerPath
 
     private boolean handleTeleport() {
         if (teleport != null) {
+            if(!teleport.getHandlers().isStarted())
+            {
+                teleportStart = PlayerEx.getLocal().getWorldPoint();
+            }
             boolean state = teleport.getHandlers().step();
             if(!state) {
                 teleport = null;
