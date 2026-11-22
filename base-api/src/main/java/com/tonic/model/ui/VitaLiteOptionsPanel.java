@@ -8,6 +8,9 @@ import com.tonic.model.ui.components.*;
 import com.tonic.services.ClickManager;
 import com.tonic.services.ClickStrategy;
 import com.tonic.services.RenderScale;
+import com.tonic.services.streamer.MirrorFrameRate;
+import com.tonic.services.streamer.Streamer;
+import com.tonic.services.streamer.StreamerName;
 import com.tonic.services.mouserecorder.DecodedMousePacket;
 import com.tonic.services.mouserecorder.MousePacketDecoder;
 import com.tonic.services.mouserecorder.trajectory.TrajectoryService;
@@ -19,6 +22,12 @@ import com.tonic.services.profiler.ProfilerWindow;
 import com.tonic.util.ReflectBuilder;
 import com.tonic.util.ThreadPool;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 import java.awt.*;
 
 public class VitaLiteOptionsPanel extends VPluginPanel {
@@ -293,7 +302,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         drawHull.setSelected(Static.getVitaConfig().getDrawBoatHull());
         boatPanel.addContent(createToggleOption(
                 "Draw Boat Hull",
-                "Draw the boat's hull at its real angle, with any land it touches in red",
+                "Draw the hull at its real angle, land it touches in red",
                 drawHull,
                 () -> Static.getVitaConfig().setDrawBoatHull(drawHull.isSelected())
         ));
@@ -315,7 +324,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         drawDebug.setSelected(Static.getVitaConfig().getDrawBoatDebug());
         boatPanel.addContent(createToggleOption(
                 "Boat Info Panel",
-                "Show the boat's position, speed, throttle, voyage state, last plan and resistances",
+                "Show position, speed, throttle, voyage, plan and resistances",
                 drawDebug,
                 () -> Static.getVitaConfig().setDrawBoatDebug(drawDebug.isSelected())
         ));
@@ -337,7 +346,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         drawTrack.setSelected(Static.getVitaConfig().getDrawBoatTrack());
         boatPanel.addContent(createToggleOption(
                 "Draw Predicted Track",
-                "Draw where the hull will be over the next ticks if the helm is left as set",
+                "Draw the hull's path over the next ticks at the current helm",
                 drawTrack,
                 () -> Static.getVitaConfig().setDrawBoatTrack(drawTrack.isSelected())
         ));
@@ -348,7 +357,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         drawSeaCells.setSelected(Static.getVitaConfig().getDrawSeaCells());
         boatPanel.addContent(createToggleOption(
                 "Draw Sea Cells",
-                "Draw the sea map round the boat: land in coast tiles, walk-blocked water, water close to land",
+                "Draw land, blocked water and near-land water round the boat",
                 drawSeaCells,
                 () -> Static.getVitaConfig().setDrawSeaCells(drawSeaCells.isSelected())
         ));
@@ -374,7 +383,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         drawGroundUnderObjects.setSelected(Static.getVitaConfig().shouldDrawGroundUnderObjects());
         scenePanel.addContent(createToggleOption(
                 "Ground Overlays Under Objects",
-                "Draw tile overlays on the ground, hidden by what stands in front of them.",
+                "Draw tile overlays under what stands in front of them",
                 drawGroundUnderObjects,
                 () -> Static.getVitaConfig().setShouldDrawGroundUnderObjects(drawGroundUnderObjects.isSelected())
         ));
@@ -390,7 +399,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         reuseStillScene.setSelected(Static.getVitaConfig().shouldReuseStillScene());
         scenePanel.addContent(createToggleOption(
                 "Reuse Still Scene",
-                "In CPU mode, while the camera is still, redraw only what moves.",
+                "CPU mode: redraw only what moves while the camera is still",
                 reuseStillScene,
                 () -> Static.getVitaConfig().setShouldReuseStillScene(reuseStillScene.isSelected())
         ));
@@ -421,7 +430,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         Static.getVitaConfig().setDrawStratPath(false);
         scenePanel.addContent(createToggleOption(
                 "Debug Strat Pathing",
-                "Define warning and impassible tiles for strategic pathfinding with overlay.",
+                "Mark warning and impassable tiles for strategic pathfinding",
                 debugStratPathing,
                 () -> Static.getVitaConfig().setDrawStratPath(debugStratPathing.isSelected())
         ));
@@ -444,6 +453,33 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         scenePanel.addContent(distanceDebug);
 
         contentPanel.add(scenePanel);
+        contentPanel.add(Box.createVerticalStrut(10));
+
+        CollapsiblePanel streamerPanel = new CollapsiblePanel("Streamer");
+
+        ToggleSlider streamerMode = new ToggleSlider();
+        streamerMode.setSelected(Streamer.active);
+        streamerPanel.addContent(createToggleOption(
+                "Streamer Mode",
+                "Open a stock RuneLite look-alike window to capture in OBS",
+                streamerMode,
+                () ->
+                {
+                    if (!Streamer.request(streamerMode.isSelected()))
+                    {
+                        streamerMode.setSelected(false);
+                    }
+                }
+        ));
+        Streamer.addListener(on -> SwingUtilities.invokeLater(() -> streamerMode.setSelected(on)));
+        streamerPanel.addContent(createStreamerNameOption());
+
+        FancyDropdown<MirrorFrameRate> mirrorFrameRate = new FancyDropdown<>("Mirror Frame Rate", MirrorFrameRate.class);
+        mirrorFrameRate.setSelectedItem(Static.getVitaConfig().getStreamerFrameRate());
+        mirrorFrameRate.addSelectionListener(event -> setMirrorFrameRate(mirrorFrameRate.getSelectedItem()));
+        streamerPanel.addContent(mirrorFrameRate);
+
+        contentPanel.add(streamerPanel);
         contentPanel.add(Box.createVerticalStrut(10));
 
         // Input Settings
@@ -489,7 +525,7 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         recordTrajectory = new ToggleSlider();
         inputPanel.addContent(createToggleOption(
                 "Train Mouse Data",
-                "Train a data set on your manual play for use in automated mouse movements.",
+                "Learn mouse movement from your manual play",
                 recordTrajectory,
                 () -> {
                     if (recordTrajectory.isSelected()) {
@@ -734,6 +770,67 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         short info = (short)(time << 1);
 
         Logger.info("Client last pressed: " + client_latsPressed + ", MouseHandler last pressed: " + mh_lastPressed + ", Diff: " + time + ", Info: " + info);
+    }
+
+    private static void setMirrorFrameRate(MirrorFrameRate rate)
+    {
+        Static.getVitaConfig().setStreamerFrameRate(rate);
+        Streamer.frameRate = rate.getFramesPerSecond();
+    }
+
+    private JPanel createStreamerNameOption()
+    {
+        String saved = Static.getVitaConfig().getStreamerName();
+        JTextField field = new JTextField(StreamerName.isValid(saved) ? saved : "", StreamerName.MAX_LENGTH);
+        field.setToolTipText("Blank shows " + StreamerName.DEFAULT);
+        ((AbstractDocument) field.getDocument()).setDocumentFilter(new DocumentFilter()
+        {
+            @Override
+            public void insertString(FilterBypass bypass, int offset, String text, AttributeSet attributes) throws BadLocationException
+            {
+                replace(bypass, offset, 0, text, attributes);
+            }
+
+            @Override
+            public void replace(FilterBypass bypass, int offset, int length, String text, AttributeSet attributes) throws BadLocationException
+            {
+                String current = bypass.getDocument().getText(0, bypass.getDocument().getLength());
+                String changed = current.substring(0, offset) + (text == null ? "" : text) + current.substring(offset + length);
+                if (StreamerName.isValid(changed))
+                {
+                    super.replace(bypass, offset, length, text, attributes);
+                }
+            }
+        });
+        field.getDocument().addDocumentListener(new DocumentListener()
+        {
+            @Override
+            public void insertUpdate(DocumentEvent event)
+            {
+                save(field.getText());
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event)
+            {
+                save(field.getText());
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event)
+            {
+            }
+
+            private void save(String name)
+            {
+                Static.getVitaConfig().setStreamerName(name);
+                StreamerName.setFake(name);
+            }
+        });
+
+        OptionPanel optionPanel = new OptionPanel();
+        optionPanel.init("Streamer Name", "Shown in the mirror in place of your name.", field);
+        return optionPanel;
     }
 
     private JPanel createToggleOption(String title, String description, ToggleSlider toggle, Runnable onClick) {

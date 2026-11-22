@@ -71,6 +71,7 @@ public class Injector {
             ClassNode classNode = gamepack.remove(name); // Remove from map immediately
             FieldHookTransformer.instrument(classNode);
             OSGlobalMixin.patch(classNode);
+            MemberCheck.verifyVitaLite(classNode);
 
             byte[] modified = ClassNodeUtil.toBytes(classNode);
             Main.LIBS.getGamepack().classes.put(name, modified);
@@ -122,7 +123,7 @@ public class Injector {
             String gamepackName = AnnotationUtil.getAnnotation(mixin, Mixin.class, "value");
             Boolean isCheatIdentifier = AnnotationUtil.getAnnotation(mixin, Mixin.class, "isInterface");
             isCheatIdentifier = isCheatIdentifier != null && isCheatIdentifier;
-            ClassNode gamepackClass = null;
+            ClassNode gamepackClass;
             if(isCheatIdentifier)
             {
                 gamepackClass = gamepack.values().stream()
@@ -195,6 +196,10 @@ public class Injector {
                 {
                     InsertTransformer.patch(mixin, method);
                 }
+                if(AnnotationUtil.hasAnnotation(method, Redirect.class))
+                {
+                    RedirectTransformer.patch(mixin, method);
+                }
                 if(AnnotationUtil.hasAnnotation(method, ClassMod.class))
                 {
                     ClassModTransformer.patch(mixin, method);
@@ -216,7 +221,7 @@ public class Injector {
                 String gamepackName = AnnotationUtil.getAnnotation(mixin, Mixin.class, "value");
                 Boolean isCheatIdentifier = AnnotationUtil.getAnnotation(api, Mixin.class, "isInterface");
                 isCheatIdentifier = isCheatIdentifier != null && isCheatIdentifier;
-                ClassNode gamepackClass = null;
+                ClassNode gamepackClass;
                 if(isCheatIdentifier)
                 {
                     gamepackClass = gamepack.values().stream()
@@ -229,7 +234,7 @@ public class Injector {
                     JClass clazz = MappingProvider.getClass(gamepackName);
                     if(clazz == null)
                     {
-                        System.err.println("Warning: Could not find mapping for mixin target class: " + gamepackName);
+                        InjectionFailures.record("interface mixin " + mixin.name + ": no mapping for target class " + gamepackName);
                         continue;
                     }
                     gamepackClass = gamepack.get(clazz.getObfuscatedName());
@@ -237,7 +242,7 @@ public class Injector {
 
                 if(gamepackClass == null)
                 {
-                    System.err.println("Warning: Could not find target class for interface mixin: " + gamepackName);
+                    InjectionFailures.record("interface mixin " + mixin.name + ": target class " + gamepackName + " not found");
                     continue;
                 }
 
@@ -253,6 +258,7 @@ public class Injector {
             }
             catch (Exception e)
             {
+                InjectionFailures.record("interface mixin " + entry.getKey().name + ": " + e);
                 e.printStackTrace();
             }
 

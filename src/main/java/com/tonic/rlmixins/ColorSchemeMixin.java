@@ -20,6 +20,8 @@ public class ColorSchemeMixin
     {
         BytecodeBuilder builder = BytecodeBuilder.create();
         builder
+                .newInstance("com/tonic/services/streamer/MirrorColor")
+                .dup()
                 .newInstance("java/awt/Color")
                 .dup()
                 .pushInt(50)
@@ -27,6 +29,8 @@ public class ColorSchemeMixin
                 .pushInt(250)
                 .pushInt(255)
                 .invokeSpecial("java/awt/Color", "<init>", "(IIII)V")
+                .getStaticField("net/runelite/client/ui/ColorScheme", "BRAND_ORANGE", "Ljava/awt/Color;")
+                .invokeSpecial("com/tonic/services/streamer/MirrorColor", "<init>", "(Ljava/awt/Color;Ljava/awt/Color;)V")
                 .putStaticField("net/runelite/client/ui/ColorScheme", "BRAND_ORANGE", "Ljava/awt/Color;");
 
         method.instructions.insertBefore(insertionPoint, builder.build());

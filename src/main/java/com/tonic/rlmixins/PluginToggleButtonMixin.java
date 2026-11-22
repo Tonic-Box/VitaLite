@@ -61,8 +61,8 @@ public class PluginToggleButtonMixin
                         "Ljava/awt/Color;"
                     )
                     .invokeStatic(
-                        "net/runelite/client/util/ImageUtil",
-                        "recolorImage",
+                        "com/tonic/services/streamer/MirrorImages",
+                        "recolourKeepingStock",
                         RECOLOR_DESCRIPTOR
                     )
                     .build();

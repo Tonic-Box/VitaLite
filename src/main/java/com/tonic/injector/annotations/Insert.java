@@ -48,4 +48,22 @@ public @interface Insert {
      * @return true for raw mode
      */
     boolean raw() default false;
+
+    /**
+     * How many instructions the pattern must match, or -1 for any number; a different count fails the injector run.
+     * @return expected match count
+     */
+    int expectedMatches() default -1;
+
+    /**
+     * A static boolean field, as "owner/Class.field", that must be true for the inserted call to run, or empty for none.
+     * @return gate field
+     */
+    String gate() default "";
+
+    /**
+     * The target parameter, by 0-based index, that the hook's return value is stored into, or -1 to discard it.
+     * @return parameter index
+     */
+    int storeIntoParameter() default -1;
 }

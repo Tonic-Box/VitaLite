@@ -628,6 +628,7 @@
     ]
   },
   {
+    "name": "Font",
     "obfuscatedName": "aab",
     "fields": [],
     "methods": [
@@ -734,6 +735,7 @@
     ]
   },
   {
+    "name": "AbstractFont",
     "obfuscatedName": "aae",
     "fields": [
       {
@@ -913,7 +915,9 @@
         "isStatic": true
       },
       {
+        "name": "drawLines",
         "obfuscatedName": "bj",
+        "owner": "AbstractFont",
         "ownerObfuscatedName": "aae",
         "descriptor": "(Ljava/lang/String;IIIIIIIIII)I",
         "isStatic": false
@@ -1110,6 +1114,7 @@
         "isStatic": true
       },
       {
+        "name": "drawText",
         "obfuscatedName": "pb",
         "ownerObfuscatedName": "aae",
         "descriptor": "(Laae;Ljava/lang/String;IIIII)V",
@@ -4115,6 +4120,7 @@
     ]
   },
   {
+    "name": "ChatLineBuffer",
     "obfuscatedName": "ae",
     "fields": [
       {
@@ -4124,7 +4130,9 @@
         "isStatic": true
       },
       {
+        "name": "lineCount",
         "obfuscatedName": "ai",
+        "owner": "ChatLineBuffer",
         "ownerObfuscatedName": "ae",
         "descriptor": "I",
         "getter": -634337091,
@@ -5002,6 +5010,7 @@
         "isStatic": true
       },
       {
+        "name": "loginDisplayName",
         "obfuscatedName": "dg",
         "ownerObfuscatedName": "ak",
         "descriptor": "Ljava/lang/String;",
@@ -17018,6 +17027,7 @@
         "isStatic": true
       },
       {
+        "name": "getComponentGroup",
         "obfuscatedName": "yq",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -17777,6 +17787,7 @@
         "isStatic": false
       },
       {
+        "name": "addChatMessage",
         "obfuscatedName": "addChatMessage",
         "owner": "Client",
         "ownerObfuscatedName": "client",
@@ -31903,6 +31914,7 @@
         "isStatic": true
       },
       {
+        "name": "drawLoginScreen",
         "obfuscatedName": "ac",
         "ownerObfuscatedName": "ev",
         "descriptor": "(Laab;Laab;Laab;I)V",
@@ -39148,6 +39160,7 @@
         "isStatic": false
       },
       {
+        "name": "drawOverheadText",
         "obfuscatedName": "al",
         "ownerObfuscatedName": "gj",
         "descriptor": "(Lcx;IIIIII)V",
@@ -40173,6 +40186,7 @@
     ]
   },
   {
+    "name": "WidgetDrawer",
     "obfuscatedName": "gr",
     "fields": [
       {
@@ -40351,7 +40365,9 @@
         "isStatic": false
       },
       {
+        "name": "drawWidgets",
         "obfuscatedName": "ts",
+        "owner": "WidgetDrawer",
         "ownerObfuscatedName": "gr",
         "descriptor": "(Lgr;[Llz;IIIIIIIIIILvj;II)V",
         "garbageValue": 1788921204,
@@ -51967,2014 +51983,2351 @@
     ]
   },
   {
+    "name": "Strings",
     "obfuscatedName": "kr",
     "fields": [
       {
         "obfuscatedName": "ax",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ga",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ai",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ad",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ms",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "aw",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ab",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "aq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ap",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fj",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ak",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ah",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lo",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "az",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dl",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "at",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bf",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bd",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bw",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bj",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bl",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bn",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bu",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "iq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "br",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bm",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bo",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bi",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bv",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bp",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bt",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bx",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bh",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ku",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bg",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bc",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gn",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ba",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "et",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ib",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "di",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lx",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cm",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cn",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cw",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kj",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kl",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cy",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hi",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cs",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ch",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cv",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gy",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ci",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fn",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bs",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cx",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cb",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ck",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ln",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ce",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ca",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cf",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "me",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mm",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ct",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dg",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mb",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fl",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dk",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hz",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "he",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "de",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dj",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dc",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "do",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dm",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dh",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dr",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dz",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "li",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bk",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dp",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dy",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fk",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dx",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dv",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ds",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "db",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dd",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hw",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dw",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "es",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "en",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jp",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hj",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ek",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ae",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ep",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "am",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ez",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cr",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ew",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ej",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "em",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "iz",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mz",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ed",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mv",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fe",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "eb",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ec",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ei",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ea",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "el",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ey",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "eq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "eg",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mg",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fp",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fm",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fg",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ft",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fx",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cd",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fv",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fb",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bz",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fw",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hk",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ff",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fu",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fs",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lj",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fy",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fo",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ky",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fc",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fh",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "eu",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cg",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fa",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jk",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gf",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jg",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gr",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gd",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ex",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "go",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gp",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gt",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gv",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gw",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jv",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hy",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "eo",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gi",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ge",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gl",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gu",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hv",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gk",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gj",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gm",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lu",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gh",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gc",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kd",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hd",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jy",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ee",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hc",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gx",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ls",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hh",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ho",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hx",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hr",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hs",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hb",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hg",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cj",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lm",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mw",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mk",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hp",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hn",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "is",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hf",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ac",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ht",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "by",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ij",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "id",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "in",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "it",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ix",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ii",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fr",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "nh",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "iw",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "iy",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cl",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "iu",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "if",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "io",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "il",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ia",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ir",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kh",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ip",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "iv",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "im",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ig",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ic",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kw",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ie",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cz",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jo",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gb",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fd",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "be",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gs",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ih",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "da",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jr",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jt",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jc",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jb",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lr",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ja",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ji",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jd",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jj",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jx",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "je",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jm",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jz",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kg",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jf",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ma",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
+        "name": "welcomeToRuneScape",
         "obfuscatedName": "ju",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hu",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kp",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ka",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "nz",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kf",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kv",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lw",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ko",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ki",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jh",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ks",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ar",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kn",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kt",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "du",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kc",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fz",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kz",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "km",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ha",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kr",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ke",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gz",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mc",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lv",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "er",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "la",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lf",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jl",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lg",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lh",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hm",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ik",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kb",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ao",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ll",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lp",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "le",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ly",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mj",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ef",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "fi",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lb",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lz",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "bb",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mh",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ld",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kk",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "hl",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "df",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lc",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cu",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cp",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "my",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "eh",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mi",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mo",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "cc",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mf",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jw",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "co",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mx",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mp",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ml",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ev",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lt",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mt",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "jn",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "lk",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mq",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "md",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "gg",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dn",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "dt",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mu",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mr",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "mn",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "nc",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "js",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "nd",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "nr",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "nt",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "kx",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
       },
       {
         "obfuscatedName": "nm",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "Ljava/lang/String;",
         "isStatic": true
@@ -53983,18 +54336,21 @@
     "methods": [
       {
         "obfuscatedName": "\u003cinit\u003e",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "()V",
         "isStatic": false
       },
       {
         "obfuscatedName": "\u003cclinit\u003e",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "()V",
         "isStatic": true
       },
       {
         "obfuscatedName": "af",
+        "owner": "Strings",
         "ownerObfuscatedName": "kr",
         "descriptor": "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V",
         "garbageValue": -2086702255,
@@ -92932,6 +93288,7 @@
     ]
   },
   {
+    "name": "DualNode",
     "obfuscatedName": "wa",
     "fields": [
       {
@@ -92941,13 +93298,17 @@
         "isStatic": false
       },
       {
+        "name": "nextDual",
         "obfuscatedName": "fa",
+        "owner": "DualNode",
         "ownerObfuscatedName": "wa",
         "descriptor": "Lwa;",
         "isStatic": false
       },
       {
+        "name": "previousDual",
         "obfuscatedName": "fd",
+        "owner": "DualNode",
         "ownerObfuscatedName": "wa",
         "descriptor": "Lwa;",
         "isStatic": false
@@ -96877,46 +97238,54 @@
     ]
   },
   {
+    "name": "Menu",
     "obfuscatedName": "xq",
     "fields": [
       {
         "obfuscatedName": "am",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "[Ljava/lang/String;",
         "isStatic": false
       },
       {
         "obfuscatedName": "de",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "Lcx;",
         "isStatic": true
       },
       {
         "obfuscatedName": "ai",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "[I",
         "isStatic": false
       },
       {
         "obfuscatedName": "ag",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "[I",
         "isStatic": false
       },
       {
         "obfuscatedName": "as",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "[I",
         "isStatic": false
       },
       {
         "obfuscatedName": "bx",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "ao",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "I",
         "getter": -1418998637,
@@ -96925,6 +97294,7 @@
       },
       {
         "obfuscatedName": "aa",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "I",
         "getter": 1591175795,
@@ -96933,18 +97303,21 @@
       },
       {
         "obfuscatedName": "ad",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "[I",
         "isStatic": false
       },
       {
         "obfuscatedName": "al",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "[I",
         "isStatic": false
       },
       {
         "obfuscatedName": "fi",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "I",
         "getter": -1418998637,
@@ -96953,30 +97326,35 @@
       },
       {
         "obfuscatedName": "av",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "[Ljava/lang/String;",
         "isStatic": false
       },
       {
         "obfuscatedName": "ay",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "[Lxq;",
         "isStatic": false
       },
       {
         "obfuscatedName": "aj",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "[Z",
         "isStatic": false
       },
       {
         "obfuscatedName": "ax",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "Z",
         "isStatic": false
       },
       {
         "obfuscatedName": "an",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "I",
         "getter": 765720731,
@@ -96985,6 +97363,7 @@
       },
       {
         "obfuscatedName": "lg",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "I",
         "getter": -1418998637,
@@ -96993,12 +97372,14 @@
       },
       {
         "obfuscatedName": "kd",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "Z",
         "isStatic": true
       },
       {
         "obfuscatedName": "af",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "I",
         "getter": 688428537,
@@ -97007,6 +97388,7 @@
       },
       {
         "obfuscatedName": "aw",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "I",
         "getter": -593116259,
@@ -97015,6 +97397,7 @@
       },
       {
         "obfuscatedName": "ab",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "I",
         "getter": -652040125,
@@ -97023,6 +97406,7 @@
       },
       {
         "obfuscatedName": "aq",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "I",
         "getter": 25558591,
@@ -97031,18 +97415,21 @@
       },
       {
         "obfuscatedName": "qm",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "[Lrl5;",
         "isStatic": false
       },
       {
         "obfuscatedName": "kh",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "I",
         "isStatic": false
       },
       {
         "obfuscatedName": "ap",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "J",
         "getter": -737186429728909027,
@@ -97051,6 +97438,7 @@
       },
       {
         "obfuscatedName": "au",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "[I",
         "isStatic": false
@@ -97059,6 +97447,7 @@
     "methods": [
       {
         "obfuscatedName": "ao",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(I)V",
         "garbageValue": -362427880,
@@ -97066,6 +97455,7 @@
       },
       {
         "obfuscatedName": "ad",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(III)Z",
         "garbageValue": -804861470,
@@ -97073,18 +97463,21 @@
       },
       {
         "obfuscatedName": "setMenuEntries",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "([Lnet/runelite/api/MenuEntry;)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "tf",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(Lxq;)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "as",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(III)Z",
         "garbageValue": 1443673052,
@@ -97092,6 +97485,7 @@
       },
       {
         "obfuscatedName": "ac",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(I)V",
         "garbageValue": 1454461342,
@@ -97099,6 +97493,7 @@
       },
       {
         "obfuscatedName": "ae",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(I)V",
         "garbageValue": -2021004880,
@@ -97106,6 +97501,7 @@
       },
       {
         "obfuscatedName": "ay",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(I)V",
         "garbageValue": 1101159405,
@@ -97113,6 +97509,7 @@
       },
       {
         "obfuscatedName": "fa",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(I)V",
         "garbageValue": -1,
@@ -97120,50 +97517,61 @@
       },
       {
         "obfuscatedName": "fp",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(IIII)F",
         "isStatic": true
       },
       {
         "obfuscatedName": "jx",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(II)Z",
         "isStatic": false
       },
       {
         "obfuscatedName": "us",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "()V",
         "isStatic": false
       },
       {
         "obfuscatedName": "aj",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(Ljava/lang/String;Ljava/lang/String;IIIIIZIB)I",
         "garbageValue": 34,
         "isStatic": false
       },
       {
+        "name": "draw",
         "obfuscatedName": "aa",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(B)V",
         "garbageValue": 40,
         "isStatic": false
       },
       {
+        "name": "createEntry",
         "obfuscatedName": "sl",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(I)Lrl5;",
         "isStatic": false
       },
       {
         "obfuscatedName": "vx",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(Lxq;)V",
         "isStatic": false
       },
       {
+        "name": "layout",
         "obfuscatedName": "ai",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(III)V",
         "garbageValue": -1049435369,
@@ -97171,36 +97579,42 @@
       },
       {
         "obfuscatedName": "qy",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(II)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "\u003cinit\u003e",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(Z)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "ox",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(II)Z",
         "isStatic": false
       },
       {
         "obfuscatedName": "wc",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "()V",
         "isStatic": false
       },
       {
         "obfuscatedName": "dx",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(II)I",
         "isStatic": false
       },
       {
         "obfuscatedName": "ax",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(IB)Ljava/lang/String;",
         "garbageValue": 2,
@@ -97208,36 +97622,42 @@
       },
       {
         "obfuscatedName": "gk",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(II)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "mm",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(II)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "ml",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(I)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "\u003cclinit\u003e",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "()V",
         "isStatic": true
       },
       {
         "obfuscatedName": "rr",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "()V",
         "isStatic": false
       },
       {
         "obfuscatedName": "nl",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(Lxq;Lxq;I)V",
         "garbageValue": -810270005,
@@ -97245,6 +97665,7 @@
       },
       {
         "obfuscatedName": "wg",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(Lxq;IIB)I",
         "garbageValue": -86,
@@ -97252,24 +97673,28 @@
       },
       {
         "obfuscatedName": "au",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(II)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "getMenuEntries",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "()[Lnet/runelite/api/MenuEntry;",
         "isStatic": false
       },
       {
         "obfuscatedName": "ag",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(Lxq;I)V",
         "isStatic": false
       },
       {
         "obfuscatedName": "rm",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(Lxq;II)V",
         "garbageValue": -1472736345,
@@ -97277,12 +97702,14 @@
       },
       {
         "obfuscatedName": "ar",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "()V",
         "isStatic": false
       },
       {
         "obfuscatedName": "al",
+        "owner": "Menu",
         "ownerObfuscatedName": "xq",
         "descriptor": "(IIB)I",
         "isStatic": false

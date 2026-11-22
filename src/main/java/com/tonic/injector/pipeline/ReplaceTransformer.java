@@ -23,7 +23,10 @@ public class ReplaceTransformer
         ClassNode gamepack = TransformerUtil.getBaseClass(mixin);
         InjectTransformer.patch(gamepack, mixin, method);
 
-        MethodNode toReplace = TransformerUtil.getTargetMethod(mixin, name);
+        MethodNode toReplace = TransformerUtil.requireTargetMethod("@Replace " + mixin.name + "." + method.name, mixin, name, null);
+        if (toReplace == null) {
+            return;
+        }
 
         Type hookType   = Type.getMethodType(method.desc);
         Type targetType = Type.getMethodType(toReplace.desc);

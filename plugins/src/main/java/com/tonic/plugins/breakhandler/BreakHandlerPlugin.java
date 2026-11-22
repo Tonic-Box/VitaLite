@@ -40,6 +40,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.SwingUtilities;
+
 @PluginDescriptor(
         name = "# Break Handler",
         description = "Schedules and takes breaks automatically"
@@ -246,7 +248,7 @@ public class BreakHandlerPlugin extends Plugin
     private void update()
     {
         updateBreaks();
-        panel.refreshBreakList();
+        SwingUtilities.invokeLater(panel::refreshBreakList);
         updateState();
 
         if (state != State.LOGIN)

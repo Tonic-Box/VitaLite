@@ -1,6 +1,7 @@
 package com.tonic.services;
 
 import com.tonic.Static;
+import com.tonic.services.streamer.Streamer;
 
 /**
  * Has the CPU renderer draw the 3D scene into the top left of the viewport at a smaller size and stretches it over
@@ -62,7 +63,7 @@ public final class SceneScale
      */
     public static void latch(boolean gpu)
     {
-        percent = gpu ? 100 : Static.getVitaConfig().getRenderScale().getPercent();
+        percent = gpu || Streamer.active ? 100 : Static.getVitaConfig().getRenderScale().getPercent();
     }
 
     /**

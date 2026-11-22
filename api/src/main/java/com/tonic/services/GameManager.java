@@ -5,6 +5,7 @@ import com.tonic.Static;
 import com.tonic.api.game.reach.Reachability;
 import com.tonic.api.game.sailing.BoatStatsAPI;
 import com.tonic.services.ground.GroundOverlays;
+import com.tonic.services.streamer.StreamerMode;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
 import com.tonic.services.pathfinder.sailing.BoatPathing;
 import com.tonic.services.pathfinder.sailing.Sailing;
@@ -437,6 +438,8 @@ public class GameManager extends Overlay {
         TransportLoader.init();
         BankCache.init();
         SceneCacheEvents.init();
+        StreamerMode.install();
+        FrameProfiling.install();
 
         ThreadPool.submit(() -> {
             Client client = Static.getClient();

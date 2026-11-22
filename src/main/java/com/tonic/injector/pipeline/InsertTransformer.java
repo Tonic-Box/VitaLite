@@ -9,6 +9,8 @@ import com.tonic.injector.annotations.Mixin;
 import com.tonic.injector.annotations.Shift;
 import com.tonic.injector.types.InstructionMatcher;
 import com.tonic.injector.util.AnnotationUtil;
+import com.tonic.injector.util.Gates;
+import com.tonic.injector.util.InjectionFailures;
 import com.tonic.injector.util.TransformerUtil;
 import com.tonic.util.ReflectBuilder;
 import org.objectweb.asm.Opcodes;
@@ -29,145 +31,118 @@ public class InsertTransformer {
      * @param method method annotated with @Insert
      */
     public static void patch(ClassNode mixin, MethodNode method) {
+        String hook = "@Insert " + mixin.name + "." + method.name;
         try {
             String gamepackName = AnnotationUtil.getAnnotation(mixin, Mixin.class, "value");
             String targetMethodName = AnnotationUtil.getAnnotation(method, Insert.class, "method");
             String targetMethodDesc = AnnotationUtil.getAnnotation(method, Insert.class, "desc");
+            boolean gamepack = !gamepackName.contains("/");
 
             JClass jClass = MappingProvider.getClass(gamepackName);
             ClassNode gamepackClass = TransformerUtil.getMethodClass(mixin, targetMethodName);
 
-            Insert insertAnnotation = getInsertAnnotation(method);
-            if (insertAnnotation == null) {
-                System.err.println("No @Insert annotation found on method: " + method.name);
-                return;
-            }
+            Insert insertAnnotation = AnnotationUtil.annotation(method, Insert.class);
 
             if(!insertAnnotation.raw())
                 InjectTransformer.patch(gamepackClass, mixin, method);
 
-            MethodNode targetMethod = TransformerUtil.getTargetMethod(mixin, targetMethodName, targetMethodDesc);
-
+            MethodNode targetMethod = TransformerUtil.requireTargetMethod(hook, mixin, targetMethodName, targetMethodDesc);
             if(targetMethod == null) {
-                System.err.println("Target method not found: " + targetMethodName + " in class " + gamepackClass.name);
                 return;
             }
-            
+
             List<InstructionMatcher.MatchResult> matches = InstructionMatcher.findMatches(
-                    targetMethod, 
-                    insertAnnotation.at(), 
+                    targetMethod,
+                    insertAnnotation.at(),
                     insertAnnotation.slice(),
-                    jClass
+                    jClass,
+                    gamepack
             );
 
             matches = filterMatchesByContext(matches, insertAnnotation.at(), gamepackClass);
-            
-            if (matches.isEmpty()) {
-                System.err.println("No matching instructions found for pattern in method: " + targetMethod.name + " :: " + targetMethodName + targetMethod.desc);
-                return;
-            }
 
-            List<InstructionMatcher.MatchResult> targetMatches;
-            if (insertAnnotation.all()) {
-                targetMatches = matches;
-            } else {
-                int ordinal = insertAnnotation.ordinal();
-                if (ordinal == -1) {
-                    targetMatches = List.of(matches.get(matches.size() - 1));
-                } else if (ordinal >= 0 && ordinal < matches.size()) {
-                    targetMatches = List.of(matches.get(ordinal));
-                } else {
-                    return;
-                }
+            List<InstructionMatcher.MatchResult> targetMatches = TransformerUtil.select(hook + " in " + targetMethod.name + targetMethod.desc, matches, insertAnnotation.expectedMatches(), insertAnnotation.all(), insertAnnotation.ordinal());
+            if (targetMatches == null) {
+                return;
             }
 
             if(insertAnnotation.raw())
             {
-                String name = mixin.name.replace("/", ".");
-                Type type = Type.getMethodType(method.desc);
-                Type[] params = type.getArgumentTypes();
-                if(params.length > 2)
-                {
-                    Class<?> clazz = InsertTransformer.class.getClassLoader()
-                            .loadClass(name);
-
-                    ReflectBuilder.of(clazz)
-                            .staticMethod(
-                                    method.name,
-                                    new Class[]{ClassNode.class, MethodNode.class, AbstractInsnNode.class},
-                                    new Object[]{gamepackClass, targetMethod, targetMatches.get(0).instruction}
-                            )
-                            .get();
-                }
-                else
-                {
-                    Class<?> clazz = InsertTransformer.class.getClassLoader()
-                            .loadClass(name);
-
-                    ReflectBuilder.of(clazz)
-                            .staticMethod(
-                                    method.name,
-                                    new Class[]{MethodNode.class, AbstractInsnNode.class},
-                                    new Object[]{targetMethod, targetMatches.get(0).instruction}
-                            )
-                            .get();
+                Class<?> clazz = InsertTransformer.class.getClassLoader().loadClass(mixin.name.replace("/", "."));
+                boolean withClass = Type.getArgumentTypes(method.desc).length > 2;
+                for (int i = targetMatches.size() - 1; i >= 0; i--) {
+                    AbstractInsnNode point = targetMatches.get(i).instruction;
+                    if (withClass) {
+                        ReflectBuilder.of(clazz).staticMethod(method.name, new Class[]{ClassNode.class, MethodNode.class, AbstractInsnNode.class}, new Object[]{gamepackClass, targetMethod, point}).get();
+                    } else {
+                        ReflectBuilder.of(clazz).staticMethod(method.name, new Class[]{MethodNode.class, AbstractInsnNode.class}, new Object[]{targetMethod, point}).get();
+                    }
                 }
                 System.out.println("Successfully invoked raw insert method: " + method.name + " on " + targetMethod.name);
                 return;
             }
-            
+
             for (int i = targetMatches.size() - 1; i >= 0; i--) {
                 InstructionMatcher.MatchResult match = targetMatches.get(i);
-                insertMethodCall(targetMethod, match.instruction, gamepackClass, method, insertAnnotation.at());
+                insertMethodCall(targetMethod, match.instruction, gamepackClass, method, insertAnnotation);
             }
-            
+
             System.out.println("Successfully inserted " + targetMatches.size() + " call(s) to " + method.name + " in " + targetMethod.name);
-            
-        } catch (Exception e) {
-            System.err.println("Error processing @Insert on method " + method.name + ": " + e.getMessage());
+
+        } catch (Exception | LinkageError e) {
+            InjectionFailures.record(hook + ": " + e);
             e.printStackTrace();
         }
     }
-    
-    /**
-     * Extracts Insert annotation from method.
-     * @param method method to check
-     * @return Insert annotation or null
-     */
-    private static Insert getInsertAnnotation(MethodNode method) {
-        if (method.visibleAnnotations == null) return null;
-        
-        for (AnnotationNode annotation : method.visibleAnnotations) {
-            if (annotation.desc.equals("L" + Insert.class.getName().replace('.', '/') + ";")) {
-                return AnnotationUtil.createAnnotationProxy(Insert.class, annotation);
-            }
-        }
-        return null;
-    }
-    
+
     /**
      * Inserts method call at specified instruction point, always before one that leaves the method.
      * @param targetMethod method to inject into
      * @param insertPoint instruction to insert at
      * @param gamepackClass class containing injected method
      * @param injectedMethod method to inject
-     * @param pattern injection pattern
+     * @param insert the insert's annotation
      */
-    private static void insertMethodCall(MethodNode targetMethod, AbstractInsnNode insertPoint, 
-                                       ClassNode gamepackClass, MethodNode injectedMethod, At pattern) {
-        
-        InsnList callInstructions = MethodUtil.generateContextAwareInvoke(gamepackClass, targetMethod, injectedMethod, true);
-        
-        Shift shiftType = getShiftType(pattern);
+    private static void insertMethodCall(MethodNode targetMethod, AbstractInsnNode insertPoint, ClassNode gamepackClass, MethodNode injectedMethod, Insert insert) {
+        At pattern = insert.at();
+        int parameter = insert.storeIntoParameter();
+        InsnList call = MethodUtil.generateContextAwareInvoke(gamepackClass, targetMethod, injectedMethod, parameter < 0);
+        if (parameter >= 0) {
+            call.add(storeIntoParameter(targetMethod, injectedMethod, parameter));
+        }
+        InsnList code = Gates.around(insert.gate(), call);
+
         int opcode = insertPoint.getOpcode();
         boolean exits = (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) || opcode == Opcodes.ATHROW;
-        if (shiftType == Shift.HEAD || exits) {
-            targetMethod.instructions.insertBefore(insertPoint, callInstructions);
+        if (getTargetTypeString(pattern).equals("HEAD") || getShiftType(pattern) == Shift.HEAD || exits) {
+            targetMethod.instructions.insertBefore(insertPoint, code);
         } else {
-            targetMethod.instructions.insert(insertPoint, callInstructions);
+            targetMethod.instructions.insert(insertPoint, code);
         }
     }
-    
+
+    private static InsnList storeIntoParameter(MethodNode targetMethod, MethodNode injectedMethod, int parameter) {
+        Type[] parameters = Type.getArgumentTypes(targetMethod.desc);
+        if (parameter >= parameters.length) {
+            throw new IllegalArgumentException("storeIntoParameter " + parameter + " but " + targetMethod.name + targetMethod.desc + " has " + parameters.length + " parameters");
+        }
+        Type returned = Type.getReturnType(injectedMethod.desc);
+        Type type = parameters[parameter];
+        if (returned.getSort() != type.getSort()) {
+            throw new IllegalArgumentException("the hook returns " + returned + " but parameter " + parameter + " of " + targetMethod.name + targetMethod.desc + " is " + type);
+        }
+        int local = (targetMethod.access & Opcodes.ACC_STATIC) != 0 ? 0 : 1;
+        for (int i = 0; i < parameter; i++) {
+            local += parameters[i].getSize();
+        }
+        InsnList store = new InsnList();
+        if (type.getSort() == Type.OBJECT && !returned.equals(type)) {
+            store.add(new TypeInsnNode(Opcodes.CHECKCAST, type.getInternalName()));
+        }
+        store.add(new VarInsnNode(type.getOpcode(Opcodes.ISTORE), local));
+        return store;
+    }
+
     /**
      * Gets shift type from pattern.
      * @param pattern pattern specification

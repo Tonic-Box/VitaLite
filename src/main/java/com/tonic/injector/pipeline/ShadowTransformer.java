@@ -1,5 +1,6 @@
 package com.tonic.injector.pipeline;
 
+import com.tonic.injector.util.InjectionFailures;
 import com.tonic.util.dto.JClass;
 import com.tonic.util.dto.JField;
 import com.tonic.util.dto.JMethod;
@@ -37,7 +38,10 @@ public class ShadowTransformer
 
         ClassNode gamepack = TransformerUtil.getMethodClass(mixin, name);
 
-        MethodNode toShadow = TransformerUtil.getTargetMethod(mixin, name);
+        MethodNode toShadow = TransformerUtil.requireTargetMethod("@Shadow " + mixin.name + "." + method.name, mixin, name, null);
+        if (toShadow == null) {
+            return;
+        }
 
         Number multiplier = null;
         if(!gamepackName.contains("/"))
@@ -164,9 +168,8 @@ public class ShadowTransformer
         }
         catch (Exception e)
         {
-            System.out.println("Error transforming shadow field: " + mixin.name + "." + field.name);
+            InjectionFailures.record("@Shadow " + mixin.name + "." + field.name + ": " + e);
             e.printStackTrace();
-            System.exit(0);
         }
     }
 

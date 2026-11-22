@@ -40,18 +40,28 @@ public class InstructionMatcher {
      * Find all instructions matching the given pattern with mapping context.
      */
     public static List<MatchResult> findMatches(MethodNode method, At pattern, Slice slice, JClass mappingContext) {
+        return findMatches(method, pattern, slice, mappingContext, true);
+    }
+
+    /**
+     * Find all instructions matching the given pattern, resolving names through the gamepack mappings only for a gamepack target.
+     */
+    public static List<MatchResult> findMatches(MethodNode method, At pattern, Slice slice, JClass mappingContext, boolean gamepack) {
         List<MatchResult> matches = new ArrayList<>();
+        if (getTargetType(pattern) == AtTarget.HEAD) {
+            matches.add(new MatchResult(headOf(method), 0));
+            return matches;
+        }
         
-        AbstractInsnNode start = getSliceStart(method, slice, mappingContext);
-        AbstractInsnNode end = getSliceEnd(method, slice, mappingContext);
+        AbstractInsnNode start = getSliceStart(method, slice, mappingContext, gamepack);
+        AbstractInsnNode end = getSliceEnd(method, slice, mappingContext, gamepack);
         
         AbstractInsnNode current = start;
         int index = 0;
         
         while (current != null && (end == null || current != end.getNext())) {
-            if (matchesPattern(current, pattern, mappingContext)) {
-                AbstractInsnNode targetInsn = applyShift(current, pattern);
-                matches.add(new MatchResult(targetInsn, index));
+            if (matchesPattern(current, pattern, mappingContext, gamepack)) {
+                matches.add(new MatchResult(current, index));
             }
             current = current.getNext();
             index++;
@@ -60,42 +70,48 @@ public class InstructionMatcher {
         return matches;
     }
     
-    private static AbstractInsnNode getSliceStart(MethodNode method, Slice slice, JClass mappingContext) {
+    private static AbstractInsnNode getSliceStart(MethodNode method, Slice slice, JClass mappingContext, boolean gamepack) {
         AtTarget fromTarget = getTargetType(slice.from());
         if (fromTarget == AtTarget.NONE) {
             return method.instructions.getFirst();
         }
         
-        List<MatchResult> fromMatches = findMatches(method, slice.from(), new SliceImpl(), mappingContext);
-        return fromMatches.isEmpty() ? method.instructions.getFirst() : fromMatches.get(0).instruction;
+        List<MatchResult> fromMatches = findMatches(method, slice.from(), new SliceImpl(), mappingContext, gamepack);
+        if (fromMatches.isEmpty()) {
+            throw new IllegalStateException("slice start " + slice.from().value() + " " + slice.from().target() + " matched nothing in " + method.name + method.desc);
+        }
+        return fromMatches.get(0).instruction;
     }
     
-    private static AbstractInsnNode getSliceEnd(MethodNode method, Slice slice, JClass mappingContext) {
+    private static AbstractInsnNode getSliceEnd(MethodNode method, Slice slice, JClass mappingContext, boolean gamepack) {
         AtTarget toTarget = getTargetType(slice.to());
         if (toTarget == AtTarget.NONE) {
             return method.instructions.getLast();
         }
         
-        List<MatchResult> toMatches = findMatches(method, slice.to(), new SliceImpl(), mappingContext);
-        return toMatches.isEmpty() ? method.instructions.getLast() : toMatches.get(0).instruction;
+        List<MatchResult> toMatches = findMatches(method, slice.to(), new SliceImpl(), mappingContext, gamepack);
+        if (toMatches.isEmpty()) {
+            throw new IllegalStateException("slice end " + slice.to().value() + " " + slice.to().target() + " matched nothing in " + method.name + method.desc);
+        }
+        return toMatches.get(0).instruction;
     }
     
-    private static boolean matchesPattern(AbstractInsnNode insn, At pattern, JClass mappingContext) {
+    private static boolean matchesPattern(AbstractInsnNode insn, At pattern, JClass mappingContext, boolean gamepack) {
         AtTarget targetType = getTargetType(pattern);
         
         switch (targetType) {
             case INVOKE:
-                return matchesInvoke(insn, pattern.target(), pattern.owner(), mappingContext);
+                return matchesInvoke(insn, pattern.target(), pattern.owner(), mappingContext, gamepack);
             case GETFIELD:
-                return matchesFieldAccess(insn, pattern.target(), pattern.owner(), Opcodes.GETFIELD, mappingContext);
+                return matchesFieldAccess(insn, pattern.target(), pattern.owner(), Opcodes.GETFIELD, mappingContext, gamepack);
             case PUTFIELD:
-                return matchesFieldAccess(insn, pattern.target(), pattern.owner(), Opcodes.PUTFIELD, mappingContext);
+                return matchesFieldAccess(insn, pattern.target(), pattern.owner(), Opcodes.PUTFIELD, mappingContext, gamepack);
             case GETSTATIC:
-                return matchesFieldAccess(insn, pattern.target(), pattern.owner(), Opcodes.GETSTATIC, mappingContext);
+                return matchesFieldAccess(insn, pattern.target(), pattern.owner(), Opcodes.GETSTATIC, mappingContext, gamepack);
             case PUTSTATIC:
-                return matchesFieldAccess(insn, pattern.target(), pattern.owner(), Opcodes.PUTSTATIC, mappingContext);
+                return matchesFieldAccess(insn, pattern.target(), pattern.owner(), Opcodes.PUTSTATIC, mappingContext, gamepack);
             case NEW:
-                return matchesNew(insn, pattern.target(), pattern.owner());
+                return matchesNew(insn, pattern.target(), pattern.owner(), gamepack);
             case LDC:
                 return matchesLdc(insn, pattern.constant());
             case OPCODE:
@@ -117,7 +133,7 @@ public class InstructionMatcher {
             case ARRAY_STORE:
                 return matchesArrayStore(insn);
             case CHECKCAST:
-                return matchesCheckcast(insn, pattern.owner(), mappingContext);
+                return matchesCheckcast(insn, pattern.owner(), mappingContext, gamepack);
             default:
                 return false;
         }
@@ -127,6 +143,9 @@ public class InstructionMatcher {
      * Get the target type, supporting both enum and legacy string values.
      */
     private static AtTarget getTargetType(At pattern) {
+        if (!java.lang.reflect.Proxy.isProxyClass(pattern.getClass())) {
+            return pattern.value();
+        }
         try {
             java.lang.reflect.InvocationHandler handler = java.lang.reflect.Proxy.getInvocationHandler(pattern);
             java.lang.reflect.Method valueMethod = At.class.getMethod("value");
@@ -195,7 +214,7 @@ public class InstructionMatcher {
         }
     }
     
-    private static boolean matchesInvoke(AbstractInsnNode insn, String target, String owner, JClass mappingContext) {
+    private static boolean matchesInvoke(AbstractInsnNode insn, String target, String owner, JClass mappingContext, boolean gamepack) {
         if (!(insn instanceof MethodInsnNode)) return false;
         
         MethodInsnNode methodInsn = (MethodInsnNode) insn;
@@ -203,7 +222,7 @@ public class InstructionMatcher {
         if (target.isEmpty()) return true;
         
         if (!owner.isEmpty()) {
-            String resolvedOwner = resolveClassName(owner);
+            String resolvedOwner = resolveClassName(owner, gamepack);
             if (!methodInsn.owner.equals(resolvedOwner) && !methodInsn.owner.endsWith("/" + resolvedOwner)) {
                 return false;
             }
@@ -214,7 +233,7 @@ public class InstructionMatcher {
             String className = parts[0];
             String methodPart = parts[1];
             
-            String resolvedClassName = resolveClassName(className);
+            String resolvedClassName = resolveClassName(className, gamepack);
             
             if (!methodInsn.owner.equals(resolvedClassName) && !methodInsn.owner.endsWith("/" + resolvedClassName)) {
                 return false;
@@ -233,7 +252,7 @@ public class InstructionMatcher {
             descriptor = target.substring(parenIndex);
         }
         
-        JClass ownerContext = owner.isEmpty() ? mappingContext : MappingProvider.getClass(owner);
+        JClass ownerContext = !gamepack ? null : owner.isEmpty() ? mappingContext : MappingProvider.getClass(owner);
         String resolvedMethodName = resolveMethodName(ownerContext, methodName, descriptor);
         
         if (descriptor != null) {
@@ -243,7 +262,7 @@ public class InstructionMatcher {
         }
     }
     
-    private static boolean matchesFieldAccess(AbstractInsnNode insn, String target, String owner, int expectedOpcode, JClass mappingContext) {
+    private static boolean matchesFieldAccess(AbstractInsnNode insn, String target, String owner, int expectedOpcode, JClass mappingContext, boolean gamepack) {
         if (!(insn instanceof FieldInsnNode) || insn.getOpcode() != expectedOpcode) return false;
         
         FieldInsnNode fieldInsn = (FieldInsnNode) insn;
@@ -252,19 +271,22 @@ public class InstructionMatcher {
         
         String resolvedOwner;
         if (!owner.isEmpty()) {
-            resolvedOwner = resolveClassName(owner);
+            resolvedOwner = resolveClassName(owner, gamepack);
             if (!fieldInsn.owner.equals(resolvedOwner)) {
                 return false;
             }
         }
         
+        if (!gamepack) {
+            return fieldInsn.name.equals(target);
+        }
         JClass fieldContext = owner.isEmpty() ? mappingContext : MappingProvider.getClass(owner);
         String resolvedFieldName = resolveFieldName(fieldContext, target);
 
         return fieldInsn.name.equals(resolvedFieldName);
     }
     
-    private static boolean matchesNew(AbstractInsnNode insn, String target, String owner) {
+    private static boolean matchesNew(AbstractInsnNode insn, String target, String owner, boolean gamepack) {
         if (!(insn instanceof TypeInsnNode) || insn.getOpcode() != Opcodes.NEW) return false;
         
         TypeInsnNode typeInsn = (TypeInsnNode) insn;
@@ -273,7 +295,7 @@ public class InstructionMatcher {
         
         if (className.isEmpty()) return true;
         
-        String resolvedClassName = resolveClassName(className);
+        String resolvedClassName = resolveClassName(className, gamepack);
         return typeInsn.desc.equals(resolvedClassName);
     }
     
@@ -402,47 +424,33 @@ public class InstructionMatcher {
                opcode == Opcodes.CASTORE || opcode == Opcodes.SASTORE;
     }
     
-    private static boolean matchesCheckcast(AbstractInsnNode insn, String owner, JClass mappingContext) {
+    private static boolean matchesCheckcast(AbstractInsnNode insn, String owner, JClass mappingContext, boolean gamepack) {
         if (!(insn instanceof TypeInsnNode) || insn.getOpcode() != Opcodes.CHECKCAST) return false;
         TypeInsnNode typeInsn = (TypeInsnNode) insn;
         if (owner.isEmpty()) return true;
-        String resolvedClassName = resolveClassName(owner);
+        String resolvedClassName = resolveClassName(owner, gamepack);
         return typeInsn.desc.equals(resolvedClassName);
     }
     
-    private static AbstractInsnNode applyShift(AbstractInsnNode insn, At pattern) {
-        Shift shiftType = getShiftType(pattern);
-
-        if (shiftType == Shift.TAIL) {
-            return insn;
-        }
-        return insn.getPrevious();
-    }
-    
     /**
-     * Get the shift type, supporting both enum and legacy string values.
+     * Finds where a method's own code starts: right after the superclass or delegated constructor call in a constructor, otherwise its first instruction.
+     *
+     * @param method the method
+     * @return the instruction to insert before
      */
-    private static Shift getShiftType(At pattern) {
-        try {
-            return pattern.shift();
-        } catch (ClassCastException e) {
-            try {
-                Object shiftObj = getRawAnnotationValue(pattern, "shift");
-                if (shiftObj instanceof String) {
-                    String shiftStr = (String) shiftObj;
-                    return Shift.valueOf(shiftStr.toUpperCase());
+    public static AbstractInsnNode headOf(MethodNode method)
+    {
+        if (method.name.equals("<init>"))
+        {
+            for (AbstractInsnNode insn : method.instructions)
+            {
+                if (insn.getOpcode() == Opcodes.INVOKESPECIAL && ((MethodInsnNode) insn).name.equals("<init>"))
+                {
+                    return insn.getNext();
                 }
-            } catch (Exception ex) {
-                System.err.println("Error getting shift type: " + ex.getMessage());
             }
-            // Default fallback
-            return Shift.TAIL;
-        } catch (Exception e) {
-            System.err.println("Error getting shift type: " + e.getMessage());
-            e.printStackTrace();
         }
-
-        return Shift.TAIL;
+        return method.instructions.getFirst();
     }
     
     private static class SliceImpl implements Slice {
@@ -495,7 +503,10 @@ public class InstructionMatcher {
     /**
      * Resolve class name through mappings, fallback to literal if no mapping exists.
      */
-    private static String resolveClassName(String mappedName) {
+    private static String resolveClassName(String mappedName, boolean gamepack) {
+        if (!gamepack) {
+            return mappedName.replace(".", "/");
+        }
         JClass jClass = MappingProvider.getClass(mappedName);
         if (jClass != null && jClass.getObfuscatedName() != null) {
             return jClass.getObfuscatedName();

@@ -1,6 +1,7 @@
 package com.tonic.services.ground;
 
 import com.tonic.api.TClient;
+import com.tonic.services.streamer.MirrorHiding;
 import net.runelite.api.BufferProvider;
 import net.runelite.api.Client;
 import net.runelite.api.Projection;
@@ -39,8 +40,16 @@ final class GroundRaster
     private float centreY;
     private float scale;
     private TClient tclient;
+    private boolean hidden;
 
-    void draw(Client client, List<GroundLayer> layers)
+    /**
+     * Draws the layers' triangles into the frame.
+     *
+     * @param client the client
+     * @param layers the layers
+     * @param hiddenDraw whether a hidden draw is open on the frame, whose tiles are saved before each triangle draws on them
+     */
+    void draw(Client client, List<GroundLayer> layers, boolean hiddenDraw)
     {
         BufferProvider buffer = client.getBufferProvider();
         float[] sceneDepth = ((TClient) client).getRasterDepth();
@@ -66,6 +75,7 @@ final class GroundRaster
         centreY = client.getViewportYOffset() + client.getViewportHeight() / 2f;
         scale = client.getScale();
         tclient = (TClient) client;
+        hidden = hiddenDraw;
 
         for (GroundLayer layer : layers)
         {
@@ -247,6 +257,10 @@ final class GroundRaster
         if (minX > maxX || minY > maxY)
         {
             return;
+        }
+        if (hidden)
+        {
+            MirrorHiding.touch(minX, minY, maxX + 1, maxY + 1);
         }
 
         float da = depths[a];

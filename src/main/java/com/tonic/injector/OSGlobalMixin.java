@@ -2,7 +2,6 @@ package com.tonic.injector;
 
 import com.tonic.Static;
 import com.tonic.util.asm.BytecodeBuilder;
-import com.tonic.injector.util.LdcRewriter;
 import com.tonic.util.MappingProvider;
 import com.tonic.injector.util.expreditor.impls.*;
 import com.tonic.model.ConditionType;
@@ -23,8 +22,14 @@ public class OSGlobalMixin
     private static final SystemPropertyReplacer propertyReplacer = new SystemPropertyReplacer();
     private static final IntegerLiteralReplacer integerReplacer = new IntegerLiteralReplacer(-1094877034);
 
+    /**
+     * Patches a gamepack class.
+     *
+     * @param classNode a gamepack class
+     */
     public static void patch(ClassNode classNode)
     {
+        StreamerMenuPatch.patch(classNode);
         pathsGetReplacer.instrument(classNode);
         memoryReplacer.instrument(classNode);
         propertyReplacer.instrument(classNode);
@@ -41,16 +46,8 @@ public class OSGlobalMixin
             randomDat(classNode, method);
             mouseFlag(method);
             isHidden(classNode, method);
-
-            if(!Static.getCliArgs().isIncognito())
-            {
-                LdcRewriter.rewriteString(
-                        method,
-                        "Welcome to RuneScape",
-                        "<col=FFFFFF>Welcome to </col><col=00FFFF>VitaLite</col>"
-                );
-            }
         }
+        StreamerNamePatch.patch(classNode);
     }
 
     /**

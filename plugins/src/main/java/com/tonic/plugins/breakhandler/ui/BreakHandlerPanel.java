@@ -11,9 +11,10 @@ import java.util.List;
 
 public class BreakHandlerPanel extends PluginPanel
 {
-    private BreakHandler breakHandler = RuneLite.getInjector().getInstance(BreakHandler.class);
+    private final BreakHandler breakHandler = RuneLite.getInjector().getInstance(BreakHandler.class);
     private final JPanel breaksContainer;
     private final JLabel noBreaksLabel;
+    private List<Break> shown;
 
     public BreakHandlerPanel()
     {
@@ -48,9 +49,14 @@ public class BreakHandlerPanel extends PluginPanel
 
     public void refreshBreakList()
     {
+        List<Break> breaks = getActiveBreaks();
+        if (breaks.equals(shown))
+        {
+            return;
+        }
+        shown = breaks;
         breaksContainer.removeAll();
 
-        List<Break> breaks = getActiveBreaks();
         if (breaks.isEmpty())
         {
             breaksContainer.add(noBreaksLabel);
