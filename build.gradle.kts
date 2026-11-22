@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("1")
+val vitaVersion by extra("2")
 val runeliteVersion by extra("1.13.7")
 
 group = "com.tonic"
@@ -358,13 +358,13 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-optimizations"
+    val title = "${tag}-feature"
     val body = "# ${tag}\n" +
-            "- Implemented cpu render scaling for optional perf\n" +
-            "- Reuse the still CPU scene and redraw only what moves while the camera is still\n" +
-            "- GPU zone buffers sized by the faces actually uploaded\n" +
-            "- Pathfinder collision and object maps memory-mapped from shared files\n" +
-            "- Plugin jars load only their plugin classes up front, @LoadAllClasses annotation on main plugin class opts out\n"
+            "- Implemented Streamer/mirror mode (See [Streamer Mode](https://github.com/Tonic-Box/VitaLite/blob/main/docs/STREAMER-MODE.md))\n" +
+            "- Injector fails the build when any hook misses\n" +
+            "- FPS profiling in the profiler and its API\n" +
+            "- The CPU renderer no longer waits on the AWT event queue each frame\n" +
+            "- Break Handler panel rebuilds on the Swing thread\n"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
