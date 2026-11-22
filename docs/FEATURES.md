@@ -9,9 +9,7 @@ What VitaLite adds on top of RuneLite. Most of it is in VitaLite's settings pane
 - **Built-in plugins:**
   - **Enhanced Profiles:** save Jagex and legacy accounts and switch between them.
   - **Break Handler:** schedule breaks for plugins that support it.
-  - **Bank Valuer:** shows what your bank's value is made up of.
   - **Authenticator Gen:** set up two-factor authentication on an account without a phone.
-  - **Multi-Client Util:** tools for running several clients together.
   - **Code Eval:** run Java code against the live client.
 
 ## Playing

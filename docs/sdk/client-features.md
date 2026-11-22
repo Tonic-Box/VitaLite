@@ -10,10 +10,8 @@ What VitaLite adds to the client itself, in brief. Most of these are useful to k
 - **Vita Hub.** A tab in the configuration panel for installing, updating and removing plugins from plugin repositories. The official repository is built in; to publish your own, see [VitaLitePlugins](https://github.com/Tonic-Box/VitaLitePlugins).
 - **Built-in plugins:**
   - Authenticator Gen: set up two-factor authentication on an account without a phone.
-  - Bank Valuer: shows what your bank's value is made up of.
   - Break Handler: settings and schedule for plugin breaks (see [Services](services.md#break-handler)).
   - Code Eval: run Java code against the live client.
-  - Multi-Client Util: tools for running several clients together.
   - Enhanced Profiles: save Jagex and legacy accounts and switch between them.
 
 ## Settings panel
