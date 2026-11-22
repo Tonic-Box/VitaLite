@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("2")
+val vitaVersion by extra("3")
 val runeliteVersion by extra("1.13.7")
 
 group = "com.tonic"
@@ -360,11 +360,7 @@ tasks.register<Exec>("publishRelease") {
     val tag = "${runeliteVersion}_${vitaVersion}"
     val title = "${tag}-feature"
     val body = "# ${tag}\n" +
-            "- Implemented Streamer/mirror mode (See [Streamer Mode](https://github.com/Tonic-Box/VitaLite/blob/main/docs/STREAMER-MODE.md))\n" +
-            "- Injector fails the build when any hook misses\n" +
-            "- FPS profiling in the profiler and its API\n" +
-            "- The CPU renderer no longer waits on the AWT event queue each frame\n" +
-            "- Break Handler panel rebuilds on the Swing thread\n"
+            "- Moving bank valuer and multi-client utils out of base client to the hub\n"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
