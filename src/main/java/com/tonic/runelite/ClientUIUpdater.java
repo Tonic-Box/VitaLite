@@ -1,8 +1,8 @@
 package com.tonic.runelite;
 
 import com.tonic.Logger;
-import com.tonic.Static;
 import com.tonic.services.proxy.ProxyManager;
+import com.tonic.services.streamer.Streamer;
 import com.tonic.vitalite.Main;
 import com.tonic.model.NavButton;
 import com.tonic.model.ui.VitaLiteInfoPanel;
@@ -21,10 +21,8 @@ public class ClientUIUpdater
 
     public static void inject()
     {
-        if(Static.getCliArgs().isIncognito())
-            return;
-
         addNavigation();
+        Streamer.uiReady();
 
         Object clientUI = ReflectBuilder.runelite()
                 .staticField("rlInstance")

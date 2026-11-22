@@ -2,6 +2,7 @@ package com.tonic.services.hotswapper;
 
 import com.tonic.Logger;
 import com.tonic.Static;
+import com.tonic.services.streamer.MirrorLook;
 import com.tonic.util.ReflectBuilder;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginManager;
@@ -272,6 +273,8 @@ public class PluginReloader {
             });
 
             leftPanel.add(cycleButton, BorderLayout.CENTER);
+            cycleButton.putClientProperty(MirrorLook.HIDDEN, Boolean.TRUE);
+            leftPanel.putClientProperty(MirrorLook.SIZE_OF, pinButton);
             pluginListItem.add(leftPanel, BorderLayout.LINE_START);
             pluginListItem.revalidate();
             pluginListItem.repaint();

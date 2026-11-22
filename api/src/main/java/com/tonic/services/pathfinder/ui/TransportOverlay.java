@@ -73,7 +73,8 @@ public class TransportOverlay extends Overlay implements GroundOverlay
                         client.getMenu().createMenuEntry(1)
                                 .setOption("Hardcoded Transport [-> " + WorldPointUtil.fromCompressed(t.getDestination()) + "]")
                                 .setTarget(color + "Transport ")
-                                .setType(MenuAction.RUNELITE);
+                                .setType(MenuAction.RUNELITE)
+                                .onClick(clicked -> {});
                     }
                 }
             }

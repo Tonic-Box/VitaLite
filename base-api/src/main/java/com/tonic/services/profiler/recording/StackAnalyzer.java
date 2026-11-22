@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Builds every view of a recording from its stack samples: per-method counts, the flame graph, the top-down call
@@ -23,11 +24,13 @@ public final class StackAnalyzer {
     private final CallTreeNode callTree = CallTreeNode.createRoot();
     private final CallTreeNode callersTree = CallTreeNode.createRoot();
     private final Map<String, long[]> allocationsByClass = new HashMap<>();
+    private static final int LOCK_FRAMES = 6;
     private final Map<String, long[]> allocationsBySite = new HashMap<>();
     private int samples;
     private int nativeSamples;
     private int truncatedSamples;
     private long allocatedBytes;
+    private final Map<String, long[]> lockWaits = new HashMap<>();
 
     /**
      * One Java frame of a stack
@@ -178,16 +181,33 @@ public final class StackAnalyzer {
     }
 
     /**
+     * Adds one wait of a thread to park or enter a monitor, keyed by the thread, what it waited on and where it waited
+     * @param thread the thread's name
+     * @param lock the class of the object waited on
+     * @param nanos how long it waited
+     * @param frames the waiting stack, innermost first
+     */
+    public void addLockWait(String thread, String lock, long nanos, List<Frame> frames) {
+        String where = frames.stream().limit(LOCK_FRAMES).map(Frame::key).collect(Collectors.joining(" < "));
+        long[] total = lockWaits.computeIfAbsent(MethodTimingResults.LockWaits.key(thread, lock, where), ignored -> new long[3]);
+        total[0] += nanos;
+        total[1]++;
+        total[2] = Math.max(total[2], nanos);
+    }
+
+    /**
      * Builds the results
      * @param samplePeriodMs the sampling period the recording used
      * @param startTime when recording started, in epoch milliseconds
      * @param endTime when recording stopped, in epoch milliseconds
      * @param allocationsRecorded whether allocation events were recorded
+     * @param locksRecorded whether lock waits were recorded
      * @return the results
      */
-    public MethodTimingResults results(int samplePeriodMs, long startTime, long endTime, boolean allocationsRecorded) {
+    public MethodTimingResults results(int samplePeriodMs, long startTime, long endTime, boolean allocationsRecorded, boolean locksRecorded) {
         MethodTimingResults.Allocations allocations = allocationsRecorded ? new MethodTimingResults.Allocations(allocatedBytes, allocationsByClass, allocationsBySite) : null;
-        return new MethodTimingResults(stats, samples, truncatedSamples, samplePeriodMs, startTime, endTime, flameRoot, callTree, callersTree, methodNodes, nativeStats, nativeSamples, allocations);
+        MethodTimingResults.LockWaits locks = locksRecorded ? new MethodTimingResults.LockWaits(lockWaits) : null;
+        return new MethodTimingResults(stats, samples, truncatedSamples, samplePeriodMs, startTime, endTime, flameRoot, callTree, callersTree, methodNodes, nativeStats, nativeSamples, allocations, locks);
     }
 
     private static void add(Map<String, long[]> totals, String key, long bytes) {

@@ -9,7 +9,7 @@ import java.time.Instant;
 
 public class BreakPanel extends JPanel
 {
-    private Break scheduledBreak;
+    private final Break scheduledBreak;
     private final JLabel pluginLabel;
     private final JLabel countdownLabel;
     private final Timer updateTimer;
@@ -35,14 +35,14 @@ public class BreakPanel extends JPanel
         add(pluginLabel, BorderLayout.WEST);
         add(countdownLabel, BorderLayout.EAST);
 
-        updateTimer = new Timer(1000, e ->
-        {
-            SwingUtilities.invokeLater(() ->
-            {
-                updateCountdown();
-            });
-        });
+        updateTimer = new Timer(1000, e -> SwingUtilities.invokeLater(this::updateCountdown));
         updateTimer.setInitialDelay(0);
+    }
+
+    @Override
+    public void addNotify()
+    {
+        super.addNotify();
         updateTimer.start();
     }
 

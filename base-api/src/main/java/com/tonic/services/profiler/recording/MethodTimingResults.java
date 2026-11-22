@@ -26,6 +26,7 @@ public class MethodTimingResults {
     public final Map<String, MethodStats> nativeStats;
     public final int nativeSamples;
     public final Allocations allocations;
+    public final LockWaits lockWaits;
 
     /**
      * Allocation totals, by the allocated class and by the method that allocated
@@ -58,6 +59,43 @@ public class MethodTimingResults {
     }
 
     /**
+     * Waits of threads to park or enter a monitor, each as total nanoseconds, count and longest nanoseconds, per thread, waited-on class and waiting stack
+     */
+    public static final class LockWaits {
+        private static final String SEPARATOR = "\u0000";
+
+        public final Map<String, long[]> waits;
+
+        /**
+         * Creates the totals
+         * @param waits total nanoseconds, count and longest nanoseconds per key from key(...)
+         */
+        public LockWaits(Map<String, long[]> waits) {
+            this.waits = waits;
+        }
+
+        /**
+         * Builds the key of one kind of wait
+         * @param thread the thread's name
+         * @param lock the class of the object waited on
+         * @param where the innermost frames of the waiting stack
+         * @return the key
+         */
+        public static String key(String thread, String lock, String where) {
+            return thread + SEPARATOR + lock + SEPARATOR + where;
+        }
+
+        /**
+         * Splits a key back into its parts
+         * @param key a key from key(...)
+         * @return the thread, the waited-on class and the stack
+         */
+        public static String[] parts(String key) {
+            return key.split(SEPARATOR, 3);
+        }
+    }
+
+    /**
      * Creates the results
      * @param methodStats Java execution samples per method
      * @param totalSamples Java execution samples taken
@@ -72,8 +110,9 @@ public class MethodTimingResults {
      * @param nativeStats samples of threads blocked in native code, per method
      * @param nativeSamples native samples taken
      * @param allocations allocation totals, or null when allocations were not recorded
+     * @param lockWaits lock wait totals, or null when lock waits were not recorded
      */
-    public MethodTimingResults(Map<String, MethodStats> methodStats, int totalSamples, int truncatedSamples, int samplePeriodMs, long recordingStartTime, long recordingEndTime, FlameGraphNode flameGraphRoot, CallTreeNode callTreeRoot, CallTreeNode callersRoot, Map<String, CallTreeNode> methodNodes, Map<String, MethodStats> nativeStats, int nativeSamples, Allocations allocations) {
+    public MethodTimingResults(Map<String, MethodStats> methodStats, int totalSamples, int truncatedSamples, int samplePeriodMs, long recordingStartTime, long recordingEndTime, FlameGraphNode flameGraphRoot, CallTreeNode callTreeRoot, CallTreeNode callersRoot, Map<String, CallTreeNode> methodNodes, Map<String, MethodStats> nativeStats, int nativeSamples, Allocations allocations, LockWaits lockWaits) {
         this.methodStats = methodStats;
         this.totalSamples = totalSamples;
         this.truncatedSamples = truncatedSamples;
@@ -88,6 +127,7 @@ public class MethodTimingResults {
         this.nativeStats = nativeStats;
         this.nativeSamples = nativeSamples;
         this.allocations = allocations;
+        this.lockWaits = lockWaits;
     }
 
     /**

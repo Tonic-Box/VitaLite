@@ -1,5 +1,6 @@
 package com.tonic.ui.sdn;
 
+import com.tonic.services.streamer.MirrorLook;
 import com.tonic.ui.VitaTheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.util.ImageUtil;
@@ -66,6 +67,7 @@ public final class HubTheme {
     public static void styleSwitch(JCheckBox checkbox) {
         checkbox.setIcon(switchOff());
         checkbox.setSelectedIcon(switchOn());
+        checkbox.putClientProperty(MirrorLook.STOCK_ICONS, Boolean.TRUE);
     }
 
     private static BufferedImage infoGlyph(int scale) {

@@ -1,5 +1,6 @@
 package com.tonic.vitalite;
 
+import com.tonic.injector.util.InjectionFailures;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.logging.LogFileManager;
@@ -81,6 +82,7 @@ public class Main {
             PatchGenerator.enableCapture();
             Injector.patch();
             RLInjector.patch();
+            InjectionFailures.throwIfAny();
             try {
                 String resourcesPath = "src/main/resources";
                 PatchGenerator.writePatchesZip(resourcesPath);

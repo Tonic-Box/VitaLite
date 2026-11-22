@@ -1,6 +1,6 @@
 # VitaLite
 VitaLite is a launcher for RuneLite that offers additional features and customization options.
-- Provides access to aditional GamePack functionalities
+- Provides access to additional GamePack functionalities
 - Robust built-in API SDK for plugin development
 - Builtin plugins including profiles which allows you to use your Jagex Accounts directly from the client and swap between
 - Dual-layered mixin system for modifying both RuneLites classes and the GamePack
@@ -17,6 +17,8 @@ VitaLite is a launcher for RuneLite that offers additional features and customiz
 [VitaLite Launcher](https://github.com/Tonic-Box/VitaLauncher/releases)
 
 [Client QoL User Features](./docs/FEATURES.md)
+
+[Streamer Mode](./docs/STREAMER-MODE.md)
 
 ## Developers
 [SDK Docs](./docs/SDK-DOCS.md)
@@ -54,7 +56,6 @@ VitaLite is a launcher for RuneLite that offers additional features and customiz
 | `-noPlugins`   | Boolean | Disables loading of core plugins                                                                  |
 | `-min`         | Boolean | Runs jvm with minimal alotted memory. Also turns on `-noPlugins` and `-noMusic`.                  |
 | `-noMusic`     | Boolean | Prevent the loading of music tracks                                                               |
-| `-incognito`   | Boolean | Visually display as 'RuneLite' instead of 'VitaLite'                                              |
 | `-help`        | Boolean | Displays help information about command line options                                              |
 | `--legacyLogin` | String | details for logging int (user:pass)                                                               |
 | `--jagexLogin` | String | details for logging int (sessionID:characterID:displayName)  or path to runelite credentials file |

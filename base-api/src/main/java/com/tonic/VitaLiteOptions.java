@@ -3,6 +3,7 @@ package com.tonic;
 import com.tonic.util.AudioDeviceChecker;
 import com.tonic.util.optionsparser.OptionsParser;
 import com.tonic.util.optionsparser.annotations.CLIArgument;
+import lombok.AccessLevel;
 import lombok.Getter;
 
 @Getter
@@ -20,10 +21,14 @@ public class VitaLiteOptions extends OptionsParser
     )
     private boolean noPlugins = false;
 
+    /**
+     * Accepted and ignored: older launchers still pass it, and RuneLite stops on flags it does not know.
+     */
     @CLIArgument(
             name = "incognito",
-            description = "[Optional] Visually display as 'RuneLite' instead of 'VitaLite'"
+            description = ""
     )
+    @Getter(AccessLevel.NONE)
     private boolean incognito = false;
 
     @CLIArgument(

@@ -128,6 +128,11 @@ public interface TClient
      */
     String getCharacterId();
 
+    /**
+     * @return the Jagex character name the login screen shows, which switching Jagex accounts changes, or null or empty for none
+     */
+    String getLoginDisplayName();
+
     void setLoginIndex(int index);
 
     /**
@@ -159,4 +164,12 @@ public interface TClient
      * @return the depth value
      */
     float depthOf(float viewZ);
+
+    /**
+     * Gets an interface's live component array, the one the client draws and its scripts change, so a slot written here is what both see.
+     *
+     * @param group the interface id
+     * @return the components, which are the client's widgets, indexed by child id, or null while the interface is not loaded
+     */
+    Object[] getComponentGroup(int group);
 }

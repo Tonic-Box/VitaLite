@@ -6,8 +6,10 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import com.tonic.services.profiler.MetricSnapshot;
 import com.tonic.services.profiler.ResourceMetricsCollector;
+import com.tonic.services.profiler.frames.FrameProfiler;
 import com.tonic.services.profiler.heap.HeapSnapshot;
 import com.tonic.services.profiler.recording.CallTreeNode;
+import com.tonic.services.profiler.recording.FullRecording;
 import com.tonic.services.profiler.recording.JFRMethodRecorder;
 import com.tonic.services.profiler.recording.MethodProfiler;
 import com.tonic.services.profiler.recording.MethodStats;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A local HTTP API over the profiler for scripts and LLM agents: status, JFR recordings and their hotspots, native
@@ -41,6 +44,7 @@ public class ProfilerServer {
 
     private final ResourceMetricsCollector metricsCollector = new ResourceMetricsCollector();
     private final JFRMethodRecorder jfrRecorder = new JFRMethodRecorder();
+    private final AtomicBoolean fullRecording = new AtomicBoolean();
     private HttpServer server;
     private ExecutorService executor;
     @Getter
@@ -99,14 +103,22 @@ public class ProfilerServer {
         route("/profiler/jfr", this::handleJfr);
         route("/profiler/jfr/start", this::handleJfrStart);
         route("/profiler/jfr/stop", this::handleJfrStop);
+        route("/profiler/jfr/full", this::handleJfrFull);
         route("/profiler/hotspots", this::handleHotspots);
         route("/profiler/method", this::handleMethod);
         route("/profiler/native", this::handleNative);
         route("/profiler/allocations", this::handleAllocations);
+        route("/profiler/locks", this::handleLocks);
         route("/profiler/histogram", this::handleHistogram);
         route("/profiler/resources", this::handleResources);
         route("/profiler/threads", this::handleThreads);
         route("/profiler/gc", this::handleGc);
+        route("/profiler/frames", this::handleFrames);
+        route("/profiler/frames/reset", this::handleFramesReset);
+        route("/profiler/frames/sections/enable", exchange -> setFrameSections(exchange, true));
+        route("/profiler/frames/sections/disable", exchange -> setFrameSections(exchange, false));
+        route("/profiler/frames/slow", this::handleFramesSlow);
+        route("/profiler/frames/stacks", this::handleFramesStacks);
         server.start();
         running = true;
         System.out.println("[ProfilerServer] Started on http://127.0.0.1:" + port);
@@ -133,13 +145,15 @@ public class ProfilerServer {
         }
         Map<String, Object> endpoints = new LinkedHashMap<>();
         endpoints.put("GET /profiler/status", "Server, exact timing and recording status");
-        endpoints.put("POST /profiler/jfr/start", "Start a JFR recording. Optional: ?period=N (ms, default 10), ?allocations=true to record allocations too, ?package=com.example or ?class=com.example.Foo to show only those methods; allocations are then credited to the first matching frame");
+        endpoints.put("POST /profiler/jfr/start", "Start a JFR recording. Optional: ?period=N (ms, default 10), ?allocations=true to record allocations too, ?locks=true to record waits of 1 ms or more to park or enter a monitor, ?package=com.example or ?class=com.example.Foo to show only those methods; allocations are then credited to the first matching frame");
         endpoints.put("POST /profiler/jfr/stop", "Stop the recording and analyze it");
+        endpoints.put("POST /profiler/jfr/full", "Record a full Flight Recorder file for offline analysis, blocking until done: the JDK profile settings, every safepoint, VM operation, GC phase and compilation, waits of 1 ms or more, 5 ms samples and a vita.Frame event per client frame. Optional: ?seconds=N (default 20). Returns the file's path");
         endpoints.put("GET /profiler/jfr", "Every method of the last recording, Java execution samples only");
         endpoints.put("GET /profiler/hotspots", "Methods that ran the most. Optional: ?top=N (default 10)");
         endpoints.put("GET /profiler/method", "A method's samples, callers and callees. Required: ?name=fully.qualified.Class.method");
         endpoints.put("GET /profiler/native", "Methods threads were blocked in (I/O, locks, window system, GPU); not CPU use. Optional: ?top=N");
         endpoints.put("GET /profiler/allocations", "Allocation bytes by class and by allocating method, when the recording had allocations=true. Optional: ?top=N");
+        endpoints.put("GET /profiler/locks", "Lock waits by thread, waited-on class and stack, when the recording had locks=true. Optional: ?top=N, ?thread=part of the thread name");
         endpoints.put("GET /profiler/exact", "Exact timings from MethodProfiler.begin/end instrumentation");
         endpoints.put("GET /profiler/exact/csv", "Exact timings as CSV");
         endpoints.put("POST /profiler/exact/enable", "Start collecting exact timings");
@@ -149,6 +163,12 @@ public class ProfilerServer {
         endpoints.put("GET /profiler/resources", "CPU, GC, heap, metaspace, code cache and thread counts now");
         endpoints.put("GET /profiler/threads", "Every thread with state and blocked/waited counts. Optional: ?stacks=true&depth=N");
         endpoints.put("POST /profiler/gc", "Run a full GC and report what it freed");
+        endpoints.put("GET /profiler/frames", "Client frame rate since the last reset: fps, last second's fps, frame time avg/p50/p90/p95/p99/max and 1% low, client thread bytes allocated per frame, GC, timed and counted sections per frame, and the client's renderer context");
+        endpoints.put("POST /profiler/frames/reset", "Start measuring frames again from now");
+        endpoints.put("POST /profiler/frames/stacks", "Sample the client thread's stack every ?ms=N (0 stops) and report in GET /profiler/frames which stacks fill slow frames against the others. Needs a slow frame threshold; each sample briefly stops the client thread");
+        endpoints.put("POST /profiler/frames/slow", "Keep the last 30 frames slower than ?ms=N, each with its sections and GC, in GET /profiler/frames; ms=0 stops. Needs frame sections on");
+        endpoints.put("POST /profiler/frames/sections/enable", "Start collecting frame sections (also on at launch with -Dvita.frameprofile=true)");
+        endpoints.put("POST /profiler/frames/sections/disable", "Stop collecting frame sections; frame rate is always collected");
         Map<String, Object> help = new LinkedHashMap<>();
         help.put("name", "VitaLite Profiler API");
         help.put("version", "2");
@@ -166,7 +186,7 @@ public class ProfilerServer {
         send(exchange, 200, map(
                 "server", map("running", true, "port", port),
                 "exact", map("enabled", MethodProfiler.isEnabled(), "methodCount", MethodProfiler.getMethodCount()),
-                "jfr", map("available", JFRMethodRecorder.isAvailable(), "recording", jfrRecorder.isRecording(), "hasResults", results != null, "hasAllocations", results != null && results.allocations != null)));
+                "jfr", map("available", JFRMethodRecorder.isAvailable(), "recording", jfrRecorder.isRecording(), "hasResults", results != null, "hasAllocations", results != null && results.allocations != null, "hasLockWaits", results != null && results.lockWaits != null)));
     }
 
     private void handleExact(HttpExchange exchange) throws IOException {
@@ -222,6 +242,7 @@ public class ProfilerServer {
         Map<String, String> query = query(exchange);
         int period = intParam(query, "period", 10);
         boolean allocations = "true".equalsIgnoreCase(query.get("allocations"));
+        boolean locks = "true".equalsIgnoreCase(query.get("locks"));
         String packageFilter = query.getOrDefault("package", "").trim();
         String classFilter = query.getOrDefault("class", "").trim();
         JFRMethodRecorder.FilterMode filter = !classFilter.isEmpty() ? JFRMethodRecorder.FilterMode.CLASS : !packageFilter.isEmpty() ? JFRMethodRecorder.FilterMode.PACKAGE : JFRMethodRecorder.FilterMode.ALL;
@@ -233,6 +254,7 @@ public class ProfilerServer {
             try {
                 jfrRecorder.setSamplePeriodMs(period);
                 jfrRecorder.setRecordAllocations(allocations);
+                jfrRecorder.setRecordLocks(locks);
                 jfrRecorder.setFilterMode(filter);
                 jfrRecorder.setPackageFilter(packageFilter);
                 jfrRecorder.setClassFilter(classFilter);
@@ -242,7 +264,7 @@ public class ProfilerServer {
                 return;
             }
         }
-        send(exchange, 200, map("success", true, "recording", true, "periodMs", jfrRecorder.getSamplePeriodMs(), "allocations", allocations, "filter", filter == JFRMethodRecorder.FilterMode.CLASS ? "class " + classFilter : filter == JFRMethodRecorder.FilterMode.PACKAGE ? "package " + packageFilter : "all"));
+        send(exchange, 200, map("success", true, "recording", true, "periodMs", jfrRecorder.getSamplePeriodMs(), "allocations", allocations, "locks", locks, "filter", filter == JFRMethodRecorder.FilterMode.CLASS ? "class " + classFilter : filter == JFRMethodRecorder.FilterMode.PACKAGE ? "package " + packageFilter : "all"));
     }
 
     private void handleJfrStop(HttpExchange exchange) throws IOException {
@@ -264,7 +286,7 @@ public class ProfilerServer {
             }
         }
         lastJFRResults = results;
-        send(exchange, 200, map("success", true, "recording", false, "totalSamples", results.totalSamples, "nativeSamples", results.nativeSamples, "methodCount", results.getMethodCount(), "durationMs", results.recordingDurationMs, "allocations", results.allocations != null));
+        send(exchange, 200, map("success", true, "recording", false, "totalSamples", results.totalSamples, "nativeSamples", results.nativeSamples, "methodCount", results.getMethodCount(), "durationMs", results.recordingDurationMs, "allocations", results.allocations != null, "locks", results.lockWaits != null));
     }
 
     private void handleHotspots(HttpExchange exchange) throws IOException {
@@ -324,7 +346,7 @@ public class ProfilerServer {
         }
         MethodTimingResults.Allocations allocations = lastJFRResults.allocations;
         if (allocations == null) {
-            send(exchange, 200, map("hasResults", false, "message", "The last recording had no allocations. Start one with POST /profiler/jfr/start?allocations=true."));
+            missing(exchange, "allocations", "allocations");
             return;
         }
         int top = intParam(query(exchange), "top", 20);
@@ -384,6 +406,95 @@ public class ProfilerServer {
         send(exchange, 200, map("timestamp", System.currentTimeMillis(), "threadCount", threads.size(), "threads", threads));
     }
 
+    private void handleFrames(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "GET")) {
+            return;
+        }
+        send(exchange, 200, FrameProfiler.snapshot());
+    }
+
+    private void handleJfrFull(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "POST")) {
+            return;
+        }
+        if (!fullRecording.compareAndSet(false, true)) {
+            send(exchange, 409, map("success", false, "error", "A full recording is already running."));
+            return;
+        }
+        int seconds = intParam(query(exchange), "seconds", 20);
+        try {
+            send(exchange, 200, map("success", true, "file", FullRecording.record(seconds).toString()));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            send(exchange, 500, map("success", false, "error", "Interrupted while recording"));
+        } catch (Exception e) {
+            send(exchange, 500, map("success", false, "error", String.valueOf(e.getMessage())));
+        } finally {
+            fullRecording.set(false);
+        }
+    }
+
+    private void handleFramesSlow(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "POST")) {
+            return;
+        }
+        int milliseconds = Math.max(0, intParam(query(exchange), "ms", 0));
+        FrameProfiler.setSlowFrameMs(milliseconds);
+        send(exchange, 200, map("slowFrameMs", milliseconds));
+    }
+
+    private void handleFramesStacks(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "POST")) {
+            return;
+        }
+        int milliseconds = Math.max(0, intParam(query(exchange), "ms", 0));
+        send(exchange, 200, map("sampling", FrameProfiler.setStackSampling(milliseconds), "periodMs", milliseconds));
+    }
+
+    private void handleLocks(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "GET") || !hasResults(exchange)) {
+            return;
+        }
+        MethodTimingResults.LockWaits locks = lastJFRResults.lockWaits;
+        if (locks == null) {
+            missing(exchange, "lock waits", "locks");
+            return;
+        }
+        Map<String, String> query = query(exchange);
+        int top = Math.max(0, intParam(query, "top", 20));
+        String thread = query.getOrDefault("thread", "");
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (Map.Entry<String, long[]> entry : MethodTimingResults.Allocations.sorted(locks.waits)) {
+            if (rows.size() == top) {
+                break;
+            }
+            String[] parts = MethodTimingResults.LockWaits.parts(entry.getKey());
+            if (!parts[0].contains(thread)) {
+                continue;
+            }
+            long[] total = entry.getValue();
+            rows.add(map("thread", parts[0], "lock", parts[1], "where", parts[2], "totalMs", round(total[0] / 1e6, 2), "count", total[1], "maxMs", round(total[2] / 1e6, 2)));
+        }
+        send(exchange, 200, map("hasResults", true, "note", "Waits of 1 ms or more to park or enter a monitor; idle pool threads park too, so filter with ?thread=", "waits", rows));
+    }
+
+    private void handleFramesReset(HttpExchange exchange) throws IOException {
+        if (!allow(exchange, "POST")) {
+            return;
+        }
+        FrameProfiler.reset();
+        send(exchange, 200, map("reset", true));
+    }
+
+    private void setFrameSections(HttpExchange exchange, boolean enabled) throws IOException {
+        if (!allow(exchange, "POST")) {
+            return;
+        }
+        FrameProfiler.setSectionsEnabled(enabled);
+        FrameProfiler.reset();
+        send(exchange, 200, map("sectionsEnabled", enabled));
+    }
+
     private void handleGc(HttpExchange exchange) throws IOException {
         if (!allow(exchange, "POST")) {
             return;
@@ -422,6 +533,10 @@ public class ProfilerServer {
         }
         send(exchange, 200, map("hasResults", false, "message", "No recording results yet. POST /profiler/jfr/start, then POST /profiler/jfr/stop."));
         return false;
+    }
+
+    private static void missing(HttpExchange exchange, String what, String flag) throws IOException {
+        send(exchange, 200, map("hasResults", false, "message", "The last recording had no " + what + ". Start one with POST /profiler/jfr/start?" + flag + "=true."));
     }
 
     private void route(String path, Handler handler) {

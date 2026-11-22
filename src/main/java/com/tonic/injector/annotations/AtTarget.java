@@ -6,6 +6,12 @@ package com.tonic.injector.annotations;
  */
 public enum AtTarget {
     /**
+     * The start of the method's own code, after the superclass constructor call in a constructor. Calls are inserted before it.
+     * Usage: @At(value = AtTarget.HEAD)
+     */
+    HEAD,
+    
+    /**
      * Method invocation (INVOKEVIRTUAL, INVOKESTATIC, INVOKEINTERFACE, INVOKESPECIAL)
      * Usage: @At(value = AtTarget.INVOKE, target = "methodName", owner = "ClassName")
      */

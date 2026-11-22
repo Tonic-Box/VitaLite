@@ -94,7 +94,7 @@ public class AnnotationUtil {
                 }
             }
         }
-        return (T) null;
+        return null;
     }
 
     /**
@@ -115,7 +115,7 @@ public class AnnotationUtil {
                 }
             }
         }
-        return (T) null;
+        return null;
     }
 
     /**
@@ -136,7 +136,7 @@ public class AnnotationUtil {
                 }
             }
         }
-        return (T) null;
+        return null;
     }
 
     /**
@@ -213,5 +213,25 @@ public class AnnotationUtil {
                     return method.getDefaultValue();
                 }
         );
+    }
+
+    /**
+     * Reads a method's annotation as an instance of its interface.
+     *
+     * @param method the annotated method
+     * @param annotationType the annotation's type
+     * @return the annotation
+     * @throws IllegalStateException if the method does not carry it
+     */
+    public static <T> T annotation(MethodNode method, Class<T> annotationType) {
+        String desc = Type.getDescriptor(annotationType);
+        if (method.visibleAnnotations != null) {
+            for (AnnotationNode annotation : method.visibleAnnotations) {
+                if (annotation.desc.equals(desc)) {
+                    return createAnnotationProxy(annotationType, annotation);
+                }
+            }
+        }
+        throw new IllegalStateException(method.name + " has no " + annotationType.getSimpleName() + " annotation");
     }
 }

@@ -3,6 +3,7 @@ package com.tonic.util;
 import com.tonic.services.ClickStrategy;
 import com.tonic.services.RenderScale;
 import com.tonic.services.pathfinder.PathfinderAlgo;
+import com.tonic.services.streamer.MirrorFrameRate;
 import com.tonic.util.config.ConfigGroup;
 import com.tonic.util.config.ConfigKey;
 import com.tonic.util.config.VitaConfig;
@@ -161,4 +162,14 @@ public interface ClientConfig extends VitaConfig {
     boolean shouldShowHLoggerPanel();
     @ConfigKey(value = "showLogger")
     void setShowLoggerPanel(boolean show);
+
+    @ConfigKey(value = "streamerName")
+    String getStreamerName();
+    @ConfigKey(value = "streamerName")
+    void setStreamerName(String name);
+
+    @ConfigKey(value = "streamerFrameRate", defaultValue = "SIXTY")
+    MirrorFrameRate getStreamerFrameRate();
+    @ConfigKey(value = "streamerFrameRate")
+    void setStreamerFrameRate(MirrorFrameRate rate);
 }

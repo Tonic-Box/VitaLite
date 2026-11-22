@@ -31,10 +31,9 @@ public class DisableTransformer
         ClassNode gamepack = TransformerUtil.getMethodClass(mixin, name);
         InjectTransformer.patch(gamepack, mixin, method);
 
-        MethodNode toHook = TransformerUtil.getTargetMethod(mixin, name);
+        MethodNode toHook = TransformerUtil.requireTargetMethod("@Disable " + mixin.name + "." + method.name, mixin, name, null);
 
         if (toHook == null) {
-            System.err.println("Could not find method to hook: " + name);
             return;
         }
 

@@ -3,6 +3,9 @@ package com.tonic.services.ground;
 import com.tonic.Logger;
 import com.tonic.Static;
 import com.tonic.services.WorldOverlays;
+import com.tonic.services.profiler.frames.FrameProfiler;
+import com.tonic.services.streamer.MirrorHiding;
+import com.tonic.services.streamer.Streamer;
 import net.runelite.api.BufferProvider;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
@@ -38,7 +41,12 @@ public final class GroundHooks
     private static boolean hadGround;
     private static BufferedImage deferredImage;
     private static Graphics2D deferredGraphics;
+    private static BufferedImage mirrorDeferredImage;
+    private static final PaintedTiles painted = new PaintedTiles();
+    private static final PaintedTiles mirrorPainted = new PaintedTiles();
     private static Graphics2D sceneGraphics;
+    private static final int FINISH = FrameProfiler.timer("ground.finish");
+    private static final int FINISH_MIRRORED = FrameProfiler.timer("ground.finishMirrored");
 
     private GroundHooks()
     {
@@ -71,6 +79,10 @@ public final class GroundHooks
                 Graphics2D deferred = deferTo(graphics);
                 if (deferred != null)
                 {
+                    if (Streamer.mirroring)
+                    {
+                        MirrorHiding.deferTo(deferredImage);
+                    }
                     return new GroundCapture(deferred);
                 }
             }
@@ -108,6 +120,13 @@ public final class GroundHooks
      */
     public static void finish(Graphics2D graphics, OverlayLayer layer)
     {
+        long began = FrameProfiler.begin();
+        finishLayer(graphics, layer);
+        FrameProfiler.end(FINISH, began);
+    }
+
+    private static void finishLayer(Graphics2D graphics, OverlayLayer layer)
+    {
         CapturedShapes.end();
         if (layer != OverlayLayer.ABOVE_SCENE)
         {
@@ -118,20 +137,108 @@ public final class GroundHooks
         if (!mode.drawsGround())
         {
             hadGround = false;
-            drawFlat(target);
+            if (Streamer.mirroring)
+            {
+                MirrorHiding.drawHidden(target, GroundHooks::drawFlat);
+            }
+            else
+            {
+                drawFlat(target);
+            }
             return;
         }
 
         hadGround = hasGround();
+        if (Streamer.mirroring && mode == Mode.SOFTWARE)
+        {
+            long began = FrameProfiler.begin();
+            finishMirrored(target);
+            FrameProfiler.end(FINISH_MIRRORED, began);
+            return;
+        }
         if (mode == Mode.SOFTWARE && hadGround)
         {
-            raster.draw(Static.getClient(), frame);
+            raster.draw(Static.getClient(), frame, false);
         }
         if (mode == Mode.MESH)
         {
             updateMeshes();
         }
-        compositeDeferred(target);
+        if (takeDeferredGraphics())
+        {
+            composite(target, deferredImage);
+        }
+    }
+
+    /**
+     * @param graphics an overlay layer's graphics
+     * @return the graphics it draws through, past the ground capture
+     */
+    public static Graphics2D target(Graphics2D graphics)
+    {
+        return graphics instanceof GroundCapture ? ((GroundCapture) graphics).target() : graphics;
+    }
+
+    private static void finishMirrored(Graphics2D target)
+    {
+        boolean deferredLayer = false;
+        if (deferredGraphics != null)
+        {
+            if (mirrorDeferredImage == null || mirrorDeferredImage.getWidth() != deferredImage.getWidth() || mirrorDeferredImage.getHeight() != deferredImage.getHeight())
+            {
+                mirrorDeferredImage = new BufferedImage(deferredImage.getWidth(), deferredImage.getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+            }
+            mirrorPainted.clear(mirrorDeferredImage.getWidth(), mirrorDeferredImage.getHeight());
+            deferredLayer = MirrorHiding.takeDeferred(mirrorDeferredImage, mirrorPainted::mark);
+        }
+        if (!hadGround && deferredGraphics == null)
+        {
+            return;
+        }
+
+        MirrorHiding.hideFrame();
+        try
+        {
+            if (hadGround)
+            {
+                raster.draw(Static.getClient(), frame, true);
+            }
+            if (takeDeferredGraphics())
+            {
+                painted.scan(deferredImage);
+                composite(target, deferredImage, painted);
+            }
+        }
+        finally
+        {
+            MirrorHiding.end();
+        }
+
+        if (deferredLayer)
+        {
+            mirrorPainted.include(painted);
+            MirrorHiding.mirrorFrame();
+            try
+            {
+                composite(target, mirrorDeferredImage, mirrorPainted);
+            }
+            finally
+            {
+                MirrorHiding.end();
+            }
+        }
+    }
+
+    private static void composite(Graphics2D target, BufferedImage image, PaintedTiles tiles)
+    {
+        if (tiles.isEmpty())
+        {
+            return;
+        }
+        tiles.touch();
+        Graphics2D out = compositeGraphics(target);
+        tiles.draw(out, image);
+        out.dispose();
     }
 
     /**
@@ -223,7 +330,7 @@ public final class GroundHooks
         {
             return Mode.GL;
         }
-        if (!failed.contains(Mode.MESH) && client.getDrawCallbacks() != null)
+        if (!failed.contains(Mode.MESH) && client.getDrawCallbacks() != null && !Streamer.active)
         {
             return Mode.MESH;
         }
@@ -334,20 +441,31 @@ public final class GroundHooks
         return target;
     }
 
-    private static void compositeDeferred(Graphics2D target)
+    private static boolean takeDeferredGraphics()
     {
         if (deferredGraphics == null)
         {
-            return;
+            return false;
         }
         deferredGraphics.dispose();
         deferredGraphics = null;
+        return true;
+    }
+
+    private static void composite(Graphics2D target, BufferedImage image)
+    {
+        Graphics2D out = compositeGraphics(target);
+        out.drawImage(image, 0, 0, null);
+        out.dispose();
+    }
+
+    private static Graphics2D compositeGraphics(Graphics2D target)
+    {
         Graphics2D out = (Graphics2D) target.create();
         out.setTransform(new AffineTransform());
         out.setClip(null);
         out.setComposite(AlphaComposite.SrcOver);
-        out.drawImage(deferredImage, 0, 0, null);
-        out.dispose();
+        return out;
     }
 
     private enum Mode

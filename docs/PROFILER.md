@@ -137,6 +137,37 @@ MethodProfiler.end("MyPlugin.load");
 
 ---
 
+## Frame timing (FrameProfiler)
+
+`FrameProfiler` measures the client's frames from `BeforeRender` to `BeforeRender`: frame rate, frame time percentiles, the client thread's allocation per frame and GC, all since the last reset. Frame rate is always collected; named sections inside frames are collected only while sections are on (`-Dvita.frameprofile=true` at launch, or the API), and cost one volatile read each while off.
+
+```java
+private static final int SCAN = FrameProfiler.timer("MyPlugin.scan");
+private static final int ITEMS = FrameProfiler.counter("MyPlugin.items");
+
+long began = FrameProfiler.begin();
+scan();
+FrameProfiler.end(SCAN, began);
+FrameProfiler.count(ITEMS, items.size());
+```
+
+| Method | What it does |
+|---|---|
+| `timer(name)`, `counter(name)` | Register a section once, keep the id. A timer sums nanoseconds, a counter sums samples. |
+| `begin()`, `end(id, began)` | Time code on any thread; `begin` returns 0 while sections are off and `end` then does nothing. |
+| `count(id, amount)` | Add a sample to a counter. |
+| `setSectionsEnabled(boolean)`, `isSectionsEnabled()` | Turn section collection on or off. |
+| `setStackSampling(ms)` | Sample the client thread's stack every `ms`, sorting samples into slow frames and the others; 0 stops. |
+| `setSlowFrameMs(ms)` | Keep the last 30 frames slower than `ms`, each with what its sections took and the GC during it; 0 stops. |
+| `snapshot()` | Everything since the last reset, as nested maps. |
+| `reset()` | Start measuring again from now. |
+
+Streamer mode registers `ground.*` and `mirror.*` sections. Sections nest: `mirror.tileSave` and `mirror.tileEnd` are also inside `ground.finishMirrored`, `mirror.publish` and the overlay sections. `mirror.edtPaint` and `mirror.edtSidebar` run on the event dispatch thread, not in the client's frame.
+
+Launch with `-Dvita.profiler.api=true` to start the HTTP API with the client. VitaLite relaunches itself in a child JVM that does not inherit `-D` flags, so pass both through the `JAVA_TOOL_OPTIONS` environment variable.
+
+---
+
 ## HTTP API
 
 Scripts and LLM agents can drive the profiler over HTTP. Start the server with **Start API** in the profiler's status bar. It listens on `http://127.0.0.1:8787` and keeps running after the window closes, until you stop it or the client exits. `GET /` lists every endpoint.
@@ -144,12 +175,14 @@ Scripts and LLM agents can drive the profiler over HTTP. Start the server with *
 | Endpoint | What it does |
 |---|---|
 | `GET /profiler/status` | Server, exact timing and recording status. |
-| `POST /profiler/jfr/start` | Start a recording. `?period=N` sets the period in ms (default 10); `?allocations=true` records allocations too; `?package=com.example` or `?class=com.example.Foo` shows only those methods and credits allocations to the first matching frame. Returns 409 when one is already running. |
+| `POST /profiler/jfr/start` | Start a recording. `?period=N` sets the period in ms (default 10); `?allocations=true` records allocations too; `?locks=true` records waits of 1 ms or more to park or enter a monitor; `?package=com.example` or `?class=com.example.Foo` shows only those methods and credits allocations to the first matching frame. Returns 409 when one is already running. |
 | `POST /profiler/jfr/stop` | Stop and analyze it. |
+| `POST /profiler/jfr/full?seconds=N` | Record a full Flight Recorder file for offline analysis (`jfr print`, JDK Mission Control) and return its path. Uses the JDK's profile settings plus every safepoint, VM operation, GC phase and compilation, waits of 1 ms or more, 5 ms samples, and a `vita.Frame` event spanning each client frame. Blocks until done; default 20 seconds. Returns 409 when one is already running. |
 | `GET /profiler/jfr` | Every method of the last recording. |
 | `GET /profiler/hotspots` | The methods that ran the most. `?top=N` (default 10). |
 | `GET /profiler/method?name=...` | A method's samples, callers and callees; use the fully qualified `Class.method`. |
 | `GET /profiler/native` | Methods threads were blocked in. `?top=N`. |
+| `GET /profiler/locks` | Lock waits by thread, waited-on class and the innermost frames of the waiting stack, if the recording had locks. `?top=N`, `?thread=` part of the thread name. |
 | `GET /profiler/allocations` | Allocation bytes by class and by method, if the recording had allocations. `?top=N`. |
 | `GET /profiler/exact`, `GET /profiler/exact/csv` | Exact timings as JSON or CSV. |
 | `POST /profiler/exact/enable`, `/disable`, `/clear` | Control exact timing. |
@@ -157,6 +190,11 @@ Scripts and LLM agents can drive the profiler over HTTP. Start the server with *
 | `GET /profiler/resources` | CPU, GC, heap, metaspace, code cache and thread counts now. |
 | `GET /profiler/threads` | Every thread with state and blocked/waited counts. `?stacks=true&depth=N` adds stacks. |
 | `POST /profiler/gc` | Run a full GC and report what it freed. |
+| `GET /profiler/frames` | Frame rate since the last reset: fps, last second's fps, frame time avg/p50/p90/p95/p99/max and 1% low, client thread bytes allocated per frame, GC, sections per frame and the renderer context. |
+| `POST /profiler/frames/reset` | Start measuring frames again from now. |
+| `POST /profiler/frames/sections/enable`, `/disable` | Turn frame sections on or off; both reset. |
+| `POST /profiler/frames/stacks?ms=N` | Sample the client thread's stack every N ms (0 stops); `GET /profiler/frames` then reports under `stacks` the innermost methods by how much more of the slow frames' samples they take than of the others', and the top stacks of each. Needs a slow frame threshold; each sample briefly stops the client thread. |
+| `POST /profiler/frames/slow?ms=N` | Keep the last 30 frames slower than N ms in `GET /profiler/frames` as `slowFrames`, with each section's share and the GC; 0 stops. |
 
 A typical session: `POST /profiler/jfr/start`, use the client for a few seconds, `POST /profiler/jfr/stop`, then `GET /profiler/hotspots` and `GET /profiler/method?name=...` on whatever stands out. Each method carries a confidence: HIGH at 100+ samples, MEDIUM at 30+, LOW at 10+, otherwise VERY_LOW.
 

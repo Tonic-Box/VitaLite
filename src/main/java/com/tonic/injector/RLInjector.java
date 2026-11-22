@@ -8,12 +8,17 @@ import com.tonic.util.PackageUtil;
 import com.tonic.util.asm.ClassNodeUtil;
 import com.tonic.util.asm.SignerMapper;
 import com.tonic.vitalite.Main;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class RLInjector
 {
@@ -38,10 +43,17 @@ public class RLInjector
         }
 
         List<ClassNode> mixins = PackageUtil.getClasses(MIXINS, null);
+        Set<String> targets = new HashSet<>();
 
         for(ClassNode mixin : mixins)
         {
             String target = AnnotationUtil.getAnnotation(mixin, Mixin.class, "value");
+            if (target == null)
+            {
+                continue;
+            }
+            targets.add(target);
+            shadowFields(mixin, runelite.get(target));
             for(MethodNode method : mixin.methods)
             {
                 if(AnnotationUtil.hasAnnotation(method, Inject.class) || !AnnotationUtil.hasAnyAnnotation(method))
@@ -76,10 +88,23 @@ public class RLInjector
                 {
                     InsertTransformer.patch(mixin, method);
                 }
+                if(AnnotationUtil.hasAnnotation(method, Redirect.class))
+                {
+                    RedirectTransformer.patch(mixin, method);
+                }
                 if(AnnotationUtil.hasAnnotation(method, ClassMod.class))
                 {
                     ClassModTransformer.patch(mixin, method);
                 }
+            }
+        }
+
+        for (String target : targets)
+        {
+            ClassNode patched = runelite.get(target);
+            if (InjectionFailures.require(patched != null, "RuneLite mixin target " + target + " not found"))
+            {
+                MemberCheck.verify(patched, runelite);
             }
         }
 
@@ -90,6 +115,7 @@ public class RLInjector
                 continue;
             }
             RLGlobalMixin.patch(entry.getValue());
+            MemberCheck.verifyVitaLite(entry.getValue());
             byte[] bytes = ClassNodeUtil.toBytes(entry.getValue());
             Main.LIBS.getRunelite().classes.put(
                     name,
@@ -117,5 +143,32 @@ public class RLInjector
 //            }
         }
         runelite.clear();
+    }
+
+    private static void shadowFields(ClassNode mixin, ClassNode target)
+    {
+        for (FieldNode field : mixin.fields)
+        {
+            String name = AnnotationUtil.getAnnotation(field, Shadow.class, "value");
+            if (name == null)
+            {
+                continue;
+            }
+            boolean present = target != null && target.fields.stream().anyMatch(candidate -> candidate.name.equals(name) && candidate.desc.equals(field.desc));
+            if (!InjectionFailures.require(present, "@Shadow " + mixin.name + "." + field.name + ": no field " + name + " " + field.desc + " in " + (target == null ? "a missing class" : target.name)))
+            {
+                continue;
+            }
+            for (MethodNode method : mixin.methods)
+            {
+                for (AbstractInsnNode insn : method.instructions)
+                {
+                    if (insn instanceof FieldInsnNode && ((FieldInsnNode) insn).owner.equals(mixin.name) && ((FieldInsnNode) insn).name.equals(field.name))
+                    {
+                        ((FieldInsnNode) insn).name = name;
+                    }
+                }
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.tonic.injector.pipeline;
 
+import com.tonic.injector.util.InjectionFailures;
 import com.tonic.injector.annotations.MethodOverride;
 import com.tonic.injector.util.AnnotationUtil;
 import com.tonic.injector.util.TransformerUtil;
@@ -21,7 +22,10 @@ public class MethodOverrideTransformer {
      */
     public static void patch(ClassNode mixin, MethodNode method) {
         String name = AnnotationUtil.getAnnotation(method, MethodOverride.class, "value");
-        MethodNode toReplace = TransformerUtil.getTargetMethod(mixin, name);
+        MethodNode toReplace = TransformerUtil.requireTargetMethod("@MethodOverride " + mixin.name + "." + method.name, mixin, name, null);
+        if (toReplace == null) {
+            return;
+        }
 
         toReplace.instructions.clear();
         toReplace.tryCatchBlocks.clear();
@@ -39,7 +43,7 @@ public class MethodOverrideTransformer {
             if (cloned != null) {
                 toReplace.instructions.add(cloned);
             } else {
-                System.err.println("[MethodOverrideTransformer] Warning: Failed to clone instruction: " + insn);
+                InjectionFailures.record("@MethodOverride " + mixin.name + "." + method.name + ": could not clone " + insn);
             }
         }
 

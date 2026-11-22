@@ -7,6 +7,7 @@ import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordedFrame;
 import jdk.jfr.consumer.RecordedMethod;
 import jdk.jfr.consumer.RecordedStackTrace;
+import jdk.jfr.consumer.RecordedThread;
 import jdk.jfr.consumer.RecordingFile;
 import lombok.Getter;
 
@@ -18,14 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Records Java Flight Recorder samples: Java execution, threads blocked in native code, and optionally allocations,
- * then turns them into results
+ * Records Java Flight Recorder samples: Java execution, threads blocked in native code, and optionally allocations
+ * and lock waits, then turns them into results
  */
 public class JFRMethodRecorder {
     private static final String EXECUTION = "jdk.ExecutionSample";
     private static final String NATIVE = "jdk.NativeMethodSample";
     private static final String ALLOCATION_IN_TLAB = "jdk.ObjectAllocationInNewTLAB";
     private static final String ALLOCATION_OUTSIDE_TLAB = "jdk.ObjectAllocationOutsideTLAB";
+    private static final String THREAD_PARK = "jdk.ThreadPark";
+    private static final String MONITOR_ENTER = "jdk.JavaMonitorEnter";
+    private static final Duration LOCK_THRESHOLD = Duration.ofMillis(1);
 
     /**
      * Which methods the results show
@@ -48,6 +52,8 @@ public class JFRMethodRecorder {
     private String classFilter = "";
     private boolean recordAllocations;
     private boolean allocationsRecorded;
+    private boolean recordLocks;
+    private boolean locksRecorded;
 
     /**
      * Checks whether this JVM has Flight Recorder
@@ -83,6 +89,10 @@ public class JFRMethodRecorder {
             recording.enable(ALLOCATION_OUTSIDE_TLAB).withStackTrace();
         }
         allocationsRecorded = recordAllocations;
+        if (recordLocks) {
+            enableLockWaits(recording);
+        }
+        locksRecorded = recordLocks;
         recording.setToDisk(true);
         recording.setDestination(tempFile);
         recording.start();
@@ -115,7 +125,7 @@ public class JFRMethodRecorder {
     public synchronized MethodTimingResults analyze() throws IOException {
         StackAnalyzer analyzer = new StackAnalyzer(this::matchesFilter);
         if (tempFile == null || !Files.exists(tempFile)) {
-            return analyzer.results(samplePeriodMs, recordingStartTime, recordingEndTime, false);
+            return analyzer.results(samplePeriodMs, recordingStartTime, recordingEndTime, false, false);
         }
         try (RecordingFile file = new RecordingFile(tempFile)) {
             while (file.hasMoreEvents()) {
@@ -138,6 +148,12 @@ public class JFRMethodRecorder {
                     case ALLOCATION_OUTSIDE_TLAB:
                         analyzer.addAllocation(className(event.getClass("objectClass")), event.getLong("allocationSize"), frames(stack));
                         break;
+                    case THREAD_PARK:
+                        analyzer.addLockWait(threadName(event), className(event.getClass("parkedClass")), event.getDuration().toNanos(), frames(stack));
+                        break;
+                    case MONITOR_ENTER:
+                        analyzer.addLockWait(threadName(event), className(event.getClass("monitorClass")), event.getDuration().toNanos(), frames(stack));
+                        break;
                     default:
                         break;
                 }
@@ -145,7 +161,7 @@ public class JFRMethodRecorder {
         } finally {
             discard();
         }
-        return analyzer.results(samplePeriodMs, recordingStartTime, recordingEndTime, allocationsRecorded);
+        return analyzer.results(samplePeriodMs, recordingStartTime, recordingEndTime, allocationsRecorded, locksRecorded);
     }
 
     /**
@@ -173,6 +189,11 @@ public class JFRMethodRecorder {
             }
         }
         return frames;
+    }
+
+    private static String threadName(RecordedEvent event) {
+        RecordedThread thread = event.getThread();
+        return thread == null || thread.getJavaName() == null ? "(unknown)" : thread.getJavaName();
     }
 
     private static String className(RecordedClass type) {
@@ -238,6 +259,21 @@ public class JFRMethodRecorder {
     public void setRecordAllocations(boolean recordAllocations) {
         requireStopped();
         this.recordAllocations = recordAllocations;
+    }
+
+    /**
+     * Sets whether waits of 1 ms or more to park or enter a monitor are recorded
+     * @param recordLocks true to record lock waits with their stacks
+     * @throws IllegalStateException if recording
+     */
+    public void setRecordLocks(boolean recordLocks) {
+        requireStopped();
+        this.recordLocks = recordLocks;
+    }
+
+    static void enableLockWaits(Recording recording) {
+        recording.enable(THREAD_PARK).withThreshold(LOCK_THRESHOLD).withStackTrace();
+        recording.enable(MONITOR_ENTER).withThreshold(LOCK_THRESHOLD).withStackTrace();
     }
 
     /**
