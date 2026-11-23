@@ -20,6 +20,13 @@ public abstract class TRandomDatMixin
     @Shadow("randomDat")
     public static byte[] randomDat;
 
+    /**
+     * Keeps the random.dat bytes the server sent for the account being played instead of writing them to the shared file. The client copies them into randomDat in the same method, so the copy is made here before it is skipped.
+     *
+     * @param buffer the buffer holding the bytes
+     * @param offset where they start
+     * @return whether the client's write is skipped
+     */
     @Disable("writeRandomDat")
     public static boolean onWriteRandomDat(TBuffer buffer, int offset)
     {
@@ -28,6 +35,7 @@ public abstract class TRandomDatMixin
             return false;
         }
 
+        randomDat = Arrays.copyOfRange(buffer.getArray(), offset, offset + 24);
         String username = ReflectBuilder.of(client)
                 .method("getUsername", null, null)
                 .get();
@@ -38,8 +46,7 @@ public abstract class TRandomDatMixin
             return true;
         }
 
-        byte[] data = Arrays.copyOfRange(buffer.getArray(), offset, offset + 24);
-        RandomDat.writeCachedRandomDatData(identifier, data);
+        RandomDat.writeCachedRandomDatData(identifier, randomDat);
         Logger.info("Storing cached random.dat data for user " + identifier);
         return true;
     }

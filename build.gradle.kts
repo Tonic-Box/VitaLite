@@ -8,8 +8,8 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("4")
-val runeliteVersion by extra("1.13.7")
+val vitaVersion by extra("0")
+val runeliteVersion by extra("1.13.8")
 
 group = "com.tonic"
 version = runeliteVersion + "_" + vitaVersion
@@ -358,9 +358,9 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-feature"
+    val title = "${tag}-rev"
     val body = "# ${tag}\n" +
-            "- Make discord presence available to mirror mode\n"
+            "- Updated to new revision 1.13.8\n"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {

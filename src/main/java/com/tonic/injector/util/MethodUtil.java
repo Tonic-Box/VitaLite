@@ -29,6 +29,15 @@ public class MethodUtil
         return copy;
     }
 
+    /**
+     * Builds the call from a target method to a hook, passing the target's parameters in order. An instance hook on a static target that takes an instance of its own class first, the form the obfuscator gives some instance methods, is called on that first parameter and is passed the rest.
+     *
+     * @param clazz the class holding the target and the hook
+     * @param target the method the call is placed in
+     * @param hook the method called
+     * @param discardReturn whether to pop what the hook returns
+     * @return the call
+     */
     public static InsnList generateContextAwareInvoke(ClassNode clazz, MethodNode target, MethodNode hook, boolean discardReturn)
     {
         InsnList code = new InsnList();
@@ -36,9 +45,10 @@ public class MethodUtil
         Type[] hookParams = injectedMethodType.getArgumentTypes();
         boolean isInjectedStatic = (hook.access & Opcodes.ACC_STATIC) != 0;
         boolean isTargetStatic = (target.access & Opcodes.ACC_STATIC) != 0;
+        boolean receiverFirst = !isInjectedStatic && isTargetStatic && takesReceiverFirst(clazz, target);
 
         if (!isInjectedStatic) {
-            if (isTargetStatic) {
+            if (isTargetStatic && !receiverFirst) {
                 throw new RuntimeException("Cannot call non-static injected method from static target method");
             }
             code.add(new VarInsnNode(Opcodes.ALOAD, 0));
@@ -47,15 +57,16 @@ public class MethodUtil
         if(hookParams.length > 0)
         {
             Type[] targetParams = Type.getArgumentTypes(target.desc);
-            if (hookParams.length > targetParams.length) {
+            int first = receiverFirst ? 1 : 0;
+            if (hookParams.length > targetParams.length - first) {
                 System.err.println("Hook method expects more parameters than target method has");
                 throw new RuntimeException("Hook method expects more parameters than target method has");
             }
 
-            int localVarIndex = isTargetStatic ? 0 : 1;
+            int localVarIndex = isTargetStatic && !receiverFirst ? 0 : 1;
 
             for (int i = 0; i < hookParams.length; i++) {
-                Type targetParamType = targetParams[i];
+                Type targetParamType = targetParams[i + first];
                 Type hookParamType = hookParams[i];
 
                 switch (targetParamType.getSort()) {
@@ -111,5 +122,11 @@ public class MethodUtil
         }
 
         return code;
+    }
+
+    private static boolean takesReceiverFirst(ClassNode clazz, MethodNode target)
+    {
+        Type[] params = Type.getArgumentTypes(target.desc);
+        return params.length > 0 && params[0].getSort() == Type.OBJECT && params[0].getInternalName().equals(clazz.name);
     }
 }

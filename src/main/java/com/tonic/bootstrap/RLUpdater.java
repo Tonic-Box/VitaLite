@@ -21,7 +21,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.tonic.vitalite.Main.REPOSITORY_DIR;
 
@@ -121,14 +124,23 @@ public class RLUpdater
 
             // Delete all files in repository directory
             if (Files.exists(REPOSITORY_DIR)) {
-                Files.list(REPOSITORY_DIR).forEach(file -> {
-                    try {
+                List<Path> files;
+                try (Stream<Path> listing = Files.list(REPOSITORY_DIR))
+                {
+                    files = listing.collect(Collectors.toList());
+                }
+                for (Path file : files)
+                {
+                    try
+                    {
                         Files.delete(file);
                         System.out.println("Deleted: " + file.getFileName());
-                    } catch (IOException e) {
-                        System.err.println("Failed to delete " + file.getFileName() + ": " + e.getMessage());
                     }
-                });
+                    catch (IOException e)
+                    {
+                        throw new IOException("Could not delete " + file.getFileName() + " to update RuneLite, as another client still has it open; close every VitaLite client and start again", e);
+                    }
+                }
             }
 
             // Download all artifacts fresh

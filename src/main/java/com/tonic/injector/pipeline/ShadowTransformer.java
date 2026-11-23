@@ -19,7 +19,7 @@ import org.objectweb.asm.tree.*;
 public class ShadowTransformer
 {
     /**
-     * Creates shadow method proxy for accessing target method.
+     * Creates shadow method proxy for accessing target method. An instance shadow of a static target that takes an instance of its own class first passes itself there; a static shadow of an instance target passes its first parameter as the receiver.
      * @param mixin class node containing shadow method
      * @param method shadow method to patch
      */
@@ -60,17 +60,28 @@ public class ShadowTransformer
         boolean isTargetStatic = (toShadow.access & Opcodes.ACC_STATIC) != 0;
         boolean isShadowStatic = (method.access & Opcodes.ACC_STATIC) != 0;
 
+        boolean receiverFirst = isTargetStatic && !isShadowStatic && toShadowParams.length > 0 && toShadowParams[0].getSort() == Type.OBJECT && toShadowParams[0].getInternalName().equals(gamepack.name);
+        boolean receiverParam = !isTargetStatic && isShadowStatic && shadowParams.length > 0;
+        int first = receiverFirst ? 1 : 0;
+        int skip = receiverParam ? 1 : 0;
+
         int localVarIndex = isShadowStatic ? 0 : 1;
-        if (!isTargetStatic) {
+        if (!isTargetStatic || receiverFirst) {
             instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+            if (receiverParam) {
+                if (!shadowParams[0].equals(Type.getObjectType(gamepack.name))) {
+                    instructions.add(new TypeInsnNode(Opcodes.CHECKCAST, gamepack.name));
+                }
+                localVarIndex += shadowParams[0].getSize();
+            }
         }
 
-        for (int i = 0; i < shadowParams.length; i++) {
+        for (int i = skip; i < shadowParams.length; i++) {
             Type paramType = shadowParams[i];
             instructions.add(new VarInsnNode(paramType.getOpcode(Opcodes.ILOAD), localVarIndex));
 
-            if (i < toShadowParams.length) {
-                Type expectedType = toShadowParams[i];
+            if (i - skip + first < toShadowParams.length) {
+                Type expectedType = toShadowParams[i - skip + first];
                 if (!paramType.equals(expectedType)) {
                     if (expectedType.getSort() == Type.OBJECT || expectedType.getSort() == Type.ARRAY) {
                         instructions.add(new TypeInsnNode(Opcodes.CHECKCAST, expectedType.getInternalName()));
@@ -81,7 +92,7 @@ public class ShadowTransformer
             localVarIndex += paramType.getSize();
         }
 
-        if (multiplier != null && toShadowParams.length > shadowParams.length) {
+        if (multiplier != null && toShadowParams.length > shadowParams.length - skip + first) {
             Type garbageType = toShadowParams[toShadowParams.length - 1];
 
             if (multiplier instanceof Integer) {
