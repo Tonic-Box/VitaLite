@@ -38,7 +38,6 @@ final class BlockedPlugins
 
     private static final List<Blocked> BLOCKED = List.of(
             new Blocked("net.runelite.client.plugins.account.AccountPlugin", null, "/net/runelite/client/plugins/account/login_icon.png", "Sign in to RuneLite"),
-            new Blocked("net.runelite.client.plugins.discord.DiscordPlugin", "net.runelite.client.plugins.discord.DiscordConfig", "/net/runelite/client/plugins/discord/discord.png", "Join Discord"),
             new Blocked("net.runelite.client.plugins.twitch.TwitchPlugin", "net.runelite.client.plugins.twitch.TwitchConfig", null, null),
             new Blocked("net.runelite.client.plugins.crowdsourcing.CrowdsourcingPlugin", null, null, null));
 

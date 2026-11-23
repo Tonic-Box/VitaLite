@@ -35,6 +35,7 @@ public final class StreamerMode
         MirrorMenu.install();
         MirrorChat.install();
         MirrorNameText.install();
+        StreamerPresence.install();
         StreamerName.setFake(Static.getVitaConfig().getStreamerName());
         Streamer.frameRate = Static.getVitaConfig().getStreamerFrameRate().getFramesPerSecond();
         Streamer.whenUiReady(() -> SwingUtilities.invokeLater(() -> updateButton(Streamer.active)));

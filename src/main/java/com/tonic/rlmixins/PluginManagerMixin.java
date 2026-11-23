@@ -25,7 +25,6 @@ public class PluginManagerMixin {
     {{
         add("net.runelite.client.plugins.account");
         add("net.runelite.client.plugins.crowdsourcing");
-        add("net.runelite.client.plugins.discord");
         add("net.runelite.client.plugins.twitch");
         add("net.runelite.client.plugins.xtea");
     }};
