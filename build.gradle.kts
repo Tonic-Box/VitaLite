@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("3")
+val vitaVersion by extra("4")
 val runeliteVersion by extra("1.13.7")
 
 group = "com.tonic"
@@ -360,7 +360,7 @@ tasks.register<Exec>("publishRelease") {
     val tag = "${runeliteVersion}_${vitaVersion}"
     val title = "${tag}-feature"
     val body = "# ${tag}\n" +
-            "- Moving bank valuer and multi-client utils out of base client to the hub\n"
+            "- Make discord presence available to mirror mode\n"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
