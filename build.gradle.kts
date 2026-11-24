@@ -361,7 +361,8 @@ tasks.register<Exec>("publishRelease") {
     val title = "${tag}-feature"
     val body = "# ${tag}\n" +
             "- Custom login world select\n" +
-            "- Break Handler relogs Jagex accounts\n"
+            "- Break Handler relogs Jagex accounts\n" +
+            "- Unified Break handler to use Profiles plugin profiles\n"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
