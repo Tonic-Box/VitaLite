@@ -3,11 +3,14 @@ package com.tonic.plugins.breakhandler;
 import com.google.inject.Inject;
 import com.tonic.api.game.ClientScriptAPI;
 import com.tonic.api.widgets.WidgetAPI;
+import com.tonic.data.LoginMessage;
+import com.tonic.data.LoginResponse;
+import com.tonic.data.LoginResponseType;
 import com.tonic.services.breakhandler.Break;
 import com.tonic.services.breakhandler.BreakHandler;
 import com.tonic.services.breakhandler.settings.Property;
 import com.tonic.plugins.breakhandler.ui.BreakHandlerPanel;
-import com.tonic.plugins.profiles.session.ProfilesSession;
+import com.tonic.plugins.profiles.data.ProfileRef;
 import com.tonic.services.ConfigManager;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -86,7 +89,9 @@ public class BreakHandlerPlugin extends Plugin
     private int loginAttempts = 0;
     private int loginAttemptDelay = 0;
     private int targetWorld = -1;
-    private boolean autoLogin;
+    private BreakAccount account;
+    private boolean relogging;
+    private String lastLoginMessage;
 
     @Override
     protected void startUp()
@@ -107,6 +112,8 @@ public class BreakHandlerPlugin extends Plugin
         logoutAttempts = 0;
         logoutAttemptDelay = 0;
         targetWorld = -1;
+        relogging = false;
+        lastLoginMessage = null;
         exec = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "Vita-BreakHandler");
             t.setDaemon(true);
@@ -115,6 +122,8 @@ public class BreakHandlerPlugin extends Plugin
         updater = exec.scheduleAtFixedRate(() ->
                 clientThread.invoke(this::update), 1, 1, TimeUnit.SECONDS);
         configManager = breakHandler.getConfigManager();
+        account = new BreakAccount(breakHandler);
+        account.migrate();
         checkVmArgs();
     }
 
@@ -137,18 +146,9 @@ public class BreakHandlerPlugin extends Plugin
     {
         String profile = System.getProperty("vProfile", "");
 
-        if (!profile.isEmpty())
+        if (!profile.isEmpty() && !account.chooseByName(profile))
         {
-            this.configManager.setProperty(Property.ACCOUNT_PROFILE.key(), profile);
-        }
-
-        String username = System.getProperty("vUsername", "");
-        String password = System.getProperty("vPassword", "");
-
-        if (!username.isEmpty() && !password.isEmpty())
-        {
-            this.configManager.setProperty(Property.ACCOUNT_USERNAME.key(), username);
-            this.configManager.setProperty(Property.ACCOUNT_PASSWORD.key(), password);
+            breakHandler.log("[%s] The launch profile %s is not in Profiles, keeping %s", "Break Handler", profile, account.describe());
         }
 
         boolean autoLogin = System.getProperty("vAutoLogin") != null;
@@ -167,24 +167,14 @@ public class BreakHandlerPlugin extends Plugin
     @Subscribe
     private void onGameStateChanged(GameStateChanged event)
     {
-        int loginIndex = client.getLoginIndex();
-
-        if (state == State.LOGIN)
-        {
-            if (loginIndex == 14)
-            {
-                breakHandler.log("[%s] Ban/Lock/Unpaid balance detected, " +
-                                "cancelling breaks this session", "Break Handler");
-                breakHandler.cancel();
-            }
-        }
-
         GameState gameState = event.getGameState();
 
         if (gameState == GameState.LOGGED_IN)
         {
             loginAttempts = 0;
             targetWorld = -1;
+            relogging = false;
+            lastLoginMessage = null;
         }
 
         if (gameState == GameState.LOGIN_SCREEN && state == State.LOGOUT)
@@ -361,75 +351,76 @@ public class BreakHandlerPlugin extends Plugin
 
         if (loginAttempts >= LOGIN_ATTEMPT_LIMIT)
         {
-            breakHandler.log("[%s] Exceeded maximum login attempts. " +
-                    "Cancelling break handler this session", "Break Handler");
-            breakHandler.cancel();
+            cancel("no login succeeded in " + LOGIN_ATTEMPT_LIMIT + " attempts" + (lastLoginMessage == null ? "" : ", the last said: " + lastLoginMessage));
             return;
         }
 
-        boolean profiles = configManager.getBooleanOrDefault(Property.ACCOUNT_MODE.key(),
-                false);
-
-        if (profiles)
+        BreakAccount.Result result = account.login();
+        switch (result)
         {
-            loginProfiles();
-            return;
+            case STARTED:
+                loginAttempts++;
+                loginAttemptDelay = LOGIN_ATTEMPT_BASE_DELAY
+                        + ThreadLocalRandom.current().nextInt(0, 15);
+                relogging = true;
+                breakHandler.log("[%s] Logging in to %s, attempt %d",
+                        "Break Handler", account.describe(), loginAttempts);
+                break;
+            case NO_ACCOUNT:
+                cancel("the client has no account to log back in to; pick a profile under Account in the Break Handler settings");
+                break;
+            case MISSING_PROFILE:
+                cancel("the chosen profile is no longer in Profiles: " + account.describe());
+                break;
+            default:
+                break;
         }
-
-        loginDefault();
     }
 
-    private void loginProfiles() {
-        String profileName = configManager.getStringOrDefault(
-                Property.ACCOUNT_PROFILE.key(), "");
-
-        if (profileName.isEmpty()) {
-            breakHandler.log("[%s] Unable to login with empty profile, cancelling break",
-                    "Break Handler");
-            breakHandler.cancel();
-            return;
-        }
-
-        ProfilesSession profilesSession = ProfilesSession.getInstance();
-        profilesSession.loadProfilesFromFile();
-
-        if (!profilesSession.getProfileNames().contains(profileName)) {
-            breakHandler.log("[%s] Unable to login with null profile - %s, cancelling break",
-                    "Break Handler", profileName);
-            breakHandler.cancel();
-            return;
-        }
-
-        loginAttempts++;
-        loginAttemptDelay = LOGIN_ATTEMPT_BASE_DELAY
-                + ThreadLocalRandom.current().nextInt(0, 15);
-        profilesSession.loginByName(profileName, true);
-        breakHandler.log("[%s] Logging in with profile - %s", "Break Handler", profileName);
-    }
-
-    private void loginDefault()
+    /**
+     * Logs why a login attempt failed, and cancels breaks at once when retrying cannot help: the account is banned, locked or restricted, or its credentials or Jagex session were refused.
+     *
+     * @param response the client's login response
+     */
+    @Subscribe
+    private void onLoginResponse(LoginResponse response)
     {
-        String username = configManager.getStringOrDefault(
-                Property.ACCOUNT_USERNAME.key(), "");
-        String password = configManager.getStringOrDefault(
-                Property.ACCOUNT_PASSWORD.key(), "");
-
-        if (username.isEmpty() || password.isEmpty())
+        if (!relogging)
         {
-            breakHandler.log("[%s] Unable to login with empty username or password, " +
-                    "cancelling break", "Break Handler");
-            breakHandler.cancel();
             return;
         }
+        String message = response.getMessage() == null ? response.name() : response.getMessage();
+        breakHandler.log("[%s] Login failed: %s", "Break Handler", message);
+        LoginResponseType type = response.getType();
+        boolean restricted = type == LoginResponseType.ACCOUNT_RESTRICTION && response != LoginResponse.MEMBERS_ONLY;
+        if (type == LoginResponseType.BANNED || type == LoginResponseType.LOCKED || type == LoginResponseType.AUTHENTICATION || restricted)
+        {
+            ProfileRef chosen = account.chosenProfile();
+            boolean legacy = chosen != null && chosen.getKind() == ProfileRef.Kind.LEGACY;
+            String hint = type == LoginResponseType.AUTHENTICATION && !legacy ? "; if the Jagex session expired, sign in again in Profiles" : "";
+            cancel("the login was refused (" + message + ")" + hint);
+        }
+    }
 
-        loginAttempts++;
-        loginAttemptDelay = LOGIN_ATTEMPT_BASE_DELAY
-                + ThreadLocalRandom.current().nextInt(0, 15);
-        client.setUsername(username);
-        client.setPassword(password);
-        client.setGameState(GameState.LOGGING_IN);
-        breakHandler.log("[%s] Logging in with %s, attempt %d",
-                "Break Handler", username, loginAttempts);
+    /**
+     * Remembers the login screen's message while logging back in, for the log when the attempts run out.
+     *
+     * @param message the login screen's message
+     */
+    @Subscribe
+    private void onLoginMessage(LoginMessage message)
+    {
+        if (relogging && !message.toString().isEmpty())
+        {
+            lastLoginMessage = message.toString();
+        }
+    }
+
+    private void cancel(String reason)
+    {
+        relogging = false;
+        breakHandler.log("[%s] Cancelling breaks this session: %s", "Break Handler", reason);
+        breakHandler.cancel();
     }
 
     private void setWorld()

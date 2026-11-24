@@ -55,20 +55,11 @@ public class ConfigManager {
     }
 
     /**
-     * loads the config from an arbitrarily defined file path
-     * @param fileName file path
+     * Loads the config from another file in VitaLite's folder, creating it when missing.
+     * @param fileName the file's name, relative to VitaLite's folder
      */
     public void loadConfigFromFile(String fileName) {
-        configFile = new File(System.getProperty("user.home") + "/VitaX/" + fileName);
-        if(!configFile.exists())
-        {
-            configFile.mkdirs();
-            try {
-                configFile.createNewFile();
-            } catch (IOException ignored) {
-            }
-        }
-
+        configFile = new File(Static.VITA_DIR.toFile(), fileName);
         loadConfigFromFile();
     }
 
@@ -183,6 +174,17 @@ public class ConfigManager {
         } catch (ConfigurationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Removes a property, so it is gone from the file as well.
+     *
+     * @param propertyName name
+     */
+    @SneakyThrows
+    public void removeProperty(String propertyName)
+    {
+        builder.getConfiguration().clearProperty(propertyName);
     }
 
     /**

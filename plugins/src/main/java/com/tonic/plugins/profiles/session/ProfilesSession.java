@@ -11,6 +11,7 @@ import com.tonic.model.DeviceID;
 import com.tonic.plugins.profiles.data.JagexAccount;
 import com.tonic.plugins.profiles.data.JagexAccountCharacter;
 import com.tonic.plugins.profiles.data.Profile;
+import com.tonic.plugins.profiles.data.ProfileRef;
 import com.tonic.plugins.profiles.util.GsonUtil;
 import com.tonic.plugins.profiles.util.OS;
 import com.tonic.services.LoginService;
@@ -125,6 +126,60 @@ public class ProfilesSession
     }
 
     /**
+     * The profiles other plugins pick from: every legacy profile, then every character of every Jagex account.
+     *
+     * @return references to them, in that order
+     */
+    public synchronized List<ProfileRef> getProfileRefs()
+    {
+        List<ProfileRef> refs = new ArrayList<>();
+        for (Profile profile : legacy)
+        {
+            refs.add(ProfileRef.legacy(profile.getIdentifier()));
+        }
+        for (JagexAccount account : jagex)
+        {
+            for (JagexAccountCharacter character : account.getCharacters())
+            {
+                refs.add(ProfileRef.jagex(character.getAccountId(), character.entryName(account.getLabel())));
+            }
+        }
+        return refs;
+    }
+
+    /**
+     * @param key a key as ProfileRef.getKey gives it
+     * @return the profile saved under that key, or null when the store has none
+     */
+    public synchronized ProfileRef findRef(String key)
+    {
+        for (ProfileRef ref : getProfileRefs())
+        {
+            if (ref.getKey().equals(key))
+            {
+                return ref;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param name a profile name, as getProfileNames lists it
+     * @return the profile with that name, or null when the store has none
+     */
+    public synchronized ProfileRef findRefByName(String name)
+    {
+        for (ProfileRef ref : getProfileRefs())
+        {
+            if (ref.getName().equals(name))
+            {
+                return ref;
+            }
+        }
+        return null;
+    }
+
+    /**
      * The names other plugins pick profiles by: every legacy identifier, then {@code Label / Character} for
      * every character of every Jagex account.
      *
@@ -133,16 +188,9 @@ public class ProfilesSession
     public synchronized List<String> getProfileNames()
     {
         List<String> names = new ArrayList<>();
-        for (Profile profile : legacy)
+        for (ProfileRef ref : getProfileRefs())
         {
-            names.add(profile.getIdentifier());
-        }
-        for (JagexAccount account : jagex)
-        {
-            for (JagexAccountCharacter character : account.getCharacters())
-            {
-                names.add(character.entryName(account.getLabel()));
-            }
+            names.add(ref.getName());
         }
         return names;
     }
@@ -362,25 +410,47 @@ public class ProfilesSession
      */
     public boolean loginByName(String name, boolean login)
     {
+        ProfileRef ref = findRefByName(name);
+        if (ref == null)
+        {
+            return false;
+        }
+        login(ref, login);
+        return true;
+    }
+
+    /**
+     * Fills the login screen with a referenced profile and optionally logs in. Blocks until the client thread
+     * has run it.
+     *
+     * @param ref the profile
+     * @param login whether to log in after filling the login screen
+     * @return whether the profile is still in the store and the client was on the login screen
+     */
+    public boolean login(ProfileRef ref, boolean login)
+    {
         Profile profile = null;
         JagexAccount account = null;
         JagexAccountCharacter character = null;
         synchronized (this)
         {
-            for (Profile candidate : legacy)
+            if (ref.getKind() == ProfileRef.Kind.LEGACY)
             {
-                if (candidate.getIdentifier().equals(name))
+                for (Profile candidate : legacy)
                 {
-                    profile = copy(candidate);
-                    break;
+                    if (candidate.getIdentifier().equals(ref.getId()))
+                    {
+                        profile = copy(candidate);
+                        break;
+                    }
                 }
             }
-            for (int i = 0; profile == null && character == null && i < jagex.size(); i++)
+            else
             {
-                JagexAccount candidate = jagex.get(i);
-                for (JagexAccountCharacter entry : candidate.getCharacters())
+                for (JagexAccount candidate : jagex)
                 {
-                    if (entry.entryName(candidate.getLabel()).equals(name))
+                    JagexAccountCharacter entry = candidate.getCharacter(ref.getId());
+                    if (entry != null)
                     {
                         account = candidate.copy();
                         character = entry.copy();
@@ -392,13 +462,11 @@ public class ProfilesSession
 
         if (profile != null)
         {
-            login(profile, login);
-            return true;
+            return login(profile, login);
         }
         if (character != null)
         {
-            login(account, character, login);
-            return true;
+            return login(account, character, login);
         }
         return false;
     }

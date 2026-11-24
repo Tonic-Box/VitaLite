@@ -2,19 +2,25 @@ package com.tonic.plugins.breakhandler.ui;
 
 import com.tonic.services.breakhandler.BreakHandler;
 import com.tonic.services.breakhandler.settings.Property;
+import com.tonic.plugins.breakhandler.BreakAccount;
+import com.tonic.plugins.profiles.data.ProfileRef;
 import com.tonic.plugins.profiles.session.ProfilesSession;
 import com.tonic.services.ConfigManager;
 import net.runelite.client.RuneLite;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import java.util.List;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import java.awt.*;
 
 public class BreakSettingsPanel extends JPanel
 {
     private final BreakHandler breakHandler = RuneLite.getInjector().getInstance(BreakHandler.class);
+    private static final Color MISSING = new Color(0xE05050);
+
     private final ConfigManager configManager = breakHandler.getConfigManager();
+    private final BreakAccount account = new BreakAccount(breakHandler);
+    private boolean filling;
 
     public BreakSettingsPanel()
     {
@@ -74,104 +80,118 @@ public class BreakSettingsPanel extends JPanel
         p.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         GridBagConstraints gc = gc();
-        int row = 0;
+        addSectionLabel(p, gc, 0, "Account");
 
-        addSectionLabel(p, gc, row++, "Account");
-
-        final String modeKey = Property.ACCOUNT_MODE.key();
-        final String profileKey = Property.ACCOUNT_PROFILE.key();
-        final String userKey = Property.ACCOUNT_USERNAME.key();
-        final String passKey = Property.ACCOUNT_PASSWORD.key();
-
-        boolean useProfilesInitial = configManager.getBooleanOrDefault(modeKey, false);
-        JCheckBox useProfiles = new JCheckBox("Use Profiles", useProfilesInitial);
-        useProfiles.setOpaque(false);
-        useProfiles.setForeground(Color.WHITE);
-
-        GridBagConstraints gFull = (GridBagConstraints) gc.clone();
-        gFull.gridx = 0; gFull.gridy = row++; gFull.gridwidth = 2; gFull.weightx = 1.0;
-        p.add(useProfiles, gFull);
-
-        JPanel cardHolder = new JPanel(new CardLayout());
-        cardHolder.setOpaque(false);
-
-        JPanel manualPanel = new JPanel(new GridBagLayout());
-        manualPanel.setOpaque(false);
-        GridBagConstraints gMan = gc();
-
-        JTextField username = new JTextField(configManager.getStringOrDefault(userKey, ""));
-        JPasswordField password = new JPasswordField(configManager.getStringOrDefault(passKey, ""));
-
-        addRow(manualPanel, gMan, 0, "Username:", username);
-        addRow(manualPanel, gMan, 1, "Password:", password);
-
-        username.getDocument().addDocumentListener(onChange(() ->
-                configManager.setProperty(userKey, username.getText())));
-        password.getDocument().addDocumentListener(onChange(() ->
-                configManager.setProperty(passKey, new String(password.getPassword()))));
-
-        username.setMaximumSize(new Dimension(Integer.MAX_VALUE, username.getPreferredSize().height));
-        password.setMaximumSize(new Dimension(Integer.MAX_VALUE, password.getPreferredSize().height));
-
-        JPanel profilesPanel = new JPanel(new GridBagLayout());
-        profilesPanel.setOpaque(false);
-        GridBagConstraints gProf = gc();
-
-        List<String> profileNames = getProfileNames();
-        profileNames.sort(String::compareToIgnoreCase);
-
-        String lastSelected = configManager.getStringOrDefault(profileKey, "");
-        JComboBox<String> profileBox = new JComboBox<>(profileNames.toArray(new String[0]));
-        profileBox.setEditable(false);
-        profileBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, profileBox.getPreferredSize().height));
-
-        if (!lastSelected.isEmpty()) {
-            profileBox.setSelectedItem(lastSelected);
-        } else if (profileBox.getItemCount() > 0) {
-            profileBox.setSelectedIndex(0);
-        }
-
-        addRow(profilesPanel, gProf, 0, "Profile:", profileBox);
-
-        profileBox.addActionListener(e -> {
-            Object sel = profileBox.getSelectedItem();
-            if (sel != null) {
-                configManager.setProperty(profileKey, sel.toString());
-            }
-        });
-
-        cardHolder.add(manualPanel, "manual");
-        cardHolder.add(profilesPanel, "profiles");
-
-        CardLayout cl = (CardLayout) cardHolder.getLayout();
-        cl.show(cardHolder, useProfilesInitial ? "profiles" : "manual");
-
-        useProfiles.addActionListener(e -> {
-            boolean use = useProfiles.isSelected();
-            configManager.setProperty(modeKey, use);
-
-            if (use)
+        JComboBox<AccountOption> accounts = new JComboBox<>();
+        accounts.setRenderer(new AccountRenderer());
+        fillAccounts(accounts);
+        accounts.addActionListener(e ->
+        {
+            Object selected = accounts.getSelectedItem();
+            if (!filling && selected instanceof AccountOption && !((AccountOption) selected).missing)
             {
-                ProfilesSession profilesSession = ProfilesSession.getInstance();
-                profilesSession.loadProfilesFromFile();
+                account.choose(((AccountOption) selected).key);
+            }
+        });
+        accounts.addPopupMenuListener(new PopupMenuListener()
+        {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e)
+            {
+                fillAccounts(accounts);
             }
 
-            cl.show(cardHolder, use ? "profiles" : "manual");
-        });
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
+            {
+            }
 
-        GridBagConstraints gCards = (GridBagConstraints) gc.clone();
-        gCards.gridx = 0; gCards.gridy = row; gCards.gridwidth = 2; gCards.weightx = 1.0; gCards.fill = GridBagConstraints.HORIZONTAL;
-        p.add(cardHolder, gCards);
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e)
+            {
+            }
+        });
+        addRow(p, gc, 1, "Log in as:", accounts);
+
+        JLabel hint = new JLabel("<html>Current account logs back in to whichever account the client was on. Profiles come from the Profiles plugin.</html>");
+        hint.setForeground(Color.GRAY);
+        GridBagConstraints g = (GridBagConstraints) gc.clone();
+        g.gridx = 0;
+        g.gridy = 2;
+        g.gridwidth = 2;
+        p.add(hint, g);
 
         return wrapNorth(p);
     }
 
-    private static List<String> getProfileNames() {
-        ProfilesSession profilesSession = ProfilesSession.getInstance();
-        profilesSession.loadProfilesFromFile();
-        return profilesSession.getProfileNames();
+    private void fillAccounts(JComboBox<AccountOption> box)
+    {
+        String target = account.target();
+        DefaultComboBoxModel<AccountOption> model = new DefaultComboBoxModel<>();
+        AccountOption selected = new AccountOption(BreakAccount.CURRENT, "Current account", false);
+        model.addElement(selected);
+        ProfilesSession profiles = ProfilesSession.getInstance();
+        profiles.loadProfilesFromFile();
+        for (ProfileRef ref : profiles.getProfileRefs())
+        {
+            AccountOption option = new AccountOption(ref.getKey(), ref.getName(), false);
+            model.addElement(option);
+            if (ref.getKey().equals(target))
+            {
+                selected = option;
+            }
+        }
+        if (!BreakAccount.CURRENT.equals(target) && BreakAccount.CURRENT.equals(selected.key))
+        {
+            selected = new AccountOption(target, "Missing profile", true);
+            model.addElement(selected);
+        }
+        filling = true;
+        box.setModel(model);
+        box.setSelectedItem(selected);
+        box.setToolTipText(selected.missing ? "The chosen profile is no longer in Profiles; pick another" : null);
+        filling = false;
     }
 
+    /**
+     * One choice in the account dropdown: the key it saves and what it shows.
+     */
+    private static final class AccountOption
+    {
+        private final String key;
+        private final String label;
+        private final boolean missing;
+
+        private AccountOption(String key, String label, boolean missing)
+        {
+            this.key = key;
+            this.label = label;
+            this.missing = missing;
+        }
+
+        @Override
+        public String toString()
+        {
+            return label;
+        }
+    }
+
+    /**
+     * Shows a chosen profile that is gone from Profiles in red.
+     */
+    private static final class AccountRenderer extends DefaultListCellRenderer
+    {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean selected, boolean focused)
+        {
+            Component component = super.getListCellRendererComponent(list, value, index, selected, focused);
+            if (value instanceof AccountOption && ((AccountOption) value).missing)
+            {
+                component.setForeground(MISSING);
+            }
+            return component;
+        }
+    }
 
     private JComponent buildWorldTab()
     {
@@ -284,22 +304,5 @@ public class BreakSettingsPanel extends JPanel
         box.setForeground(Color.WHITE);
         box.addActionListener(e -> configManager.setProperty(key, box.isSelected()));
         return box;
-    }
-
-    private static javax.swing.event.DocumentListener onChange(Runnable r)
-    {
-        return new javax.swing.event.DocumentListener() {
-            public void insertUpdate(DocumentEvent e) {
-                r.run();
-            }
-
-            public void removeUpdate(DocumentEvent e) {
-                r.run();
-            }
-
-            public void changedUpdate(DocumentEvent e) {
-                r.run();
-            }
-        };
     }
 }

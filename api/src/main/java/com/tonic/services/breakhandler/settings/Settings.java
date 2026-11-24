@@ -9,11 +9,8 @@ public class Settings
     static final String MIN_DURATION = "minDuration";
     static final String MAX_DURATION = "maxDuration";
 
-    static final String ACCOUNT_MODE = "account.mode";
     static final String ACCOUNT_AUTO_LOGIN = "account.login";
-    static final String ACCOUNT_PROFILE = "account.profile";
-    static final String ACCOUNT_USERNAME = "account.username";
-    static final String ACCOUNT_PASSWORD = "account.password";
+    static final String ACCOUNT_TARGET = "account.target";
 
     static final String HOP_ENABLED = "world.hopEnabled";
     static final String F2P_ONLY = "world.f2pOnly";
