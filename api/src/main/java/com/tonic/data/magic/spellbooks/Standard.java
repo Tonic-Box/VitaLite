@@ -93,7 +93,7 @@ public enum Standard implements Spell
             new RuneRequirement(2, Rune.LAW)
     ),
     TELEPORT_TO_KOUREND(
-            48, InterfaceID.MagicSpellbook.KOUREND_TELEPORT, SpellbookEnums.StandardSpell.KOUREND_CASTLE_TELEPORT.index, true,
+            48, InterfaceID.MagicSpellbook.KOUREND_TELEPORT, SpellbookEnums.StandardSpell.KOUREND_CASTLE_TELEPORT.index, true, Quest.CLIENT_OF_KOUREND,
             new RuneRequirement(1, Rune.WATER),
             new RuneRequirement(1, Rune.FIRE),
             new RuneRequirement(2, Rune.LAW)
