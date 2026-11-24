@@ -8,7 +8,7 @@ plugins {
     id("maven-publish")
 }
 
-val vitaVersion by extra("1")
+val vitaVersion by extra("2")
 val runeliteVersion by extra("1.13.8")
 
 group = "com.tonic"
@@ -358,12 +358,10 @@ tasks.register<Exec>("publishRelease") {
     dependsOn("buildRelease")
 
     val tag = "${runeliteVersion}_${vitaVersion}"
-    val title = "${tag}-rev"
+    val title = "${tag}-feature"
     val body = "# ${tag}\n" +
-            "- Walker rework\n" +
-            "- Shared mmapped vcol collision, live scene and instance support\n" +
-            "- Unified transports.json schema\n" +
-            "- Fixed TELEPORT_TO_KOUREND in Spellbook\n"
+            "- Custom login world select\n" +
+            "- Break Handler relogs Jagex accounts\n"
     val zipFile = layout.buildDirectory.file("libs/VitaLite-${project.version}.zip").get().asFile
 
     doFirst {
