@@ -140,6 +140,21 @@ public interface TClient
      */
     void useJagexAccountLoginType();
 
+    /**
+     * @return whether the client's own login world select exists, loaded or still loading
+     */
+    boolean isWorldSelectOpen();
+
+    /**
+     * Drops the client's own login world select, so it is neither drawn nor given input.
+     */
+    void closeWorldSelect();
+
+    /**
+     * Returns the login screen from its "switch world" page to the login form, as closing the client's own world select there does.
+     */
+    void leaveWorldSelect();
+
     int getShipHeading();
 
     void setShipHeading(int heading);

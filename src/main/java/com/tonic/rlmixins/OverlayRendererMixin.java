@@ -2,6 +2,7 @@ package com.tonic.rlmixins;
 
 import com.tonic.injector.annotations.At;
 import com.tonic.injector.annotations.AtTarget;
+import com.tonic.injector.annotations.Delegate;
 import com.tonic.injector.annotations.Insert;
 import com.tonic.injector.annotations.Mixin;
 import com.tonic.model.ConditionType;
@@ -13,10 +14,12 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import java.awt.Graphics2D;
+
 /**
  * Leaves RuneLite's overlays laid over the scene undrawn while WorldOverlays says so, as while a VR
  * headset shows the world itself, and draws the rest, those over the interfaces too, through
- * GroundHooks so their ground shapes can be drawn on the ground.
+ * GroundHooks so their ground shapes can be drawn on the ground; also paints VitaLite's world select.
  */
 @Mixin("net/runelite/client/ui/overlay/OverlayRenderer")
 public class OverlayRendererMixin
@@ -55,6 +58,16 @@ public class OverlayRendererMixin
                 .build();
         method.instructions.insert(skip);
     }
+
+    /**
+     * Paints VitaLite's world select over the whole canvas while it is open, on the layer drawn last each frame, the login screen included.
+     *
+     * @param graphics the frame's graphics
+     * @param layer the layer being drawn
+     */
+    @Insert(method = "renderOverlayLayer", at = @At(value = AtTarget.HEAD), gate = "com/tonic/services/worldselect/WorldSelectBridge.open")
+    @Delegate("com/tonic/services/worldselect/WorldSelect.paint")
+    public static native void paintWorldSelect(Graphics2D graphics, Object layer);
 
     @Insert(
             method = "renderAfterInterface",

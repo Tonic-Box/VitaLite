@@ -30,6 +30,7 @@ In **VitaLite Options -> Streamer**:
 - Their sidebar tabs, title bar buttons and plugin list rows.
 - VitaLite's recolours and its own settings switches. The mirror uses RuneLite's colours.
 - Ground overlays drawn under objects show flat in the mirror, as stock RuneLite draws them.
+- VitaLite's world select. While streamer mode is on, the login screen uses Jagex's world select in both windows.
 
 The mirror shows stand-ins for the RuneLite plugins VitaLite never loads, such as Discord and Twitch, so it looks complete.
 

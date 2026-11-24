@@ -131,13 +131,7 @@ public class WorldsAPI
                 .add(0, () -> {
                     if (client.getGameState() == GameState.LOGIN_SCREEN)
                     {
-                        final net.runelite.api.World rsWorld = client.createWorld();
-                        rsWorld.setActivity(world.getActivity());
-                        rsWorld.setAddress(world.getAddress());
-                        rsWorld.setId(world.getId());
-                        rsWorld.setPlayerCount(world.getPlayers());
-                        rsWorld.setLocation(world.getRegion().getId());
-                        rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
+                        final net.runelite.api.World rsWorld = toClientWorld(world);
 
                         client.changeWorld(rsWorld);
                         client.hopToWorld(rsWorld);
@@ -163,6 +157,24 @@ public class WorldsAPI
                 })
                 .addDelay(3, 1)
                 .build();
+    }
+
+    /**
+     * Builds the client's own world object for a world from RuneLite's list, as changing world from the login screen needs. Call on the client thread.
+     * @param world the world
+     * @return the client's world object for it
+     */
+    public static net.runelite.api.World toClientWorld(World world)
+    {
+        Client client = Static.getClient();
+        net.runelite.api.World rsWorld = client.createWorld();
+        rsWorld.setActivity(world.getActivity());
+        rsWorld.setAddress(world.getAddress());
+        rsWorld.setId(world.getId());
+        rsWorld.setPlayerCount(world.getPlayers());
+        rsWorld.setLocation(world.getRegion().getId());
+        rsWorld.setTypes(WorldUtil.toWorldTypes(world.getTypes()));
+        return rsWorld;
     }
 
     /**

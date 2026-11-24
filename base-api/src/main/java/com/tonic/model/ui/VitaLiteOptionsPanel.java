@@ -11,6 +11,7 @@ import com.tonic.services.RenderScale;
 import com.tonic.services.streamer.MirrorFrameRate;
 import com.tonic.services.streamer.Streamer;
 import com.tonic.services.streamer.StreamerName;
+import com.tonic.services.worldselect.WorldSelectBridge;
 import com.tonic.services.mouserecorder.DecodedMousePacket;
 import com.tonic.services.mouserecorder.MousePacketDecoder;
 import com.tonic.services.mouserecorder.trajectory.TrajectoryService;
@@ -141,6 +142,20 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 "Prevent the AFK logout",
                 neverLogToggle,
                 () -> Static.getVitaConfig().setNeverLog(neverLogToggle.isSelected())
+        ));
+        generalPanel.addVerticalStrut(12);
+
+        ToggleSlider worldSelectToggle = new ToggleSlider();
+        worldSelectToggle.setSelected(Static.getVitaConfig().shouldUseCustomWorldSelect());
+        generalPanel.addContent(createToggleOption(
+                "Custom World Select",
+                "Use VitaLite's login world select (Jagex's in streamer mode)",
+                worldSelectToggle,
+                () ->
+                {
+                    Static.getVitaConfig().setUseCustomWorldSelect(worldSelectToggle.isSelected());
+                    WorldSelectBridge.refresh();
+                }
         ));
         contentPanel.add(generalPanel);
         contentPanel.add(Box.createVerticalStrut(10));

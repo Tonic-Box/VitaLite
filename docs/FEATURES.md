@@ -16,6 +16,7 @@ What VitaLite adds on top of RuneLite. Most of it is in VitaLite's settings pane
 
 - **World map walking.** Right-click the world map to walk, or sail, to that spot from wherever you are.
 - **Never log out.** Turn off the idle logout.
+- **World select.** The login screen's world select is VitaLite's own, filling the window.
 - **Headless mode.** Stop drawing the game to save CPU. You can show a small collision map instead and click it to walk.
 
 ## Accounts

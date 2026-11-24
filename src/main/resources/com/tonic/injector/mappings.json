@@ -12949,6 +12949,7 @@
         "isStatic": true
       },
       {
+        "name": "worldSelect",
         "obfuscatedName": "dy",
         "ownerObfuscatedName": "cg",
         "descriptor": "Lwf;",
@@ -59581,6 +59582,7 @@
         "isStatic": true
       },
       {
+        "name": "leaveWorldSelect",
         "obfuscatedName": "as",
         "ownerObfuscatedName": "lr",
         "descriptor": "(ZI)V",

@@ -171,4 +171,44 @@ public interface ClientConfig extends VitaConfig {
     MirrorFrameRate getStreamerFrameRate();
     @ConfigKey(value = "streamerFrameRate")
     void setStreamerFrameRate(MirrorFrameRate rate);
+
+    @ConfigKey(value = "customWorldSelect", defaultValue = "true")
+    boolean shouldUseCustomWorldSelect();
+    @ConfigKey(value = "customWorldSelect")
+    void setUseCustomWorldSelect(boolean use);
+
+    @ConfigKey(value = "worldSelectModes")
+    String getWorldSelectModes();
+    @ConfigKey(value = "worldSelectModes")
+    void setWorldSelectModes(String modes);
+
+    @ConfigKey(value = "worldSelectRegions")
+    String getWorldSelectRegions();
+    @ConfigKey(value = "worldSelectRegions")
+    void setWorldSelectRegions(String regions);
+
+    @ConfigKey(value = "worldSelectMembers", defaultValue = "true")
+    boolean shouldWorldSelectShowMembers();
+    @ConfigKey(value = "worldSelectMembers")
+    void setWorldSelectShowMembers(boolean show);
+
+    @ConfigKey(value = "worldSelectFree", defaultValue = "true")
+    boolean shouldWorldSelectShowFree();
+    @ConfigKey(value = "worldSelectFree")
+    void setWorldSelectShowFree(boolean show);
+
+    @ConfigKey(value = "worldSelectCompact", defaultValue = "false")
+    boolean isWorldSelectCompact();
+    @ConfigKey(value = "worldSelectCompact")
+    void setWorldSelectCompact(boolean compact);
+
+    @ConfigKey(value = "worldSelectSort")
+    String getWorldSelectSort();
+    @ConfigKey(value = "worldSelectSort")
+    void setWorldSelectSort(String sort);
+
+    @ConfigKey(value = "worldSelectFavourites")
+    String getWorldSelectFavourites();
+    @ConfigKey(value = "worldSelectFavourites")
+    void setWorldSelectFavourites(String favourites);
 }
