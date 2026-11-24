@@ -9,6 +9,7 @@ public enum Comparison implements BiFunction<Integer, Integer, Boolean>
     GREATER_THAN,
     GREATER_THAN_EQUAL,
     EQUAL,
+    NOT_EQUAL,
     ;
 
     @Override
@@ -26,6 +27,8 @@ public enum Comparison implements BiFunction<Integer, Integer, Boolean>
                 return value >= expected;
             case EQUAL:
                 return value.equals(expected);
+            case NOT_EQUAL:
+                return !value.equals(expected);
         }
         return false;
     }

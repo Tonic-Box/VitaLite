@@ -21,7 +21,7 @@ VitaLite's own sidebar panel has these sections:
 - **General:** headless mode, headless map view, never log out when idle.
 - **Logging:** packets, mouse packets, server packets, menu actions, and showing or hiding the console.
 - **Caching:** cached `random.dat`, keeping the bank cache between sessions.
-- **Walker:** pathfinding algorithm, drawing the walker's path, the Transport Editor.
+- **Walker:** drawing the walker's path, tracing what the walker does, the Transport Editor.
 - **Boat Debug** and **Scene:** debug overlays for boats, collision, interactable tiles and distances. **Ground Overlays Under Objects** (on by default) draws tile overlays on the ground, hidden by what stands in front of them.
 - **Input:** mouse movement spoofing and training, click strategy. See [Mouse Movement](../MOUSE-MOVEMENT.md) and [Click Manager](../CLICKMANAGER.md).
 - **Debug:** the [profiler](../PROFILER.md) and platform and mouse info windows.

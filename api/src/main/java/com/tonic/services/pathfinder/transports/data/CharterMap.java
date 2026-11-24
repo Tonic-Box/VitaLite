@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Getter
@@ -238,12 +239,6 @@ public enum CharterMap
 
     public List<CharterShip> getDestinations()
     {
-        List<CharterShip> destinations = new ArrayList<>();
-        for(CharterShip destination : this.destinations)
-        {
-            if(destination.getRequirements().fulfilled())
-                destinations.add(destination);
-        }
-        return destinations;
+        return new ArrayList<>(Arrays.asList(destinations));
     }
 }

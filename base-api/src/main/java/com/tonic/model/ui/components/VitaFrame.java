@@ -287,10 +287,16 @@ public class VitaFrame extends JFrame {
     private void addWindowListeners() {
         minimizeBtn.addActionListener(e -> setExtendedState(JFrame.ICONIFIED));
         maximizeBtn.addActionListener(e -> toggleMaximize());
-        closeBtn.addActionListener(e -> {
-            setVisible(false);
-            dispose();
-        });
+        closeBtn.addActionListener(e -> closeRequested());
+    }
+
+    /**
+     * Runs when the title bar's close button is pressed; hides and disposes the window unless overridden.
+     */
+    protected void closeRequested()
+    {
+        setVisible(false);
+        dispose();
     }
 
     private void toggleMaximize() {

@@ -1,226 +1,233 @@
 package com.tonic.services.pathfinder.collections;
 
+import java.util.Arrays;
+
 /**
- * A hybrid queue that stores integers, combining a standard FIFO queue with a delayed release mechanism.
- *
- * <p>This data structure maintains a main circular queue for immediate enqueuing and dequeuing of elements,
- * and a separate "transport" layer for elements that should only become available after a specified
- * number of "expansions." Once the expansion count meets or exceeds an element's release time,
- * that element is automatically transferred into the main queue. If the main queue is ever empty
- * and delayed elements remain, it will forcibly release the earliest delayed element, ensuring that
- * there's always a value to dequeue.</p>
- *
- * <p>Key Features:</p>
- * <ul>
- *   <li>A fast, circular buffer for the main queue.</li>
- *   <li>A secondary storage for delayed-release elements, providing deferred availability.</li>
- *   <li>Automatic "expansion" tracking, incremented on each dequeue, controls when delayed elements are released.</li>
- *   <li>Optional forced early release of delayed elements if the main queue becomes empty.</li>
- * </ul>
- *
- * <p>This structure is useful for scenarios where elements are expected to become "ready" only after
- * certain conditions or time steps have passed, but you still want a queue-like interface for retrieving them.</p>
+ * The search's queue: a growable ring of tiles taken in the order they were queued, where each level is one step further from the start, and a lane of tiles held until the search is a given number of levels deep, joining at the end of that level in the order they were held.
  */
-public final class HybridIntQueue {
-    private final int[] data;
-    private final int capacityMask;
+public final class HybridIntQueue
+{
+    private static final int FIRST_HELD = 64;
+
+    private int[] data;
+    private int capacityMask;
     private int head;
     private int tail;
 
-    // Maintain a global expansion count
-    private int expansions = 0;
+    private int level;
+    private int levelEnd = -1;
 
-    // Transport min-heap arrays
-    private int[] transportValues;
-    private int[] transportReleaseTimes;
-    private int transportCount = 0;
-    private int transportCapacity;
+    private int[] heldValues = new int[FIRST_HELD];
+    private long[] heldKeys = new long[FIRST_HELD];
+    private int heldCount;
+    private int heldSequence;
 
     /**
-     * Creates a new HybridIntQueue with the specified capacity.
-     * @param capacity The initial capacity of the queue.
+     * @param capacity how many tiles the ring holds before it first grows
+     * @throws IllegalArgumentException if capacity is not positive
      */
-    public HybridIntQueue(final int capacity) {
-        int adjustedCapacity = nextPowerOfTwo(capacity);
-        data = new int[adjustedCapacity];
-        capacityMask = adjustedCapacity - 1;
-        head = 0;
-        tail = 0;
-
-        // Initialize transport arrays with some initial capacity (can be tuned)
-        this.transportCapacity = 64;
-        this.transportValues = new int[transportCapacity];
-        this.transportReleaseTimes = new int[transportCapacity];
+    public HybridIntQueue(int capacity)
+    {
+        int adjusted = nextPowerOfTwo(capacity);
+        data = new int[adjusted];
+        capacityMask = adjusted - 1;
     }
 
     /**
-     * Returns the number of elements in the queue.
-     * @return The number of elements in the queue.
+     * @return how many tiles the ring holds now, held ones not counted
      */
-    public int size() {
+    public int size()
+    {
         return (tail - head) & capacityMask;
     }
 
     /**
-     * Enqueues a new value into the queue.
-     * @param value The value to enqueue.
+     * @return how many tiles the ring can hold before it next grows
      */
-    public void enqueue(final int value) {
-        if (((tail + 1) & capacityMask) == head) {
-            // Queue is full; handle resize if necessary
-            throw new IllegalStateException("Main queue is full");
+    public int capacity()
+    {
+        return data.length - 1;
+    }
+
+    /**
+     * Queues a tile behind the ones already queued, growing the ring when it is full.
+     *
+     * @param value the tile
+     */
+    public void enqueue(int value)
+    {
+        if (((tail + 1) & capacityMask) == head)
+        {
+            grow();
         }
         data[tail] = value;
         tail = (tail + 1) & capacityMask;
     }
 
     /**
-     * Enqueue a transport node that should only become available after 'delay' expansions.
-     * @param value The value to enqueue.
-     * @param delay The number of expansions to delay.
+     * Empties the queue and its held tiles and starts again from level nought, keeping the ring's size.
      */
-    public void enqueueTransport(int value, int delay) {
-        if (transportCount == transportCapacity) {
-            growTransportArrays();
+    public void reset()
+    {
+        head = 0;
+        tail = 0;
+        level = 0;
+        levelEnd = -1;
+        heldCount = 0;
+        heldSequence = 0;
+    }
+
+    private void grow()
+    {
+        int size = size();
+        int[] grown = new int[data.length << 1];
+        for (int i = 0; i < size; i++)
+        {
+            grown[i] = data[(head + i) & capacityMask];
         }
-        transportValues[transportCount] = value;
-        transportReleaseTimes[transportCount] = expansions + delay;
-        siftUp(transportCount);
-        transportCount++;
+        if (levelEnd >= 0)
+        {
+            levelEnd = (levelEnd - head) & capacityMask;
+        }
+        data = grown;
+        capacityMask = grown.length - 1;
+        head = 0;
+        tail = size;
     }
 
     /**
-     * Dequeues a value from the queue.
-     * @return The dequeued value, or -1 if the queue is empty.
+     * Holds a tile until the search is a number of levels deep, then queues it at the end of that level.
+     *
+     * @param value the tile
+     * @param at the level it joins at, counted from the start
      */
-    public int dequeue() {
-        // Release all ready transports
-        releaseReadyTransports();
+    public void enqueueAtLevel(int value, int at)
+    {
+        if (heldCount == heldValues.length)
+        {
+            heldValues = Arrays.copyOf(heldValues, heldCount << 1);
+            heldKeys = Arrays.copyOf(heldKeys, heldCount << 1);
+        }
+        heldValues[heldCount] = value;
+        heldKeys[heldCount] = (long) at << Integer.SIZE | (heldSequence++ & 0xFFFFFFFFL);
+        siftUp(heldCount);
+        heldCount++;
+    }
 
-        if (isMainQueueEmpty()) {
-            // Main queue is empty. Force release the earliest transport if any.
-            if (transportCount > 0) {
-                // The earliest transport is at the root of the heap
-                int earliestValue = transportValues[0];
-                removeMinTransport();
-                enqueue(earliestValue);
+    /**
+     * @return how many levels deep the search is: the level of the tile last taken out
+     */
+    public int level()
+    {
+        return level;
+    }
+
+    /**
+     * Takes out the next tile, starting a new level once the current one is used up and letting in the held tiles
+     * that wait for it.
+     *
+     * @return the tile, or -1 when nothing is queued or held
+     */
+    public int dequeue()
+    {
+        if (levelEnd < 0 || head == levelEnd)
+        {
+            if (levelEnd >= 0)
+            {
+                level++;
             }
+            if (head == tail && heldCount > 0)
+            {
+                level = Math.max(level, heldLevel(0));
+            }
+            releaseUpTo(level);
+            levelEnd = tail;
         }
-
-        if (isMainQueueEmpty()) {
-            // Still nothing to dequeue
-            return -1; // or throw exception
+        if (head == tail)
+        {
+            return -1;
         }
-
         int value = data[head];
         head = (head + 1) & capacityMask;
-        expansions++;
-
-        // After expansion, release ready transports again
-        releaseReadyTransports();
-
         return value;
     }
 
     /**
-     * Checks if the entire queue (main + transport) is empty.
-     * @return True if empty, false otherwise.
+     * @return whether nothing is queued or held
      */
-    public boolean isEmpty() {
-        return isMainQueueEmpty() && transportCount == 0;
+    public boolean isEmpty()
+    {
+        return head == tail && heldCount == 0;
     }
 
-    private boolean isMainQueueEmpty() {
-        return head == tail;
-    }
-
-    /**
-     * Releases all transport elements that are ready to be enqueued.
-     */
-    private void releaseReadyTransports() {
-        while (transportCount > 0 && transportReleaseTimes[0] <= expansions) {
-            // The earliest transport is ready
-            enqueue(transportValues[0]);
-            removeMinTransport();
-        }
-    }
-
-    /**
-     * Removes and returns the transport element with the smallest release time.
-     */
-    private void removeMinTransport() {
-        if (transportCount == 0) return;
-        // Replace root with the last element
-        transportCount--;
-        if (transportCount > 0) {
-            transportValues[0] = transportValues[transportCount];
-            transportReleaseTimes[0] = transportReleaseTimes[transportCount];
-            siftDown(0);
-        }
-    }
-
-    /**
-     * Sifts up the element at the given index to maintain heap property.
-     */
-    private void siftUp(int idx) {
-        while (idx > 0) {
-            int parent = (idx - 1) >>> 1;
-            if (transportReleaseTimes[idx] >= transportReleaseTimes[parent]) {
-                break;
+    private void releaseUpTo(int reached)
+    {
+        while (heldCount > 0 && heldLevel(0) <= reached)
+        {
+            enqueue(heldValues[0]);
+            heldCount--;
+            if (heldCount > 0)
+            {
+                heldValues[0] = heldValues[heldCount];
+                heldKeys[0] = heldKeys[heldCount];
+                siftDown(0);
             }
-            swapTransportElements(idx, parent);
-            idx = parent;
         }
     }
 
-    /**
-     * Sifts down the element at the given index to maintain heap property.
-     */
-    private void siftDown(int idx) {
-        int leftChild;
-        while ((leftChild = (idx << 1) + 1) < transportCount) {
-            int smallest = leftChild;
-            int rightChild = leftChild + 1;
-            if (rightChild < transportCount && transportReleaseTimes[rightChild] < transportReleaseTimes[leftChild]) {
-                smallest = rightChild;
+    private int heldLevel(int index)
+    {
+        return (int) (heldKeys[index] >> Integer.SIZE);
+    }
+
+    private void siftUp(int index)
+    {
+        while (index > 0)
+        {
+            int parent = (index - 1) >>> 1;
+            if (heldKeys[index] >= heldKeys[parent])
+            {
+                return;
             }
-            if (transportReleaseTimes[idx] <= transportReleaseTimes[smallest]) {
-                break;
-            }
-            swapTransportElements(idx, smallest);
-            idx = smallest;
+            swap(index, parent);
+            index = parent;
         }
     }
 
-    /**
-     * Swaps two transport elements in the heap.
-     */
-    private void swapTransportElements(int i, int j) {
-        int tempValue = transportValues[i];
-        transportValues[i] = transportValues[j];
-        transportValues[j] = tempValue;
-
-        int tempTime = transportReleaseTimes[i];
-        transportReleaseTimes[i] = transportReleaseTimes[j];
-        transportReleaseTimes[j] = tempTime;
+    private void siftDown(int index)
+    {
+        int child;
+        while ((child = (index << 1) + 1) < heldCount)
+        {
+            if (child + 1 < heldCount && heldKeys[child + 1] < heldKeys[child])
+            {
+                child++;
+            }
+            if (heldKeys[index] <= heldKeys[child])
+            {
+                return;
+            }
+            swap(index, child);
+            index = child;
+        }
     }
 
-    private void growTransportArrays() {
-        int newCapacity = transportCapacity << 1;
-        int[] newValues = new int[newCapacity];
-        int[] newTimes = new int[newCapacity];
-        System.arraycopy(transportValues, 0, newValues, 0, transportCount);
-        System.arraycopy(transportReleaseTimes, 0, newTimes, 0, transportCount);
-        transportValues = newValues;
-        transportReleaseTimes = newTimes;
-        transportCapacity = newCapacity;
+    private void swap(int a, int b)
+    {
+        int value = heldValues[a];
+        heldValues[a] = heldValues[b];
+        heldValues[b] = value;
+        long key = heldKeys[a];
+        heldKeys[a] = heldKeys[b];
+        heldKeys[b] = key;
     }
 
-    /**
-     * Computes the next power of two greater than or equal to n.
-     */
-    private static int nextPowerOfTwo(int n) {
-        if (n <= 0) throw new IllegalArgumentException("Capacity must be positive");
+    private static int nextPowerOfTwo(int n)
+    {
+        if (n <= 0)
+        {
+            throw new IllegalArgumentException("capacity must be positive");
+        }
         return 1 << (32 - Integer.numberOfLeadingZeros(n - 1));
     }
 }

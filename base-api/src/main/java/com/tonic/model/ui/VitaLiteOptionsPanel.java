@@ -16,11 +16,9 @@ import com.tonic.services.mouserecorder.MousePacketDecoder;
 import com.tonic.services.mouserecorder.trajectory.TrajectoryService;
 import com.tonic.services.mouserecorder.trajectory.ui.TrajectoryTrainerMonitor;
 import com.tonic.services.mouserecorder.trajectory.ui.TrajectorySettingsPanel;
-import com.tonic.services.pathfinder.PathfinderAlgo;
 import com.tonic.services.mouserecorder.MovementVisualization;
 import com.tonic.services.profiler.ProfilerWindow;
 import com.tonic.util.ReflectBuilder;
-import com.tonic.util.ThreadPool;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -56,7 +54,6 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
     private final ToggleSlider logMenuActionsToggle;
     private final ToggleSlider hideLoggerToggle;
     private final ToggleSlider bankCacheToggle;
-    private JFrame transportsEditor;
 
     private final ToggleSlider sendMouseMovement;
     private final ToggleSlider recordTrajectory;
@@ -266,15 +263,6 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         // Walker Settings
         CollapsiblePanel walkerPanel = new CollapsiblePanel("Walker");
 
-        FancyDropdown<PathfinderAlgo> pathfinderAlgo = new FancyDropdown<>("Pathfinder Algo", PathfinderAlgo.class);
-        PathfinderAlgo algo = Static.getVitaConfig().getPathfinderImpl();
-        pathfinderAlgo.setSelectedItem(algo);
-
-        pathfinderAlgo.addSelectionListener(event -> Static.getVitaConfig().setPathfinderImpl(pathfinderAlgo.getSelectedItem()));
-
-        walkerPanel.addContent(pathfinderAlgo);
-        walkerPanel.addVerticalStrut(12);
-
         ToggleSlider drawPath = new ToggleSlider();
         drawPath.setSelected(Static.getVitaConfig().shouldDrawWalkerPath());
         walkerPanel.addContent(createToggleOption(
@@ -282,6 +270,16 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
                 "Draw the walker path on the floating and mini maps",
                 drawPath,
                 () -> Static.getVitaConfig().setShouldDrawWalkerPath(drawPath.isSelected())
+        ));
+
+        walkerPanel.addVerticalStrut(12);
+        ToggleSlider traceWalker = new ToggleSlider();
+        traceWalker.setSelected(Static.getVitaConfig().shouldTraceWalker());
+        walkerPanel.addContent(createToggleOption(
+                "Trace Walker",
+                "Log what the walker does and why: clicks, doors, replans, teleports and transports",
+                traceWalker,
+                () -> Static.getVitaConfig().setShouldTraceWalker(traceWalker.isSelected())
         ));
 
         if(!Static.isRunningFromShadedJar())
@@ -728,27 +726,17 @@ public class VitaLiteOptionsPanel extends VPluginPanel {
         scrollPane.getVerticalScrollBar().setBlockIncrement(64);
     }
 
-    private JFrame getTransportsEditor()
+    public void toggleTransportsEditor()
     {
         try
         {
             Class<?> clazz = Static.getClient().getClass().getClassLoader().loadClass("com.tonic.services.pathfinder.ui.TransportEditorFrame");
-            return (JFrame) clazz.getDeclaredConstructor().newInstance();
+            clazz.getMethod("toggle").invoke(null);
         }
         catch (Exception e)
         {
             Logger.error("Failed to open Transports Editor: " + e.getMessage());
         }
-        return null;
-    }
-
-    public void toggleTransportsEditor()
-    {
-        if(transportsEditor == null)
-        {
-            transportsEditor = ThreadPool.submit(this::getTransportsEditor);
-        }
-        SwingUtilities.invokeLater(() -> transportsEditor.setVisible(!transportsEditor.isVisible()));
     }
 
     private void checkMouseValues()

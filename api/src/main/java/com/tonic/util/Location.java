@@ -1,14 +1,10 @@
 package com.tonic.util;
 
 import com.tonic.Static;
-import com.tonic.api.game.SceneAPI;
 import com.tonic.data.wrappers.PlayerEx;
-import com.tonic.services.pathfinder.LocalPathfinder;
 import com.tonic.services.pathfinder.Walker;
-import com.tonic.services.pathfinder.implimentations.hybridbfs.HybridBFSStep;
 import lombok.Getter;
 import net.runelite.api.*;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldArea;
 import net.runelite.api.coords.WorldPoint;
 

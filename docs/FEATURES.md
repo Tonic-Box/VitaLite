@@ -35,7 +35,7 @@ What VitaLite adds on top of RuneLite. Most of it is in VitaLite's settings pane
 - **Profiler.** A built-in JVM profiler for checking performance. See [Profiler](PROFILER.md).
 - **Debug overlays.** Collision, interactable tiles, boat hull and deck, distances, and the walker's path.
 - **Ground overlays under objects.** Tile overlays from any plugin are drawn on the ground in the 3D scene, so trees, walls and characters in front of them hide them. Works with the software renderer, the GPU plugin and 117 HD.
-- **Transport Editor.** Add and edit the doors, stairs and other links the walker uses.
+- **Transport Recorder and Editor.** Record the doors, stairs and other links the walker uses as you take them, and edit them with their requirements (dev runs).
 
 ## Launching
 

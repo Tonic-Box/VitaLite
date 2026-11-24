@@ -5,13 +5,35 @@ import com.tonic.api.game.WorldsAPI;
 import lombok.Value;
 import net.runelite.api.Skill;
 
-import java.util.Set;
-
 @Value
 public class SkillRequirement implements Requirement
 {
     Skill skill;
     int level;
+    boolean boostable;
+
+    /**
+     * A base level, boosts not counting.
+     *
+     * @param skill the skill
+     * @param level the level needed
+     */
+    public SkillRequirement(Skill skill, int level)
+    {
+        this(skill, level, false);
+    }
+
+    /**
+     * @param skill the skill
+     * @param level the level needed
+     * @param boostable whether a boosted level counts
+     */
+    public SkillRequirement(Skill skill, int level, boolean boostable)
+    {
+        this.skill = skill;
+        this.level = level;
+        this.boostable = boostable;
+    }
 
     @Override
     public Boolean get()
@@ -21,7 +43,7 @@ public class SkillRequirement implements Requirement
             return false;
         }
 
-        return SkillAPI.getLevel(skill) >= level;
+        return (boostable ? SkillAPI.getBoostedLevel(skill) : SkillAPI.getLevel(skill)) >= level;
     }
 }
 

@@ -6,8 +6,9 @@ import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.util.handler.StepHandler;
 import com.tonic.queries.TileObjectQuery;
 import com.tonic.util.handler.HandlerBuilder;
-import com.tonic.services.pathfinder.transports.Transport;
-import com.tonic.util.WorldPointUtil;
+import com.tonic.services.pathfinder.requirements.Requirements;
+import com.tonic.services.pathfinder.requirements.WorldRequirement;
+import com.tonic.services.pathfinder.transports.CodeTransport;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -86,9 +87,12 @@ public enum CanoeStation
                 .build();
     }
 
-    public static List<Transport> getTravelMatrix()
+    /**
+     * @return a canoe trip for every station pair each canoe reaches, each building a fresh handler per use
+     */
+    public static List<CodeTransport> getTravelMatrix()
     {
-        List<Transport> transports = new ArrayList<>();
+        List<CodeTransport> transports = new ArrayList<>();
 
         CanoeStation[] stations = values();
         for (CanoeStation start : stations)
@@ -109,18 +113,10 @@ public enum CanoeStation
                     int ordinalDiff = Math.abs(endOrdinal - startOrdinal);
                     if (ordinalDiff <= distance)
                     {
-                        transports.add(
-                                new Transport(
-                                        WorldPointUtil.compress(start.getLocation()),
-                                        WorldPointUtil.compress(end.getLocation()),
-                                        6,
-                                        10,
-                                        29,
-                                        start.travelTo(end, canoe),
-                                        canoe.getRequirements(),
-                                        -1
-                                )
-                        );
+                        Requirements requirements = new Requirements();
+                        requirements.addRequirements(canoe.getRequirements().getAll());
+                        requirements.addRequirement(new WorldRequirement(true));
+                        transports.add(new CodeTransport("Canoe", start.getLocation(), end.getLocation(), 29, requirements, () -> start.travelTo(end, canoe)));
                     }
                 }
             }

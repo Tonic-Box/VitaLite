@@ -2,7 +2,6 @@ package com.tonic.util;
 
 import com.tonic.services.ClickStrategy;
 import com.tonic.services.RenderScale;
-import com.tonic.services.pathfinder.PathfinderAlgo;
 import com.tonic.services.streamer.MirrorFrameRate;
 import com.tonic.util.config.ConfigGroup;
 import com.tonic.util.config.ConfigKey;
@@ -42,15 +41,15 @@ public interface ClientConfig extends VitaConfig {
     @ConfigKey(value = "cachedBank")
     void setShouldCacheBank(boolean shouldCache);
 
-    @ConfigKey(value = "pathfinderImpl", defaultValue = "HYBRID_BFS")
-    PathfinderAlgo getPathfinderImpl();
-    @ConfigKey(value = "pathfinderImpl")
-    void setPathfinderImpl(PathfinderAlgo impl);
-
     @ConfigKey(value = "drawWalkerPath", defaultValue = "true")
     boolean shouldDrawWalkerPath();
     @ConfigKey(value = "drawWalkerPath")
     void setShouldDrawWalkerPath(boolean shouldDraw);
+
+    @ConfigKey(value = "traceWalker", defaultValue = "false")
+    boolean shouldTraceWalker();
+    @ConfigKey(value = "traceWalker")
+    void setShouldTraceWalker(boolean shouldTrace);
 
     @ConfigKey(value = "drawCollision", defaultValue = "false")
     boolean shouldDrawCollision();

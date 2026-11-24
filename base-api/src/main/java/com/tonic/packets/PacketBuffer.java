@@ -214,7 +214,7 @@ public class PacketBuffer {
     }
 
     public short readShortAddLE() {
-        short value = (short)(((payload.getByte(offset) & 0xFF) << 8) | ((payload.getByte(offset + 1) & 0xFF) - 128));
+        short value = (short)(((payload.getByte(offset) & 0xFF) << 8) | (((payload.getByte(offset + 1) & 0xFF) - 128) & 0xFF));
         //short value = (short)((payload[offset] & 0xFF) - 128 | ((payload[offset + 1] & 0xFF) << 8));
         offset += 2;
         return value;

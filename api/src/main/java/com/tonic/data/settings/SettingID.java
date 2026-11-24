@@ -1126,6 +1126,11 @@ public final class SettingID
         public static final ActionSetting RESET_SPLIT_CHAT_COLOURS = new ActionSetting(2916);
 
         /**
+         * Set the minimum level a player must have for their death broadcast to be sent to you. Setting 507.
+         */
+        public static final NumberSetting HARDCORE_WORLDS_DEATH_BROADCAST_MINIMUM_LEVEL = new NumberSetting(1781);
+
+        /**
          * The options of Friend Login/Logout messages.
          */
         public static final class FriendLoginLogoutMessages
@@ -2846,11 +2851,6 @@ public final class SettingID
         public static final ToggleSetting VALE_TOTEM_TRAIL_BUFF = new ToggleSetting(4952);
 
         /**
-         * When active, the minimenu reordering button will be displayed on the top-right of the minimenu. Setting 406.
-         */
-        public static final ToggleSetting MINIMENU_REORDERING = new ToggleSetting(1102);
-
-        /**
          * Reset and remove any reordering done to the minimenu across all entitites. Setting 407.
          */
         public static final ActionSetting RESTORE_MINIMENU_REORDERING = new ActionSetting(1103);
@@ -3644,6 +3644,11 @@ public final class SettingID
          * When putting seeds into a birdhouse, if the item is worth more than this value, a warning will be shown. Setting 449.
          */
         public static final NumberSetting MINIMUM_ITEM_VALUE_NEEDED_FOR_BIRDHOUSE_WARNING = new NumberSetting(6247);
+
+        /**
+         * When enabled, skip the confirmation screen when banking your catch. Setting 506.
+         */
+        public static final ToggleSetting DRIFT_NET_FISHING_IGNORE_BANK_CONFIRMATION = new ToggleSetting(1780);
 
         /**
          * When enabled, shows a warning before teleport spells will transport you off your boat, if this would cause the boat to become lost at sea. Setting 471.

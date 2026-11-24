@@ -6,6 +6,7 @@ import com.tonic.api.game.reach.Reachability;
 import com.tonic.api.game.sailing.BoatStatsAPI;
 import com.tonic.services.ground.GroundOverlays;
 import com.tonic.services.streamer.StreamerMode;
+import com.tonic.services.pathfinder.recorder.TransportTools;
 import com.tonic.services.pathfinder.sailing.BoatCollisionAPI;
 import com.tonic.services.pathfinder.sailing.BoatPathing;
 import com.tonic.services.pathfinder.sailing.Sailing;
@@ -25,8 +26,8 @@ import com.tonic.headless.HeadlessMode;
 import com.tonic.services.hotswapper.PluginReloader;
 import com.tonic.services.mouse.ClickVisualizationOverlay;
 import com.tonic.services.mouse.MovementVisualizationOverlay;
-import com.tonic.services.pathfinder.abstractions.IPathfinder;
 import com.tonic.services.pathfinder.abstractions.IStep;
+import com.tonic.services.pathfinder.PlayerMotion;
 import com.tonic.services.pathfinder.Walker;
 import com.tonic.services.pathfinder.model.WalkerPath;
 import com.tonic.services.pathfinder.transports.TransportLoader;
@@ -439,6 +440,7 @@ public class GameManager extends Overlay {
         BankCache.init();
         SceneCacheEvents.init();
         StreamerMode.install();
+        TransportTools.install();
         FrameProfiling.install();
 
         ThreadPool.submit(() -> {
@@ -534,6 +536,9 @@ public class GameManager extends Overlay {
     protected void onGameTick(GameTick event)
     {
         tickCount++;
+        Client tickClient = Static.getClient();
+        Player local = tickClient.getLocalPlayer();
+        PlayerMotion.tick(local == null ? null : local.getWorldLocation());
         if(walkerPath != null && !walkerPath.step())
         {
             walkerPath = null;
@@ -732,7 +737,10 @@ public class GameManager extends Overlay {
                     .setParam1(event.getActionParam1())
                     .setIdentifier(event.getIdentifier())
                     .setType(MenuAction.RUNELITE)
-                    .onClick(e -> walkerPath = WalkerPath.get(wp));
+                    .onClick(e -> ThreadPool.submit(() ->
+                    {
+                        walkerPath = WalkerPath.get(wp);
+                    }));
         }
         else
         {
@@ -756,8 +764,7 @@ public class GameManager extends Overlay {
                 .setIdentifier(event.getIdentifier())
                 .setType(MenuAction.RUNELITE)
                 .onClick(e -> ThreadPool.submit(() -> {
-                    final IPathfinder engine = Static.getVitaConfig().getPathfinderImpl().newInstance();
-                    List<? extends IStep> path = engine.find(wp);
+                    List<? extends IStep> path = WalkerPath.get(wp).getSteps();
                     if(path == null || path.isEmpty())
                         return;
                     testPoints = IStep.toWorldPoints(path);

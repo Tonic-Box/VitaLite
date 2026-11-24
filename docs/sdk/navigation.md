@@ -9,31 +9,55 @@
 | Class | What it is |
 |---|---|
 | `Walker` | Walk to a point or any of a set of areas, with an optional stop condition (waits). Also `sailTo`, `cancel()` and `isWalking()`. Turns run on and drinks stamina along the way. |
-| `WalkerPath` | The same walk as an object you advance yourself with `step()` once per tick, so it doesn't block. `HandlerBuilder.walkTo` uses it. |
+| `WalkerPath` | The same walk as an object you advance yourself with `step()` once per tick, so it doesn't block. `HandlerBuilder.walkTo` uses it. `WalkerPath.nearby(areas)` plans only when a route inside the loaded scene exists, so an unreachable target is given up on at once; `WalkerPath.get(object)` walks to a tile an object can be used from. |
 | `StrategicPathing` | Short paths inside the loaded scene that avoid tiles you mark as dangerous. |
-| `LocalPathfinder` | A plain path between two tiles in the loaded scene. |
 
 ```java
 Walker.walkTo(new WorldPoint(3208, 3220, 2));
 ```
 
-## Algorithms
+While walking, each click is checked against the walk the scene actually allows: a route tile the player can no longer reach is skipped when a later one still is, and otherwise the door, gate or curtain in the way is opened or the walk is replanned. A tile is clicked once while the player is busy, never more than 17 tiles ahead. A teleport that does not land is tried three times and then left out of replans, and a transport whose requirements stop holding is replanned around. Replans run off the client thread.
 
-The world walker can use one of five algorithms, picked in VitaLite's settings or passed to `WalkerPath`. They are listed in `PathfinderAlgo` (`HYBRID_BFS`, the default, then `BI_DIR_BFS`, `FLOW_FIELD`, `ASTAR` and `JPS`). Each implements `IPathfinder`.
+Turn on **Trace Walker** in VitaLite's settings to log what the walker does and why.
+
+## Algorithm
+
+The world walker plans with a breadth-first search (`impl.Pathfinder`, an `IPathfinder`) in which each level is one step: transports count two steps per tick they take, and teleports join after 25 steps of walking. Tiles of the loaded scene are planned over the scene's own collision (`impl.LiveLayer`), with doors and gates the walker opens left passable, and inside an instance its tiles are mapped to the world tiles they copy. The rest of the world is planned over the collision map dumped from the cache (`collision.dat`), which every local client shares through one memory-mapped file.
 
 ## Transports
 
-`transports` holds the links the pathfinder can take besides walking: doors, stairs, ladders, shortcuts, NPC and item transports, and teleports from `teleports`.
+`transports` holds the links the pathfinder can take besides walking.
 
 | Class | What it is |
 |---|---|
-| `TransportLoader` | Loads every transport. You can add temporary ones of your own with `updateTempTransports`. |
-| `Transport` / `LongTransport` | One link from a tile to a tile, and one that takes several actions. |
-| `transports.data` | Fixed networks: fairy rings, spirit trees, gnome gliders, canoes, minecarts, dwarven carts, charter ships, Barnaby's ship, quetzals. |
+| `TransportLoader` | The transport graph: every transport in `transports.json` plus the code-defined ones, by the tile they leave from. |
+| `Transport` | One link: using an object or NPC (`id`, `isObject`) with a 1-based `option` at `location`, answering `dialogueOptions`, lands on `destination` after `duration` ticks. It builds a fresh handler each time it is used. |
+| `CodeTransport` | A link too involved for the JSON, defined in code. The networks live in `transports.hardcoded`: fairy rings, quetzals, gnome gliders, spirit trees, minecarts, charter ships, canoes, dwarven carts, Barnaby's ship, magic carpets, the Shantay Pass, trapdoors and more. |
 
-`requirements` holds what a transport needs before it's used (`ItemRequirement`, `SkillRequirement`, `QuestRequirement`, `VarRequirement`, `WorldRequirement`, `OtherRequirement`), combined in `Requirements`.
+`transports.json` entries look like this:
 
-The settings panel has a Transport Editor for adding and editing transports.
+```json
+{
+  "name": "Ladder",
+  "id": 11794,
+  "isObject": true,
+  "location": { "worldX": 3202, "worldY": 3435, "plane": 0, "packed": 56282242 },
+  "destination": { "worldX": 3202, "worldY": 3435, "plane": 1, "packed": 593153154 },
+  "option": 1,
+  "dialogueOptions": [],
+  "duration": 1
+}
+```
+
+`requirements` holds what a transport needs before it's used (`ItemRequirement`, `SkillRequirement`, `QuestRequirement`, `VarRequirement`, `WorldRequirement`, `OtherRequirement`), combined in `Requirements`; in the JSON a transport carries an optional `requirements` block. Quests use RuneLite's `Quest` names.
+
+`teleports` holds the teleports a route can start with: spells, items and jewellery. Each waits until the player lands before the walk goes on, and teleports landing in the Wilderness are only used when the target is in it.
+
+## Transport recorder and editor
+
+In a dev run (not from the shaded jar) the **Transport Recorder** sidebar panel records transports as you use them: switch on Record and click an object or NPC option, answer its dialogue, and the transport is staged once you land. Show tiles marks every tile a transport leaves from, and right-clicking one offers "Edit transport". Promote adds staged transports to `transports.json` and the running walker.
+
+The **Transport Editor** (VitaLite's settings, or the recorder panel) edits live and staged transports and their requirements. Saving a live transport updates the running walker and `transports.json` at once.
 
 ## Sailing
 

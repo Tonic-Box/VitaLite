@@ -3,7 +3,6 @@ package com.tonic.services.pathfinder.transports.data;
 import com.tonic.api.entities.NpcAPI;
 import com.tonic.api.entities.TileObjectAPI;
 import com.tonic.api.game.MovementAPI;
-import com.tonic.api.threaded.Delays;
 import com.tonic.data.wrappers.NpcEx;
 import com.tonic.util.DialogueNode;
 import com.tonic.api.widgets.DialogueAPI;
@@ -93,10 +92,6 @@ public enum DwarvenCart
                     {
                         NpcEx npc = new NpcQuery().withName("Cart conductor").nearest();
                         NpcAPI.interact(npc, "Tickets");
-                        while (!DialogueAPI.dialoguePresent())
-                        {
-                            Delays.tick();
-                        }
                         return 1;
                     }
                     return 3;

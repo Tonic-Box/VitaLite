@@ -1,6 +1,7 @@
 package com.tonic;
 
 import com.tonic.util.LoggerFormatting;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import javax.inject.Singleton;
@@ -24,6 +25,7 @@ public class Logger {
     private static JFrame clientFrame;           // the top level window
     private static JScrollPane consoleScrollPane; // scroll pane for smart auto-scroll
     private static int loggerHeight = 150;         // height of the logger component
+    @Getter
     private static int maxMessages = 50;           // maximum number of messages to keep in console
 
     static
@@ -293,7 +295,7 @@ public class Logger {
     {
         if(INSTANCE == null)
             return;
-        INSTANCE._error(message.replace("%e", throwable.getMessage()));
+        INSTANCE._error(message.replace("%e", String.valueOf(throwable.getMessage())));
     }
 
 
@@ -337,15 +339,6 @@ public class Logger {
         {
             INSTANCE.trimToMaxMessages();
         }
-    }
-
-    /**
-     * Gets the current maximum message count limit.
-     * @return Current max messages
-     */
-    public static int getMaxMessages()
-    {
-        return maxMessages;
     }
 
     /**

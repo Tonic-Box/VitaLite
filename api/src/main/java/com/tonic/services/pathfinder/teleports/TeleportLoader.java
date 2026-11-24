@@ -1,6 +1,7 @@
 package com.tonic.services.pathfinder.teleports;
 
 import com.tonic.Static;
+import com.tonic.util.WorldPointUtil;
 import com.tonic.api.game.GameAPI;
 import com.tonic.api.game.QuestAPI;
 import com.tonic.api.game.VarAPI;
@@ -27,6 +28,7 @@ public class TeleportLoader {
 
             // TODO: if teleblocked return here
             Client client = Static.getClient();
+            WorldPoint here = WorldPointUtil.fromInstance(PlayerEx.getLocal().getWorldPoint());
 
             if (client.getVarbitValue(VarbitID.TELEBLOCK_CYCLES) > 0) {
                 return teleports;
@@ -42,7 +44,7 @@ public class TeleportLoader {
             }
 
             for (TeleportItem tele : TeleportItem.values()) {
-                if (tele.canUse() && tele.getDestination().distanceTo(PlayerEx.getLocal().getWorldPoint()) > 20) {
+                if (tele.canUse() && tele.getDestination().distanceTo(here) > 20) {
                     if (!membersCheck(tele.getItemId())) {
                         continue;
                     }
@@ -67,199 +69,76 @@ public class TeleportLoader {
             boolean inMembers = WorldsAPI.inMembersWorld();
 
             if (InventoryAPI.getItem(i -> ArrayUtils.contains(MovementConstants.SLAYER_RING, i.getId())) != null && inMembers) {
-                teleports.add(new Teleport(new WorldPoint(2432, 3423, 0), 2,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Teleport", "Stronghold", MovementConstants.SLAYER_RING));
-                        }}));
+                teleports.add(new Teleport("SLAYER_RING: Stronghold", new WorldPoint(2432, 3423, 0), 2, jewelryTeleport("Teleport", "Stronghold", MovementConstants.SLAYER_RING)));
                 if (QuestAPI.getState(Quest.PRIEST_IN_PERIL) == QuestState.FINISHED) {
-                    teleports.add(new Teleport(new WorldPoint(3422, 3537, 0), 2,
-                            new ArrayList<>() {{
-                                addAll(jewelryTeleport("Teleport", "Slayer Tower", MovementConstants.SLAYER_RING));
-                            }}));
+                    teleports.add(new Teleport("SLAYER_RING: Slayer Tower", new WorldPoint(3422, 3537, 0), 2, jewelryTeleport("Teleport", "Slayer Tower", MovementConstants.SLAYER_RING)));
                 }
-                teleports.add(new Teleport(new WorldPoint(2802, 10000, 0), 2,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Teleport", "Fremennik Dungeon", MovementConstants.SLAYER_RING));
-                        }}));
+                teleports.add(new Teleport("SLAYER_RING: Fremennik Dungeon", new WorldPoint(2802, 10000, 0), 2, jewelryTeleport("Teleport", "Fremennik Dungeon", MovementConstants.SLAYER_RING)));
                 if (QuestAPI.getState(Quest.HAUNTED_MINE) == QuestState.FINISHED) {
-                    teleports.add(new Teleport(new WorldPoint(3185, 4601, 0), 2,
-                            new ArrayList<>() {{
-                                addAll(jewelryTeleport("Teleport", "Tarn's Lair", MovementConstants.SLAYER_RING));
-                            }}));
+                    teleports.add(new Teleport("SLAYER_RING: Tarn's Lair", new WorldPoint(3185, 4601, 0), 2, jewelryTeleport("Teleport", "Tarn's Lair", MovementConstants.SLAYER_RING)));
                 }
             }
             if (getTeleportItem(MovementConstants.AMULET_OF_GLORY) != null && inMembers) {
-                teleports.add(new Teleport(new WorldPoint(3087, 3496, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Edgeville", MovementConstants.AMULET_OF_GLORY));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(2918, 3176, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Karamja", MovementConstants.AMULET_OF_GLORY));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(3105, 3251, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Draynor Village", MovementConstants.AMULET_OF_GLORY));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(3293, 3163, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Al Kharid", MovementConstants.AMULET_OF_GLORY));
-                        }}));
+                teleports.add(new Teleport("AMULET_OF_GLORY: Edgeville", new WorldPoint(3087, 3496, 0), 5, jewelryTeleport("Rub", "Edgeville", MovementConstants.AMULET_OF_GLORY)));
+                teleports.add(new Teleport("AMULET_OF_GLORY: Karamja", new WorldPoint(2918, 3176, 0), 5, jewelryTeleport("Rub", "Karamja", MovementConstants.AMULET_OF_GLORY)));
+                teleports.add(new Teleport("AMULET_OF_GLORY: Draynor Village", new WorldPoint(3105, 3251, 0), 5, jewelryTeleport("Rub", "Draynor Village", MovementConstants.AMULET_OF_GLORY)));
+                teleports.add(new Teleport("AMULET_OF_GLORY: Al Kharid", new WorldPoint(3293, 3163, 0), 5, jewelryTeleport("Rub", "Al Kharid", MovementConstants.AMULET_OF_GLORY)));
             }
             if (getTeleportItem(MovementConstants.GAMES_NECKLACE) != null && inMembers) {
-                teleports.add(new Teleport(new WorldPoint(2898, 3552, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Burthorpe", MovementConstants.GAMES_NECKLACE));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(2521, 3571, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Barbarian Outpost", MovementConstants.GAMES_NECKLACE));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(2965, 4382, 2), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Corporeal Beast", MovementConstants.GAMES_NECKLACE));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(3245, 9500, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Tears of Guthix", MovementConstants.GAMES_NECKLACE));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(1625, 3937, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Wintertodt Camp", MovementConstants.GAMES_NECKLACE));
-                        }}));
+                teleports.add(new Teleport("GAMES_NECKLACE: Burthorpe", new WorldPoint(2898, 3552, 0), 5, jewelryTeleport("Rub", "Burthorpe", MovementConstants.GAMES_NECKLACE)));
+                teleports.add(new Teleport("GAMES_NECKLACE: Barbarian Outpost", new WorldPoint(2521, 3571, 0), 5, jewelryTeleport("Rub", "Barbarian Outpost", MovementConstants.GAMES_NECKLACE)));
+                teleports.add(new Teleport("GAMES_NECKLACE: Corporeal Beast", new WorldPoint(2965, 4382, 2), 5, jewelryTeleport("Rub", "Corporeal Beast", MovementConstants.GAMES_NECKLACE)));
+                teleports.add(new Teleport("GAMES_NECKLACE: Tears of Guthix", new WorldPoint(3245, 9500, 0), 5, jewelryTeleport("Rub", "Tears of Guthix", MovementConstants.GAMES_NECKLACE)));
+                teleports.add(new Teleport("GAMES_NECKLACE: Wintertodt Camp", new WorldPoint(1625, 3937, 0), 5, jewelryTeleport("Rub", "Wintertodt Camp", MovementConstants.GAMES_NECKLACE)));
             }
             if (getTeleportItem(MovementConstants.RING_OF_WEALTH) != null && inMembers) {
-                teleports.add(new Teleport(new WorldPoint(2535, 3862, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Miscellania", MovementConstants.RING_OF_WEALTH));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(3162, 3480, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Grand Exchange", MovementConstants.RING_OF_WEALTH));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(2995, 3375, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Falador", MovementConstants.RING_OF_WEALTH));
-                        }}));
+                teleports.add(new Teleport("RING_OF_WEALTH: Miscellania", new WorldPoint(2535, 3862, 0), 5, jewelryTeleport("Rub", "Miscellania", MovementConstants.RING_OF_WEALTH)));
+                teleports.add(new Teleport("RING_OF_WEALTH: Grand Exchange", new WorldPoint(3162, 3480, 0), 5, jewelryTeleport("Rub", "Grand Exchange", MovementConstants.RING_OF_WEALTH)));
+                teleports.add(new Teleport("RING_OF_WEALTH: Falador", new WorldPoint(2995, 3375, 0), 5, jewelryTeleport("Rub", "Falador", MovementConstants.RING_OF_WEALTH)));
                 if (QuestAPI.getState(Quest.BETWEEN_A_ROCK) == QuestState.FINISHED) {
-                    teleports.add(new Teleport(new WorldPoint(2831, 10165, 0), 5,
-                            new ArrayList<>() {{
-                                addAll(jewelryTeleport("Rub", "Dondakan", MovementConstants.RING_OF_WEALTH));
-                            }}));
+                    teleports.add(new Teleport("RING_OF_WEALTH: Dondakan", new WorldPoint(2831, 10165, 0), 5, jewelryTeleport("Rub", "Dondakan", MovementConstants.RING_OF_WEALTH)));
                 }
             }
             if (getTeleportItem(MovementConstants.RING_OF_DUELING) != null && inMembers) {
-                teleports.add(new Teleport(new WorldPoint(3315, 3235, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Emir's Arena", MovementConstants.RING_OF_DUELING));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(2441, 3091, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Castle Wars", MovementConstants.RING_OF_DUELING));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(3151, 3636, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Ferox Enclave", MovementConstants.RING_OF_DUELING));
-                        }}));
+                teleports.add(new Teleport("RING_OF_DUELING: Emir's Arena", new WorldPoint(3315, 3235, 0), 5, jewelryTeleport("Rub", "Emir's Arena", MovementConstants.RING_OF_DUELING)));
+                teleports.add(new Teleport("RING_OF_DUELING: Castle Wars", new WorldPoint(2441, 3091, 0), 5, jewelryTeleport("Rub", "Castle Wars", MovementConstants.RING_OF_DUELING)));
+                teleports.add(new Teleport("RING_OF_DUELING: Ferox Enclave", new WorldPoint(3151, 3636, 0), 5, jewelryTeleport("Rub", "Ferox Enclave", MovementConstants.RING_OF_DUELING)));
                 if (VarAPI.getVarp(VarPlayerID.COLOSSEUM_GLORY) >= 12000) {
-                    teleports.add(new Teleport(new WorldPoint(1791, 3107, 0), 3,
-                            new ArrayList<>() {{
-                                addAll(jewelryTeleport("Rub", "Fortis Colosseum", MovementConstants.RING_OF_DUELING));
-                            }}));
+                    teleports.add(new Teleport("RING_OF_DUELING: Fortis Colosseum", new WorldPoint(1791, 3107, 0), 3, jewelryTeleport("Rub", "Fortis Colosseum", MovementConstants.RING_OF_DUELING)));
                 }
             }
             if (getTeleportItem(MovementConstants.COMBAT_BRACELET) != null && inMembers) {
-                teleports.add(new Teleport(new WorldPoint(2883, 3549, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Warriors' Guild", MovementConstants.COMBAT_BRACELET));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(3189, 3368, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Champions' Guild", MovementConstants.COMBAT_BRACELET));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(3053, 3487, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Monastery", MovementConstants.COMBAT_BRACELET));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(2654, 3441, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Ranging Guild", MovementConstants.COMBAT_BRACELET));
-                        }}));
+                teleports.add(new Teleport("COMBAT_BRACELET: Warriors' Guild", new WorldPoint(2883, 3549, 0), 5, jewelryTeleport("Rub", "Warriors' Guild", MovementConstants.COMBAT_BRACELET)));
+                teleports.add(new Teleport("COMBAT_BRACELET: Champions' Guild", new WorldPoint(3189, 3368, 0), 5, jewelryTeleport("Rub", "Champions' Guild", MovementConstants.COMBAT_BRACELET)));
+                teleports.add(new Teleport("COMBAT_BRACELET: Monastery", new WorldPoint(3053, 3487, 0), 5, jewelryTeleport("Rub", "Monastery", MovementConstants.COMBAT_BRACELET)));
+                teleports.add(new Teleport("COMBAT_BRACELET: Ranging Guild", new WorldPoint(2654, 3441, 0), 5, jewelryTeleport("Rub", "Ranging Guild", MovementConstants.COMBAT_BRACELET)));
             }
             if (getTeleportItem(MovementConstants.SKILLS_NECKLACE) != null && inMembers) {
-                teleports.add(new Teleport(new WorldPoint(2612, 3391, 0), 4,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Fishing Guild", MovementConstants.SKILLS_NECKLACE));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(3049, 9764, 0), 4,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Mining Guild", MovementConstants.SKILLS_NECKLACE));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(2933, 3297, 0), 4,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Crafting Guild", MovementConstants.SKILLS_NECKLACE));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(3145, 3439, 0), 2,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Cooking Guild", MovementConstants.SKILLS_NECKLACE));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(1662, 3505, 0), 3,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Woodcutting Guild", MovementConstants.SKILLS_NECKLACE));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(1249, 3718, 0), 3,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Farming Guild", MovementConstants.SKILLS_NECKLACE));
-                        }}));
+                teleports.add(new Teleport("SKILLS_NECKLACE: Fishing Guild", new WorldPoint(2612, 3391, 0), 4, jewelryTeleport("Rub", "Fishing Guild", MovementConstants.SKILLS_NECKLACE)));
+                teleports.add(new Teleport("SKILLS_NECKLACE: Mining Guild", new WorldPoint(3049, 9764, 0), 4, jewelryTeleport("Rub", "Mining Guild", MovementConstants.SKILLS_NECKLACE)));
+                teleports.add(new Teleport("SKILLS_NECKLACE: Crafting Guild", new WorldPoint(2933, 3297, 0), 4, jewelryTeleport("Rub", "Crafting Guild", MovementConstants.SKILLS_NECKLACE)));
+                teleports.add(new Teleport("SKILLS_NECKLACE: Cooking Guild", new WorldPoint(3145, 3439, 0), 2, jewelryTeleport("Rub", "Cooking Guild", MovementConstants.SKILLS_NECKLACE)));
+                teleports.add(new Teleport("SKILLS_NECKLACE: Woodcutting Guild", new WorldPoint(1662, 3505, 0), 3, jewelryTeleport("Rub", "Woodcutting Guild", MovementConstants.SKILLS_NECKLACE)));
+                teleports.add(new Teleport("SKILLS_NECKLACE: Farming Guild", new WorldPoint(1249, 3718, 0), 3, jewelryTeleport("Rub", "Farming Guild", MovementConstants.SKILLS_NECKLACE)));
             }
             if (InventoryAPI.getItem(i -> ArrayUtils.contains(MovementConstants.DIGSITE_PENDANT, i.getId())) != null && inMembers) {
-                teleports.add(new Teleport(new WorldPoint(3341, 3444, 0), 3,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Digsite", MovementConstants.DIGSITE_PENDANT));
-                        }}));
+                teleports.add(new Teleport("DIGSITE_PENDANT: Digsite", new WorldPoint(3341, 3444, 0), 3, jewelryTeleport("Rub", "Digsite", MovementConstants.DIGSITE_PENDANT)));
                 // TODO implement requirements for Fossil Island and Lithkren
                 // couldn't find the vars for it
                 /*
-                teleports.add(new Teleport(new WorldPoint(3762, 3869, 1), 3,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Fossil Island", MovementConstants.DIGSITE_PENDANT));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(1,2,3), 3,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Lithkren", MovementConstants.DIGSITE_PENDANT));
-                        }}));*/
+                teleports.add(new Teleport("DIGSITE_PENDANT: Fossil Island", new WorldPoint(3762, 3869, 1), 3, jewelryTeleport("Rub", "Fossil Island", MovementConstants.DIGSITE_PENDANT)));
+                teleports.add(new Teleport("DIGSITE_PENDANT: Lithkren", new WorldPoint(1,2,3), 3, jewelryTeleport("Rub", "Lithkren", MovementConstants.DIGSITE_PENDANT)));*/
             }
             if (getTeleportItem(MovementConstants.NECKLACE_OF_PASSAGE) != null && inMembers) {
-                teleports.add(new Teleport(new WorldPoint(3114, 3181, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Wizards' Tower", MovementConstants.NECKLACE_OF_PASSAGE));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(2431, 3348, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "The Outpost", MovementConstants.NECKLACE_OF_PASSAGE));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(3406, 3157, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Eagles' Eyrie", MovementConstants.NECKLACE_OF_PASSAGE));
-                        }}));
+                teleports.add(new Teleport("NECKLACE_OF_PASSAGE: Wizards' Tower", new WorldPoint(3114, 3181, 0), 5, jewelryTeleport("Rub", "Wizards' Tower", MovementConstants.NECKLACE_OF_PASSAGE)));
+                teleports.add(new Teleport("NECKLACE_OF_PASSAGE: The Outpost", new WorldPoint(2431, 3348, 0), 5, jewelryTeleport("Rub", "The Outpost", MovementConstants.NECKLACE_OF_PASSAGE)));
+                teleports.add(new Teleport("NECKLACE_OF_PASSAGE: Eagles' Eyrie", new WorldPoint(3406, 3157, 0), 5, jewelryTeleport("Rub", "Eagles' Eyrie", MovementConstants.NECKLACE_OF_PASSAGE)));
             }
             if (getTeleportItem(MovementConstants.XERICS_TALISMAN) != null && inMembers && VarAPI.getVar(VarbitID.CHARGES_XERICS_TALISMAN_QUANTITY) > 0) {
-                teleports.add(new Teleport(new WorldPoint(1579, 3530, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Xeric's Lookout", MovementConstants.XERICS_TALISMAN));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(1752, 3566, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Xeric's Glade", MovementConstants.XERICS_TALISMAN));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(1504, 3815, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Xeric's Inferno", MovementConstants.XERICS_TALISMAN));
-                        }}));
-                teleports.add(new Teleport(new WorldPoint(1644, 3673, 0), 5,
-                        new ArrayList<>() {{
-                            addAll(jewelryTeleport("Rub", "Xeric's Heart", MovementConstants.XERICS_TALISMAN));
-                        }}));
+                teleports.add(new Teleport("XERICS_TALISMAN: Xeric's Lookout", new WorldPoint(1579, 3530, 0), 5, jewelryTeleport("Rub", "Xeric's Lookout", MovementConstants.XERICS_TALISMAN)));
+                teleports.add(new Teleport("XERICS_TALISMAN: Xeric's Glade", new WorldPoint(1752, 3566, 0), 5, jewelryTeleport("Rub", "Xeric's Glade", MovementConstants.XERICS_TALISMAN)));
+                teleports.add(new Teleport("XERICS_TALISMAN: Xeric's Inferno", new WorldPoint(1504, 3815, 0), 5, jewelryTeleport("Rub", "Xeric's Inferno", MovementConstants.XERICS_TALISMAN)));
+                teleports.add(new Teleport("XERICS_TALISMAN: Xeric's Heart", new WorldPoint(1644, 3673, 0), 5, jewelryTeleport("Rub", "Xeric's Heart", MovementConstants.XERICS_TALISMAN)));
             }
             if (InventoryAPI.getItem(i -> ArrayUtils.contains(MovementConstants.BURNING_AMULET, i.getId())) != null) {
                 //TODO
@@ -298,7 +177,7 @@ public class TeleportLoader {
     }
 
     public static Teleport spellTeleport(TeleportSpell teleportSpell) {
-        return new Teleport(teleportSpell.getDestination(), 5, () -> {
+        return new Teleport(teleportSpell.name(), teleportSpell.getDestination(), 5, () -> {
             if (teleportSpell.canCast()) {
                 teleportSpell.getSpell().cast();
             }
@@ -306,7 +185,7 @@ public class TeleportLoader {
     }
 
     public static Teleport itemTeleport(TeleportItem teleportItem) {
-        return new Teleport(teleportItem.getDestination(), 5, new ArrayList<>() {{
+        return new Teleport(teleportItem.name(), teleportItem.getDestination(), 5, new ArrayList<>() {{
             add(() ->
             {
                 ItemEx item = InventoryAPI.getItem(i -> ArrayUtils.contains(teleportItem.getItemId(), i.getId()));

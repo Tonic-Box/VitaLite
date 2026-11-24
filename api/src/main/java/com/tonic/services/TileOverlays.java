@@ -6,7 +6,6 @@ import com.tonic.data.wrappers.TileObjectEx;
 import com.tonic.services.ground.GroundCanvas;
 import com.tonic.services.ground.GroundOverlay;
 import com.tonic.services.ground.TileSide;
-import com.tonic.util.WorldPointUtil;
 import lombok.Getter;
 import net.runelite.api.Client;
 import net.runelite.api.WorldView;
@@ -22,7 +21,6 @@ import java.util.List;
  */
 public class TileOverlays implements GroundOverlay
 {
-    private static final int MAX_DRAW_DISTANCE = 32;
     private static final int[][] SIDES = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
     private static final TileSide[] SIDE_NAMES = {TileSide.NORTH, TileSide.EAST, TileSide.SOUTH, TileSide.WEST};
     private int interactableTick = -1;
@@ -59,30 +57,38 @@ public class TileOverlays implements GroundOverlay
         }
     }
 
-    private void drawPath(GroundCanvas canvas, List<WorldPoint> points, Color color, boolean asLine)
+    /**
+     * Draws a route as a line: on a boat straight through every point, as sailing routes are sparse waypoints; on foot one line per run of adjacent tiles, so a transport or teleport that jumps across the map is not drawn as a line across it
+     * @param canvas the ground canvas
+     * @param points the route's tiles
+     * @param color the line's colour
+     * @param onBoat whether the route is sailed
+     */
+    private void drawPath(GroundCanvas canvas, List<WorldPoint> points, Color color, boolean onBoat)
     {
-        if(asLine)
+        if(onBoat)
         {
             canvas.path(points, color, GroundCanvas.THIN);
+            return;
         }
-        else
+
+        int start = 0;
+        for(int i = 1; i <= points.size(); i++)
         {
-            drawWorldTiles(canvas, points, color);
+            if(i == points.size() || !adjacent(points.get(i - 1), points.get(i)))
+            {
+                if(i - start > 1)
+                {
+                    canvas.path(points.subList(start, i), color, GroundCanvas.THIN);
+                }
+                start = i;
+            }
         }
     }
 
-    private void drawWorldTiles(GroundCanvas canvas, List<WorldPoint> points, Color color)
+    private static boolean adjacent(WorldPoint from, WorldPoint to)
     {
-        final WorldPoint playerLocation = WorldPointUtil.getTopWorldViewLocation();
-        Color fillColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 50);
-
-        for(WorldPoint point : points)
-        {
-            if(point.distanceTo(playerLocation) >= MAX_DRAW_DISTANCE)
-                continue;
-
-            canvas.markTile(point.getX(), point.getY(), point.getPlane(), color, fillColor, GroundCanvas.THIN);
-        }
+        return from.getPlane() == to.getPlane() && Math.abs(from.getX() - to.getX()) <= 1 && Math.abs(from.getY() - to.getY()) <= 1;
     }
 
     /**
